@@ -102,6 +102,36 @@ export type Database = {
         }
         Relationships: []
       }
+      exercises: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          muscle_group: string | null
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          muscle_group?: string | null
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          muscle_group?: string | null
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       goals: {
         Row: {
           category: string | null
@@ -264,6 +294,114 @@ export type Database = {
           mood?: number | null
           obsidian_path?: string | null
           title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mentor_messages: {
+        Row: {
+          content: string
+          context: string
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          context?: string
+          created_at?: string
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          context?: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      nutrition_logs: {
+        Row: {
+          calories: number
+          carbs_g: number
+          created_at: string
+          description: string
+          fat_g: number
+          id: string
+          logged_at: string
+          meal_type: string
+          protein_g: number
+          source: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          calories?: number
+          carbs_g?: number
+          created_at?: string
+          description: string
+          fat_g?: number
+          id?: string
+          logged_at?: string
+          meal_type: string
+          protein_g?: number
+          source?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          calories?: number
+          carbs_g?: number
+          created_at?: string
+          description?: string
+          fat_g?: number
+          id?: string
+          logged_at?: string
+          meal_type?: string
+          protein_g?: number
+          source?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      nutrition_targets: {
+        Row: {
+          created_at: string
+          id: string
+          target_calories: number
+          target_carbs_g: number
+          target_fat_g: number
+          target_protein_g: number
+          target_water_ml: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          target_calories?: number
+          target_carbs_g?: number
+          target_fat_g?: number
+          target_protein_g?: number
+          target_water_ml?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          target_calories?: number
+          target_carbs_g?: number
+          target_fat_g?: number
+          target_protein_g?: number
+          target_water_ml?: number
           updated_at?: string
           user_id?: string
         }
@@ -509,6 +647,114 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      water_logs: {
+        Row: {
+          amount_ml: number
+          created_at: string
+          id: string
+          log_date: string
+          user_id: string
+        }
+        Insert: {
+          amount_ml: number
+          created_at?: string
+          id?: string
+          log_date?: string
+          user_id: string
+        }
+        Update: {
+          amount_ml?: number
+          created_at?: string
+          id?: string
+          log_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      workout_sets: {
+        Row: {
+          created_at: string
+          exercise_id: string
+          id: string
+          reps: number | null
+          set_number: number
+          updated_at: string
+          user_id: string
+          weight_kg: number | null
+          workout_id: string
+        }
+        Insert: {
+          created_at?: string
+          exercise_id: string
+          id?: string
+          reps?: number | null
+          set_number?: number
+          updated_at?: string
+          user_id: string
+          weight_kg?: number | null
+          workout_id: string
+        }
+        Update: {
+          created_at?: string
+          exercise_id?: string
+          id?: string
+          reps?: number | null
+          set_number?: number
+          updated_at?: string
+          user_id?: string
+          weight_kg?: number | null
+          workout_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workout_sets_exercise_id_fkey"
+            columns: ["exercise_id"]
+            isOneToOne: false
+            referencedRelation: "exercises"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workout_sets_workout_id_fkey"
+            columns: ["workout_id"]
+            isOneToOne: false
+            referencedRelation: "workouts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workouts: {
+        Row: {
+          completed: boolean
+          created_at: string
+          id: string
+          notes: string | null
+          session_label: string
+          started_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          id?: string
+          notes?: string | null
+          session_label?: string
+          started_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          id?: string
+          notes?: string | null
+          session_label?: string
+          started_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {
