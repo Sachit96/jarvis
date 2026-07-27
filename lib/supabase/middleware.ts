@@ -1,7 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/login", "/signup"];
+// /api/webhooks/* is called by external services (e.g. GoHighLevel) with no
+// Supabase session — those routes authenticate themselves via a shared
+// secret instead and must stay reachable without a redirect to /login.
+const PUBLIC_PATHS = ["/login", "/signup", "/api/webhooks"];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });

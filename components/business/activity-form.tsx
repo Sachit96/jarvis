@@ -1,0 +1,51 @@
+"use client";
+
+import { useActionState, useRef, useEffect } from "react";
+import { createActivityAction, type ActionState } from "@/actions/business-actions";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const initialState: ActionState = {};
+
+export function ActivityForm({ contactId }: { contactId: string }) {
+  const [state, formAction, isPending] = useActionState(createActivityAction, initialState);
+  const formRef = useRef<HTMLFormElement>(null);
+  const wasPending = useRef(false);
+
+  useEffect(() => {
+    if (wasPending.current && !isPending && !state.error) {
+      formRef.current?.reset();
+    }
+    wasPending.current = isPending;
+  }, [isPending, state.error]);
+
+  return (
+    <form ref={formRef} action={formAction} className="flex items-center gap-1.5">
+      <input type="hidden" name="contact_id" value={contactId} />
+      <Select name="type" defaultValue="note">
+        <SelectTrigger className="h-7 w-28 text-xs">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="note">Note</SelectItem>
+          <SelectItem value="call">Call</SelectItem>
+          <SelectItem value="email">Email</SelectItem>
+          <SelectItem value="meeting">Meeting</SelectItem>
+          <SelectItem value="other">Other</SelectItem>
+        </SelectContent>
+      </Select>
+      <Input name="notes" placeholder="Log an interaction…" className="h-7 flex-1 text-xs" required />
+      <Button type="submit" size="sm" variant="secondary" className="h-7 px-2 text-xs" disabled={isPending}>
+        Log
+      </Button>
+      {state.error ? <p className="text-xs text-danger">{state.error}</p> : null}
+    </form>
+  );
+}

@@ -57,3 +57,10 @@ export const HEALTH_TABS: ModuleTab[] = [
   { href: "/health/workouts", label: "Workouts" },
   { href: "/health/nutrition", label: "Nutrition" },
 ];
+
+export const BUSINESS_TABS: ModuleTab[] = [
+  { href: "/business/dashboard", label: "Dashboard" },
+  { href: "/business/pipeline", label: "Pipeline" },
+  { href: "/business/clients", label: "Clients" },
+  { href: "/business/revenue", label: "Revenue" },
+];

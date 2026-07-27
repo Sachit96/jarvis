@@ -75,6 +75,54 @@ export type Database = {
         }
         Relationships: []
       }
+      activities: {
+        Row: {
+          contact_id: string
+          created_at: string
+          deal_id: string | null
+          id: string
+          notes: string
+          occurred_at: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          contact_id: string
+          created_at?: string
+          deal_id?: string | null
+          id?: string
+          notes: string
+          occurred_at?: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          contact_id?: string
+          created_at?: string
+          deal_id?: string | null
+          id?: string
+          notes?: string
+          occurred_at?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       budgets: {
         Row: {
           category: string
@@ -102,6 +150,243 @@ export type Database = {
         }
         Relationships: []
       }
+      client_onboarding_tasks: {
+        Row: {
+          completed: boolean
+          contact_id: string
+          created_at: string
+          id: string
+          label: string
+          sort_order: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          contact_id: string
+          created_at?: string
+          id?: string
+          label: string
+          sort_order?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          contact_id?: string
+          created_at?: string
+          id?: string
+          label?: string
+          sort_order?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_onboarding_tasks_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contacts: {
+        Row: {
+          company_name: string | null
+          contact_person: string
+          created_at: string
+          email: string | null
+          external_id: string | null
+          id: string
+          notes: string | null
+          phone: string | null
+          source: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name?: string | null
+          contact_person: string
+          created_at?: string
+          email?: string | null
+          external_id?: string | null
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          source?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string | null
+          contact_person?: string
+          created_at?: string
+          email?: string | null
+          external_id?: string | null
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          source?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      contracts: {
+        Row: {
+          contact_id: string
+          created_at: string
+          end_date: string | null
+          id: string
+          monthly_value: number
+          notes: string | null
+          start_date: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contact_id: string
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          monthly_value?: number
+          notes?: string | null
+          start_date?: string
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contact_id?: string
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          monthly_value?: number
+          notes?: string | null
+          start_date?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contracts_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deal_tasks: {
+        Row: {
+          completed: boolean
+          created_at: string
+          deal_id: string
+          due_date: string | null
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          deal_id: string
+          due_date?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          deal_id?: string
+          due_date?: string | null
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_tasks_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deals: {
+        Row: {
+          closed_at: string | null
+          contact_id: string
+          created_at: string
+          expected_close_date: string | null
+          external_id: string | null
+          id: string
+          notes: string | null
+          source: string
+          stage_id: string
+          title: string | null
+          updated_at: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          closed_at?: string | null
+          contact_id: string
+          created_at?: string
+          expected_close_date?: string | null
+          external_id?: string | null
+          id?: string
+          notes?: string | null
+          source?: string
+          stage_id: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+          value?: number
+        }
+        Update: {
+          closed_at?: string | null
+          contact_id?: string
+          created_at?: string
+          expected_close_date?: string | null
+          external_id?: string | null
+          id?: string
+          notes?: string | null
+          source?: string
+          stage_id?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deals_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deals_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "pipeline_stages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       exercises: {
         Row: {
           created_at: string
@@ -128,6 +413,72 @@ export type Database = {
           muscle_group?: string | null
           name?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ghl_connections: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          last_synced_at: string | null
+          location_id: string
+          private_token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_synced_at?: string | null
+          location_id: string
+          private_token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_synced_at?: string | null
+          location_id?: string
+          private_token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ghl_sync_logs: {
+        Row: {
+          created_at: string
+          direction: string
+          event_type: string
+          id: string
+          message: string | null
+          payload: Json | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          direction: string
+          event_type: string
+          id?: string
+          message?: string | null
+          payload?: Json | null
+          status: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          event_type?: string
+          id?: string
+          message?: string | null
+          payload?: Json | null
+          status?: string
           user_id?: string
         }
         Relationships: []
@@ -447,6 +798,39 @@ export type Database = {
           target_fat_g?: number
           target_protein_g?: number
           target_water_ml?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pipeline_stages: {
+        Row: {
+          created_at: string
+          id: string
+          is_lost: boolean
+          is_won: boolean
+          name: string
+          sort_order: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_lost?: boolean
+          is_won?: boolean
+          name: string
+          sort_order?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_lost?: boolean
+          is_won?: boolean
+          name?: string
+          sort_order?: number
           updated_at?: string
           user_id?: string
         }

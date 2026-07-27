@@ -22,6 +22,16 @@ const EXPORT_TABLES = [
   "mentor_messages",
   "market_analyses",
   "trade_checklist_items",
+  "pipeline_stages",
+  "contacts",
+  "deals",
+  "activities",
+  "deal_tasks",
+  "contracts",
+  "client_onboarding_tasks",
+  "ghl_sync_logs",
+  // ghl_connections is intentionally excluded — it holds the raw GHL private
+  // integration token, which shouldn't be included in a downloadable backup.
 ] as const;
 
 export async function GET() {
