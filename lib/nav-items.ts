@@ -50,6 +50,7 @@ export const FINANCE_TABS: ModuleTab[] = [
   { href: "/finance/accounts", label: "Accounts" },
   { href: "/finance/budgets", label: "Budgets" },
   { href: "/finance/trades", label: "Trades" },
+  { href: "/finance/analysis", label: "Analysis" },
 ];
 
 export const HEALTH_TABS: ModuleTab[] = [

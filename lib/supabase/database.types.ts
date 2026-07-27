@@ -299,6 +299,51 @@ export type Database = {
         }
         Relationships: []
       }
+      market_analyses: {
+        Row: {
+          analysis_date: string
+          created_at: string
+          daily_notes: string | null
+          daily_sentiment: string | null
+          h4_notes: string | null
+          h4_sentiment: string | null
+          id: string
+          pair: string
+          updated_at: string
+          user_id: string
+          weekly_notes: string | null
+          weekly_sentiment: string | null
+        }
+        Insert: {
+          analysis_date?: string
+          created_at?: string
+          daily_notes?: string | null
+          daily_sentiment?: string | null
+          h4_notes?: string | null
+          h4_sentiment?: string | null
+          id?: string
+          pair: string
+          updated_at?: string
+          user_id: string
+          weekly_notes?: string | null
+          weekly_sentiment?: string | null
+        }
+        Update: {
+          analysis_date?: string
+          created_at?: string
+          daily_notes?: string | null
+          daily_sentiment?: string | null
+          h4_notes?: string | null
+          h4_sentiment?: string | null
+          id?: string
+          pair?: string
+          updated_at?: string
+          user_id?: string
+          weekly_notes?: string | null
+          weekly_sentiment?: string | null
+        }
+        Relationships: []
+      }
       mentor_messages: {
         Row: {
           content: string
@@ -544,10 +589,41 @@ export type Database = {
         }
         Relationships: []
       }
+      trade_checklist_items: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          label: string
+          sort_order: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label: string
+          sort_order?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          sort_order?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trades: {
         Row: {
           asset_pair: string
           closed_at: string | null
+          confluence_checked: boolean
           created_at: string
           direction: string
           entry_price: number
@@ -566,6 +642,7 @@ export type Database = {
         Insert: {
           asset_pair: string
           closed_at?: string | null
+          confluence_checked?: boolean
           created_at?: string
           direction: string
           entry_price: number
@@ -584,6 +661,7 @@ export type Database = {
         Update: {
           asset_pair?: string
           closed_at?: string | null
+          confluence_checked?: boolean
           created_at?: string
           direction?: string
           entry_price?: number

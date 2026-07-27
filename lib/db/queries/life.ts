@@ -14,6 +14,20 @@ export async function getTasks(supabase: Client) {
   return data;
 }
 
+const PRIORITY_RANK: Record<string, number> = { high: 0, medium: 1, low: 2 };
+
+/** Top incomplete tasks for the Command Center HUD — high priority first, then soonest due. */
+export async function getPriorityTasks(supabase: Client, limit = 5) {
+  const { data, error } = await supabase
+    .from("tasks")
+    .select("*")
+    .neq("status", "done")
+    .order("due_date", { ascending: true, nullsFirst: false });
+  if (error) throw error;
+  // Sorted client-side since "high"/"medium"/"low" doesn't order alphabetically the way we need.
+  return [...data].sort((a, b) => PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority]).slice(0, limit);
+}
+
 export async function getGoals(supabase: Client) {
   const { data, error } = await supabase
     .from("goals")
@@ -51,6 +65,26 @@ export async function getHabitLogsForHeatmap(supabase: Client, habitIds: string[
     .order("log_date", { ascending: true });
   if (error) throw error;
   return data;
+}
+
+/** Habits paired with their current/best streak, for the Command Center HUD. */
+export async function getHabitsWithStreaks(supabase: Client) {
+  const habits = await getHabits(supabase);
+  const logs = await getHabitLogsForHeatmap(
+    supabase,
+    habits.map((h) => h.id),
+  );
+  const datesByHabit = new Map<string, Set<string>>();
+  for (const log of logs) {
+    if (!log.completed) continue;
+    const set = datesByHabit.get(log.habit_id) ?? new Set<string>();
+    set.add(log.log_date);
+    datesByHabit.set(log.habit_id, set);
+  }
+  return habits.map((habit) => ({
+    habit,
+    streak: computeStreak(datesByHabit.get(habit.id) ?? new Set()),
+  }));
 }
 
 /** Consecutive-day streak ending today or yesterday (a day not yet logged doesn't break it until it's actually missed). */

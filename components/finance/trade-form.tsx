@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -21,6 +22,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import type { Database } from "@/lib/supabase/database.types";
+
+type ChecklistItem = Database["public"]["Tables"]["trade_checklist_items"]["Row"];
 
 const initialState: ActionState = {};
 
@@ -30,15 +34,28 @@ function nowLocalDatetime() {
   return d.toISOString().slice(0, 16);
 }
 
-export function TradeForm() {
+export function TradeForm({ checklistItems }: { checklistItems: ChecklistItem[] }) {
   const [open, setOpen] = useState(false);
+  const [checked, setChecked] = useState<Set<string>>(new Set());
   const [state, formAction, isPending] = useActionState(createTradeAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   const wasPending = useRef(false);
 
+  const allChecked = checklistItems.length === 0 || checklistItems.every((c) => checked.has(c.id));
+
+  function toggleChecked(id: string, value: boolean) {
+    setChecked((prev) => {
+      const next = new Set(prev);
+      if (value) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  }
+
   useEffect(() => {
     if (wasPending.current && !isPending && !state.error) {
       formRef.current?.reset();
+      setChecked(new Set());
       setOpen(false);
     }
     wasPending.current = isPending;
@@ -114,9 +131,32 @@ export function TradeForm() {
             <Textarea id="notes" name="notes" rows={2} />
           </div>
 
+          {checklistItems.length > 0 ? (
+            <div className="space-y-2 rounded-md border border-border bg-muted/30 p-3">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                Pre-trade confluence checklist
+              </p>
+              {checklistItems.map((item) => (
+                <label key={item.id} className="flex items-start gap-2 text-sm">
+                  <Checkbox
+                    checked={checked.has(item.id)}
+                    onCheckedChange={(c) => toggleChecked(item.id, c === true)}
+                    className="mt-0.5"
+                  />
+                  {item.label}
+                </label>
+              ))}
+            </div>
+          ) : null}
+          <input type="hidden" name="confluence_checked" value={String(allChecked)} />
+
           {state.error ? <p className="text-sm text-danger">{state.error}</p> : null}
-          <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Adding…" : "Add trade"}
+          <Button type="submit" className="w-full" disabled={isPending || !allChecked}>
+            {isPending
+              ? "Adding…"
+              : !allChecked
+                ? "Check all confluence items first"
+                : "Add trade"}
           </Button>
         </form>
       </DialogContent>

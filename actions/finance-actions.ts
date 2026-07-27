@@ -205,6 +205,7 @@ export async function createTradeAction(
     setup_category: formData.get("setup_category"),
     notes: formData.get("notes"),
     opened_at: formData.get("opened_at") || new Date().toISOString(),
+    confluence_checked: formData.get("confluence_checked") === "true",
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
@@ -240,6 +241,7 @@ export async function createTradeAction(
     opened_at: parsed.data.opened_at,
     closed_at: isClosed ? new Date().toISOString() : null,
     status: isClosed ? "closed" : "open",
+    confluence_checked: parsed.data.confluence_checked ?? false,
   });
   if (error) return { error: error.message };
   revalidatePath("/finance/trades");

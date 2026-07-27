@@ -35,6 +35,7 @@ export const tradeSchema = z.object({
   setup_category: z.string().trim().max(60).optional().or(z.literal("")),
   notes: z.string().trim().max(2000).optional().or(z.literal("")),
   opened_at: z.string().min(1),
+  confluence_checked: z.coerce.boolean().optional(),
 });
 export type TradeInput = z.infer<typeof tradeSchema>;
 
