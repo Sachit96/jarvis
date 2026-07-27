@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getGoals } from "@/lib/db/queries/life";
 import { GoalForm } from "@/components/life/goal-form";
 import { GoalCard } from "@/components/life/goal-card";
+import { ModuleTabs } from "@/components/shared/module-tabs";
+import { LIFE_TABS } from "@/lib/nav-items";
 
 const SECTIONS = [
   { key: "daily", label: "Daily" },
@@ -19,6 +21,8 @@ export default async function GoalsPage() {
         <p className="text-xs uppercase tracking-wider text-muted-foreground">Life</p>
         <h1 className="text-xl font-semibold">Goals</h1>
       </div>
+
+      <ModuleTabs tabs={LIFE_TABS} />
 
       {SECTIONS.map((section) => {
         const sectionGoals = goals.filter((g) => g.timeframe === section.key);

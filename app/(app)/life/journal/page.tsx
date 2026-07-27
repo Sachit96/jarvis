@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getJournalEntries } from "@/lib/db/queries/life";
 import { JournalForm } from "@/components/life/journal-form";
 import { JournalEntryCard } from "@/components/life/journal-entry-card";
+import { ModuleTabs } from "@/components/shared/module-tabs";
+import { LIFE_TABS } from "@/lib/nav-items";
 
 export default async function JournalPage() {
   const supabase = await createClient();
@@ -13,6 +15,8 @@ export default async function JournalPage() {
         <p className="text-xs uppercase tracking-wider text-muted-foreground">Life</p>
         <h1 className="text-xl font-semibold">Journal</h1>
       </div>
+
+      <ModuleTabs tabs={LIFE_TABS} />
 
       <JournalForm />
 

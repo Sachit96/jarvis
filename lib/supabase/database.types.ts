@@ -39,6 +39,69 @@ export type Database = {
   }
   public: {
     Tables: {
+      accounts: {
+        Row: {
+          account_type: string
+          created_at: string
+          current_balance: number
+          id: string
+          is_active: boolean
+          is_liability: boolean | null
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_type: string
+          created_at?: string
+          current_balance?: number
+          id?: string
+          is_active?: boolean
+          is_liability?: boolean | null
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_type?: string
+          created_at?: string
+          current_balance?: number
+          id?: string
+          is_active?: boolean
+          is_liability?: boolean | null
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      budgets: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          monthly_limit: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          monthly_limit: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          monthly_limit?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       goals: {
         Row: {
           category: string | null
@@ -342,6 +405,110 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      trades: {
+        Row: {
+          asset_pair: string
+          closed_at: string | null
+          created_at: string
+          direction: string
+          entry_price: number
+          exit_price: number | null
+          fees: number
+          id: string
+          notes: string | null
+          opened_at: string
+          pnl: number | null
+          quantity: number | null
+          setup_category: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          asset_pair: string
+          closed_at?: string | null
+          created_at?: string
+          direction: string
+          entry_price: number
+          exit_price?: number | null
+          fees?: number
+          id?: string
+          notes?: string | null
+          opened_at?: string
+          pnl?: number | null
+          quantity?: number | null
+          setup_category?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          asset_pair?: string
+          closed_at?: string | null
+          created_at?: string
+          direction?: string
+          entry_price?: number
+          exit_price?: number | null
+          fees?: number
+          id?: string
+          notes?: string | null
+          opened_at?: string
+          pnl?: number | null
+          quantity?: number | null
+          setup_category?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          account_id: string
+          amount: number
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          occurred_at: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          amount: number
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          occurred_at?: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          amount?: number
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          occurred_at?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

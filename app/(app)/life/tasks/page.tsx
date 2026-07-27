@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getTasks } from "@/lib/db/queries/life";
 import { TaskForm } from "@/components/life/task-form";
 import { TaskItem } from "@/components/life/task-item";
+import { ModuleTabs } from "@/components/shared/module-tabs";
+import { LIFE_TABS } from "@/lib/nav-items";
 
 export default async function TasksPage() {
   const supabase = await createClient();
@@ -19,6 +21,8 @@ export default async function TasksPage() {
         </div>
         <TaskForm />
       </div>
+
+      <ModuleTabs tabs={LIFE_TABS} />
 
       {tasks.length === 0 ? (
         <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">

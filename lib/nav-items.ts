@@ -29,3 +29,25 @@ export const MENTOR_NAV_ITEM: NavItem = {
   label: "Mentor",
   icon: Sparkles,
 };
+
+export interface ModuleTab {
+  href: string;
+  label: string;
+}
+
+/** In-module sub-navigation, rendered below the module header on each page. */
+export const LIFE_TABS: ModuleTab[] = [
+  { href: "/life/tasks", label: "Tasks" },
+  { href: "/life/goals", label: "Goals" },
+  { href: "/life/habits", label: "Habits" },
+  { href: "/life/journal", label: "Journal" },
+  { href: "/life/prayer", label: "Prayer" },
+];
+
+export const FINANCE_TABS: ModuleTab[] = [
+  { href: "/finance/overview", label: "Overview" },
+  { href: "/finance/transactions", label: "Transactions" },
+  { href: "/finance/accounts", label: "Accounts" },
+  { href: "/finance/budgets", label: "Budgets" },
+  { href: "/finance/trades", label: "Trades" },
+];

@@ -3,6 +3,8 @@ import { getPrayers, getPrayerLogsForDate } from "@/lib/db/queries/life";
 import { ensureDefaultPrayersAction } from "@/actions/life-actions";
 import { PrayerChecklist } from "@/components/life/prayer-checklist";
 import { PrayerForm } from "@/components/life/prayer-form";
+import { ModuleTabs } from "@/components/shared/module-tabs";
+import { LIFE_TABS } from "@/lib/nav-items";
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
@@ -22,6 +24,8 @@ export default async function PrayerPage() {
         <p className="text-xs uppercase tracking-wider text-muted-foreground">Life</p>
         <h1 className="text-xl font-semibold">Prayer</h1>
       </div>
+
+      <ModuleTabs tabs={LIFE_TABS} />
 
       <PrayerChecklist prayers={prayers} completedIds={completedIds} />
       <PrayerForm />

@@ -1,6 +1,17 @@
 import { StatTile } from "@/components/shared/stat-tile";
+import { createClient } from "@/lib/supabase/server";
+import { getAccounts, computeAssetLiabilityTotals } from "@/lib/db/queries/finance";
 
-export default function DashboardPage() {
+function money(n: number) {
+  const sign = n < 0 ? "-" : "";
+  return `${sign}$${Math.abs(n).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+}
+
+export default async function DashboardPage() {
+  const supabase = await createClient();
+  const accounts = await getAccounts(supabase);
+  const { netWorth } = computeAssetLiabilityTotals(accounts);
+
   return (
     <div className="space-y-6">
       <div>
@@ -22,7 +33,12 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <StatTile label="Life" value="—" delta="Phase 1" />
-        <StatTile label="Finance" value="—" delta="Phase 2" />
+        <StatTile
+          label="Finance"
+          value={accounts.length > 0 ? money(netWorth) : "—"}
+          delta={accounts.length > 0 ? "Net worth" : "Phase 2"}
+          tone={netWorth >= 0 ? "success" : "danger"}
+        />
         <StatTile label="Health" value="—" delta="Phase 3" />
         <StatTile label="Business" value="—" delta="Phase 4" />
       </div>
