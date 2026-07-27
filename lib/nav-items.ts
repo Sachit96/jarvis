@@ -64,3 +64,8 @@ export const BUSINESS_TABS: ModuleTab[] = [
   { href: "/business/clients", label: "Clients" },
   { href: "/business/revenue", label: "Revenue" },
 ];
+
+export const MENTOR_TABS: ModuleTab[] = [
+  { href: "/mentor", label: "Today" },
+  { href: "/mentor/weekly-review", label: "Weekly Review" },
+];

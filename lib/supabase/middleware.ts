@@ -1,10 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// /api/webhooks/* is called by external services (e.g. GoHighLevel) with no
-// Supabase session — those routes authenticate themselves via a shared
-// secret instead and must stay reachable without a redirect to /login.
-const PUBLIC_PATHS = ["/login", "/signup", "/api/webhooks"];
+// /api/webhooks/* and /api/mentor/run are called by external services
+// (GoHighLevel, a scheduled cron trigger) with no Supabase session — those
+// routes authenticate themselves via a shared secret instead and must stay
+// reachable without a redirect to /login.
+const PUBLIC_PATHS = ["/login", "/signup", "/api/webhooks", "/api/mentor/run"];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });

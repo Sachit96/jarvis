@@ -283,6 +283,45 @@ export type Database = {
           },
         ]
       }
+      daily_recommendations: {
+        Row: {
+          created_at: string
+          focus_areas: string[]
+          id: string
+          markdown_body: string
+          model_used: string | null
+          rec_date: string
+          strengths: string[]
+          updated_at: string
+          user_id: string
+          weaknesses: string[]
+        }
+        Insert: {
+          created_at?: string
+          focus_areas?: string[]
+          id?: string
+          markdown_body: string
+          model_used?: string | null
+          rec_date?: string
+          strengths?: string[]
+          updated_at?: string
+          user_id: string
+          weaknesses?: string[]
+        }
+        Update: {
+          created_at?: string
+          focus_areas?: string[]
+          id?: string
+          markdown_body?: string
+          model_used?: string | null
+          rec_date?: string
+          strengths?: string[]
+          updated_at?: string
+          user_id?: string
+          weaknesses?: string[]
+        }
+        Relationships: []
+      }
       deal_tasks: {
         Row: {
           completed: boolean
@@ -1131,6 +1170,48 @@ export type Database = {
           id?: string
           log_date?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      weekly_reviews: {
+        Row: {
+          created_at: string
+          focus_areas: string[]
+          id: string
+          markdown_body: string
+          model_used: string | null
+          strengths: string[]
+          updated_at: string
+          user_id: string
+          weaknesses: string[]
+          week_end_date: string
+          week_start_date: string
+        }
+        Insert: {
+          created_at?: string
+          focus_areas?: string[]
+          id?: string
+          markdown_body: string
+          model_used?: string | null
+          strengths?: string[]
+          updated_at?: string
+          user_id: string
+          weaknesses?: string[]
+          week_end_date: string
+          week_start_date: string
+        }
+        Update: {
+          created_at?: string
+          focus_areas?: string[]
+          id?: string
+          markdown_body?: string
+          model_used?: string | null
+          strengths?: string[]
+          updated_at?: string
+          user_id?: string
+          weaknesses?: string[]
+          week_end_date?: string
+          week_start_date?: string
         }
         Relationships: []
       }

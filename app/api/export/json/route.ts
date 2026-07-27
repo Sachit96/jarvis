@@ -32,6 +32,8 @@ const EXPORT_TABLES = [
   "ghl_sync_logs",
   // ghl_connections is intentionally excluded — it holds the raw GHL private
   // integration token, which shouldn't be included in a downloadable backup.
+  "daily_recommendations",
+  "weekly_reviews",
 ] as const;
 
 export async function GET() {
