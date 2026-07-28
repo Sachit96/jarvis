@@ -18,7 +18,7 @@ export async function AppShell({
 
   return (
     <div className="flex min-h-full">
-      <Sidebar />
+      <Sidebar userEmail={userEmail} />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar email={userEmail} accounts={accounts} />
         <main className="flex-1 overflow-y-auto pb-20 md:pb-6">

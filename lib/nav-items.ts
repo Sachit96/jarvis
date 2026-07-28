@@ -1,11 +1,14 @@
 import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
+  Target,
   ListChecks,
   Wallet,
   HeartPulse,
   Briefcase,
   Sparkles,
+  BrainCircuit,
+  Settings as SettingsIcon,
 } from "lucide-react";
 
 export interface NavItem {
@@ -14,21 +17,33 @@ export interface NavItem {
   icon: LucideIcon;
 }
 
-/** Bottom tab bar (mobile) / primary sidebar items (desktop). */
+/**
+ * Full nav — desktop sidebar, in the app's priority order.
+ * "Faith" was removed as its own item — prayer is folding into a Daily
+ * Routine checklist (still being scoped) rather than staying a standalone
+ * section. "Memory" has no feature behind it yet (see /memory) — it's here
+ * as a placeholder link, same pattern as the Coming Soon pages elsewhere.
+ */
+export const SIDEBAR_ITEMS: NavItem[] = [
+  { href: "/dashboard", label: "Home", icon: LayoutDashboard },
+  { href: "/business/dashboard", label: "Business", icon: Briefcase },
+  { href: "/health/workouts", label: "Health", icon: HeartPulse },
+  { href: "/finance/overview", label: "Finance", icon: Wallet },
+  { href: "/life/goals", label: "Goals", icon: Target },
+  { href: "/life/tasks", label: "Tasks & Routine", icon: ListChecks },
+  { href: "/mentor", label: "AI Mentor", icon: Sparkles },
+  { href: "/memory", label: "Memory", icon: BrainCircuit },
+  { href: "/settings", label: "Settings", icon: SettingsIcon },
+];
+
+/** Curated subset for the mobile bottom bar — five is the most a thumb can reach comfortably. */
 export const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
-  { href: "/life/tasks", label: "Life", icon: ListChecks },
+  { href: "/life/tasks", label: "Tasks", icon: ListChecks },
   { href: "/finance/overview", label: "Finance", icon: Wallet },
   { href: "/health/workouts", label: "Health", icon: HeartPulse },
   { href: "/business/dashboard", label: "Business", icon: Briefcase },
 ];
-
-/** Cross-cutting — reachable via a floating button on mobile, folds into the sidebar on desktop. */
-export const MENTOR_NAV_ITEM: NavItem = {
-  href: "/mentor",
-  label: "Mentor",
-  icon: Sparkles,
-};
 
 export interface ModuleTab {
   href: string;
@@ -36,12 +51,14 @@ export interface ModuleTab {
 }
 
 /** In-module sub-navigation, rendered below the module header on each page. */
-export const LIFE_TABS: ModuleTab[] = [
-  { href: "/life/tasks", label: "Tasks" },
+export const GOALS_TABS: ModuleTab[] = [
   { href: "/life/goals", label: "Goals" },
   { href: "/life/habits", label: "Habits" },
-  { href: "/life/journal", label: "Journal" },
+];
+
+export const FAITH_TABS: ModuleTab[] = [
   { href: "/life/prayer", label: "Prayer" },
+  { href: "/life/journal", label: "Journal" },
 ];
 
 export const FINANCE_TABS: ModuleTab[] = [

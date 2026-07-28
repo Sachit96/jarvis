@@ -3,7 +3,7 @@ import { getGoals } from "@/lib/db/queries/life";
 import { GoalForm } from "@/components/life/goal-form";
 import { GoalCard } from "@/components/life/goal-card";
 import { ModuleTabs } from "@/components/shared/module-tabs";
-import { LIFE_TABS } from "@/lib/nav-items";
+import { GOALS_TABS } from "@/lib/nav-items";
 
 const SECTIONS = [
   { key: "daily", label: "Daily" },
@@ -22,7 +22,7 @@ export default async function GoalsPage() {
         <h1 className="text-xl font-semibold">Goals</h1>
       </div>
 
-      <ModuleTabs tabs={LIFE_TABS} />
+      <ModuleTabs tabs={GOALS_TABS} />
 
       {SECTIONS.map((section) => {
         const sectionGoals = goals.filter((g) => g.timeframe === section.key);

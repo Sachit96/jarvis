@@ -4,7 +4,7 @@ import { ensureDefaultHabitsAction } from "@/actions/life-actions";
 import { HabitForm } from "@/components/life/habit-form";
 import { HabitCard } from "@/components/life/habit-card";
 import { ModuleTabs } from "@/components/shared/module-tabs";
-import { LIFE_TABS } from "@/lib/nav-items";
+import { GOALS_TABS } from "@/lib/nav-items";
 
 export default async function HabitsPage() {
   await ensureDefaultHabitsAction();
@@ -37,7 +37,7 @@ export default async function HabitsPage() {
         <HabitForm />
       </div>
 
-      <ModuleTabs tabs={LIFE_TABS} />
+      <ModuleTabs tabs={GOALS_TABS} />
 
       {noG.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-2">

@@ -9,7 +9,7 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 flex h-16 border-t border-border bg-card/95 backdrop-blur md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 flex h-16 border-t border-white/[0.06] bg-background/90 backdrop-blur-sm md:hidden">
       {NAV_ITEMS.map((item) => {
         const moduleSegment = `/${item.href.split("/")[1]}`;
         const isActive = pathname.startsWith(moduleSegment);
@@ -19,10 +19,8 @@ export function BottomNav() {
             key={item.href}
             href={item.href}
             className={cn(
-              "flex flex-1 flex-col items-center justify-center gap-1 text-xs transition-colors",
-              isActive
-                ? "text-brand"
-                : "text-muted-foreground hover:text-foreground",
+              "flex flex-1 flex-col items-center justify-center gap-1 text-caption transition-colors",
+              isActive ? "text-brand" : "text-muted-foreground hover:text-foreground",
             )}
           >
             <Icon
