@@ -3,8 +3,10 @@
 import { useState, useTransition } from "react";
 import { Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { deleteWorkoutAction, toggleWorkoutCompletedAction } from "@/actions/health-actions";
+import { computeWorkoutVolume } from "@/lib/db/queries/health";
 import { AddSetForm } from "@/components/health/add-set-form";
 import { WorkoutSetItem } from "@/components/health/workout-set-item";
 import type { Database } from "@/lib/supabase/database.types";
@@ -54,11 +56,19 @@ export function WorkoutSessionCard({
             aria-label="Mark session completed"
           />
           <div>
-            <p className={cn("text-sm font-medium", completed && "text-muted-foreground line-through")}>
-              {workout.session_label}
-            </p>
+            <div className="flex items-center gap-1.5">
+              <p className={cn("text-sm font-medium", completed && "text-muted-foreground line-through")}>
+                {workout.session_label}
+              </p>
+              {workout.source === "hevy" ? (
+                <Badge variant="outline" className="text-[10px] uppercase">
+                  Hevy
+                </Badge>
+              ) : null}
+            </div>
             <p className="font-mono text-xs text-muted-foreground">
               {date.toLocaleDateString()} {date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              {sets.length > 0 ? ` · ${computeWorkoutVolume(sets).toLocaleString()} kg volume` : ""}
             </p>
           </div>
         </div>

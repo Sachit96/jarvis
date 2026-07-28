@@ -429,28 +429,34 @@ export type Database = {
       exercises: {
         Row: {
           created_at: string
+          external_id: string | null
           id: string
           is_active: boolean
           muscle_group: string | null
           name: string
+          source: string
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          external_id?: string | null
           id?: string
           is_active?: boolean
           muscle_group?: string | null
           name: string
+          source?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
+          external_id?: string | null
           id?: string
           is_active?: boolean
           muscle_group?: string | null
           name?: string
+          source?: string
           updated_at?: string
           user_id?: string
         }
@@ -1270,9 +1276,11 @@ export type Database = {
         Row: {
           completed: boolean
           created_at: string
+          external_id: string | null
           id: string
           notes: string | null
           session_label: string
+          source: string
           started_at: string
           updated_at: string
           user_id: string
@@ -1280,9 +1288,11 @@ export type Database = {
         Insert: {
           completed?: boolean
           created_at?: string
+          external_id?: string | null
           id?: string
           notes?: string | null
           session_label?: string
+          source?: string
           started_at?: string
           updated_at?: string
           user_id: string
@@ -1290,9 +1300,11 @@ export type Database = {
         Update: {
           completed?: boolean
           created_at?: string
+          external_id?: string | null
           id?: string
           notes?: string | null
           session_label?: string
+          source?: string
           started_at?: string
           updated_at?: string
           user_id?: string

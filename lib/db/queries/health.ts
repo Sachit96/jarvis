@@ -3,6 +3,7 @@ import type { Database } from "@/lib/supabase/database.types";
 
 type Client = SupabaseClient<Database>;
 type NutritionLogRow = Database["public"]["Tables"]["nutrition_logs"]["Row"];
+type WorkoutSetRow = Database["public"]["Tables"]["workout_sets"]["Row"];
 
 // ============================================================= Workouts
 
@@ -39,6 +40,11 @@ export async function getWorkoutSets(supabase: Client, workoutIds: string[]) {
     .order("set_number", { ascending: true });
   if (error) throw error;
   return data;
+}
+
+/** Total volume (weight x reps, summed across sets) — the standard training-load metric. */
+export function computeWorkoutVolume(sets: Pick<WorkoutSetRow, "weight_kg" | "reps">[]): number {
+  return sets.reduce((sum, s) => sum + Number(s.weight_kg ?? 0) * Number(s.reps ?? 0), 0);
 }
 
 // ============================================================= Nutrition

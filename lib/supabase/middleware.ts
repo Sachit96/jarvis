@@ -33,9 +33,29 @@ export async function updateSession(request: NextRequest) {
 
   // getUser() (not getSession()) revalidates the token against Supabase Auth
   // on every request — required for middleware to trust the session.
-  const {
+  let {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // Local-dev-only: auto-sign-in a fixed account instead of showing /login.
+  // Gated on NODE_ENV so this can never activate in a production build even
+  // if DEV_AUTH_BYPASS were accidentally set there — and in practice it never
+  // will be, since it only lives in .env.local, which Netlify doesn't read.
+  // This signs in a REAL Supabase user (not a bypass of RLS), so every RLS
+  // policy and query in the app keeps working completely unchanged.
+  const devBypassEnabled =
+    process.env.NODE_ENV !== "production" &&
+    process.env.DEV_AUTH_BYPASS === "true" &&
+    !!process.env.DEV_USER_EMAIL &&
+    !!process.env.DEV_USER_PASSWORD;
+
+  if (!user && devBypassEnabled) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: process.env.DEV_USER_EMAIL!,
+      password: process.env.DEV_USER_PASSWORD!,
+    });
+    if (!error) user = data.user;
+  }
 
   const isPublicPath = PUBLIC_PATHS.some((path) =>
     request.nextUrl.pathname.startsWith(path),

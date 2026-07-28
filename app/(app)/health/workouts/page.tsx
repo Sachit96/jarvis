@@ -1,9 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { getExercises, getWorkouts, getWorkoutSets } from "@/lib/db/queries/health";
 import { ensureDefaultExercisesAction } from "@/actions/health-actions";
+import { syncHevyWorkouts } from "@/lib/providers/workout/hevy-sync";
+import { hasHevyKey } from "@/lib/providers/workout/hevy-client";
 import { WorkoutForm } from "@/components/health/workout-form";
 import { ExerciseForm } from "@/components/health/exercise-form";
 import { WorkoutSessionCard } from "@/components/health/workout-session-card";
+import { HevySyncButton } from "@/components/health/hevy-sync-button";
 import { StreakHeatmap } from "@/components/shared/streak-heatmap";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { HEALTH_TABS } from "@/lib/nav-items";
@@ -12,6 +15,20 @@ export default async function WorkoutsPage() {
   await ensureDefaultExercisesAction();
 
   const supabase = await createClient();
+
+  const connected = hasHevyKey();
+  if (connected) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      // Best-effort — a Hevy outage should never break the Workouts page.
+      await syncHevyWorkouts(supabase, user.id).catch((err) => {
+        console.error("Hevy auto-sync failed:", err);
+      });
+    }
+  }
+
   const exercises = await getExercises(supabase);
   const workouts = await getWorkouts(supabase);
   const sets = await getWorkoutSets(
@@ -44,7 +61,10 @@ export default async function WorkoutsPage() {
       <ModuleTabs tabs={HEALTH_TABS} />
 
       <div className="rounded-lg border border-border bg-card p-4">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">Last 90 days</p>
+        <div className="flex items-center justify-between">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">Last 90 days</p>
+          <HevySyncButton connected={connected} />
+        </div>
         <div className="mt-2">
           <StreakHeatmap completedDates={trainedDates} days={90} />
         </div>
