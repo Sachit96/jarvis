@@ -119,13 +119,15 @@
   --chart-4: oklch(0.65 0.21 15);
   --chart-5: oklch(0.6 0.02 235);
   --radius: 0.625rem;
-  --sidebar: oklch(0.13 0.02 240);
+  /* Sidebar reads as the same surface as the page, not a separate panel —
+     no lightness/hue shift from --background. */
+  --sidebar: oklch(0.15 0.02 240);
   --sidebar-foreground: oklch(0.93 0.01 235);
   --sidebar-primary: oklch(0.82 0.15 200);
   --sidebar-primary-foreground: oklch(0.15 0.02 240);
-  --sidebar-accent: oklch(0.24 0.02 240);
+  --sidebar-accent: oklch(0.22 0.02 240);
   --sidebar-accent-foreground: oklch(0.93 0.01 235);
-  --sidebar-border: oklch(0.24 0.02 240);
+  --sidebar-border: oklch(0.15 0.02 240);
   --sidebar-ring: oklch(0.82 0.15 200);
 
   /* JARVIS brand palette */

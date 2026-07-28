@@ -2,7 +2,13 @@ import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
 interface CardProps extends ComponentProps<"div"> {
-  /** Cards that respond to hover/press because they navigate or open something. */
+  /**
+   * Cards that respond to hover/press because they navigate or open
+   * something. This only adds the visual affordance — if you're wrapping
+   * the Card in a Link/button (the usual pattern), put
+   * `focus-visible:ring-3 focus-visible:ring-ring/50 outline-none` on that
+   * wrapper yourself, since it's the actual focusable element, not this div.
+   */
   interactive?: boolean;
 }
 

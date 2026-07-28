@@ -95,6 +95,47 @@ export function computeSpendByCategory(transactions: Pick<TransactionRow, "type"
   return map;
 }
 
+const TREND_DAYS = 30;
+
+export async function getRecentTransactions(supabase: Client, days = TREND_DAYS) {
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+  const { data, error } = await supabase
+    .from("transactions")
+    .select("*")
+    .gte("occurred_at", since.toISOString().slice(0, 10))
+    .order("occurred_at", { ascending: true });
+  if (error) throw error;
+  return data;
+}
+
+/** Buckets transactions into one point per day (zero-filled) for a trend chart — no gaps on days with no activity. */
+export function computeDailyCashflow(transactions: Pick<TransactionRow, "type" | "amount" | "occurred_at">[], days = TREND_DAYS) {
+  const byDay = new Map<string, { income: number; expense: number }>();
+  for (const t of transactions) {
+    const bucket = byDay.get(t.occurred_at) ?? { income: 0, expense: 0 };
+    if (t.type === "income") bucket.income += Number(t.amount);
+    else bucket.expense += Number(t.amount);
+    byDay.set(t.occurred_at, bucket);
+  }
+
+  const points: { date: string; income: number; expense: number; net: number }[] = [];
+  const cursor = new Date();
+  cursor.setDate(cursor.getDate() - days + 1);
+  for (let i = 0; i < days; i++) {
+    const key = cursor.toISOString().slice(0, 10);
+    const bucket = byDay.get(key) ?? { income: 0, expense: 0 };
+    points.push({
+      date: new Date(key + "T00:00:00").toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+      income: bucket.income,
+      expense: bucket.expense,
+      net: bucket.income - bucket.expense,
+    });
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return points;
+}
+
 export async function getBudgets(supabase: Client) {
   const { data, error } = await supabase.from("budgets").select("*").order("category", { ascending: true });
   if (error) throw error;

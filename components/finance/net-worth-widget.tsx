@@ -21,6 +21,7 @@ export function NetWorthWidget({
         value={money(netWorth)}
         delta={netWorth >= 0 ? "Positive" : "Negative"}
         tone={netWorth >= 0 ? "success" : "danger"}
+        trend={netWorth >= 0 ? "up" : "down"}
         primary
         className="col-span-3 sm:col-span-1"
       />

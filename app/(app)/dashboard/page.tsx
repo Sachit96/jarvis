@@ -65,7 +65,10 @@ export default async function DashboardPage() {
         <p className="mt-0.5 text-body text-muted-foreground">Your cross-module command center.</p>
       </div>
 
-      <Link href="/mentor" className="block">
+      <Link
+        href="/mentor"
+        className="block rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+      >
         <Card interactive>
           <p className="text-label uppercase tracking-wide text-brand">Mentor&apos;s take</p>
           <p className="mt-2 line-clamp-3 text-body text-muted-foreground">
