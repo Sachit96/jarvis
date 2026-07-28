@@ -1,7 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
-import { getPriorityTasks, getHabitsWithStreaks, getJournalEntries } from "@/lib/db/queries/life";
+import { getPriorityTasks, getJournalEntries } from "@/lib/db/queries/life";
 import {
   getAccounts,
   computeAssetLiabilityTotals,
@@ -12,6 +12,7 @@ import {
 } from "@/lib/db/queries/finance";
 import { getNutritionTargets, getNutritionLogsForDate, computeMacroTotals, getWorkouts } from "@/lib/db/queries/health";
 import { getPipelineStages, getDeals, getContracts, computeMrr } from "@/lib/db/queries/business";
+import { getTodayRoutineItems } from "@/lib/db/queries/routine";
 
 type Client = SupabaseClient<Database>;
 
@@ -25,7 +26,7 @@ export async function buildMentorContext(supabase: Client) {
 
   const [
     priorityTasks,
-    habitsWithStreaks,
+    routineItems,
     journalEntries,
     accounts,
     monthTransactions,
@@ -38,7 +39,7 @@ export async function buildMentorContext(supabase: Client) {
     contracts,
   ] = await Promise.all([
     getPriorityTasks(supabase, 10),
-    getHabitsWithStreaks(supabase),
+    getTodayRoutineItems(supabase),
     getJournalEntries(supabase),
     getAccounts(supabase),
     getMonthTransactions(supabase),
@@ -69,10 +70,10 @@ export async function buildMentorContext(supabase: Client) {
     today,
     life: {
       priorityTasks: priorityTasks.map((t) => ({ title: t.title, priority: t.priority, due_date: t.due_date })),
-      habitStreaks: habitsWithStreaks.map(({ habit, streak }) => ({
-        name: habit.name,
-        current: streak.current,
-        best: streak.best,
+      dailyRoutineToday: routineItems.map((item) => ({
+        item: item.label,
+        completedToday: item.completed,
+        currentStreak: item.streak?.current,
       })),
       recentMoods: journalEntries
         .slice(0, 7)

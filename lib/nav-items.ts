@@ -19,10 +19,10 @@ export interface NavItem {
 
 /**
  * Full nav — desktop sidebar, in the app's priority order.
- * "Faith" was removed as its own item — prayer is folding into a Daily
- * Routine checklist (still being scoped) rather than staying a standalone
- * section. "Memory" has no feature behind it yet (see /memory) — it's here
- * as a placeholder link, same pattern as the Coming Soon pages elsewhere.
+ * "Faith" no longer exists as its own item — "Pray to God" is now a Daily
+ * Routine checklist item (see /life/habits) instead of a standalone section.
+ * "Memory" has no feature behind it yet (see /memory) — it's here as a
+ * placeholder link, same pattern as the Coming Soon pages elsewhere.
  */
 export const SIDEBAR_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
@@ -51,15 +51,16 @@ export interface ModuleTab {
 }
 
 /** In-module sub-navigation, rendered below the module header on each page. */
-export const GOALS_TABS: ModuleTab[] = [
-  { href: "/life/goals", label: "Goals" },
-  { href: "/life/habits", label: "Habits" },
-];
-
-export const FAITH_TABS: ModuleTab[] = [
-  { href: "/life/prayer", label: "Prayer" },
+export const TASKS_TABS: ModuleTab[] = [
+  { href: "/life/tasks", label: "Tasks" },
+  { href: "/life/habits", label: "Routine" },
   { href: "/life/journal", label: "Journal" },
 ];
+
+// GOALS_TABS was retired (Habits/Routine moved fully under Tasks & Routine,
+// so Goals is now a standalone page with no tab row, matching Tasks OS
+// pattern before it got its own tabs). FAITH_TABS was removed entirely
+// along with the standalone /life/prayer page it pointed to.
 
 export const FINANCE_TABS: ModuleTab[] = [
   { href: "/finance/overview", label: "Overview" },

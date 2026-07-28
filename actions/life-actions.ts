@@ -2,14 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import {
-  taskSchema,
-  goalSchema,
-  habitSchema,
-  journalEntrySchema,
-  prayerSchema,
-} from "@/lib/validations/life";
-import { DEFAULT_PRAYERS } from "@/lib/db/queries/life";
+import { taskSchema, goalSchema, habitSchema, journalEntrySchema } from "@/lib/validations/life";
 
 export interface ActionState {
   error?: string;
@@ -161,12 +154,15 @@ export async function createHabitAction(
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not signed in" };
 
+  const { count } = await supabase.from("habits").select("id", { count: "exact", head: true });
+
   const { error } = await supabase.from("habits").insert({
     user_id: user.id,
     name: parsed.data.name,
     metric_type: parsed.data.metric_type,
     kind: parsed.data.kind,
     target_count: parsed.data.target_count ?? null,
+    sort_order: count ?? 0,
   });
   if (error) return { error: error.message };
   revalidatePath("/life/habits");
@@ -195,14 +191,55 @@ export async function toggleHabitTodayAction(habitId: string, completed: boolean
         habit_id: habitId,
         log_date: todayStr(),
         completed,
+        completed_at: completed ? new Date().toISOString() : null,
       },
       { onConflict: "habit_id,log_date" },
     );
   if (error) throw new Error(error.message);
   revalidatePath("/life/habits");
+  revalidatePath("/dashboard");
 }
 
-/** Idempotent — inserts starter habits (including "No G") only if the user has none yet. */
+export async function toggleHabitPinnedAction(id: string, pinned: boolean) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("habits").update({ pinned }).eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/life/habits");
+}
+
+/** Swaps this habit's sort_order with its neighbor in the current display order. */
+export async function moveHabitAction(id: string, direction: "up" | "down") {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not signed in");
+
+  const { data: habits, error: fetchError } = await supabase
+    .from("habits")
+    .select("id, sort_order, pinned")
+    .eq("is_active", true)
+    .order("pinned", { ascending: false })
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true });
+  if (fetchError) throw new Error(fetchError.message);
+
+  const index = habits.findIndex((h) => h.id === id);
+  const neighborIndex = direction === "up" ? index - 1 : index + 1;
+  if (index === -1 || neighborIndex < 0 || neighborIndex >= habits.length) return;
+
+  const current = habits[index];
+  const neighbor = habits[neighborIndex];
+  // Only swap within the same pinned group — pinned items shouldn't drift into the unpinned list via reorder.
+  if (current.pinned !== neighbor.pinned) return;
+
+  const { error: err1 } = await supabase.from("habits").update({ sort_order: neighbor.sort_order }).eq("id", current.id);
+  const { error: err2 } = await supabase.from("habits").update({ sort_order: current.sort_order }).eq("id", neighbor.id);
+  if (err1 || err2) throw new Error(err1?.message ?? err2?.message);
+  revalidatePath("/life/habits");
+}
+
+/** Idempotent — inserts starter routine items (including "No G") only if the user has none yet. */
 export async function ensureDefaultHabitsAction() {
   const supabase = await createClient();
   const {
@@ -217,15 +254,14 @@ export async function ensureDefaultHabitsAction() {
   if (count && count > 0) return;
 
   const defaults = [
-    { name: "No G", metric_type: "no_g", kind: "boolean" as const },
-    { name: "Sleep 7+ hours", metric_type: "sleep", kind: "boolean" as const },
-    { name: "Deep focus block", metric_type: "focus", kind: "boolean" as const },
-    { name: "Training session", metric_type: "training", kind: "boolean" as const },
-    { name: "Screen time under limit", metric_type: "screen_time", kind: "boolean" as const },
+    { name: "No G", metric_type: "no_g" as const, kind: "boolean" as const, pinned: true },
+    { name: "Pray to God", metric_type: "custom" as const, kind: "boolean" as const, pinned: true },
+    { name: "Run", metric_type: "custom" as const, kind: "boolean" as const, pinned: false },
+    { name: "Read for 30 minutes", metric_type: "custom" as const, kind: "boolean" as const, pinned: false },
   ];
   const { error } = await supabase
     .from("habits")
-    .insert(defaults.map((d) => ({ ...d, user_id: user.id })));
+    .insert(defaults.map((d, i) => ({ ...d, user_id: user.id, sort_order: i })));
   if (error) throw new Error(error.message);
   revalidatePath("/life/habits");
 }
@@ -272,84 +308,8 @@ export async function deleteJournalEntryAction(id: string) {
   revalidatePath("/life/journal");
 }
 
-// ============================================================= Prayer
-
-export async function ensureDefaultPrayersAction() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return;
-
-  const { count, error: countError } = await supabase
-    .from("prayers")
-    .select("id", { count: "exact", head: true });
-  if (countError) throw new Error(countError.message);
-  if (count && count > 0) return;
-
-  const { error } = await supabase.from("prayers").insert(
-    DEFAULT_PRAYERS.map((name, i) => ({
-      user_id: user.id,
-      name,
-      sort_order: i,
-    })),
-  );
-  if (error) throw new Error(error.message);
-  revalidatePath("/life/prayer");
-}
-
-export async function createPrayerAction(
-  _prevState: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
-  const parsed = prayerSchema.safeParse({ name: formData.get("name") });
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
-  }
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
-  const { count } = await supabase
-    .from("prayers")
-    .select("id", { count: "exact", head: true });
-
-  const { error } = await supabase.from("prayers").insert({
-    user_id: user.id,
-    name: parsed.data.name,
-    sort_order: count ?? 0,
-  });
-  if (error) return { error: error.message };
-  revalidatePath("/life/prayer");
-  return {};
-}
-
-export async function deletePrayerAction(id: string) {
-  const supabase = await createClient();
-  const { error } = await supabase.from("prayers").delete().eq("id", id);
-  if (error) throw new Error(error.message);
-  revalidatePath("/life/prayer");
-}
-
-export async function togglePrayerTodayAction(prayerId: string, completed: boolean) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not signed in");
-
-  const { error } = await supabase.from("prayer_logs").upsert(
-    {
-      user_id: user.id,
-      prayer_id: prayerId,
-      log_date: todayStr(),
-      completed,
-      logged_at: completed ? new Date().toISOString() : null,
-    },
-    { onConflict: "prayer_id,log_date" },
-  );
-  if (error) throw new Error(error.message);
-  revalidatePath("/life/prayer");
-}
+// Prayer used to be its own module (see git history for
+// ensureDefaultPrayersAction/createPrayerAction/deletePrayerAction/
+// togglePrayerTodayAction) — removed once "Pray to God" became a Daily
+// Routine item instead. The prayers/prayer_logs tables and their historical
+// data are untouched; only the now-redundant standalone UI/actions are gone.

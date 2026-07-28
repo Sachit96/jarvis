@@ -14,9 +14,11 @@ import {
 } from "@/lib/db/queries/health";
 import { getDailyRecommendation } from "@/lib/db/queries/mentor";
 import { getContracts, computeMrr } from "@/lib/db/queries/business";
+import { getTodayRoutineItems } from "@/lib/db/queries/routine";
 import { hasHevyKey } from "@/lib/providers/workout/hevy-client";
 import { PriorityTasksWidget } from "@/components/dashboard/priority-tasks-widget";
 import { HabitStreaksWidget } from "@/components/dashboard/habit-streaks-widget";
+import { TodayRoutineCard } from "@/components/dashboard/today-routine-card";
 import { NetWorthWidget } from "@/components/finance/net-worth-widget";
 import { MonthlyPnlCard } from "@/components/finance/monthly-pnl-card";
 import { HevyAutoSync } from "@/components/health/hevy-auto-sync";
@@ -29,18 +31,29 @@ export default async function DashboardPage() {
   const supabase = await createClient();
   const today = todayStr();
 
-  const [priorityTasks, habitsWithStreaks, accounts, monthTransactions, workouts, nutritionTargets, todayNutritionLogs, dailyBrief, contracts] =
-    await Promise.all([
-      getPriorityTasks(supabase),
-      getHabitsWithStreaks(supabase),
-      getAccounts(supabase),
-      getMonthTransactions(supabase),
-      getWorkouts(supabase),
-      getNutritionTargets(supabase),
-      getNutritionLogsForDate(supabase, today),
-      getDailyRecommendation(supabase, today),
-      getContracts(supabase),
-    ]);
+  const [
+    priorityTasks,
+    habitsWithStreaks,
+    accounts,
+    monthTransactions,
+    workouts,
+    nutritionTargets,
+    todayNutritionLogs,
+    dailyBrief,
+    contracts,
+    routineItems,
+  ] = await Promise.all([
+    getPriorityTasks(supabase),
+    getHabitsWithStreaks(supabase),
+    getAccounts(supabase),
+    getMonthTransactions(supabase),
+    getWorkouts(supabase),
+    getNutritionTargets(supabase),
+    getNutritionLogsForDate(supabase, today),
+    getDailyRecommendation(supabase, today),
+    getContracts(supabase),
+    getTodayRoutineItems(supabase),
+  ]);
   const mrr = computeMrr(contracts);
 
   const financeTotals = computeAssetLiabilityTotals(accounts);
@@ -64,6 +77,8 @@ export default async function DashboardPage() {
         <h1 className="text-title">Today</h1>
         <p className="mt-0.5 text-body text-muted-foreground">Your cross-module command center.</p>
       </div>
+
+      <TodayRoutineCard items={routineItems} />
 
       <Link
         href="/mentor"

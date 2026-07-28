@@ -1,20 +1,25 @@
 import { createClient } from "@/lib/supabase/server";
 import { getHabits, getHabitLogsForHeatmap } from "@/lib/db/queries/life";
+import { getTodayRoutineItems } from "@/lib/db/queries/routine";
 import { ensureDefaultHabitsAction } from "@/actions/life-actions";
 import { HabitForm } from "@/components/life/habit-form";
 import { HabitCard } from "@/components/life/habit-card";
+import { AutoRoutineList } from "@/components/life/auto-routine-list";
 import { ModuleTabs } from "@/components/shared/module-tabs";
-import { GOALS_TABS } from "@/lib/nav-items";
+import { TASKS_TABS } from "@/lib/nav-items";
 
-export default async function HabitsPage() {
+export default async function RoutinePage() {
   await ensureDefaultHabitsAction();
 
   const supabase = await createClient();
   const habits = await getHabits(supabase);
-  const logs = await getHabitLogsForHeatmap(
-    supabase,
-    habits.map((h) => h.id),
-  );
+  const [logs, routineItems] = await Promise.all([
+    getHabitLogsForHeatmap(
+      supabase,
+      habits.map((h) => h.id),
+    ),
+    getTodayRoutineItems(supabase),
+  ]);
 
   const datesByHabit = new Map<string, string[]>();
   for (const log of logs) {
@@ -24,6 +29,7 @@ export default async function HabitsPage() {
     datesByHabit.set(log.habit_id, list);
   }
 
+  const autoItems = routineItems.filter((i) => i.kind === "auto");
   const noG = habits.filter((h) => h.metric_type === "no_g");
   const rest = habits.filter((h) => h.metric_type !== "no_g");
 
@@ -32,12 +38,14 @@ export default async function HabitsPage() {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs uppercase tracking-wider text-muted-foreground">Life</p>
-          <h1 className="text-xl font-semibold">Discipline &amp; Habits</h1>
+          <h1 className="text-xl font-semibold">Routine</h1>
         </div>
         <HabitForm />
       </div>
 
-      <ModuleTabs tabs={GOALS_TABS} />
+      <ModuleTabs tabs={TASKS_TABS} />
+
+      <AutoRoutineList items={autoItems} />
 
       {noG.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-2">
@@ -57,7 +65,7 @@ export default async function HabitsPage() {
 
       {habits.length === 0 ? (
         <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
-          No habits yet — add your first one above.
+          No routine items yet — add your first one above.
         </p>
       ) : null}
     </div>

@@ -573,6 +573,7 @@ export type Database = {
       habit_logs: {
         Row: {
           completed: boolean
+          completed_at: string | null
           count: number | null
           created_at: string
           habit_id: string
@@ -584,6 +585,7 @@ export type Database = {
         }
         Insert: {
           completed?: boolean
+          completed_at?: string | null
           count?: number | null
           created_at?: string
           habit_id: string
@@ -595,6 +597,7 @@ export type Database = {
         }
         Update: {
           completed?: boolean
+          completed_at?: string | null
           count?: number | null
           created_at?: string
           habit_id?: string
@@ -623,6 +626,8 @@ export type Database = {
           kind: string
           metric_type: string
           name: string
+          pinned: boolean
+          sort_order: number
           target_count: number | null
           updated_at: string
           user_id: string
@@ -635,6 +640,8 @@ export type Database = {
           kind?: string
           metric_type?: string
           name: string
+          pinned?: boolean
+          sort_order?: number
           target_count?: number | null
           updated_at?: string
           user_id: string
@@ -647,6 +654,8 @@ export type Database = {
           kind?: string
           metric_type?: string
           name?: string
+          pinned?: boolean
+          sort_order?: number
           target_count?: number | null
           updated_at?: string
           user_id?: string

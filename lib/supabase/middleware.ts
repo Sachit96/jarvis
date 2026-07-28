@@ -3,9 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 
 // /api/webhooks/* and /api/mentor/run are called by external services
 // (GoHighLevel, a scheduled cron trigger) with no Supabase session — those
-// routes authenticate themselves via a shared secret instead and must stay
-// reachable without a redirect to /login.
-const PUBLIC_PATHS = ["/login", "/signup", "/api/webhooks", "/api/mentor/run"];
+// routes authenticate themselves via a shared secret instead.
+const AUTH_PATHS = ["/login", "/signup"];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -57,17 +56,11 @@ export async function updateSession(request: NextRequest) {
     if (!error) user = data.user;
   }
 
-  const isPublicPath = PUBLIC_PATHS.some((path) =>
+  const isAuthPath = AUTH_PATHS.some((path) =>
     request.nextUrl.pathname.startsWith(path),
   );
 
-  if (!user && !isPublicPath) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
-  }
-
-  if (user && isPublicPath) {
+  if (isAuthPath) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);

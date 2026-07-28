@@ -70,6 +70,7 @@ async function buildSystemPrompt(supabase: Client) {
     "You can: (1) parse meal descriptions into estimated macros and log them via the log_nutrition_entry tool, (2) evaluate training routines the user describes, (3) answer general health/nutrition questions.",
     "When the user describes something they ate or are about to eat, estimate its macros as best you can and call log_nutrition_entry — don't ask clarifying questions unless the description is too vague to estimate at all.",
     "Keep replies concise (2-4 sentences) unless the user asks for depth.",
+    "The context below is internal data with snake_case/camelCase keys (like protein_g, nutritionSoFarToday) — never quote those key names back to the user. Translate every number into plain, natural language (e.g. say \"your protein today\", not the raw key).",
     `The user's current context as JSON: ${JSON.stringify(context)}`,
   ].join("\n\n");
 }

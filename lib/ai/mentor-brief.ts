@@ -32,6 +32,9 @@ function parseBrief(raw: string): BriefResult {
 const JSON_INSTRUCTION =
   'Respond with ONLY a JSON object matching this exact shape, no prose outside it: {"markdownBody": string, "focusAreas": string[], "strengths": string[], "weaknesses": string[]}.';
 
+const VOICE_GUARDRAIL =
+  "The context below is internal data with camelCase keys (like monthlyIncome, openPipelineDealsCount, dailyRoutineToday) — never quote those key names, or any other variable/field name, back to the user. Translate every number into plain, natural language a calm human coach would actually say (e.g. say \"your income this month\" or \"open deals in your pipeline\", not the raw key). Keep it concise — a clear short sentence beats a long explained one.";
+
 const DAILY_INSTRUCTIONS = `Write today's brief as markdown with these headers: ## Focus Today, ## Wins, ## Watch-outs. Be specific and reference the actual numbers in the user's context. Keep markdownBody under 200 words.`;
 
 const WEEKLY_INSTRUCTIONS = `Write this week's review as markdown with these headers: ## Summary, ## Strengths, ## Weaknesses, ## Next Week's Focus. Be specific and reference the actual numbers/trends in the user's context. Keep markdownBody under 350 words.`;
@@ -68,6 +71,7 @@ export async function generateDailyBrief(supabase: Client, userId: string) {
   const systemPrompt = [
     "You are JARVIS, a sharp, encouraging personal AI mentor reviewing the user's life/finance/health/business dashboard.",
     DAILY_INSTRUCTIONS,
+    VOICE_GUARDRAIL,
     JSON_INSTRUCTION,
     `The user's current context as JSON: ${JSON.stringify(context)}`,
   ].join("\n\n");
@@ -114,6 +118,7 @@ export async function generateWeeklyReview(supabase: Client, userId: string) {
   const systemPrompt = [
     "You are JARVIS, a sharp, encouraging personal AI mentor writing the user's weekly review across life/finance/health/business.",
     WEEKLY_INSTRUCTIONS,
+    VOICE_GUARDRAIL,
     JSON_INSTRUCTION,
     `The user's current context as JSON: ${JSON.stringify(context)}`,
   ].join("\n\n");
@@ -161,6 +166,7 @@ export async function runGeneralMentorChat(supabase: Client, userId: string, use
   const systemPrompt = [
     "You are JARVIS, the user's personal AI mentor with visibility into their tasks, habits, finances, health, and business pipeline.",
     "Answer questions, give advice, and reference specific numbers from their context when relevant. Keep replies concise (2-5 sentences) unless asked for depth.",
+    VOICE_GUARDRAIL,
     `The user's current context as JSON: ${JSON.stringify(context)}`,
   ].join("\n\n");
 

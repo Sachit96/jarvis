@@ -1,13 +1,18 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { Flame, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Flame, Pin, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { StreakHeatmap } from "@/components/shared/streak-heatmap";
 import { computeStreak } from "@/lib/db/queries/life";
-import { deleteHabitAction, toggleHabitTodayAction } from "@/actions/life-actions";
+import {
+  deleteHabitAction,
+  toggleHabitTodayAction,
+  toggleHabitPinnedAction,
+  moveHabitAction,
+} from "@/actions/life-actions";
 import type { Database } from "@/lib/supabase/database.types";
 
 type Habit = Database["public"]["Tables"]["habits"]["Row"];
@@ -34,6 +39,7 @@ export function HabitCard({
   completedDates: string[];
 }) {
   const [dates, setDates] = useState<Set<string>>(() => new Set(completedDates));
+  const [pinned, setPinned] = useState(habit.pinned);
   const [isPending, startTransition] = useTransition();
 
   const today = todayStr();
@@ -53,6 +59,22 @@ export function HabitCard({
         setDates(dates); // revert
       }
     });
+  }
+
+  function handleTogglePin() {
+    const next = !pinned;
+    setPinned(next);
+    startTransition(async () => {
+      try {
+        await toggleHabitPinnedAction(habit.id, next);
+      } catch {
+        setPinned(!next);
+      }
+    });
+  }
+
+  function handleMove(direction: "up" | "down") {
+    startTransition(() => moveHabitAction(habit.id, direction));
   }
 
   function handleDelete() {
@@ -84,17 +106,28 @@ export function HabitCard({
             <span>best {best}</span>
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2">
           <Checkbox
             checked={completedToday}
             onCheckedChange={(c) => handleToggle(c === true)}
             aria-label={`Log ${habit.name} for today`}
           />
           <button
-            onClick={handleDelete}
-            aria-label="Delete habit"
-            className="text-muted-foreground hover:text-danger"
+            onClick={handleTogglePin}
+            aria-label={pinned ? "Unpin" : "Pin to top"}
+            className={cn("hover:text-foreground", pinned ? "text-brand" : "text-muted-foreground")}
           >
+            <Pin className="h-3.5 w-3.5" fill={pinned ? "currentColor" : "none"} />
+          </button>
+          <div className="flex flex-col">
+            <button onClick={() => handleMove("up")} aria-label="Move up" className="text-muted-foreground hover:text-foreground">
+              <ChevronUp className="h-3.5 w-3.5" />
+            </button>
+            <button onClick={() => handleMove("down")} aria-label="Move down" className="text-muted-foreground hover:text-foreground">
+              <ChevronDown className="h-3.5 w-3.5" />
+            </button>
+          </div>
+          <button onClick={handleDelete} aria-label="Delete habit" className="text-muted-foreground hover:text-danger">
             <Trash2 className="h-4 w-4" />
           </button>
         </div>

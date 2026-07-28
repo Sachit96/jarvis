@@ -98,7 +98,7 @@ export function Sidebar({ userEmail }: { userEmail: string | undefined }) {
           {!collapsed ? "Collapse" : null}
         </button>
 
-        {!collapsed ? (
+        {!collapsed && userEmail ? (
           <div className="mt-2 flex items-center justify-between gap-2 rounded-xl px-3 py-2">
             <span className="min-w-0 truncate font-mono text-caption text-sidebar-foreground/60">{userEmail}</span>
             <form action={signOutAction}>

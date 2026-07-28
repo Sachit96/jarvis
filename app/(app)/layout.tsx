@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/app-shell";
 
@@ -13,11 +12,5 @@ export default async function AppLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Middleware already redirects unauthenticated requests to /login — this
-  // is a defense-in-depth check for the layout itself.
-  if (!user) {
-    redirect("/login");
-  }
-
-  return <AppShell userEmail={user.email}>{children}</AppShell>;
+  return <AppShell userEmail={user?.email}>{children}</AppShell>;
 }

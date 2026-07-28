@@ -43,7 +43,8 @@ export async function getHabits(supabase: Client) {
     .from("habits")
     .select("*")
     .eq("is_active", true)
-    .order("metric_type", { ascending: true })
+    .order("pinned", { ascending: false })
+    .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
   if (error) throw error;
   return data;

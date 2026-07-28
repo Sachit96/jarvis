@@ -3,7 +3,7 @@ import { getJournalEntries } from "@/lib/db/queries/life";
 import { JournalForm } from "@/components/life/journal-form";
 import { JournalEntryCard } from "@/components/life/journal-entry-card";
 import { ModuleTabs } from "@/components/shared/module-tabs";
-import { FAITH_TABS } from "@/lib/nav-items";
+import { TASKS_TABS } from "@/lib/nav-items";
 
 export default async function JournalPage() {
   const supabase = await createClient();
@@ -16,7 +16,7 @@ export default async function JournalPage() {
         <h1 className="text-xl font-semibold">Journal</h1>
       </div>
 
-      <ModuleTabs tabs={FAITH_TABS} />
+      <ModuleTabs tabs={TASKS_TABS} />
 
       <JournalForm />
 
