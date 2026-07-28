@@ -53,12 +53,48 @@
   --color-warn: var(--warn);
   --color-danger: var(--danger);
   --color-success: var(--success);
+
+  /* Type scale — a deliberate small set of steps, not ad hoc sizing. Each
+     name says what it's FOR, not how big it is, so usage stays disciplined.
+     text-display: the one large moment per screen (a hero number, e.g. net
+     worth). text-title: page h1. text-heading: section labels. text-body:
+     default reading size. text-label: meta/tags/uppercase eyebrows.
+     text-caption: timestamps, fine print. */
+  --text-display: 2.25rem;
+  --text-display--line-height: 2.5rem;
+  --text-display--font-weight: 600;
+  --text-title: 1.375rem;
+  --text-title--line-height: 1.75rem;
+  --text-title--font-weight: 600;
+  --text-heading: 0.9375rem;
+  --text-heading--line-height: 1.375rem;
+  --text-heading--font-weight: 600;
+  --text-body: 0.875rem;
+  --text-body--line-height: 1.4rem;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1rem;
+  --text-caption: 0.6875rem;
+  --text-caption--line-height: 0.875rem;
+
+  /* One shared easing curve for motion — a gentle deceleration, not a linear
+     tween. Used by the .press/.rise utilities below and by any component
+     reaching for a hand-rolled transition. */
+  --ease-jarvis: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* JARVIS is dark-mode only — :root and .dark carry the same values so the
    app looks correct whether or not the .dark class is present. */
 :root,
 .dark {
+  /* System font stacks, not a downloaded webfont — -apple-system/
+     BlinkMacSystemFont resolve to the real SF Pro/SF Mono already on Apple
+     devices (zero network cost, genuinely Apple's own type), falling back to
+     each platform's native UI font elsewhere rather than a generic serif. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, "Cascadia Code", "Roboto Mono",
+    "Segoe UI Mono", monospace;
+
   --background: oklch(0.15 0.02 240);
   --foreground: oklch(0.93 0.01 235);
   --card: oklch(0.19 0.02 240);
@@ -117,5 +153,28 @@
   .glow-brand {
     box-shadow: 0 0 0 1px color-mix(in oklch, var(--brand) 40%, transparent),
       0 0 24px 0 color-mix(in oklch, var(--brand) 25%, transparent);
+  }
+
+  /* Shared press/hover feedback — transform + opacity only (GPU-friendly,
+     never triggers layout). Apply to anything tappable that isn't already a
+     Button (which has its own feedback via active:translate-y-px). */
+  .press {
+    transition: transform 200ms var(--ease-jarvis), box-shadow 200ms var(--ease-jarvis);
+  }
+  .press:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Anyone with reduce-motion set gets it fully respected, not just on the
+   handful of components that remembered a motion-reduce: variant. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

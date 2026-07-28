@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { StatTile } from "@/components/shared/stat-tile";
+import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 import { getPriorityTasks, getHabitsWithStreaks } from "@/lib/db/queries/life";
 import { getAccounts, getMonthTransactions, computeAssetLiabilityTotals, computeMonthlyPnl } from "@/lib/db/queries/finance";
@@ -56,21 +57,21 @@ export default async function DashboardPage() {
   const volume7d = computeWorkoutVolume(recentSets);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {hasHevyKey() ? <HevyAutoSync /> : null}
 
       <div>
-        <h1 className="text-xl font-semibold">Today</h1>
-        <p className="text-sm text-muted-foreground">
-          Your cross-module command center.
-        </p>
+        <h1 className="text-title">Today</h1>
+        <p className="mt-0.5 text-body text-muted-foreground">Your cross-module command center.</p>
       </div>
 
-      <Link href="/mentor" className="block rounded-lg border border-brand/40 bg-card p-4 hover:border-brand/70">
-        <p className="text-xs uppercase tracking-wider text-brand">Mentor&apos;s take</p>
-        <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
-          {dailyBrief ? dailyBrief.markdown_body : "No brief generated yet today — tap to generate one."}
-        </p>
+      <Link href="/mentor" className="block">
+        <Card interactive>
+          <p className="text-label uppercase tracking-wide text-brand">Mentor&apos;s take</p>
+          <p className="mt-2 line-clamp-3 text-body text-muted-foreground">
+            {dailyBrief ? dailyBrief.markdown_body : "No brief yet today — tap to have your mentor look things over."}
+          </p>
+        </Card>
       </Link>
 
       <NetWorthWidget {...financeTotals} />
@@ -91,7 +92,7 @@ export default async function DashboardPage() {
           tone={caloriePct > 100 ? "danger" : "neutral"}
         />
         <StatTile label="Life" value={String(priorityTasks.length)} delta="Priority tasks" />
-        <StatTile label="MRR" value={`$${mrr.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} tone="success" />
+        <StatTile label="MRR" value={`$${mrr.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">

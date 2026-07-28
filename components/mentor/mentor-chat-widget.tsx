@@ -42,35 +42,38 @@ export function MentorChatWidget({ initialMessages, hasKey }: { initialMessages:
       } else if (result.reply) {
         setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "assistant", content: result.reply! }]);
       }
-      queueMicrotask(() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight }));
+      queueMicrotask(() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" }));
     });
   }
 
   return (
-    <div className="flex flex-col rounded-lg border border-border bg-card">
-      <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+    <div className="flex flex-col rounded-2xl bg-card ring-1 ring-white/[0.06]">
+      <div className="flex items-center gap-2 border-b border-white/[0.06] px-5 py-3.5">
         <Sparkles className="h-4 w-4 text-brand" />
-        <p className="text-sm font-medium">Ask your Mentor</p>
+        <p className="text-body font-medium">Ask your Mentor</p>
       </div>
 
       {!hasKey ? (
-        <div className="mx-4 mt-3 flex items-start gap-2 rounded-md border border-warn/40 bg-warn/10 p-3 text-xs text-warn">
+        <div className="mx-5 mt-3 flex items-start gap-2 rounded-xl bg-warn/10 p-3 text-label text-warn">
           <TriangleAlert className="h-4 w-4 shrink-0" />
           <span>GROQ_API_KEY isn&apos;t configured yet, so the AI Mentor can&apos;t respond right now.</span>
         </div>
       ) : null}
 
-      <div ref={scrollRef} className="max-h-80 min-h-32 space-y-3 overflow-y-auto p-4">
+      <div ref={scrollRef} className="max-h-80 min-h-32 space-y-3 overflow-y-auto p-5">
         {messages.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-body text-muted-foreground">
             Ask about your tasks, habits, finances, health, or pipeline — the Mentor sees your whole dashboard.
           </p>
         ) : (
           messages.map((m) => (
-            <div key={m.id} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
+            <div
+              key={m.id}
+              className={cn("flex animate-in fade-in-0 slide-in-from-bottom-1 duration-300", m.role === "user" ? "justify-end" : "justify-start")}
+            >
               <p
                 className={cn(
-                  "max-w-[85%] rounded-lg px-3 py-2 text-sm",
+                  "max-w-[85%] rounded-2xl px-3.5 py-2 text-body",
                   m.role === "user"
                     ? "bg-brand text-primary-foreground"
                     : m.failed
@@ -83,10 +86,14 @@ export function MentorChatWidget({ initialMessages, hasKey }: { initialMessages:
             </div>
           ))
         )}
-        {isPending ? <p className="text-xs text-muted-foreground">Mentor is thinking…</p> : null}
+        {isPending ? (
+          <p className="text-label text-muted-foreground after:inline-block after:animate-pulse after:content-['…']">
+            Mentor is thinking
+          </p>
+        ) : null}
       </div>
 
-      <div className="flex items-center gap-2 border-t border-border p-3">
+      <div className="flex items-center gap-2 border-t border-white/[0.06] p-3.5">
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}

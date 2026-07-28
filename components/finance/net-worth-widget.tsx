@@ -19,11 +19,13 @@ export function NetWorthWidget({
       <StatTile
         label="Net Worth"
         value={money(netWorth)}
+        delta={netWorth >= 0 ? "Positive" : "Negative"}
         tone={netWorth >= 0 ? "success" : "danger"}
+        primary
         className="col-span-3 sm:col-span-1"
       />
-      <StatTile label="Total Assets" value={money(assets)} tone="success" />
-      <StatTile label="Total Liabilities" value={money(liabilities)} tone={liabilities > 0 ? "danger" : "neutral"} />
+      <StatTile label="Total Assets" value={money(assets)} />
+      <StatTile label="Total Liabilities" value={money(liabilities)} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Check, Pencil, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { deleteAccountAction, adjustAccountBalanceAction } from "@/actions/finance-actions";
 import type { Database } from "@/lib/supabase/database.types";
@@ -51,16 +52,11 @@ export function AccountCard({ account }: { account: Account }) {
   }
 
   return (
-    <div
-      className={cn(
-        "rounded-lg border border-border bg-card p-4 border-t-2 border-t-brand transition-opacity",
-        isPending && "opacity-70",
-      )}
-    >
+    <Card className={cn("transition-opacity", isPending && "opacity-70")}>
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="text-sm font-medium">{account.name}</p>
-          <Badge variant="outline" className="mt-1 text-[10px] uppercase">
+          <p className="text-body font-medium">{account.name}</p>
+          <Badge variant="outline" className="mt-1.5 text-caption uppercase">
             {TYPE_LABEL[account.account_type]}
           </Badge>
         </div>
@@ -100,7 +96,7 @@ export function AccountCard({ account }: { account: Account }) {
           </>
         ) : (
           <>
-            <p className={cn("font-mono text-xl", isLiability && "text-danger")}>
+            <p className={cn("font-mono text-title", isLiability && "text-danger")}>
               {isLiability ? "Owed " : ""}${fmt(display)}
             </p>
             <button
@@ -113,6 +109,6 @@ export function AccountCard({ account }: { account: Account }) {
           </>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

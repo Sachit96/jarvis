@@ -1,10 +1,13 @@
 import { cn } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 
 interface StatTileProps {
   label: string;
   value: string;
   delta?: string;
   tone?: "neutral" | "success" | "danger" | "warn";
+  /** Mark at most one tile per screen — the accent ring is reserved for it. */
+  primary?: boolean;
   className?: string;
 }
 
@@ -15,30 +18,19 @@ const TONE_CLASSES: Record<NonNullable<StatTileProps["tone"]>, string> = {
   warn: "text-warn",
 };
 
-/** The JARVIS "glowing number card" — a thin accent top-border, not a full glow. */
 export function StatTile({
   label,
   value,
   delta,
   tone = "neutral",
+  primary = false,
   className,
 }: StatTileProps) {
   return (
-    <div
-      className={cn(
-        "rounded-lg border border-border bg-card p-4 border-t-2 border-t-brand",
-        className,
-      )}
-    >
-      <p className="text-xs uppercase tracking-wider text-muted-foreground">
-        {label}
-      </p>
-      <p className="mt-1 font-mono text-2xl text-foreground">{value}</p>
-      {delta ? (
-        <p className={cn("mt-1 font-mono text-xs", TONE_CLASSES[tone])}>
-          {delta}
-        </p>
-      ) : null}
-    </div>
+    <Card className={cn(primary && "ring-brand/40", className)}>
+      <p className="text-label uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className={cn("mt-1.5 font-mono text-title", primary ? "text-brand" : "text-foreground")}>{value}</p>
+      {delta ? <p className={cn("mt-1 text-caption font-mono", TONE_CLASSES[tone])}>{delta}</p> : null}
+    </Card>
   );
 }

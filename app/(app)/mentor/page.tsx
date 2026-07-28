@@ -1,9 +1,11 @@
+import { Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getDailyRecommendation, getGeneralMentorMessages } from "@/lib/db/queries/mentor";
 import { generateDailyBriefAction } from "@/actions/mentor-actions";
 import { BriefCard } from "@/components/mentor/brief-card";
 import { GenerateBriefButton } from "@/components/mentor/generate-brief-button";
 import { MentorChatWidget } from "@/components/mentor/mentor-chat-widget";
+import { EmptyState } from "@/components/shared/empty-state";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { MENTOR_TABS } from "@/lib/nav-items";
 
@@ -22,16 +24,16 @@ export default async function MentorPage() {
   ]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">AI Mentor</p>
-        <h1 className="text-xl font-semibold">Today</h1>
+        <p className="text-label uppercase tracking-wide text-muted-foreground">AI Mentor</p>
+        <h1 className="text-title">Today</h1>
       </div>
 
       <ModuleTabs tabs={MENTOR_TABS} />
 
       {brief ? (
-        <div className="space-y-2">
+        <div className="space-y-3">
           <BriefCard
             dateLabel={`Generated for ${brief.rec_date}`}
             markdownBody={brief.markdown_body}
@@ -42,13 +44,13 @@ export default async function MentorPage() {
           <GenerateBriefButton action={generateDailyBriefAction} label="Regenerate today's brief" hasKey={hasGroqKey} />
         </div>
       ) : (
-        <div className="space-y-3 rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            No brief for today yet — generate one from your current tasks, habits, finances, health, and pipeline.
-          </p>
-          <div className="flex justify-center">
-            <GenerateBriefButton action={generateDailyBriefAction} label="Generate today's brief" hasKey={hasGroqKey} />
-          </div>
+        <div className="rounded-2xl bg-card ring-1 ring-white/[0.06]">
+          <EmptyState
+            icon={Sparkles}
+            title="No brief yet today"
+            description="Generate one from your current tasks, habits, finances, health, and pipeline."
+            action={<GenerateBriefButton action={generateDailyBriefAction} label="Generate today's brief" hasKey={hasGroqKey} />}
+          />
         </div>
       )}
 
