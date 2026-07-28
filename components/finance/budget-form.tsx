@@ -3,7 +3,7 @@
 import { useActionState, useRef, useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { createBudgetAction, type ActionState } from "@/actions/finance-actions";
-import { SUGGESTED_CATEGORIES } from "@/lib/validations/finance";
+import { SUGGESTED_CATEGORIES } from "@/lib/constants/finance";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

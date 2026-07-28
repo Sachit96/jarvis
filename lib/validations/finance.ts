@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-export const SUGGESTED_CATEGORIES = ["Business", "Personal", "Software", "Trading", "Living"];
-
 export const accountSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
   account_type: z.enum(["cash", "savings", "credit", "investment"]),
