@@ -1,8 +1,5 @@
-import Link from "next/link";
-import { StatTile } from "@/components/shared/stat-tile";
-import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
-import { getPriorityTasks, getHabitsWithStreaks } from "@/lib/db/queries/life";
+import { getPriorityTasks, getGoals } from "@/lib/db/queries/life";
 import { getAccounts, getMonthTransactions, computeAssetLiabilityTotals, computeMonthlyPnl } from "@/lib/db/queries/finance";
 import {
   getWorkouts,
@@ -13,12 +10,18 @@ import {
   computeWorkoutVolume,
 } from "@/lib/db/queries/health";
 import { getDailyRecommendation } from "@/lib/db/queries/mentor";
-import { getContracts, computeMrr } from "@/lib/db/queries/business";
+import { getPipelineStages, getDeals, getContracts, computeMrr, computePipelineSummary } from "@/lib/db/queries/business";
 import { getTodayRoutineItems } from "@/lib/db/queries/routine";
+import { getUpcoming, getRecentActivity } from "@/lib/db/queries/command-center";
 import { hasHevyKey } from "@/lib/providers/workout/hevy-client";
 import { PriorityTasksWidget } from "@/components/dashboard/priority-tasks-widget";
-import { HabitStreaksWidget } from "@/components/dashboard/habit-streaks-widget";
 import { TodayRoutineCard } from "@/components/dashboard/today-routine-card";
+import { GoalProgressCard } from "@/components/dashboard/goal-progress-card";
+import { MentorInsightCard } from "@/components/dashboard/mentor-insight-card";
+import { BusinessSnapshotCard } from "@/components/dashboard/business-snapshot-card";
+import { HealthSnapshotCard } from "@/components/dashboard/health-snapshot-card";
+import { UpcomingCard } from "@/components/dashboard/upcoming-card";
+import { RecentActivityCard } from "@/components/dashboard/recent-activity-card";
 import { NetWorthWidget } from "@/components/finance/net-worth-widget";
 import { MonthlyPnlCard } from "@/components/finance/monthly-pnl-card";
 import { HevyAutoSync } from "@/components/health/hevy-auto-sync";
@@ -33,35 +36,43 @@ export default async function DashboardPage() {
 
   const [
     priorityTasks,
-    habitsWithStreaks,
+    goals,
     accounts,
     monthTransactions,
     workouts,
     nutritionTargets,
     todayNutritionLogs,
     dailyBrief,
+    stages,
+    deals,
     contracts,
     routineItems,
+    upcoming,
+    recentActivity,
   ] = await Promise.all([
     getPriorityTasks(supabase),
-    getHabitsWithStreaks(supabase),
+    getGoals(supabase),
     getAccounts(supabase),
     getMonthTransactions(supabase),
     getWorkouts(supabase),
     getNutritionTargets(supabase),
     getNutritionLogsForDate(supabase, today),
     getDailyRecommendation(supabase, today),
+    getPipelineStages(supabase),
+    getDeals(supabase),
     getContracts(supabase),
     getTodayRoutineItems(supabase),
+    getUpcoming(supabase),
+    getRecentActivity(supabase),
   ]);
-  const mrr = computeMrr(contracts);
 
   const financeTotals = computeAssetLiabilityTotals(accounts);
   const pnl = computeMonthlyPnl(monthTransactions);
   const trainedToday = workouts.some((w) => w.started_at.slice(0, 10) === today);
   const macroTotals = computeMacroTotals(todayNutritionLogs);
   const calorieTarget = nutritionTargets?.target_calories ?? 2000;
-  const caloriePct = calorieTarget > 0 ? Math.round((macroTotals.calories / calorieTarget) * 100) : 0;
+  const pipelineSummary = computePipelineSummary(deals, stages);
+  const mrr = computeMrr(contracts);
 
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -70,52 +81,47 @@ export default async function DashboardPage() {
   const volume7d = computeWorkoutVolume(recentSets);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {hasHevyKey() ? <HevyAutoSync /> : null}
 
       <div>
         <h1 className="text-title">Today</h1>
-        <p className="mt-0.5 text-body text-muted-foreground">Your cross-module command center.</p>
+        <p className="mt-0.5 text-body text-muted-foreground">
+          What you need to know and do today, in one place.
+        </p>
       </div>
 
       <TodayRoutineCard items={routineItems} />
 
-      <Link
-        href="/mentor"
-        className="block rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-      >
-        <Card interactive>
-          <p className="text-label uppercase tracking-wide text-brand">Mentor&apos;s take</p>
-          <p className="mt-2 line-clamp-3 text-body text-muted-foreground">
-            {dailyBrief ? dailyBrief.markdown_body : "No brief yet today — tap to have your mentor look things over."}
-          </p>
-        </Card>
-      </Link>
+      <MentorInsightCard markdownBody={dailyBrief?.markdown_body ?? null} focusAreas={dailyBrief?.focus_areas ?? []} />
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <PriorityTasksWidget tasks={priorityTasks} />
+        <GoalProgressCard goals={goals} />
+      </div>
 
       <NetWorthWidget {...financeTotals} />
       <MonthlyPnlCard {...pnl} />
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-        <StatTile
-          label="Workouts (90d)"
-          value={String(workouts.length)}
-          delta={trainedToday ? "Trained today" : "Not yet today"}
-          tone={trainedToday ? "success" : "neutral"}
+      <div className="grid gap-3 sm:grid-cols-2">
+        <BusinessSnapshotCard
+          openValue={pipelineSummary.openValue}
+          openCount={pipelineSummary.openCount}
+          winRate={pipelineSummary.winRate}
+          mrr={mrr}
         />
-        <StatTile label="Volume (7d)" value={`${volume7d.toLocaleString()} kg`} delta="Weight × reps" />
-        <StatTile
-          label="Calories today"
-          value={`${macroTotals.calories} kcal`}
-          delta={`${caloriePct}% of target`}
-          tone={caloriePct > 100 ? "danger" : "neutral"}
+        <HealthSnapshotCard
+          trainedToday={trainedToday}
+          workoutsCount={workouts.length}
+          volume7d={volume7d}
+          caloriesToday={macroTotals.calories}
+          calorieTarget={calorieTarget}
         />
-        <StatTile label="Life" value={String(priorityTasks.length)} delta="Priority tasks" />
-        <StatTile label="MRR" value={`$${mrr.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <PriorityTasksWidget tasks={priorityTasks} />
-        <HabitStreaksWidget habitsWithStreaks={habitsWithStreaks} />
+        <UpcomingCard items={upcoming} />
+        <RecentActivityCard items={recentActivity} />
       </div>
     </div>
   );

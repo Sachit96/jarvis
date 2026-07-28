@@ -4,6 +4,7 @@ import type { Database } from "@/lib/supabase/database.types";
 type Client = SupabaseClient<Database>;
 type DealRow = Database["public"]["Tables"]["deals"]["Row"];
 type ContractRow = Database["public"]["Tables"]["contracts"]["Row"];
+type PipelineStageRow = Database["public"]["Tables"]["pipeline_stages"]["Row"];
 
 export async function getPipelineStages(supabase: Client) {
   const { data, error } = await supabase
@@ -103,6 +104,29 @@ export function computePipelineValueByStage(deals: Pick<DealRow, "stage_id" | "v
     map.set(d.stage_id, (map.get(d.stage_id) ?? 0) + Number(d.value));
   }
   return map;
+}
+
+/** Shared by the Business dashboard and the Home command-center snapshot — one place for "open vs won vs win rate" math. */
+export function computePipelineSummary(
+  deals: Pick<DealRow, "stage_id" | "value">[],
+  stages: Pick<PipelineStageRow, "id" | "is_won" | "is_lost">[],
+) {
+  const stageById = new Map(stages.map((s) => [s.id, s]));
+  const openDeals = deals.filter((d) => {
+    const stage = stageById.get(d.stage_id);
+    return stage && !stage.is_won && !stage.is_lost;
+  });
+  const wonDeals = deals.filter((d) => stageById.get(d.stage_id)?.is_won);
+  const lostDeals = deals.filter((d) => stageById.get(d.stage_id)?.is_lost);
+  const closedCount = wonDeals.length + lostDeals.length;
+  return {
+    openCount: openDeals.length,
+    openValue: openDeals.reduce((sum, d) => sum + Number(d.value), 0),
+    wonCount: wonDeals.length,
+    wonValue: wonDeals.reduce((sum, d) => sum + Number(d.value), 0),
+    winRate: closedCount > 0 ? Math.round((wonDeals.length / closedCount) * 100) : 0,
+    closedCount,
+  };
 }
 
 export async function getGhlConnection(supabase: Client) {

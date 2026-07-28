@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getPipelineStages, getDeals, getContracts, computeMrr } from "@/lib/db/queries/business";
+import { getPipelineStages, getDeals, getContracts, computeMrr, computePipelineSummary } from "@/lib/db/queries/business";
 import { StatTile } from "@/components/shared/stat-tile";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { BUSINESS_TABS } from "@/lib/nav-items";
@@ -16,17 +16,7 @@ export default async function BusinessDashboardPage() {
     getContracts(supabase),
   ]);
 
-  const stageById = new Map(stages.map((s) => [s.id, s]));
-  const openDeals = deals.filter((d) => {
-    const stage = stageById.get(d.stage_id);
-    return stage && !stage.is_won && !stage.is_lost;
-  });
-  const wonDeals = deals.filter((d) => stageById.get(d.stage_id)?.is_won);
-  const lostDeals = deals.filter((d) => stageById.get(d.stage_id)?.is_lost);
-  const closedCount = wonDeals.length + lostDeals.length;
-  const winRate = closedCount > 0 ? Math.round((wonDeals.length / closedCount) * 100) : 0;
-  const openValue = openDeals.reduce((sum, d) => sum + Number(d.value), 0);
-  const wonValue = wonDeals.reduce((sum, d) => sum + Number(d.value), 0);
+  const summary = computePipelineSummary(deals, stages);
   const mrr = computeMrr(contracts);
 
   return (
@@ -39,9 +29,9 @@ export default async function BusinessDashboardPage() {
       <ModuleTabs tabs={BUSINESS_TABS} />
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <StatTile label="Open Pipeline" value={money(openValue)} delta={`${openDeals.length} deal(s)`} />
-        <StatTile label="Won (all time)" value={money(wonValue)} tone="success" delta={`${wonDeals.length} deal(s)`} />
-        <StatTile label="Win Rate" value={`${winRate}%`} delta={`${closedCount} closed`} />
+        <StatTile label="Open Pipeline" value={money(summary.openValue)} delta={`${summary.openCount} deal(s)`} />
+        <StatTile label="Won (all time)" value={money(summary.wonValue)} tone="success" delta={`${summary.wonCount} deal(s)`} />
+        <StatTile label="Win Rate" value={`${summary.winRate}%`} delta={`${summary.closedCount} closed`} />
         <StatTile label="MRR" value={money(mrr)} tone="success" />
       </div>
 
