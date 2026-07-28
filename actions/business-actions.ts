@@ -28,11 +28,6 @@ function revalidateBusiness() {
 
 export async function ensureDefaultPipelineStagesAction() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return;
-
   const { count, error: countError } = await supabase
     .from("pipeline_stages")
     .select("id", { count: "exact", head: true });
@@ -41,7 +36,6 @@ export async function ensureDefaultPipelineStagesAction() {
 
   const { error } = await supabase.from("pipeline_stages").insert(
     DEFAULT_PIPELINE_STAGES.map((s, i) => ({
-      user_id: user.id,
       name: s.name,
       sort_order: i,
       is_won: s.is_won ?? false,
@@ -64,14 +58,8 @@ export async function createPipelineStageAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const { count } = await supabase.from("pipeline_stages").select("id", { count: "exact", head: true });
   const { error } = await supabase.from("pipeline_stages").insert({
-    user_id: user.id,
     name: parsed.data.name,
     sort_order: count ?? 0,
   });
@@ -108,15 +96,9 @@ export async function createLeadAction(
   if (!stageId) return { error: "Choose a starting stage" };
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const { data: contact, error: contactError } = await supabase
     .from("contacts")
     .insert({
-      user_id: user.id,
       company_name: parsed.data.company_name || null,
       contact_person: parsed.data.contact_person,
       email: parsed.data.email || null,
@@ -128,7 +110,6 @@ export async function createLeadAction(
   if (contactError) return { error: contactError.message };
 
   const { error: dealError } = await supabase.from("deals").insert({
-    user_id: user.id,
     contact_id: contact.id,
     stage_id: stageId,
     value: parsed.data.value ?? 0,
@@ -190,13 +171,7 @@ export async function createActivityAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const { error } = await supabase.from("activities").insert({
-    user_id: user.id,
     contact_id: parsed.data.contact_id,
     deal_id: parsed.data.deal_id || null,
     type: parsed.data.type,
@@ -229,13 +204,7 @@ export async function createDealTaskAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const { error } = await supabase.from("deal_tasks").insert({
-    user_id: user.id,
     deal_id: parsed.data.deal_id,
     title: parsed.data.title,
     due_date: parsed.data.due_date || null,
@@ -278,13 +247,7 @@ export async function createContractAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const { error } = await supabase.from("contracts").insert({
-    user_id: user.id,
     contact_id: parsed.data.contact_id,
     title: parsed.data.title,
     monthly_value: parsed.data.monthly_value,
@@ -319,11 +282,6 @@ export async function deleteContractAction(id: string) {
 
 export async function ensureOnboardingTasksAction(contactId: string) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return;
-
   const { count, error: countError } = await supabase
     .from("client_onboarding_tasks")
     .select("id", { count: "exact", head: true })
@@ -333,7 +291,6 @@ export async function ensureOnboardingTasksAction(contactId: string) {
 
   const { error } = await supabase.from("client_onboarding_tasks").insert(
     DEFAULT_ONBOARDING_TASKS.map((label, i) => ({
-      user_id: user.id,
       contact_id: contactId,
       label,
       sort_order: i,
@@ -355,18 +312,12 @@ export async function createOnboardingTaskAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const { count } = await supabase
     .from("client_onboarding_tasks")
     .select("id", { count: "exact", head: true })
     .eq("contact_id", parsed.data.contact_id);
 
   const { error } = await supabase.from("client_onboarding_tasks").insert({
-    user_id: user.id,
     contact_id: parsed.data.contact_id,
     label: parsed.data.label,
     sort_order: count ?? 0,

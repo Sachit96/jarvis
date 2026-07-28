@@ -10,13 +10,8 @@ export interface BriefActionResult {
 
 export async function generateDailyBriefAction(): Promise<BriefActionResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   try {
-    await generateDailyBrief(supabase, user.id);
+    await generateDailyBrief(supabase);
     revalidatePath("/mentor");
     return {};
   } catch (err) {
@@ -26,13 +21,8 @@ export async function generateDailyBriefAction(): Promise<BriefActionResult> {
 
 export async function generateWeeklyReviewAction(): Promise<BriefActionResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   try {
-    await generateWeeklyReview(supabase, user.id);
+    await generateWeeklyReview(supabase);
     revalidatePath("/mentor/weekly-review");
     return {};
   } catch (err) {
@@ -48,13 +38,8 @@ export interface MentorChatResult {
 export async function sendGeneralMentorMessageAction(content: string): Promise<MentorChatResult> {
   if (!content.trim()) return { error: "Say something first" };
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   try {
-    const assistantRow = await runGeneralMentorChat(supabase, user.id, content.trim());
+    const assistantRow = await runGeneralMentorChat(supabase, content.trim());
     revalidatePath("/mentor");
     return { reply: assistantRow.content };
   } catch (err) {

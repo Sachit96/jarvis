@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
   const { data: connection } = await admin
     .from("ghl_connections")
-    .select("user_id")
+    .select("id")
     .eq("location_id", locationId)
     .eq("is_active", true)
     .maybeSingle();
@@ -47,13 +47,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, note: "No matching connection for this locationId" });
   }
 
-  const userId = connection.user_id;
   const eventType = String((payload as Record<string, unknown>).type ?? "unknown");
 
   try {
-    await handleEvent(admin, userId, payload as Record<string, unknown>);
+    await handleEvent(admin, payload as Record<string, unknown>);
     await admin.from("ghl_sync_logs").insert({
-      user_id: userId,
       direction: "inbound",
       event_type: eventType,
       status: "success",
@@ -62,7 +60,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (err) {
     await admin.from("ghl_sync_logs").insert({
-      user_id: userId,
       direction: "inbound",
       event_type: eventType,
       status: "error",
@@ -77,7 +74,7 @@ export async function POST(request: NextRequest) {
 
 type AdminClient = ReturnType<typeof createAdminClient>;
 
-async function handleEvent(admin: AdminClient, userId: string, payload: Record<string, unknown>) {
+async function handleEvent(admin: AdminClient, payload: Record<string, unknown>) {
   const contactId = pickString(payload, "contactId") ?? (looksLikeContact(payload) ? pickString(payload, "id") : null);
 
   if (looksLikeContact(payload)) {
@@ -88,7 +85,6 @@ async function handleEvent(admin: AdminClient, userId: string, payload: Record<s
       const name = pickString(payload, "contactName", "name") ?? `${firstName} ${lastName}`.trim();
       await admin.from("contacts").upsert(
         {
-          user_id: userId,
           external_id: id,
           source: "ghl",
           company_name: pickString(payload, "companyName"),
@@ -96,7 +92,7 @@ async function handleEvent(admin: AdminClient, userId: string, payload: Record<s
           email: pickString(payload, "email"),
           phone: pickString(payload, "phone"),
         },
-        { onConflict: "user_id,external_id" },
+        { onConflict: "external_id" },
       );
     }
   }
@@ -108,13 +104,11 @@ async function handleEvent(admin: AdminClient, userId: string, payload: Record<s
       const { data: localContact } = await admin
         .from("contacts")
         .select("id")
-        .eq("user_id", userId)
         .eq("external_id", linkedContactExternalId)
         .maybeSingle();
       const { data: stages } = await admin
         .from("pipeline_stages")
         .select("id, sort_order, is_won, is_lost")
-        .eq("user_id", userId)
         .order("sort_order", { ascending: true });
 
       if (localContact && stages && stages.length > 0) {
@@ -129,7 +123,6 @@ async function handleEvent(admin: AdminClient, userId: string, payload: Record<s
         const rawValue = payload.monetaryValue ?? payload.value;
         await admin.from("deals").upsert(
           {
-            user_id: userId,
             external_id: id,
             source: "ghl",
             contact_id: localContact.id,
@@ -137,7 +130,7 @@ async function handleEvent(admin: AdminClient, userId: string, payload: Record<s
             title: pickString(payload, "name", "title"),
             value: typeof rawValue === "number" ? rawValue : Number(rawValue) || 0,
           },
-          { onConflict: "user_id,external_id" },
+          { onConflict: "external_id" },
         );
       }
     }

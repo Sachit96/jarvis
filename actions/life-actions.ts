@@ -36,13 +36,7 @@ export async function createTaskAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const { error } = await supabase.from("tasks").insert({
-    user_id: user.id,
     title: parsed.data.title,
     description: parsed.data.description || null,
     priority: parsed.data.priority,
@@ -92,13 +86,7 @@ export async function createGoalAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const { error } = await supabase.from("goals").insert({
-    user_id: user.id,
     title: parsed.data.title,
     description: parsed.data.description || null,
     timeframe: parsed.data.timeframe,
@@ -149,15 +137,9 @@ export async function createHabitAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const { count } = await supabase.from("habits").select("id", { count: "exact", head: true });
 
   const { error } = await supabase.from("habits").insert({
-    user_id: user.id,
     name: parsed.data.name,
     metric_type: parsed.data.metric_type,
     kind: parsed.data.kind,
@@ -178,16 +160,10 @@ export async function deleteHabitAction(id: string) {
 
 export async function toggleHabitTodayAction(habitId: string, completed: boolean) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not signed in");
-
   const { error } = await supabase
     .from("habit_logs")
     .upsert(
       {
-        user_id: user.id,
         habit_id: habitId,
         log_date: todayStr(),
         completed,
@@ -197,7 +173,7 @@ export async function toggleHabitTodayAction(habitId: string, completed: boolean
     );
   if (error) throw new Error(error.message);
   revalidatePath("/life/habits");
-  revalidatePath("/dashboard");
+  revalidatePath("/");
 }
 
 export async function toggleHabitPinnedAction(id: string, pinned: boolean) {
@@ -210,11 +186,6 @@ export async function toggleHabitPinnedAction(id: string, pinned: boolean) {
 /** Swaps this habit's sort_order with its neighbor in the current display order. */
 export async function moveHabitAction(id: string, direction: "up" | "down") {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not signed in");
-
   const { data: habits, error: fetchError } = await supabase
     .from("habits")
     .select("id, sort_order, pinned")
@@ -242,11 +213,6 @@ export async function moveHabitAction(id: string, direction: "up" | "down") {
 /** Idempotent — inserts starter routine items (including "No G") only if the user has none yet. */
 export async function ensureDefaultHabitsAction() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return;
-
   const { count, error: countError } = await supabase
     .from("habits")
     .select("id", { count: "exact", head: true });
@@ -261,7 +227,7 @@ export async function ensureDefaultHabitsAction() {
   ];
   const { error } = await supabase
     .from("habits")
-    .insert(defaults.map((d, i) => ({ ...d, user_id: user.id, sort_order: i })));
+    .insert(defaults.map((d, i) => ({ ...d, sort_order: i })));
   if (error) throw new Error(error.message);
   // No revalidatePath here — this only ever runs at the top of a Server
   // Component's render body (never from a client-triggered form submit), and
@@ -288,13 +254,7 @@ export async function createJournalEntryAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const { error } = await supabase.from("journal_entries").insert({
-    user_id: user.id,
     title: parsed.data.title || null,
     body: parsed.data.body,
     mood: parsed.data.mood ?? null,

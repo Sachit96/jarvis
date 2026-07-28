@@ -38,12 +38,6 @@ const EXPORT_TABLES = [
 
 export async function GET() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: "Not signed in" }, { status: 401 });
-  }
 
   const results = await Promise.all(
     EXPORT_TABLES.map(async (table) => {
@@ -55,7 +49,6 @@ export async function GET() {
 
   const payload = {
     exportedAt: new Date().toISOString(),
-    userEmail: user.email,
     data: Object.fromEntries(results),
   };
 

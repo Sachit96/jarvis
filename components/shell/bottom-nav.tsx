@@ -12,7 +12,7 @@ export function BottomNav() {
     <nav className="fixed inset-x-0 bottom-0 z-40 flex h-16 border-t border-white/[0.06] bg-background/90 backdrop-blur-sm md:hidden">
       {NAV_ITEMS.map((item) => {
         const moduleSegment = `/${item.href.split("/")[1]}`;
-        const isActive = pathname.startsWith(moduleSegment);
+        const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(moduleSegment);
         const Icon = item.icon;
         return (
           <Link

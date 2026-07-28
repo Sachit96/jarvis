@@ -63,7 +63,7 @@ async function callMentorJson(client: Groq, systemPrompt: string): Promise<Brief
   }
 }
 
-export async function generateDailyBrief(supabase: Client, userId: string) {
+export async function generateDailyBrief(supabase: Client) {
   const client = getGroqClient();
   if (!client) throw new Error("GROQ_API_KEY is not configured");
   const context = await buildMentorContext(supabase);
@@ -81,7 +81,6 @@ export async function generateDailyBrief(supabase: Client, userId: string) {
 
   const { error } = await supabase.from("daily_recommendations").upsert(
     {
-      user_id: userId,
       rec_date: recDate,
       markdown_body: brief.markdownBody,
       focus_areas: brief.focusAreas,
@@ -89,7 +88,7 @@ export async function generateDailyBrief(supabase: Client, userId: string) {
       weaknesses: brief.weaknesses,
       model_used: MENTOR_MODEL,
     },
-    { onConflict: "user_id,rec_date" },
+    { onConflict: "rec_date" },
   );
   if (error) throw new Error(error.message);
 
@@ -105,7 +104,7 @@ function startOfWeek(d: Date) {
   return date;
 }
 
-export async function generateWeeklyReview(supabase: Client, userId: string) {
+export async function generateWeeklyReview(supabase: Client) {
   const client = getGroqClient();
   if (!client) throw new Error("GROQ_API_KEY is not configured");
   const context = await buildMentorContext(supabase);
@@ -129,7 +128,6 @@ export async function generateWeeklyReview(supabase: Client, userId: string) {
 
   const { error } = await supabase.from("weekly_reviews").upsert(
     {
-      user_id: userId,
       week_start_date: weekStartDate,
       week_end_date: weekEndDate,
       markdown_body: brief.markdownBody,
@@ -138,20 +136,20 @@ export async function generateWeeklyReview(supabase: Client, userId: string) {
       weaknesses: brief.weaknesses,
       model_used: MENTOR_MODEL,
     },
-    { onConflict: "user_id,week_start_date" },
+    { onConflict: "week_start_date" },
   );
   if (error) throw new Error(error.message);
 
   return { ...brief, weekStartDate, weekEndDate };
 }
 
-export async function runGeneralMentorChat(supabase: Client, userId: string, userContent: string) {
+export async function runGeneralMentorChat(supabase: Client, userContent: string) {
   const client = getGroqClient();
   if (!client) throw new Error("GROQ_API_KEY is not configured");
 
   const { error: insertUserErr } = await supabase
     .from("mentor_messages")
-    .insert({ user_id: userId, role: "user", content: userContent, context: "mentor" });
+    .insert({ role: "user", content: userContent, context: "mentor" });
   if (insertUserErr) throw new Error(insertUserErr.message);
 
   const { data: history, error: historyErr } = await supabase
@@ -185,7 +183,7 @@ export async function runGeneralMentorChat(supabase: Client, userId: string, use
 
   const { data: assistantRow, error: insertAssistantErr } = await supabase
     .from("mentor_messages")
-    .insert({ user_id: userId, role: "assistant", content: replyContent, context: "mentor" })
+    .insert({ role: "assistant", content: replyContent, context: "mentor" })
     .select()
     .single();
   if (insertAssistantErr) throw new Error(insertAssistantErr.message);

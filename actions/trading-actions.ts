@@ -36,14 +36,8 @@ export async function upsertMarketAnalysisAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const { error } = await supabase.from("market_analyses").upsert(
     {
-      user_id: user.id,
       pair: parsed.data.pair.toUpperCase(),
       analysis_date: parsed.data.analysis_date,
       weekly_sentiment: parsed.data.weekly_sentiment ?? null,
@@ -53,7 +47,7 @@ export async function upsertMarketAnalysisAction(
       h4_sentiment: parsed.data.h4_sentiment ?? null,
       h4_notes: parsed.data.h4_notes || null,
     },
-    { onConflict: "user_id,pair,analysis_date" },
+    { onConflict: "pair,analysis_date" },
   );
   if (error) return { error: error.message };
   revalidatePath("/finance/analysis");
@@ -71,11 +65,6 @@ export async function deleteMarketAnalysisAction(id: string) {
 
 export async function ensureDefaultChecklistAction() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return;
-
   const { count, error: countError } = await supabase
     .from("trade_checklist_items")
     .select("id", { count: "exact", head: true });
@@ -84,7 +73,6 @@ export async function ensureDefaultChecklistAction() {
 
   const { error } = await supabase.from("trade_checklist_items").insert(
     DEFAULT_CHECKLIST_ITEMS.map((label, i) => ({
-      user_id: user.id,
       label,
       sort_order: i,
     })),
@@ -105,17 +93,11 @@ export async function createChecklistItemAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const { count } = await supabase
     .from("trade_checklist_items")
     .select("id", { count: "exact", head: true });
 
   const { error } = await supabase.from("trade_checklist_items").insert({
-    user_id: user.id,
     label: parsed.data.label,
     sort_order: count ?? 0,
   });

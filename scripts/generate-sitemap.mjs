@@ -42,8 +42,7 @@ function routeFromPagePath(absPath) {
 }
 
 function moduleFromRoute(route) {
-  if (route === "/") return "Root";
-  if (route.startsWith("/login") || route.startsWith("/signup")) return "Auth";
+  if (route === "/") return "Command Center";
   const seg = route.split("/")[1];
   return { life: "Life OS", finance: "Finance OS", health: "Health OS", business: "Business OS", mentor: "AI Mentor", settings: "System", dashboard: "Command Center" }[seg] ?? seg;
 }
@@ -69,9 +68,9 @@ const apiRoutes = apiFiles.map((f) => {
   const route = "/" + rel.replace(/^app\//, "").replace(/\/route\.ts$/, "");
   const source = readFileSync(f, "utf8");
   const methods = [...source.matchAll(/export async function (GET|POST|PUT|PATCH|DELETE)/g)].map((m) => m[1]);
-  let auth = "Session cookie (normal login)";
-  if (source.includes("GHL_WEBHOOK_SECRET")) auth = "Shared secret (?secret= query param) — public, no session";
-  else if (source.includes("CRON_SECRET")) auth = "Shared secret (Authorization: Bearer) — public, no session";
+  let auth = "None — single-user, no auth";
+  if (source.includes("GHL_WEBHOOK_SECRET")) auth = "Shared secret (?secret= query param)";
+  else if (source.includes("CRON_SECRET")) auth = "Shared secret (Authorization: Bearer)";
   return { route, file: rel, methods, auth };
 });
 
@@ -109,7 +108,7 @@ function fileRow(f) {
   return `<li><a class="src" href="${REPO}/${esc(f)}" target="_blank" rel="noopener">${esc(f)}</a></li>`;
 }
 
-const moduleOrder = ["Command Center", "Life OS", "Finance OS", "Health OS", "Business OS", "AI Mentor", "System", "Auth", "Root"];
+const moduleOrder = ["Command Center", "Life OS", "Finance OS", "Health OS", "Business OS", "AI Mentor", "System"];
 const pageSections = moduleOrder
   .filter((m) => pagesByModule.has(m))
   .map((m) => `<section><h3>${esc(m)}</h3><ul class="pages">${pagesByModule.get(m).map(pageRow).join("")}</ul></section>`)

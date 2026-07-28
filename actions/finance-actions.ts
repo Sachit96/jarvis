@@ -51,10 +51,6 @@ export async function createAccountAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
 
   // Users enter credit balances as a positive "amount owed"; store it negative so
   // it nets against asset balances directly (see computeAssetLiabilityTotals).
@@ -64,7 +60,6 @@ export async function createAccountAction(
       : parsed.data.current_balance;
 
   const { error } = await supabase.from("accounts").insert({
-    user_id: user.id,
     name: parsed.data.name,
     account_type: parsed.data.account_type,
     current_balance,
@@ -115,13 +110,7 @@ export async function createTransactionAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
 
-  // RLS-scoped select resolves to null for another user's account, blocking cross-user writes
-  // that the balance-sync trigger would otherwise apply to an account this user doesn't own.
   const { data: account } = await supabase
     .from("accounts")
     .select("id")
@@ -130,7 +119,6 @@ export async function createTransactionAction(
   if (!account) return { error: "Account not found" };
 
   const { error } = await supabase.from("transactions").insert({
-    user_id: user.id,
     account_id: parsed.data.account_id,
     type: parsed.data.type,
     amount: parsed.data.amount,
@@ -164,18 +152,12 @@ export async function createBudgetAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const { error } = await supabase.from("budgets").upsert(
     {
-      user_id: user.id,
       category: parsed.data.category,
       monthly_limit: parsed.data.monthly_limit,
     },
-    { onConflict: "user_id,category" },
+    { onConflict: "category" },
   );
   if (error) return { error: error.message };
   revalidatePath("/finance/budgets");
@@ -211,11 +193,6 @@ export async function createTradeAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const isClosed = parsed.data.exit_price !== undefined && parsed.data.quantity !== undefined;
   const pnl = isClosed
     ? computePnl(
@@ -228,7 +205,6 @@ export async function createTradeAction(
     : null;
 
   const { error } = await supabase.from("trades").insert({
-    user_id: user.id,
     asset_pair: parsed.data.asset_pair,
     direction: parsed.data.direction,
     entry_price: parsed.data.entry_price,

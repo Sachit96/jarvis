@@ -19,7 +19,7 @@ export interface HevySyncResult {
  * reinsert) rather than diffed individually — simpler than giving every set
  * its own external identity, and cheap at personal scale.
  */
-export async function syncHevyWorkouts(supabase: Client, userId: string, pageSize = 10): Promise<HevySyncResult> {
+export async function syncHevyWorkouts(supabase: Client, pageSize = 10): Promise<HevySyncResult> {
   if (!hasHevyKey()) {
     return { ok: false, message: "HEVY_API_KEY is not configured", workoutsSynced: 0 };
   }
@@ -32,14 +32,13 @@ export async function syncHevyWorkouts(supabase: Client, userId: string, pageSiz
       .from("workouts")
       .upsert(
         {
-          user_id: userId,
           external_id: hw.id,
           source: "hevy",
           session_label: hw.title || "Hevy Workout",
           started_at: hw.start_time,
           completed: true,
         },
-        { onConflict: "user_id,external_id" },
+        { onConflict: "external_id" },
       )
       .select()
       .single();
@@ -53,8 +52,8 @@ export async function syncHevyWorkouts(supabase: Client, userId: string, pageSiz
       const { data: exerciseRow, error: exErr } = await supabase
         .from("exercises")
         .upsert(
-          { user_id: userId, external_id: ex.exercise_template_id, source: "hevy", name: ex.title },
-          { onConflict: "user_id,external_id" },
+          { external_id: ex.exercise_template_id, source: "hevy", name: ex.title },
+          { onConflict: "external_id" },
         )
         .select()
         .single();
@@ -63,7 +62,6 @@ export async function syncHevyWorkouts(supabase: Client, userId: string, pageSiz
       for (const set of ex.sets) {
         setNumber += 1;
         setRows.push({
-          user_id: userId,
           workout_id: workout.id,
           exercise_id: exerciseRow.id,
           set_number: setNumber,

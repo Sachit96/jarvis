@@ -49,7 +49,6 @@ export type Database = {
           is_liability: boolean | null
           name: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           account_type: string
@@ -60,7 +59,6 @@ export type Database = {
           is_liability?: boolean | null
           name: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           account_type?: string
@@ -71,7 +69,6 @@ export type Database = {
           is_liability?: boolean | null
           name?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -84,7 +81,6 @@ export type Database = {
           notes: string
           occurred_at: string
           type: string
-          user_id: string
         }
         Insert: {
           contact_id: string
@@ -94,7 +90,6 @@ export type Database = {
           notes: string
           occurred_at?: string
           type?: string
-          user_id: string
         }
         Update: {
           contact_id?: string
@@ -104,7 +99,6 @@ export type Database = {
           notes?: string
           occurred_at?: string
           type?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -130,7 +124,6 @@ export type Database = {
           id: string
           monthly_limit: number
           updated_at: string
-          user_id: string
         }
         Insert: {
           category: string
@@ -138,7 +131,6 @@ export type Database = {
           id?: string
           monthly_limit: number
           updated_at?: string
-          user_id: string
         }
         Update: {
           category?: string
@@ -146,7 +138,6 @@ export type Database = {
           id?: string
           monthly_limit?: number
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -159,7 +150,6 @@ export type Database = {
           label: string
           sort_order: number
           updated_at: string
-          user_id: string
         }
         Insert: {
           completed?: boolean
@@ -169,7 +159,6 @@ export type Database = {
           label: string
           sort_order?: number
           updated_at?: string
-          user_id: string
         }
         Update: {
           completed?: boolean
@@ -179,7 +168,6 @@ export type Database = {
           label?: string
           sort_order?: number
           updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -203,7 +191,6 @@ export type Database = {
           phone: string | null
           source: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           company_name?: string | null
@@ -216,7 +203,6 @@ export type Database = {
           phone?: string | null
           source?: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           company_name?: string | null
@@ -229,7 +215,6 @@ export type Database = {
           phone?: string | null
           source?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -245,7 +230,6 @@ export type Database = {
           status: string
           title: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           contact_id: string
@@ -258,7 +242,6 @@ export type Database = {
           status?: string
           title: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           contact_id?: string
@@ -271,7 +254,6 @@ export type Database = {
           status?: string
           title?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -293,7 +275,6 @@ export type Database = {
           rec_date: string
           strengths: string[]
           updated_at: string
-          user_id: string
           weaknesses: string[]
         }
         Insert: {
@@ -305,7 +286,6 @@ export type Database = {
           rec_date?: string
           strengths?: string[]
           updated_at?: string
-          user_id: string
           weaknesses?: string[]
         }
         Update: {
@@ -317,7 +297,6 @@ export type Database = {
           rec_date?: string
           strengths?: string[]
           updated_at?: string
-          user_id?: string
           weaknesses?: string[]
         }
         Relationships: []
@@ -331,7 +310,6 @@ export type Database = {
           id: string
           title: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           completed?: boolean
@@ -341,7 +319,6 @@ export type Database = {
           id?: string
           title: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           completed?: boolean
@@ -351,7 +328,6 @@ export type Database = {
           id?: string
           title?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -376,7 +352,6 @@ export type Database = {
           stage_id: string
           title: string | null
           updated_at: string
-          user_id: string
           value: number
         }
         Insert: {
@@ -391,7 +366,6 @@ export type Database = {
           stage_id: string
           title?: string | null
           updated_at?: string
-          user_id: string
           value?: number
         }
         Update: {
@@ -406,7 +380,6 @@ export type Database = {
           stage_id?: string
           title?: string | null
           updated_at?: string
-          user_id?: string
           value?: number
         }
         Relationships: [
@@ -436,7 +409,6 @@ export type Database = {
           name: string
           source: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           created_at?: string
@@ -447,7 +419,6 @@ export type Database = {
           name: string
           source?: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           created_at?: string
@@ -458,7 +429,6 @@ export type Database = {
           name?: string
           source?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -471,7 +441,6 @@ export type Database = {
           location_id: string
           private_token: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           created_at?: string
@@ -481,7 +450,6 @@ export type Database = {
           location_id: string
           private_token: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           created_at?: string
@@ -491,7 +459,6 @@ export type Database = {
           location_id?: string
           private_token?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -504,7 +471,6 @@ export type Database = {
           message: string | null
           payload: Json | null
           status: string
-          user_id: string
         }
         Insert: {
           created_at?: string
@@ -514,7 +480,6 @@ export type Database = {
           message?: string | null
           payload?: Json | null
           status: string
-          user_id: string
         }
         Update: {
           created_at?: string
@@ -524,7 +489,6 @@ export type Database = {
           message?: string | null
           payload?: Json | null
           status?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -540,7 +504,6 @@ export type Database = {
           timeframe: string
           title: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           category?: string | null
@@ -553,7 +516,6 @@ export type Database = {
           timeframe: string
           title: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           category?: string | null
@@ -566,7 +528,6 @@ export type Database = {
           timeframe?: string
           title?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -581,7 +542,6 @@ export type Database = {
           log_date: string
           note: string | null
           updated_at: string
-          user_id: string
         }
         Insert: {
           completed?: boolean
@@ -593,7 +553,6 @@ export type Database = {
           log_date: string
           note?: string | null
           updated_at?: string
-          user_id: string
         }
         Update: {
           completed?: boolean
@@ -605,7 +564,6 @@ export type Database = {
           log_date?: string
           note?: string | null
           updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -630,7 +588,6 @@ export type Database = {
           sort_order: number
           target_count: number | null
           updated_at: string
-          user_id: string
         }
         Insert: {
           color?: string | null
@@ -644,7 +601,6 @@ export type Database = {
           sort_order?: number
           target_count?: number | null
           updated_at?: string
-          user_id: string
         }
         Update: {
           color?: string | null
@@ -658,7 +614,6 @@ export type Database = {
           sort_order?: number
           target_count?: number | null
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -674,7 +629,6 @@ export type Database = {
           obsidian_path: string | null
           title: string | null
           updated_at: string
-          user_id: string
         }
         Insert: {
           body: string
@@ -687,7 +641,6 @@ export type Database = {
           obsidian_path?: string | null
           title?: string | null
           updated_at?: string
-          user_id: string
         }
         Update: {
           body?: string
@@ -700,7 +653,6 @@ export type Database = {
           obsidian_path?: string | null
           title?: string | null
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -715,7 +667,6 @@ export type Database = {
           id: string
           pair: string
           updated_at: string
-          user_id: string
           weekly_notes: string | null
           weekly_sentiment: string | null
         }
@@ -729,7 +680,6 @@ export type Database = {
           id?: string
           pair: string
           updated_at?: string
-          user_id: string
           weekly_notes?: string | null
           weekly_sentiment?: string | null
         }
@@ -743,7 +693,6 @@ export type Database = {
           id?: string
           pair?: string
           updated_at?: string
-          user_id?: string
           weekly_notes?: string | null
           weekly_sentiment?: string | null
         }
@@ -756,7 +705,6 @@ export type Database = {
           created_at: string
           id: string
           role: string
-          user_id: string
         }
         Insert: {
           content: string
@@ -764,7 +712,6 @@ export type Database = {
           created_at?: string
           id?: string
           role: string
-          user_id: string
         }
         Update: {
           content?: string
@@ -772,7 +719,6 @@ export type Database = {
           created_at?: string
           id?: string
           role?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -789,7 +735,6 @@ export type Database = {
           protein_g: number
           source: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           calories?: number
@@ -803,7 +748,6 @@ export type Database = {
           protein_g?: number
           source?: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           calories?: number
@@ -817,7 +761,6 @@ export type Database = {
           protein_g?: number
           source?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -831,7 +774,6 @@ export type Database = {
           target_protein_g: number
           target_water_ml: number
           updated_at: string
-          user_id: string
         }
         Insert: {
           created_at?: string
@@ -842,7 +784,6 @@ export type Database = {
           target_protein_g?: number
           target_water_ml?: number
           updated_at?: string
-          user_id: string
         }
         Update: {
           created_at?: string
@@ -853,7 +794,6 @@ export type Database = {
           target_protein_g?: number
           target_water_ml?: number
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -866,7 +806,6 @@ export type Database = {
           name: string
           sort_order: number
           updated_at: string
-          user_id: string
         }
         Insert: {
           created_at?: string
@@ -876,7 +815,6 @@ export type Database = {
           name: string
           sort_order?: number
           updated_at?: string
-          user_id: string
         }
         Update: {
           created_at?: string
@@ -886,7 +824,6 @@ export type Database = {
           name?: string
           sort_order?: number
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -899,7 +836,6 @@ export type Database = {
           logged_at: string | null
           prayer_id: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           completed?: boolean
@@ -909,7 +845,6 @@ export type Database = {
           logged_at?: string | null
           prayer_id: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           completed?: boolean
@@ -919,7 +854,6 @@ export type Database = {
           logged_at?: string | null
           prayer_id?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -939,7 +873,6 @@ export type Database = {
           name: string
           sort_order: number
           updated_at: string
-          user_id: string
         }
         Insert: {
           created_at?: string
@@ -948,7 +881,6 @@ export type Database = {
           name: string
           sort_order?: number
           updated_at?: string
-          user_id: string
         }
         Update: {
           created_at?: string
@@ -956,31 +888,6 @@ export type Database = {
           is_active?: boolean
           name?: string
           sort_order?: number
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          created_at: string
-          display_name: string | null
-          email: string
-          id: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          display_name?: string | null
-          email: string
-          id: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          display_name?: string | null
-          email?: string
-          id?: string
           updated_at?: string
         }
         Relationships: []
@@ -997,7 +904,6 @@ export type Database = {
           tags: string[]
           title: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           completed_at?: string | null
@@ -1010,7 +916,6 @@ export type Database = {
           tags?: string[]
           title: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           completed_at?: string | null
@@ -1023,7 +928,6 @@ export type Database = {
           tags?: string[]
           title?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -1035,7 +939,6 @@ export type Database = {
           label: string
           sort_order: number
           updated_at: string
-          user_id: string
         }
         Insert: {
           created_at?: string
@@ -1044,7 +947,6 @@ export type Database = {
           label: string
           sort_order?: number
           updated_at?: string
-          user_id: string
         }
         Update: {
           created_at?: string
@@ -1053,7 +955,6 @@ export type Database = {
           label?: string
           sort_order?: number
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -1075,7 +976,6 @@ export type Database = {
           setup_category: string | null
           status: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           asset_pair: string
@@ -1094,7 +994,6 @@ export type Database = {
           setup_category?: string | null
           status?: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           asset_pair?: string
@@ -1113,7 +1012,6 @@ export type Database = {
           setup_category?: string | null
           status?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -1128,7 +1026,6 @@ export type Database = {
           occurred_at: string
           type: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           account_id: string
@@ -1140,7 +1037,6 @@ export type Database = {
           occurred_at?: string
           type: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           account_id?: string
@@ -1152,7 +1048,6 @@ export type Database = {
           occurred_at?: string
           type?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -1170,21 +1065,18 @@ export type Database = {
           created_at: string
           id: string
           log_date: string
-          user_id: string
         }
         Insert: {
           amount_ml: number
           created_at?: string
           id?: string
           log_date?: string
-          user_id: string
         }
         Update: {
           amount_ml?: number
           created_at?: string
           id?: string
           log_date?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -1197,7 +1089,6 @@ export type Database = {
           model_used: string | null
           strengths: string[]
           updated_at: string
-          user_id: string
           weaknesses: string[]
           week_end_date: string
           week_start_date: string
@@ -1210,7 +1101,6 @@ export type Database = {
           model_used?: string | null
           strengths?: string[]
           updated_at?: string
-          user_id: string
           weaknesses?: string[]
           week_end_date: string
           week_start_date: string
@@ -1223,7 +1113,6 @@ export type Database = {
           model_used?: string | null
           strengths?: string[]
           updated_at?: string
-          user_id?: string
           weaknesses?: string[]
           week_end_date?: string
           week_start_date?: string
@@ -1238,7 +1127,6 @@ export type Database = {
           reps: number | null
           set_number: number
           updated_at: string
-          user_id: string
           weight_kg: number | null
           workout_id: string
         }
@@ -1249,7 +1137,6 @@ export type Database = {
           reps?: number | null
           set_number?: number
           updated_at?: string
-          user_id: string
           weight_kg?: number | null
           workout_id: string
         }
@@ -1260,7 +1147,6 @@ export type Database = {
           reps?: number | null
           set_number?: number
           updated_at?: string
-          user_id?: string
           weight_kg?: number | null
           workout_id?: string
         }
@@ -1292,7 +1178,6 @@ export type Database = {
           source: string
           started_at: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           completed?: boolean
@@ -1304,7 +1189,6 @@ export type Database = {
           source?: string
           started_at?: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           completed?: boolean
@@ -1316,7 +1200,6 @@ export type Database = {
           source?: string
           started_at?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }

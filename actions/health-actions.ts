@@ -31,20 +31,13 @@ function revalidateHealth() {
 
 export async function ensureDefaultExercisesAction() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return;
-
   const { count, error: countError } = await supabase
     .from("exercises")
     .select("id", { count: "exact", head: true });
   if (countError) throw new Error(countError.message);
   if (count && count > 0) return;
 
-  const { error } = await supabase
-    .from("exercises")
-    .insert(DEFAULT_EXERCISES.map((e) => ({ ...e, user_id: user.id })));
+  const { error } = await supabase.from("exercises").insert(DEFAULT_EXERCISES);
   if (error) throw new Error(error.message);
   // No revalidatePath — only ever called at the top of a Server Component's
   // render body, not from a client-triggered action; disallowed there in
@@ -64,13 +57,7 @@ export async function createExerciseAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const { error } = await supabase.from("exercises").insert({
-    user_id: user.id,
     name: parsed.data.name,
     muscle_group: parsed.data.muscle_group || null,
   });
@@ -94,13 +81,7 @@ export async function createWorkoutAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const { error } = await supabase.from("workouts").insert({
-    user_id: user.id,
     session_label: parsed.data.session_label,
     started_at: new Date(parsed.data.started_at).toISOString(),
     notes: parsed.data.notes || null,
@@ -139,13 +120,7 @@ export async function addWorkoutSetAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const { error } = await supabase.from("workout_sets").insert({
-    user_id: user.id,
     workout_id: parsed.data.workout_id,
     exercise_id: parsed.data.exercise_id,
     set_number: parsed.data.set_number,
@@ -181,14 +156,12 @@ export async function upsertNutritionTargetsAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
-  const { error } = await supabase
-    .from("nutrition_targets")
-    .upsert({ user_id: user.id, ...parsed.data }, { onConflict: "user_id" });
+  // Exactly one row ever exists — no user_id to key an upsert on, so fetch
+  // it first and update/insert accordingly.
+  const { data: existing } = await supabase.from("nutrition_targets").select("id").maybeSingle();
+  const { error } = existing
+    ? await supabase.from("nutrition_targets").update(parsed.data).eq("id", existing.id)
+    : await supabase.from("nutrition_targets").insert(parsed.data);
   if (error) return { error: error.message };
   revalidateHealth();
   return {};
@@ -211,13 +184,7 @@ export async function createNutritionLogAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   const { error } = await supabase.from("nutrition_logs").insert({
-    user_id: user.id,
     meal_type: parsed.data.meal_type,
     logged_at: parsed.data.logged_at,
     description: parsed.data.description,
@@ -244,13 +211,7 @@ export async function addWaterAction(amountMl: number) {
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Invalid amount");
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not signed in");
-
   const { error } = await supabase.from("water_logs").insert({
-    user_id: user.id,
     log_date: todayStr(),
     amount_ml: parsed.data.amount_ml,
   });
@@ -271,13 +232,8 @@ export async function sendMentorMessageAction(content: string): Promise<MentorAc
     return { error: parsed.error.issues[0]?.message ?? "Invalid message" };
   }
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not signed in" };
-
   try {
-    const assistantRow = await runMentorChat(supabase, user.id, parsed.data.content);
+    const assistantRow = await runMentorChat(supabase, parsed.data.content);
     revalidatePath("/health/nutrition");
     return { reply: assistantRow.content };
   } catch (err) {

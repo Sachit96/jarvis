@@ -75,7 +75,7 @@ async function buildSystemPrompt(supabase: Client) {
   ].join("\n\n");
 }
 
-export async function runMentorChat(supabase: Client, userId: string, userContent: string) {
+export async function runMentorChat(supabase: Client, userContent: string) {
   const client = getGroqClient();
   if (!client) {
     throw new Error("GROQ_API_KEY is not configured");
@@ -83,7 +83,7 @@ export async function runMentorChat(supabase: Client, userId: string, userConten
 
   const { error: insertUserErr } = await supabase
     .from("mentor_messages")
-    .insert({ user_id: userId, role: "user", content: userContent, context: "nutrition" });
+    .insert({ role: "user", content: userContent, context: "nutrition" });
   if (insertUserErr) throw new Error(insertUserErr.message);
 
   const { data: history, error: historyErr } = await supabase
@@ -127,7 +127,6 @@ export async function runMentorChat(supabase: Client, userId: string, userConten
         continue;
       }
       const { error: logErr } = await supabase.from("nutrition_logs").insert({
-        user_id: userId,
         meal_type: String(args.meal_type),
         description: String(args.description),
         calories: Math.round(Number(args.calories) || 0),
@@ -157,7 +156,7 @@ export async function runMentorChat(supabase: Client, userId: string, userConten
 
   const { data: assistantRow, error: insertAssistantErr } = await supabase
     .from("mentor_messages")
-    .insert({ user_id: userId, role: "assistant", content: finalContent, context: "nutrition" })
+    .insert({ role: "assistant", content: finalContent, context: "nutrition" })
     .select()
     .single();
   if (insertAssistantErr) throw new Error(insertAssistantErr.message);

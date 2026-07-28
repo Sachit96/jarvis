@@ -3,11 +3,10 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 
 /**
- * Service-role client — bypasses RLS entirely. Use ONLY from trusted
- * server-only contexts with no user session (e.g. the Netlify Scheduled
- * Function that triggers the AI Mentor for every user). Every query run
- * through this client must still explicitly filter by user_id as
- * defense-in-depth, since RLS won't do it here.
+ * Service-role client for routes with no browser-facing request context
+ * (cron/scheduler hits, webhooks) — functionally identical to
+ * lib/supabase/server.ts's createClient() now that there's no session/RLS
+ * distinction left, kept as a separate entry point for those call sites.
  */
 export function createAdminClient() {
   return createSupabaseClient<Database>(

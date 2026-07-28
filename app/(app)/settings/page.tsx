@@ -8,9 +8,6 @@ import { MENTOR_MODEL } from "@/lib/ai/groq";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
   const hasGroqKey = Boolean(process.env.GROQ_API_KEY);
   const [ghlConnection, ghlLogs] = await Promise.all([getGhlConnection(supabase), getGhlSyncLogs(supabase)]);
 
@@ -19,18 +16,6 @@ export default async function SettingsPage() {
       <div>
         <p className="text-xs uppercase tracking-wider text-muted-foreground">System</p>
         <h1 className="text-xl font-semibold">Settings</h1>
-      </div>
-
-      <div className="rounded-lg border border-border bg-card p-4">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">Account</p>
-        <p className="mt-2 text-sm">{user?.email}</p>
-        <p className="mt-0.5 font-mono text-xs text-muted-foreground">
-          Member since {user?.created_at ? new Date(user.created_at).toLocaleDateString() : "—"}
-        </p>
-        <p className="mt-2 text-xs text-muted-foreground">
-          JARVIS signs into this account automatically — there&apos;s no password to manage here. (Changing it
-          would need a matching update to the JARVIS_ACCOUNT_PASSWORD env var, so that form was removed.)
-        </p>
       </div>
 
       <GroqStatusCard hasKey={hasGroqKey} model={MENTOR_MODEL} />

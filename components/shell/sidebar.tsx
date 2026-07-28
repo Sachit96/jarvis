@@ -55,7 +55,7 @@ export function Sidebar() {
       <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-2">
         {SIDEBAR_ITEMS.map((item) => {
           const moduleSegment = `/${item.href.split("/")[1]}`;
-          const isActive = pathname.startsWith(moduleSegment);
+          const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(moduleSegment);
           const Icon = item.icon;
           return (
             <Link

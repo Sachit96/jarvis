@@ -1,34 +1,17 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import "server-only";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 
 /**
- * Server Component / Server Action client. Requests are scoped to the
- * signed-in user's JWT — RLS enforces isolation, no manual user_id filtering
- * needed in app code.
+ * JARVIS has no authentication — one fixed dataset, no sessions, no RLS.
+ * Every Server Component/Action/Route Handler gets the same service-role
+ * client. Kept async and named createClient() so every existing call site
+ * (`const supabase = await createClient()`) needed zero changes.
  */
 export async function createClient() {
-  const cookieStore = await cookies();
-
-  return createServerClient<Database>(
+  return createSupabaseClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options),
-            );
-          } catch {
-            // Called from a Server Component with no ability to set cookies —
-            // middleware.ts handles session refresh, so this is safe to ignore.
-          }
-        },
-      },
-    },
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } },
   );
 }

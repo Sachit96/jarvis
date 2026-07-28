@@ -25,7 +25,7 @@ export interface NavItem {
  * placeholder link, same pattern as the Coming Soon pages elsewhere.
  */
 export const SIDEBAR_ITEMS: NavItem[] = [
-  { href: "/dashboard", label: "Home", icon: LayoutDashboard },
+  { href: "/", label: "Home", icon: LayoutDashboard },
   { href: "/business/dashboard", label: "Business", icon: Briefcase },
   { href: "/health/workouts", label: "Health", icon: HeartPulse },
   { href: "/finance/overview", label: "Finance", icon: Wallet },
@@ -38,7 +38,7 @@ export const SIDEBAR_ITEMS: NavItem[] = [
 
 /** Curated subset for the mobile bottom bar — five is the most a thumb can reach comfortably. */
 export const NAV_ITEMS: NavItem[] = [
-  { href: "/dashboard", label: "Home", icon: LayoutDashboard },
+  { href: "/", label: "Home", icon: LayoutDashboard },
   { href: "/life/tasks", label: "Tasks", icon: ListChecks },
   { href: "/finance/overview", label: "Finance", icon: Wallet },
   { href: "/health/workouts", label: "Health", icon: HeartPulse },
