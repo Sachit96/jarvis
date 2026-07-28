@@ -34,7 +34,7 @@ export default async function BudgetsPage() {
           No budgets yet — set your first monthly cap above.
         </p>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           {budgets.map((budget) => (
             <BudgetBar
               key={budget.id}

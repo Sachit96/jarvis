@@ -44,7 +44,7 @@ export default async function FinanceOverviewPage() {
       <NetWorthWidget {...totals} />
       <MonthlyPnlCard {...pnl} />
 
-      <div className="grid gap-3 lg:grid-cols-5">
+      <div className="grid gap-4 lg:grid-cols-5">
         <div className="lg:col-span-3">
           <CashflowTrendChart points={cashflowPoints} />
         </div>
@@ -65,7 +65,7 @@ export default async function FinanceOverviewPage() {
             description="Add a cash, savings, credit, or investment account to start tracking your net worth."
           />
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             {accounts.map((account) => (
               <AccountCard key={account.id} account={account} />
             ))}

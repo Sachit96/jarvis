@@ -44,7 +44,7 @@ export default async function MentorPage() {
           <GenerateBriefButton action={generateDailyBriefAction} label="Regenerate today's brief" hasKey={hasGroqKey} />
         </div>
       ) : (
-        <div className="rounded-2xl bg-card ring-1 ring-white/[0.06]">
+        <div className="rounded-2xl bg-card ring-1 ring-border">
           <EmptyState
             icon={Sparkles}
             title="No brief yet today"

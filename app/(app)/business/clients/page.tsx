@@ -43,7 +43,7 @@ export default async function ClientsPage() {
           No clients yet — add a lead from the Pipeline tab to get started.
         </p>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           {contacts.map((contact) => (
             <ContactCard
               key={contact.id}

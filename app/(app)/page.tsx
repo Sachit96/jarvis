@@ -95,7 +95,7 @@ export default async function DashboardPage() {
 
       <MentorInsightCard markdownBody={dailyBrief?.markdown_body ?? null} focusAreas={dailyBrief?.focus_areas ?? []} />
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <PriorityTasksWidget tasks={priorityTasks} />
         <GoalProgressCard goals={goals} />
       </div>
@@ -103,7 +103,7 @@ export default async function DashboardPage() {
       <NetWorthWidget {...financeTotals} />
       <MonthlyPnlCard {...pnl} />
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <BusinessSnapshotCard
           openValue={pipelineSummary.openValue}
           openCount={pipelineSummary.openCount}
@@ -119,7 +119,7 @@ export default async function DashboardPage() {
         />
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <UpcomingCard items={upcoming} />
         <RecentActivityCard items={recentActivity} />
       </div>

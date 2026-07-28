@@ -24,9 +24,12 @@ export function PriorityTasksWidget({ tasks }: { tasks: Task[] }) {
       {tasks.length === 0 ? (
         <p className="mt-3 text-body text-muted-foreground">Nothing outstanding — nice.</p>
       ) : (
-        <ul className="mt-3 space-y-2.5">
+        <ul className="mt-2 -mx-2">
           {tasks.map((task) => (
-            <li key={task.id} className="flex items-center gap-2 text-body">
+            <li
+              key={task.id}
+              className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-body transition-colors hover:bg-white/[0.04]"
+            >
               <Badge variant="outline" className={cn("shrink-0 font-mono text-caption uppercase", PRIORITY_TONE[task.priority])}>
                 {task.priority}
               </Badge>

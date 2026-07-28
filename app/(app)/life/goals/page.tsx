@@ -33,7 +33,7 @@ export default async function GoalsPage() {
                 No {section.label.toLowerCase()} goals yet.
               </p>
             ) : (
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2">
                 {sectionGoals.map((goal) => (
                   <GoalCard key={goal.id} goal={goal} />
                 ))}

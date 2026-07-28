@@ -64,7 +64,7 @@ export function CommandPalette() {
       <button
         onClick={() => setOpen(true)}
         aria-label="Search everything"
-        className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground ring-1 ring-border transition-colors hover:bg-white/[0.04] hover:text-foreground"
       >
         <Search className="h-[18px] w-[18px]" />
       </button>

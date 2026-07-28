@@ -21,13 +21,6 @@ const TONE_TEXT: Record<NonNullable<StatTileProps["tone"]>, string> = {
   warn: "text-warn",
 };
 
-const TONE_CHIP: Record<NonNullable<StatTileProps["tone"]>, string> = {
-  neutral: "bg-muted text-muted-foreground",
-  success: "bg-success/15 text-success",
-  danger: "bg-danger/15 text-danger",
-  warn: "bg-warn/15 text-warn",
-};
-
 export function StatTile({
   label,
   value,
@@ -40,23 +33,14 @@ export function StatTile({
   const TrendIcon = trend === "up" ? TrendingUp : trend === "down" ? TrendingDown : null;
 
   return (
-    <Card className={cn(primary && "ring-brand/40", className)}>
+    <Card className={className}>
       <p className="text-label uppercase tracking-wide text-muted-foreground">{label}</p>
-      <p className={cn("mt-1.5 font-mono text-title", primary ? "text-brand" : "text-foreground")}>{value}</p>
+      <p className={cn("mt-1.5 font-mono text-title font-bold", primary ? "text-brand" : "text-foreground")}>{value}</p>
       {delta ? (
-        TrendIcon ? (
-          <span
-            className={cn(
-              "mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-caption font-medium",
-              TONE_CHIP[tone],
-            )}
-          >
-            <TrendIcon className="h-3 w-3" strokeWidth={2.5} />
-            {delta}
-          </span>
-        ) : (
-          <p className={cn("mt-1 text-caption font-mono", TONE_TEXT[tone])}>{delta}</p>
-        )
+        <p className={cn("mt-1.5 inline-flex items-center gap-1 text-caption font-medium", TONE_TEXT[tone])}>
+          {TrendIcon ? <TrendIcon className="h-3 w-3" strokeWidth={2.5} /> : null}
+          {delta}
+        </p>
       ) : null}
     </Card>
   );

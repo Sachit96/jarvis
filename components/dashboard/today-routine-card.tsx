@@ -19,7 +19,7 @@ export function TodayRoutineCard({ items }: { items: RoutineItem[] }) {
       </div>
 
       <div className="mt-3 flex items-center gap-5">
-        <ProgressRing percent={percent} size={84} strokeWidth={7} label={`${completedCount}/${items.length}`} sublabel="done" />
+        <ProgressRing percent={percent} size={104} strokeWidth={8} label={`${completedCount}/${items.length}`} sublabel="done" />
         <ul className="min-w-0 flex-1 space-y-1.5">
           {items.map((item) => (
             <li key={item.id} className="flex items-center gap-2 text-body">

@@ -13,11 +13,22 @@ export function ProgressRing({ percent, size = 96, strokeWidth = 8, label, subla
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference * (1 - clamped / 100);
+  // Segmented/dashed background track (vs. the solid progress arc below) —
+  // ~60 short ticks around the ring, purely decorative.
+  const segmentCount = 60;
+  const segmentGap = circumference / segmentCount;
 
   return (
     <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={radius} strokeWidth={strokeWidth} className="fill-none stroke-muted" />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          strokeWidth={strokeWidth * 0.55}
+          strokeDasharray={`${segmentGap * 0.55} ${segmentGap * 0.45}`}
+          className="fill-none stroke-white/[0.08]"
+        />
         <circle
           cx={size / 2}
           cy={size / 2}

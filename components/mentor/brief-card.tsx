@@ -34,7 +34,7 @@ export function BriefCard({
     <Card className="space-y-4 ring-brand/25">
       <p className="font-mono text-caption text-muted-foreground">{dateLabel}</p>
       <p className="text-body leading-relaxed whitespace-pre-wrap">{markdownBody}</p>
-      <div className="space-y-3 border-t border-white/[0.06] pt-3.5">
+      <div className="space-y-3 border-t border-white/[0.08] pt-3.5">
         <TagList label="Focus areas" items={focusAreas} tone="text-brand border-brand/40" />
         <TagList label="Strengths" items={strengths} tone="text-success border-success/40" />
         <TagList label="Weaknesses" items={weaknesses} tone="text-danger border-danger/40" />

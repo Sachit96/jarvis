@@ -3,9 +3,10 @@
 import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { PanelLeftClose, PanelLeftOpen, Settings as SettingsIcon, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SIDEBAR_ITEMS } from "@/lib/nav-items";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const COLLAPSE_KEY = "jarvis-sidebar-collapsed";
 
@@ -41,15 +42,27 @@ export function Sidebar() {
     <aside
       className={cn(
         "hidden shrink-0 flex-col bg-sidebar transition-[width] duration-200 ease-[var(--ease-jarvis)] md:flex",
-        collapsed ? "md:w-[72px]" : "md:w-60",
+        collapsed ? "md:w-[72px]" : "md:w-64",
       )}
     >
-      <div className={cn("flex h-14 shrink-0 items-center px-4", collapsed && "justify-center px-0")}>
-        {!collapsed ? (
-          <span className="font-mono text-heading font-semibold tracking-widest text-brand">JARVIS</span>
-        ) : (
-          <span className="font-mono text-heading font-semibold text-brand">J</span>
-        )}
+      {/* Workspace block — static (single-workspace app), styled like a switcher */}
+      <div className="shrink-0 p-3">
+        <div
+          className={cn(
+            "flex items-center gap-2.5 rounded-xl bg-white/[0.04] px-3 py-2.5 ring-1 ring-border",
+            collapsed && "justify-center px-0",
+          )}
+        >
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/15 text-brand">
+            <Sparkles className="h-4 w-4" strokeWidth={2} />
+          </span>
+          {!collapsed ? (
+            <div className="min-w-0">
+              <p className="truncate text-body font-semibold text-sidebar-foreground">JARVIS</p>
+              <p className="truncate text-caption text-muted-foreground">Personal OS</p>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-2">
@@ -80,12 +93,36 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="shrink-0 border-t border-white/[0.06] p-3">
+      {/* Profile block — single-user app, so this is a static identity strip
+          rather than a real account switcher. No email is shown since
+          there's no user/session record to source one from. */}
+      <div className="shrink-0 border-t border-sidebar-border p-3">
+        <div className={cn("flex items-center gap-2.5 rounded-xl px-1 py-1.5", collapsed && "justify-center px-0")}>
+          <Avatar size="sm">
+            <AvatarFallback className="bg-white/[0.06] text-sidebar-foreground">J</AvatarFallback>
+          </Avatar>
+          {!collapsed ? (
+            <>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-caption font-medium text-sidebar-foreground">JARVIS</p>
+                <p className="truncate text-caption text-muted-foreground">Personal workspace</p>
+              </div>
+              <Link
+                href="/settings"
+                aria-label="Settings"
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              >
+                <SettingsIcon className="h-4 w-4" strokeWidth={1.75} />
+              </Link>
+            </>
+          ) : null}
+        </div>
+
         <button
           onClick={toggle}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           className={cn(
-            "flex w-full items-center gap-3 rounded-xl px-3 py-2 text-body text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
+            "mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2 text-body text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
             collapsed && "justify-center px-0",
           )}
         >

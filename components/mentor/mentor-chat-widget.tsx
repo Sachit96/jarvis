@@ -47,8 +47,8 @@ export function MentorChatWidget({ initialMessages, hasKey }: { initialMessages:
   }
 
   return (
-    <div className="flex flex-col rounded-2xl bg-card ring-1 ring-white/[0.06]">
-      <div className="flex items-center gap-2 border-b border-white/[0.06] px-5 py-3.5">
+    <div className="flex flex-col rounded-2xl bg-card ring-1 ring-border">
+      <div className="flex items-center gap-2 border-b border-white/[0.08] px-5 py-3.5">
         <Sparkles className="h-4 w-4 text-brand" />
         <p className="text-body font-medium">Ask your Mentor</p>
       </div>
@@ -93,7 +93,7 @@ export function MentorChatWidget({ initialMessages, hasKey }: { initialMessages:
         ) : null}
       </div>
 
-      <div className="flex items-center gap-2 border-t border-white/[0.06] p-3.5">
+      <div className="flex items-center gap-2 border-t border-white/[0.08] p-3.5">
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}

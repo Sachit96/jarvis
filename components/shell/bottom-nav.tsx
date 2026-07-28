@@ -9,7 +9,7 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 flex h-16 border-t border-white/[0.06] bg-background/90 backdrop-blur-sm md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 flex h-16 border-t border-white/[0.08] bg-background/90 backdrop-blur-sm md:hidden">
       {NAV_ITEMS.map((item) => {
         const moduleSegment = `/${item.href.split("/")[1]}`;
         const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(moduleSegment);

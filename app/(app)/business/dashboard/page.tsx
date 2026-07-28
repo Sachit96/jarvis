@@ -28,7 +28,7 @@ export default async function BusinessDashboardPage() {
 
       <ModuleTabs tabs={BUSINESS_TABS} />
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <StatTile label="Open Pipeline" value={money(summary.openValue)} delta={`${summary.openCount} deal(s)`} />
         <StatTile label="Won (all time)" value={money(summary.wonValue)} tone="success" delta={`${summary.wonCount} deal(s)`} />
         <StatTile label="Win Rate" value={`${summary.winRate}%`} delta={`${summary.closedCount} closed`} />

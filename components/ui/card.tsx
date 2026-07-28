@@ -15,17 +15,17 @@ interface CardProps extends ComponentProps<"div"> {
 /**
  * The one card shape used everywhere — elevation over hard borders. A
  * near-black background already reads poorly with drop shadows, so depth
- * comes from a barely-there full ring (not a directional border) plus the
- * card surface sitting one step lighter than the page behind it.
+ * comes from a translucent-white fill (--card) plus a barely-there hairline
+ * ring (--border), not a directional border.
  */
 export function Card({ className, interactive, ...props }: CardProps) {
   return (
     <div
       data-slot="card"
       className={cn(
-        "rounded-2xl bg-card p-5 ring-1 ring-white/[0.06]",
+        "rounded-2xl bg-card p-6 ring-1 ring-border",
         interactive &&
-          "press cursor-pointer transition-[background-color,box-shadow] duration-200 ease-[var(--ease-jarvis)] hover:bg-[color-mix(in_oklch,var(--card),white_3%)] hover:ring-white/[0.1]",
+          "press cursor-pointer transition-[background-color,box-shadow] duration-200 ease-[var(--ease-jarvis)] hover:bg-[color-mix(in_oklch,var(--card),white_4%)] hover:ring-white/[0.14]",
         className,
       )}
       {...props}

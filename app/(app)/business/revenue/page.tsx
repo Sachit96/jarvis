@@ -25,7 +25,7 @@ export default async function RevenuePage() {
 
       <ModuleTabs tabs={BUSINESS_TABS} />
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-4">
         <StatTile label="MRR" value={`$${mrr.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} tone="success" />
         <StatTile label="Active Contracts" value={String(activeCount)} />
       </div>
@@ -35,7 +35,7 @@ export default async function RevenuePage() {
           No contracts yet — add one above once you have a client.
         </p>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           {contracts.map((contract) => (
             <ContractCard key={contract.id} contract={contract} contact={contactById.get(contract.contact_id)} />
           ))}

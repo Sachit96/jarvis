@@ -15,7 +15,7 @@ export function NetWorthWidget({
   netWorth: number;
 }) {
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-3 gap-4">
       <StatTile
         label="Net Worth"
         value={money(netWorth)}

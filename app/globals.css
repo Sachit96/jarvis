@@ -86,56 +86,65 @@
    app looks correct whether or not the .dark class is present. */
 :root,
 .dark {
-  /* System font stacks, not a downloaded webfont — -apple-system/
-     BlinkMacSystemFont resolve to the real SF Pro/SF Mono already on Apple
-     devices (zero network cost, genuinely Apple's own type), falling back to
-     each platform's native UI font elsewhere rather than a generic serif. */
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui,
-    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, "Cascadia Code", "Roboto Mono",
-    "Segoe UI Mono", monospace;
+  /* Geist (self-hosted via next/font/google, see app/layout.tsx) — a
+     modern geometric sans matching the reference design, falling back to
+     system UI fonts if a font variable somehow isn't present. */
+  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, Monaco, "Cascadia Code",
+    "Roboto Mono", "Segoe UI Mono", monospace;
 
-  --background: oklch(0.15 0.02 240);
-  --foreground: oklch(0.93 0.01 235);
-  --card: oklch(0.19 0.02 240);
-  --card-foreground: oklch(0.93 0.01 235);
-  --popover: oklch(0.22 0.02 240);
-  --popover-foreground: oklch(0.93 0.01 235);
+  /* True near-black, achromatic — the reference palette is neutral gray-
+     scale plus a sparing accent, not the previous blue-tinted dark theme. */
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  /* Card surfaces are translucent white over the page background (not a
+     flat lighter color) so depth reads from a barely-there fill, not a
+     visible box — 9% white ≈ the reference's subtle card contrast. */
+  --card: oklch(1 0 0 / 9%);
+  --card-foreground: oklch(0.985 0 0);
+  /* Popovers/dialogs float above content and need to stay legible, so
+     they're a solid (non-translucent) neutral rather than an overlay. */
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.82 0.15 200);
-  --primary-foreground: oklch(0.15 0.02 240);
-  --secondary: oklch(0.25 0.02 240);
-  --secondary-foreground: oklch(0.93 0.01 235);
-  --muted: oklch(0.24 0.02 240);
-  --muted-foreground: oklch(0.65 0.02 235);
-  --accent: oklch(0.27 0.02 240);
-  --accent-foreground: oklch(0.93 0.01 235);
-  --destructive: oklch(0.62 0.21 15);
-  --border: oklch(0.28 0.02 240);
-  --input: oklch(0.28 0.02 240);
+  --primary-foreground: oklch(0.145 0 0);
+  --secondary: oklch(0.205 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.21 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(1 0 0 / 8%);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: #ef4444;
+  /* Hairline borders — a faint translucent white edge, not a solid stroke. */
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.82 0.15 200);
   --chart-1: oklch(0.82 0.15 200);
-  --chart-2: oklch(0.75 0.17 165);
-  --chart-3: oklch(0.77 0.15 70);
-  --chart-4: oklch(0.65 0.21 15);
-  --chart-5: oklch(0.6 0.02 235);
-  --radius: 0.625rem;
+  --chart-2: oklch(0.72 0.08 165);
+  --chart-3: oklch(0.74 0.09 70);
+  --chart-4: oklch(0.65 0.03 300);
+  --chart-5: oklch(0.55 0.02 235);
+  --radius: 0.75rem;
   /* Sidebar reads as the same surface as the page, not a separate panel —
      no lightness/hue shift from --background. */
-  --sidebar: oklch(0.15 0.02 240);
-  --sidebar-foreground: oklch(0.93 0.01 235);
+  --sidebar: oklch(0.145 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.82 0.15 200);
-  --sidebar-primary-foreground: oklch(0.15 0.02 240);
-  --sidebar-accent: oklch(0.22 0.02 240);
-  --sidebar-accent-foreground: oklch(0.93 0.01 235);
-  --sidebar-border: oklch(0.15 0.02 240);
+  --sidebar-primary-foreground: oklch(0.145 0 0);
+  --sidebar-accent: oklch(1 0 0 / 8%);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.82 0.15 200);
 
-  /* JARVIS brand palette */
+  /* JARVIS brand palette — same cyan accent, applied more sparingly at the
+     component level (active nav state, icons, links) rather than as
+     heavy borders/rings. */
   --brand: oklch(0.82 0.15 200); /* cyan #22D3EE-ish */
   --brand-dim: oklch(0.55 0.1 210); /* muted teal */
   --warn: oklch(0.77 0.15 70); /* amber */
-  --danger: oklch(0.62 0.21 15); /* rose */
-  --success: oklch(0.75 0.17 165); /* emerald */
+  --danger: #ef4444;
+  --success: #22c55e;
 }
 
 @layer base {

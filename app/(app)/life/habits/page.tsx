@@ -48,7 +48,7 @@ export default async function RoutinePage() {
       <AutoRoutineList items={autoItems} />
 
       {noG.length > 0 ? (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           {noG.map((habit) => (
             <HabitCard key={habit.id} habit={habit} completedDates={datesByHabit.get(habit.id) ?? []} />
           ))}
@@ -56,7 +56,7 @@ export default async function RoutinePage() {
       ) : null}
 
       {rest.length > 0 ? (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           {rest.map((habit) => (
             <HabitCard key={habit.id} habit={habit} completedDates={datesByHabit.get(habit.id) ?? []} />
           ))}

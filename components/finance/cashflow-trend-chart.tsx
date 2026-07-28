@@ -43,7 +43,7 @@ export function CashflowTrendChart({ points }: { points: Point[] }) {
                   <stop offset="100%" stopColor="var(--brand)" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid vertical={false} stroke="var(--border)" strokeOpacity={0.5} />
+              <CartesianGrid vertical={false} stroke="var(--muted-foreground)" strokeOpacity={0.15} strokeDasharray="3 3" />
               <XAxis
                 dataKey="date"
                 tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}

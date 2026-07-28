@@ -26,7 +26,7 @@ export default async function AccountsPage() {
           No accounts yet — add your first one above.
         </p>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           {accounts.map((account) => (
             <AccountCard key={account.id} account={account} />
           ))}

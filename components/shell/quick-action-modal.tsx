@@ -225,7 +225,7 @@ export function QuickActionModal({ accounts }: { accounts: Account[] }) {
       <button
         onClick={() => setOpen(true)}
         aria-label="Quick add"
-        className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground ring-1 ring-border transition-colors hover:bg-white/[0.04] hover:text-foreground"
       >
         <CirclePlus className="h-[18px] w-[18px]" />
       </button>
