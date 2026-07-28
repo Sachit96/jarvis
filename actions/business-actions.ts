@@ -49,7 +49,10 @@ export async function ensureDefaultPipelineStagesAction() {
     })),
   );
   if (error) throw new Error(error.message);
-  revalidatePath("/business/pipeline");
+  // No revalidatePath — only ever called at the top of a Server Component's
+  // render body, not from a client-triggered action; disallowed there in
+  // production, and unnecessary since the page's own query right after this
+  // already sees the fresh rows within the same request.
 }
 
 export async function createPipelineStageAction(

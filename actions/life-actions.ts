@@ -263,7 +263,12 @@ export async function ensureDefaultHabitsAction() {
     .from("habits")
     .insert(defaults.map((d, i) => ({ ...d, user_id: user.id, sort_order: i })));
   if (error) throw new Error(error.message);
-  revalidatePath("/life/habits");
+  // No revalidatePath here — this only ever runs at the top of a Server
+  // Component's render body (never from a client-triggered form submit), and
+  // Next.js disallows calling revalidatePath during render outside a real
+  // Server Action invocation. The page's own query right after this call
+  // already sees the freshly-inserted rows within the same request, so there
+  // is nothing stale to revalidate anyway.
 }
 
 // ============================================================= Journal

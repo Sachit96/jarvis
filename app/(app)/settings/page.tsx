@@ -2,7 +2,6 @@ import { Download } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getGhlConnection, getGhlSyncLogs } from "@/lib/db/queries/business";
 import { GroqStatusCard } from "@/components/settings/groq-status-card";
-import { ChangePasswordForm } from "@/components/settings/change-password-form";
 import { GhlConnectionCard } from "@/components/settings/ghl-connection-card";
 import { GhlSyncLogs } from "@/components/settings/ghl-sync-logs";
 import { MENTOR_MODEL } from "@/lib/ai/groq";
@@ -23,12 +22,15 @@ export default async function SettingsPage() {
       </div>
 
       <div className="rounded-lg border border-border bg-card p-4">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">Profile</p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">Account</p>
         <p className="mt-2 text-sm">{user?.email}</p>
         <p className="mt-0.5 font-mono text-xs text-muted-foreground">
           Member since {user?.created_at ? new Date(user.created_at).toLocaleDateString() : "—"}
         </p>
-        <ChangePasswordForm />
+        <p className="mt-2 text-xs text-muted-foreground">
+          JARVIS signs into this account automatically — there&apos;s no password to manage here. (Changing it
+          would need a matching update to the JARVIS_ACCOUNT_PASSWORD env var, so that form was removed.)
+        </p>
       </div>
 
       <GroqStatusCard hasKey={hasGroqKey} model={MENTOR_MODEL} />

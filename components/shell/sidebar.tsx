@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SIDEBAR_ITEMS } from "@/lib/nav-items";
-import { signOutAction } from "@/actions/auth-actions";
 
 const COLLAPSE_KEY = "jarvis-sidebar-collapsed";
 
@@ -30,7 +29,7 @@ function setCollapsedPreference(value: boolean) {
   listeners.forEach((l) => l());
 }
 
-export function Sidebar({ userEmail }: { userEmail: string | undefined }) {
+export function Sidebar() {
   const pathname = usePathname();
   const collapsed = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
@@ -97,17 +96,6 @@ export function Sidebar({ userEmail }: { userEmail: string | undefined }) {
           )}
           {!collapsed ? "Collapse" : null}
         </button>
-
-        {!collapsed && userEmail ? (
-          <div className="mt-2 flex items-center justify-between gap-2 rounded-xl px-3 py-2">
-            <span className="min-w-0 truncate font-mono text-caption text-sidebar-foreground/60">{userEmail}</span>
-            <form action={signOutAction}>
-              <button type="submit" className="shrink-0 text-caption text-sidebar-foreground/60 hover:text-sidebar-foreground">
-                Sign out
-              </button>
-            </form>
-          </div>
-        ) : null}
       </div>
     </aside>
   );
