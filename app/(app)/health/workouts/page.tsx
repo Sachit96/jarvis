@@ -1,12 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { getExercises, getWorkouts, getWorkoutSets } from "@/lib/db/queries/health";
 import { ensureDefaultExercisesAction } from "@/actions/health-actions";
-import { syncHevyWorkouts } from "@/lib/providers/workout/hevy-sync";
 import { hasHevyKey } from "@/lib/providers/workout/hevy-client";
 import { WorkoutForm } from "@/components/health/workout-form";
 import { ExerciseForm } from "@/components/health/exercise-form";
 import { WorkoutSessionCard } from "@/components/health/workout-session-card";
 import { HevySyncButton } from "@/components/health/hevy-sync-button";
+import { HevyAutoSync } from "@/components/health/hevy-auto-sync";
 import { StreakHeatmap } from "@/components/shared/streak-heatmap";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { HEALTH_TABS } from "@/lib/nav-items";
@@ -15,22 +15,9 @@ export default async function WorkoutsPage() {
   await ensureDefaultExercisesAction();
 
   const supabase = await createClient();
-
   const connected = hasHevyKey();
-  if (connected) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (user) {
-      // Best-effort — a Hevy outage should never break the Workouts page.
-      await syncHevyWorkouts(supabase, user.id).catch((err) => {
-        console.error("Hevy auto-sync failed:", err);
-      });
-    }
-  }
 
-  const exercises = await getExercises(supabase);
-  const workouts = await getWorkouts(supabase);
+  const [exercises, workouts] = await Promise.all([getExercises(supabase), getWorkouts(supabase)]);
   const sets = await getWorkoutSets(
     supabase,
     workouts.map((w) => w.id),
@@ -47,6 +34,8 @@ export default async function WorkoutsPage() {
 
   return (
     <div className="space-y-6">
+      {connected ? <HevyAutoSync /> : null}
+
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="text-xs uppercase tracking-wider text-muted-foreground">Health</p>

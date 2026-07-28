@@ -13,12 +13,12 @@ import {
 } from "@/lib/db/queries/health";
 import { getDailyRecommendation } from "@/lib/db/queries/mentor";
 import { getContracts, computeMrr } from "@/lib/db/queries/business";
-import { syncHevyWorkouts } from "@/lib/providers/workout/hevy-sync";
 import { hasHevyKey } from "@/lib/providers/workout/hevy-client";
 import { PriorityTasksWidget } from "@/components/dashboard/priority-tasks-widget";
 import { HabitStreaksWidget } from "@/components/dashboard/habit-streaks-widget";
 import { NetWorthWidget } from "@/components/finance/net-worth-widget";
 import { MonthlyPnlCard } from "@/components/finance/monthly-pnl-card";
+import { HevyAutoSync } from "@/components/health/hevy-auto-sync";
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
@@ -27,16 +27,6 @@ function todayStr() {
 export default async function DashboardPage() {
   const supabase = await createClient();
   const today = todayStr();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (user && hasHevyKey()) {
-    // Best-effort — a Hevy outage should never break the dashboard.
-    await syncHevyWorkouts(supabase, user.id).catch((err) => {
-      console.error("Hevy auto-sync failed:", err);
-    });
-  }
 
   const [priorityTasks, habitsWithStreaks, accounts, monthTransactions, workouts, nutritionTargets, todayNutritionLogs, dailyBrief, contracts] =
     await Promise.all([
@@ -67,6 +57,8 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {hasHevyKey() ? <HevyAutoSync /> : null}
+
       <div>
         <h1 className="text-xl font-semibold">Today</h1>
         <p className="text-sm text-muted-foreground">
