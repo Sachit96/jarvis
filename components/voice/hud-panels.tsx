@@ -81,11 +81,17 @@ export function StatusRail({ moduleStatus, geminiBudget, voiceSupported, ttsSupp
             </span>
           </div>
         ))}
-        <div className="mt-1.5 flex items-center justify-between border-t border-white/10 pt-1.5 text-xs">
-          <span className="whitespace-nowrap text-white/50">Gemini Budget</span>
-          <span className={cn("whitespace-nowrap font-medium tabular-nums", budgetLow ? "text-warn" : "text-white/80")}>
-            {remaining} / {geminiBudget.limit}
-          </span>
+        <div className="mt-1.5 border-t border-white/10 pt-1.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="whitespace-nowrap text-white/50">Gemini Budget</span>
+            <span className={cn("whitespace-nowrap font-medium tabular-nums", budgetLow ? "text-warn" : "text-white/80")}>
+              {remaining} / {geminiBudget.limit}
+            </span>
+          </div>
+          {/* Two tiers are tracked independently now — this row always shows
+              whichever one is closer to its own ceiling, so the model name
+              is shown alongside it rather than assumed. */}
+          <p className="mt-0.5 truncate text-[9px] text-white/30">{geminiBudget.model}</p>
         </div>
       </div>
     </div>

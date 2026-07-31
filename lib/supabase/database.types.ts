@@ -464,14 +464,17 @@ export type Database = {
       }
       gemini_usage: {
         Row: {
+          model: string
           request_count: number
           usage_date: string
         }
         Insert: {
+          model: string
           request_count?: number
           usage_date: string
         }
         Update: {
+          model?: string
           request_count?: number
           usage_date?: string
         }
@@ -1488,7 +1491,7 @@ export type Database = {
     }
     Functions: {
       increment_gemini_usage: {
-        Args: { p_date: string }
+        Args: { p_date: string; p_model: string }
         Returns: number
       }
     }

@@ -8,42 +8,47 @@ function todayStr() {
 }
 
 /**
- * True only until migration 0016 has been applied. PGRST205 = table not in
- * schema cache, PGRST202 = function not in schema cache — PostgREST uses a
- * different code for each, confirmed by actually calling the RPC against
- * this project before the migration existed (not assumed from the
- * memory_entries precedent, which is a table-only case).
+ * True only until the relevant migration has been applied. PGRST205 =
+ * table not in schema cache, PGRST202 = function not in schema cache —
+ * PostgREST uses a different code for each, confirmed by actually calling
+ * the RPC against this project before the migration existed (not assumed
+ * from the memory_entries precedent, which is a table-only case).
  */
 function isMissingUsageTracking(error: { code?: string } | null): boolean {
   return error?.code === "PGRST205" || error?.code === "PGRST202";
 }
 
-/** Read-only — for display (e.g. the voice HUD's remaining-budget row). Never call this to decide whether to make a request; use incrementGeminiUsage for that (see its own doc comment on why). */
-export async function getGeminiUsageToday(supabase: Client): Promise<number> {
-  const { data, error } = await supabase.from("gemini_usage").select("request_count").eq("usage_date", todayStr()).maybeSingle();
+export interface ModelUsage {
+  model: string;
+  requestCount: number;
+}
+
+/** Read-only — for display (e.g. the voice HUD's remaining-budget row). Never call this to decide whether to make a request; use incrementGeminiUsage for that (see its own doc comment on why). One row per model that's made at least one request today. */
+export async function getGeminiUsageToday(supabase: Client): Promise<ModelUsage[]> {
+  const { data, error } = await supabase.from("gemini_usage").select("model, request_count").eq("usage_date", todayStr());
   if (error) {
-    if (isMissingUsageTracking(error)) return 0;
+    if (isMissingUsageTracking(error)) return [];
     throw error;
   }
-  return data?.request_count ?? 0;
+  return (data ?? []).map((row) => ({ model: row.model, requestCount: row.request_count }));
 }
 
 /**
- * Atomically increments today's counter and returns the new total —
- * check-then-act in one round trip via the increment_gemini_usage RPC
- * (a single "on conflict do update ... returning" statement), not a
- * separate select-then-update, so concurrent callers (Voice Mode and a
- * lead-research background run at the same time) can't race each other
- * into an undercount.
+ * Atomically increments today's per-model counter and returns the new
+ * total — check-then-act in one round trip via the increment_gemini_usage
+ * RPC (a single "on conflict do update ... returning" statement), not a
+ * separate select-then-update, so concurrent callers hitting the same
+ * model (Voice Mode and a lead-research background run at the same time)
+ * can't race each other into an undercount. Tracked per-model (migration
+ * 0018) rather than one shared counter, since the two tiers have very
+ * different, independently-enforced daily ceilings.
  *
- * Returns 0 (never blocks a real call) if migration 0016 hasn't been run
- * yet — budget tracking is a safety net on top of working functionality,
- * not a prerequisite for it. Every other Gemini call in this app would
- * otherwise break the moment this file shipped and before the migration
- * ran, exactly the memory_entries regression from earlier in this project.
+ * Returns 0 (never blocks a real call) if the tracking migration hasn't
+ * been run yet — budget tracking is a safety net on top of working
+ * functionality, not a prerequisite for it.
  */
-export async function incrementGeminiUsage(supabase: Client): Promise<number> {
-  const { data, error } = await supabase.rpc("increment_gemini_usage", { p_date: todayStr() });
+export async function incrementGeminiUsage(supabase: Client, model: string): Promise<number> {
+  const { data, error } = await supabase.rpc("increment_gemini_usage", { p_date: todayStr(), p_model: model });
   if (error) {
     if (isMissingUsageTracking(error)) return 0;
     throw error;

@@ -4,7 +4,7 @@ import { getGhlConnection, getGhlSyncLogs } from "@/lib/db/queries/business";
 import { AiMentorStatusCard } from "@/components/settings/ai-mentor-status-card";
 import { GhlConnectionCard } from "@/components/settings/ghl-connection-card";
 import { GhlSyncLogs } from "@/components/settings/ghl-sync-logs";
-import { GEMINI_MODEL } from "@/lib/ai/providers/gemini-client";
+import { TIER_MODEL } from "@/lib/ai/providers/gemini-client";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -18,7 +18,10 @@ export default async function SettingsPage() {
         <h1 className="text-xl font-semibold">Settings</h1>
       </div>
 
-      <AiMentorStatusCard hasKey={hasGeminiKey} model={GEMINI_MODEL} />
+      <AiMentorStatusCard
+        hasKey={hasGeminiKey}
+        model={`${TIER_MODEL.high_volume} (high-volume) + ${TIER_MODEL.structured} (structured)`}
+      />
 
       <GhlConnectionCard connection={ghlConnection} />
       <GhlSyncLogs logs={ghlLogs} />

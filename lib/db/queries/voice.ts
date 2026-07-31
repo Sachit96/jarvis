@@ -9,7 +9,7 @@ import { getNutritionLogsForDate, computeMacroTotals, getWorkouts } from "@/lib/
 import { getMemoryEntries } from "@/lib/db/queries/memory";
 import { getGoals } from "@/lib/db/queries/life";
 import { getGeminiUsageToday } from "@/lib/db/queries/gemini-usage";
-import { GEMINI_DAILY_LIMIT } from "@/lib/ai/providers/gemini-client";
+import { TIER_MODEL, TIER_DAILY_LIMIT, type GeminiTier } from "@/lib/ai/providers/gemini-client";
 
 type Client = SupabaseClient<Database>;
 
@@ -45,6 +45,8 @@ export interface VoiceDashboardData {
     goals: boolean;
   };
   geminiBudget: {
+    tier: GeminiTier;
+    model: string;
     used: number;
     limit: number;
   };
@@ -59,7 +61,7 @@ export async function getVoiceDashboardData(supabase: Client): Promise<VoiceDash
   const since7d = daysAgoIso(7);
   const today = todayStr();
 
-  const [stages, deals, contracts, transactions, tasks, routineItems, todayLogs, workouts, memoryEntries, goals, geminiUsed] =
+  const [stages, deals, contracts, transactions, tasks, routineItems, todayLogs, workouts, memoryEntries, goals, geminiUsage] =
     await Promise.all([
       getPipelineStages(supabase),
       getDeals(supabase),
@@ -92,6 +94,18 @@ export async function getVoiceDashboardData(supabase: Client): Promise<VoiceDash
   const macroTotals = computeMacroTotals(todayLogs);
   const workoutsToday = workouts.filter((w) => w.started_at.slice(0, 10) === today).length;
 
+  // Two independently-tracked tiers now (migration 0018) — the HUD only
+  // has room for one budget row, so it shows whichever tier is closer to
+  // exhaustion (highest used/limit fraction), since that's the one that
+  // actually risks failing next, not necessarily the one used most often.
+  const tierBudgets = (["structured", "high_volume"] as const).map((tier) => {
+    const model = TIER_MODEL[tier];
+    const limit = TIER_DAILY_LIMIT[tier];
+    const used = geminiUsage.find((row) => row.model === model)?.requestCount ?? 0;
+    return { tier, model, used, limit, fractionUsed: limit > 0 ? used / limit : 0 };
+  });
+  const closestToCeiling = tierBudgets.reduce((a, b) => (b.fractionUsed > a.fractionUsed ? b : a));
+
   return {
     last7Days: { newClientsOnboarded, mrr, cashCollected },
     today: {
@@ -109,6 +123,11 @@ export async function getVoiceDashboardData(supabase: Client): Promise<VoiceDash
       finance: transactions.length > 0,
       goals: goals.length > 0,
     },
-    geminiBudget: { used: geminiUsed, limit: GEMINI_DAILY_LIMIT },
+    geminiBudget: {
+      tier: closestToCeiling.tier,
+      model: closestToCeiling.model,
+      used: closestToCeiling.used,
+      limit: closestToCeiling.limit,
+    },
   };
 }

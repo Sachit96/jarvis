@@ -2,14 +2,17 @@ import "server-only";
 import { callGemini, type GeminiContent } from "@/lib/ai/providers/gemini-client";
 import type { MentorProvider, MentorChatMessage, MentorBriefResult, LoggedMealArgs } from "@/lib/ai/providers/types";
 
-// The model itself now lives in one place — lib/ai/providers/gemini-client.ts's
-// GEMINI_MODEL — not here. The effort: "fast" | "deep" parameter on
-// generateBrief is kept (weekly review still asks for "deep") but both
-// currently resolve to the same model; every full-tier Flash/Pro model on
-// this project is rate-limited to 5 RPM / 20 RPD, unusable across five
-// features sharing one key, so quality is traded for 25x the daily budget
-// for now. See gemini-client.ts for the ground-truth numbers and the
-// eventual-upgrade-path note for voice specifically.
+// Tier routing (see gemini-client.ts for the full verified rationale): all
+// three methods here route to "high_volume" (gemma-4-31b-it) — none of them
+// need what "structured" uniquely offers. generateBrief's schema is flat
+// (no nesting, no enums), verified reliable on Gemma 3/3 times; chat is
+// plain text; nutritionChat's tool-calling round trip was verified working
+// both directions live. The lead qualifier (a separate provider class)
+// stays on "structured" — its nested/enum schema is exactly the shape that
+// failed on Gemma. The effort: "fast" | "deep" parameter on generateBrief
+// is kept (weekly review still asks for "deep") but both currently resolve
+// to the same tier/model — effort tuning within a tier is a possible
+// future refinement, not something either the old or new routing does.
 
 const BRIEF_RESPONSE_SCHEMA = {
   type: "OBJECT",
@@ -47,9 +50,28 @@ function toGeminiContents(history: MentorChatMessage[]): GeminiContent[] {
   }));
 }
 
+/**
+ * Cheap insurance for Gemma's structured output on "high_volume": verified
+ * live that even a flat, reliably-clean schema can still get wrapped in a
+ * markdown code fence in principle (the nested/enum schema did this 3/3
+ * times; the flat brief schema tested clean but there's no guarantee that
+ * holds on every input), so strip a leading/trailing ``` fence (with or
+ * without a "json" language tag) before ever attempting JSON.parse.
+ */
+function stripMarkdownFence(text: string): string {
+  return text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/```\s*$/, "")
+    .trim();
+}
+
 export class GeminiMentorProvider implements MentorProvider {
   async generateBrief(systemPrompt: string, _effort: "fast" | "deep"): Promise<MentorBriefResult> {
+    // "high_volume": flat schema (no nesting, no enums), verified reliable
+    // on Gemma — see the tier doc comment in gemini-client.ts.
     const { text } = await callGemini({
+      tier: "high_volume",
       systemInstruction: systemPrompt,
       contents: [{ role: "user", parts: [{ text: "Generate it now." }] }],
       responseSchema: BRIEF_RESPONSE_SCHEMA,
@@ -58,7 +80,7 @@ export class GeminiMentorProvider implements MentorProvider {
     if (!text) throw new Error("Gemini response had no text part");
 
     try {
-      const parsed = JSON.parse(text);
+      const parsed = JSON.parse(stripMarkdownFence(text));
       const strings = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : []);
       return {
         markdownBody: typeof parsed.markdownBody === "string" ? parsed.markdownBody : text,
@@ -72,7 +94,15 @@ export class GeminiMentorProvider implements MentorProvider {
   }
 
   async chat(systemPrompt: string, history: MentorChatMessage[]): Promise<string> {
+    // "high_volume": plain text, no schema, no tools — and this is the
+    // highest-frequency call in the app (general mentor chat + Voice
+    // Mode share it), so the ~29x daily-request headroom matters most
+    // here. Verified live against real buildMentorContext() data + full
+    // conversation history: ~2,266 total tokens for one real turn
+    // (including Gemma's hidden thinking tokens), ~14% of the 16K/min
+    // ceiling for a single call.
     const { text } = await callGemini({
+      tier: "high_volume",
       systemInstruction: systemPrompt,
       contents: toGeminiContents(history),
     });
@@ -84,9 +114,14 @@ export class GeminiMentorProvider implements MentorProvider {
     history: MentorChatMessage[],
     executeTool: (args: LoggedMealArgs) => Promise<string>,
   ): Promise<string> {
+    // "high_volume": needs function calling, not structured JSON — verified
+    // live both call directions (functionCall out, functionResponse back
+    // in) work correctly on Gemma, including a correct final answer after
+    // the tool result comes back.
     const contents = toGeminiContents(history);
 
     const first = await callGemini({
+      tier: "high_volume",
       systemInstruction: systemPrompt,
       contents,
       tools: [LOG_NUTRITION_TOOL],
@@ -98,6 +133,7 @@ export class GeminiMentorProvider implements MentorProvider {
     const resultMessage = await executeTool(call.args as unknown as LoggedMealArgs);
 
     const second = await callGemini({
+      tier: "high_volume",
       systemInstruction: systemPrompt,
       contents: [
         ...contents,

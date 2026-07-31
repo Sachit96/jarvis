@@ -142,7 +142,20 @@ export class GeminiLeadQualifier implements LeadQualifierProvider {
   /** One real Gemini call for the given batch (or a single-element "batch" for the individual-fallback path). Returns null on any failure that should trigger a retry/fallback at the caller's level, never throws. */
   private async tryBatch(signalsList: LeadSignals[]): Promise<LeadQualifyOutcome[] | null> {
     try {
+      // "structured": stays on gemini-3.5-flash-lite, deliberately not
+      // moved to the high_volume tier's Gemma model — this exact schema
+      // shape (an array of objects, each with a nested array of
+      // {tag: enum, why} plus an integer-keyed sub-object) was verified
+      // live to fail 3/3 times on Gemma: a stray trailing markdown fence
+      // after otherwise-correct JSON, breaking JSON.parse. The content was
+      // right, only the wrapping wasn't, but that's still meaningfully
+      // less reliable than this tier's true constrained decoding for
+      // something that writes straight into the CRM pipeline. This call
+      // is also low-frequency (only runs during a manual research run),
+      // so the 500/day ceiling here was never the actual bottleneck —
+      // there's no real upside to moving it, only a reliability cost.
       const { text } = await callGemini({
+        tier: "structured",
         systemInstruction: SYSTEM_INSTRUCTION,
         contents: [{ role: "user", parts: [{ text: buildBatchPrompt(signalsList) }] }],
         responseSchema: BATCH_RESPONSE_SCHEMA,
