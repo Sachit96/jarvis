@@ -1,10 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
-import type { ResearchRunParams } from "@/lib/validations/lead-research";
+import type { ResearchRunParams, SavedLeadSearchInput } from "@/lib/validations/lead-research";
 
 type Client = SupabaseClient<Database>;
 export type ResearchRun = Database["public"]["Tables"]["research_runs"]["Row"];
 export type LeadResearchRow = Database["public"]["Tables"]["lead_research"]["Row"];
+export type SavedLeadSearch = Database["public"]["Tables"]["saved_lead_searches"]["Row"];
 
 const CACHE_WINDOW_DAYS = 30;
 
@@ -57,4 +58,62 @@ export async function getResearchLeads(supabase: Client) {
     .order("score", { ascending: false });
   if (error) throw error;
   return data;
+}
+
+// ==================================================== saved (recurring) search
+
+/** PGRST205 = table not in schema cache — true only until migration 0019 has been applied. */
+function isMissingSavedSearchesTable(error: { code?: string } | null): boolean {
+  return error?.code === "PGRST205";
+}
+
+/** Returns [] (never throws/blocks the Settings page) if migration 0019 hasn't been run yet — same graceful-degradation convention as gemini-usage.ts. */
+export async function getSavedLeadSearches(supabase: Client): Promise<SavedLeadSearch[]> {
+  const { data, error } = await supabase.from("saved_lead_searches").select("*").order("created_at", { ascending: false });
+  if (error) {
+    if (isMissingSavedSearchesTable(error)) return [];
+    throw error;
+  }
+  return data;
+}
+
+export async function createSavedLeadSearch(supabase: Client, input: SavedLeadSearchInput): Promise<SavedLeadSearch> {
+  const { label, ...params } = input;
+  const { data, error } = await supabase
+    .from("saved_lead_searches")
+    .insert({ label, params: params as unknown as Database["public"]["Tables"]["saved_lead_searches"]["Insert"]["params"] })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function setSavedLeadSearchEnabled(supabase: Client, id: string, enabled: boolean): Promise<void> {
+  const { error } = await supabase.from("saved_lead_searches").update({ enabled }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteSavedLeadSearch(supabase: Client, id: string): Promise<void> {
+  const { error } = await supabase.from("saved_lead_searches").delete().eq("id", id);
+  if (error) throw error;
+}
+
+/** Enabled, and either never run or not run in the last 7 days — the actual enforcement of the weekly cadence, not just a side effect of the scheduled function only firing once a week (schedule drift, a manual re-invoke, etc. shouldn't be able to re-run a search early). Returns [] if migration 0019 hasn't been run yet, same as getSavedLeadSearches. */
+export async function getDueSavedLeadSearches(supabase: Client): Promise<SavedLeadSearch[]> {
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const { data, error } = await supabase
+    .from("saved_lead_searches")
+    .select("*")
+    .eq("enabled", true)
+    .or(`last_run_at.is.null,last_run_at.lt.${sevenDaysAgo}`);
+  if (error) {
+    if (isMissingSavedSearchesTable(error)) return [];
+    throw error;
+  }
+  return data;
+}
+
+export async function markSavedLeadSearchRun(supabase: Client, id: string): Promise<void> {
+  const { error } = await supabase.from("saved_lead_searches").update({ last_run_at: new Date().toISOString() }).eq("id", id);
+  if (error) throw error;
 }

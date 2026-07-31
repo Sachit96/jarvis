@@ -379,6 +379,7 @@ export type Database = {
           id: string
           notes: string | null
           source: string
+          stage_changed_at: string
           stage_id: string
           title: string | null
           updated_at: string
@@ -393,6 +394,7 @@ export type Database = {
           id?: string
           notes?: string | null
           source?: string
+          stage_changed_at?: string
           stage_id: string
           title?: string | null
           updated_at?: string
@@ -407,6 +409,7 @@ export type Database = {
           id?: string
           notes?: string | null
           source?: string
+          stage_changed_at?: string
           stage_id?: string
           title?: string | null
           updated_at?: string
@@ -1114,6 +1117,39 @@ export type Database = {
           skipped_cached_count?: number
           started_at?: string | null
           status?: string
+        }
+        Relationships: []
+      }
+      saved_lead_searches: {
+        Row: {
+          cadence: string
+          created_at: string
+          enabled: boolean
+          id: string
+          label: string
+          last_run_at: string | null
+          params: Json
+          updated_at: string
+        }
+        Insert: {
+          cadence?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          label: string
+          last_run_at?: string | null
+          params: Json
+          updated_at?: string
+        }
+        Update: {
+          cadence?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          label?: string
+          last_run_at?: string | null
+          params?: Json
+          updated_at?: string
         }
         Relationships: []
       }

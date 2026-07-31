@@ -18,6 +18,15 @@ const DAILY_INSTRUCTIONS = `Write today's brief as markdown with these headers: 
 
 const WEEKLY_INSTRUCTIONS = `Write this week's review as markdown with these headers: ## Summary, ## Strengths, ## Weaknesses, ## Next Week's Focus. Be specific and reference the actual numbers/trends in the user's context. Keep markdownBody under 350 words.`;
 
+/**
+ * Follow-up watchdog (Work Order B3) — context.followUps is mechanically
+ * computed (a SQL-shaped query in lib/db/queries/business.ts, not a model
+ * call); this is the only piece that needs the LLM at all, and it rides
+ * along on whichever of the three calls below is already happening rather
+ * than adding a new one.
+ */
+const FOLLOWUP_NUDGE = `If context.followUps.staleDeals or staleContacts is non-empty, name the most important one or two specifically (e.g. "Bianchi Roofing hasn't moved in 9 days") — surfacing exactly this kind of thing unprompted is the whole point of tracking it.`;
+
 export async function generateDailyBrief(supabase: Client) {
   const provider = getMentorProvider();
   const [context, persona] = await Promise.all([buildMentorContext(supabase), buildPersonaPrefix(supabase)]);
@@ -25,6 +34,7 @@ export async function generateDailyBrief(supabase: Client) {
   const systemPrompt = [
     persona,
     DAILY_INSTRUCTIONS,
+    FOLLOWUP_NUDGE,
     VOICE_GUARDRAIL,
     JSON_INSTRUCTION,
     `The user's current context as JSON: ${JSON.stringify(context)}`,
@@ -70,6 +80,7 @@ export async function generateWeeklyReview(supabase: Client) {
   const systemPrompt = [
     persona,
     WEEKLY_INSTRUCTIONS,
+    FOLLOWUP_NUDGE,
     VOICE_GUARDRAIL,
     JSON_INSTRUCTION,
     `The user's current context as JSON: ${JSON.stringify(context)}`,
@@ -119,6 +130,7 @@ export async function runGeneralMentorChat(supabase: Client, userContent: string
   const systemPrompt = [
     persona,
     "Answer questions, give advice, and reference specific numbers from their context when relevant. Keep replies concise (2-5 sentences) unless asked for depth.",
+    FOLLOWUP_NUDGE,
     VOICE_GUARDRAIL,
     `The user's current context as JSON: ${JSON.stringify(context)}`,
   ].join("\n\n");

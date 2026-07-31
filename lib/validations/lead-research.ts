@@ -91,3 +91,19 @@ export const researchRunParamsSchema = z.object({
   force_refresh: z.coerce.boolean().optional().default(false),
 });
 export type ResearchRunParams = z.infer<typeof researchRunParamsSchema>;
+
+// ==================================================== saved (recurring) search
+
+/**
+ * A saved search's stored params never include force_refresh — a recurring
+ * run should always rely on the normal 30-day cache window (isCached in
+ * lib/db/queries/lead-research.ts), never force-recheck businesses it's
+ * already qualified. The weekly scheduled function hardcodes
+ * force_refresh: false when it dispatches a run from one of these,
+ * regardless of what's stored, so this is dropped here rather than kept
+ * and ignored.
+ */
+export const savedLeadSearchSchema = researchRunParamsSchema.omit({ force_refresh: true }).extend({
+  label: z.string().trim().min(1, "Give this search a name").max(80),
+});
+export type SavedLeadSearchInput = z.infer<typeof savedLeadSearchSchema>;

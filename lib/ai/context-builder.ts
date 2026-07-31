@@ -11,7 +11,16 @@ import {
   computeTradeStats,
 } from "@/lib/db/queries/finance";
 import { getNutritionTargets, getNutritionLogsForDate, computeMacroTotals, getWorkouts } from "@/lib/db/queries/health";
-import { getPipelineStages, getDeals, getContracts, computeMrr } from "@/lib/db/queries/business";
+import {
+  getPipelineStages,
+  getDeals,
+  getContracts,
+  getContacts,
+  getAllActivities,
+  computeMrr,
+  computeStaleDeals,
+  computeStaleContacts,
+} from "@/lib/db/queries/business";
 import { getTodayRoutineItems } from "@/lib/db/queries/routine";
 
 type Client = SupabaseClient<Database>;
@@ -37,6 +46,8 @@ export async function buildMentorContext(supabase: Client) {
     stages,
     deals,
     contracts,
+    contacts,
+    activities,
   ] = await Promise.all([
     getPriorityTasks(supabase, 10),
     getTodayRoutineItems(supabase),
@@ -50,6 +61,8 @@ export async function buildMentorContext(supabase: Client) {
     getPipelineStages(supabase),
     getDeals(supabase),
     getContracts(supabase),
+    getContacts(supabase),
+    getAllActivities(supabase),
   ]);
 
   const financeTotals = computeAssetLiabilityTotals(accounts);
@@ -65,6 +78,8 @@ export async function buildMentorContext(supabase: Client) {
   });
   const wonDeals = deals.filter((d) => stageById.get(d.stage_id)?.is_won);
   const mrr = computeMrr(contracts);
+  const staleDeals = computeStaleDeals(deals, stages, contacts);
+  const staleContacts = computeStaleContacts(contacts, activities);
 
   return {
     today,
@@ -100,6 +115,14 @@ export async function buildMentorContext(supabase: Client) {
       openPipelineValue: openDeals.reduce((sum, d) => sum + Number(d.value), 0),
       wonDealsAllTime: wonDeals.length,
       monthlyRecurringRevenue: mrr,
+    },
+    // Follow-up watchdog (Work Order B3) — mechanically computed (a SQL-shaped
+    // query, not a model call), so the daily brief/weekly review/general chat
+    // can surface it unprompted rather than the user having to remember to
+    // check the pipeline for things that quietly stopped moving.
+    followUps: {
+      staleDeals: staleDeals.map((d) => ({ label: d.label, daysSinceStageChange: d.daysSinceStageChange })),
+      staleContacts: staleContacts.map((c) => ({ label: c.label, daysSinceLastActivity: c.daysSinceLastActivity })),
     },
   };
 }

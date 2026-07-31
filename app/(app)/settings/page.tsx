@@ -1,15 +1,21 @@
 import { Download } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getGhlConnection, getGhlSyncLogs } from "@/lib/db/queries/business";
+import { getSavedLeadSearches } from "@/lib/db/queries/lead-research";
 import { AiMentorStatusCard } from "@/components/settings/ai-mentor-status-card";
 import { GhlConnectionCard } from "@/components/settings/ghl-connection-card";
 import { GhlSyncLogs } from "@/components/settings/ghl-sync-logs";
+import { SavedLeadSearchesCard } from "@/components/settings/saved-lead-searches-card";
 import { TIER_MODEL } from "@/lib/ai/providers/gemini-client";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
   const hasGeminiKey = Boolean(process.env.GEMINI_API_KEY);
-  const [ghlConnection, ghlLogs] = await Promise.all([getGhlConnection(supabase), getGhlSyncLogs(supabase)]);
+  const [ghlConnection, ghlLogs, savedSearches] = await Promise.all([
+    getGhlConnection(supabase),
+    getGhlSyncLogs(supabase),
+    getSavedLeadSearches(supabase),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -25,6 +31,7 @@ export default async function SettingsPage() {
 
       <GhlConnectionCard connection={ghlConnection} />
       <GhlSyncLogs logs={ghlLogs} />
+      <SavedLeadSearchesCard searches={savedSearches} />
 
       <div className="rounded-lg border border-border bg-card p-4">
         <p className="text-xs uppercase tracking-wider text-muted-foreground">Data export</p>
