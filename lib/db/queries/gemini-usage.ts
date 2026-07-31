@@ -11,11 +11,18 @@ function todayStr() {
  * True only until the relevant migration has been applied. PGRST205 =
  * table not in schema cache, PGRST202 = function not in schema cache —
  * PostgREST uses a different code for each, confirmed by actually calling
- * the RPC against this project before the migration existed (not assumed
- * from the memory_entries precedent, which is a table-only case).
+ * the RPC against this project before the migration existed. 42703 = plain
+ * Postgres "undefined_column" — confirmed live the moment this shipped
+ * ahead of migration 0018 actually being applied: gemini_usage's table and
+ * (old, 1-arg) function both still existed, so neither PGRST205 nor
+ * PGRST202 fired, but selecting the not-yet-existent `model` column threw
+ * this instead and crashed the whole /voice page (getVoiceDashboardData
+ * has no try/catch of its own around this call) — a real production
+ * incident, not a hypothetical one, which is why this third code is
+ * checked explicitly rather than assumed sufficient without it.
  */
 function isMissingUsageTracking(error: { code?: string } | null): boolean {
-  return error?.code === "PGRST205" || error?.code === "PGRST202";
+  return error?.code === "PGRST205" || error?.code === "PGRST202" || error?.code === "42703";
 }
 
 export interface ModelUsage {
