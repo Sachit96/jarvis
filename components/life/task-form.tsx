@@ -2,10 +2,12 @@
 
 import { useActionState, useRef, useEffect, useState } from "react";
 import { Plus } from "lucide-react";
-import { createTaskAction, type ActionState } from "@/actions/life-actions";
+import { createTaskAction } from "@/actions/life-actions";
+import { fieldAria, type ActionState } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FieldError } from "@/components/ui/field-error";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -54,11 +56,13 @@ export function TaskForm() {
         <form ref={formRef} action={formAction} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="title">Title</Label>
-            <Input id="title" name="title" required autoFocus />
+            <Input id="title" name="title" required autoFocus {...fieldAria(state, "title")} />
+            <FieldError id="title-error" message={state.fieldErrors?.title} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="description">Notes</Label>
-            <Textarea id="description" name="description" rows={2} />
+            <Textarea id="description" name="description" rows={2} {...fieldAria(state, "description")} />
+            <FieldError id="description-error" message={state.fieldErrors?.description} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
@@ -68,22 +72,26 @@ export function TaskForm() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="high" label="High">High</SelectItem>
+                  <SelectItem value="medium" label="Medium">Medium</SelectItem>
+                  <SelectItem value="low" label="Low">Low</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="due_date">Due date</Label>
-              <Input id="due_date" name="due_date" type="date" />
+              <Input id="due_date" name="due_date" type="date" {...fieldAria(state, "due_date")} />
+              <FieldError id="due_date-error" message={state.fieldErrors?.due_date} />
             </div>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="tags">Tags (comma separated)</Label>
-            <Input id="tags" name="tags" placeholder="business, deep-work" />
+            <Input id="tags" name="tags" placeholder="business, deep-work" {...fieldAria(state, "tags")} />
+            <FieldError id="tags-error" message={state.fieldErrors?.tags} />
           </div>
-          {state.error ? <p className="text-sm text-danger">{state.error}</p> : null}
+          {state.error ? (
+            <p className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{state.error}</p>
+          ) : null}
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? "Adding…" : "Add task"}
           </Button>

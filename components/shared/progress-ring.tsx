@@ -5,10 +5,19 @@ interface ProgressRingProps {
   strokeWidth?: number;
   label?: string;
   sublabel?: string;
+  /** Tailwind stroke-color class for the progress arc. */
+  colorClassName?: string;
 }
 
 /** A single circular progress ring — used for goal completion and the Today's Routine summary. */
-export function ProgressRing({ percent, size = 96, strokeWidth = 8, label, sublabel }: ProgressRingProps) {
+export function ProgressRing({
+  percent,
+  size = 96,
+  strokeWidth = 8,
+  label,
+  sublabel,
+  colorClassName = "stroke-brand",
+}: ProgressRingProps) {
   const clamped = Math.max(0, Math.min(100, percent));
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -37,7 +46,7 @@ export function ProgressRing({ percent, size = 96, strokeWidth = 8, label, subla
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          className="fill-none stroke-brand transition-[stroke-dashoffset] duration-500 ease-[var(--ease-jarvis)]"
+          className={`fill-none transition-[stroke-dashoffset] duration-500 ease-[var(--ease-jarvis)] ${colorClassName}`}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">

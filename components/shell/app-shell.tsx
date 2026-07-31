@@ -11,12 +11,12 @@ export async function AppShell({ children }: { children: ReactNode }) {
   const accounts = await getAccounts(supabase);
 
   return (
-    <div className="flex min-h-full">
+    <div className="flex min-h-full shrink-0">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar accounts={accounts} />
         <main className="flex-1 overflow-y-auto pb-20 md:pb-6">
-          <div className="mx-auto w-full max-w-4xl px-4 py-6">{children}</div>
+          <div className="mx-auto w-full max-w-6xl px-6 pt-5 pb-8 2xl:max-w-[1800px]">{children}</div>
         </main>
       </div>
       <BottomNav />

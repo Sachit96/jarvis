@@ -7,10 +7,8 @@ import {
   checklistItemSchema,
   DEFAULT_CHECKLIST_ITEMS,
 } from "@/lib/validations/trading";
+import { actionStateFromZodError, type ActionState } from "@/lib/validation";
 
-export interface ActionState {
-  error?: string;
-}
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
@@ -33,7 +31,7 @@ export async function upsertMarketAnalysisAction(
     h4_notes: formData.get("h4_notes"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   const { error } = await supabase.from("market_analyses").upsert(
@@ -90,7 +88,7 @@ export async function createChecklistItemAction(
 ): Promise<ActionState> {
   const parsed = checklistItemSchema.safeParse({ label: formData.get("label") });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   const { count } = await supabase

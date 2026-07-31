@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { numeric, optionalNumeric, optionalTextInput, dateInput, optionalDateInput } from "@/lib/validation";
 
 export const DEFAULT_PIPELINE_STAGES: { name: string; is_won?: boolean; is_lost?: boolean }[] = [
   { name: "Lead" },
@@ -18,18 +19,18 @@ export const DEFAULT_ONBOARDING_TASKS = [
 ];
 
 export const leadSchema = z.object({
-  company_name: z.string().trim().max(200).optional().or(z.literal("")),
+  company_name: optionalTextInput,
   contact_person: z.string().trim().min(1, "Contact person is required").max(200),
-  email: z.string().trim().max(200).optional().or(z.literal("")),
-  phone: z.string().trim().max(60).optional().or(z.literal("")),
-  value: z.coerce.number().min(0).max(100_000_000).optional(),
-  notes: z.string().trim().max(2000).optional().or(z.literal("")),
+  email: optionalTextInput,
+  phone: optionalTextInput,
+  value: optionalNumeric(z.number().min(0, "Value can't be negative").max(100_000_000)),
+  notes: optionalTextInput,
 });
 export type LeadInput = z.infer<typeof leadSchema>;
 
 export const activitySchema = z.object({
   contact_id: z.string().uuid(),
-  deal_id: z.string().uuid().optional().or(z.literal("")),
+  deal_id: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().uuid().optional()),
   type: z.enum(["call", "email", "meeting", "note", "other"]),
   notes: z.string().trim().min(1, "Notes are required").max(2000),
 });
@@ -38,18 +39,18 @@ export type ActivityInput = z.infer<typeof activitySchema>;
 export const dealTaskSchema = z.object({
   deal_id: z.string().uuid(),
   title: z.string().trim().min(1, "Title is required").max(200),
-  due_date: z.string().optional().or(z.literal("")),
+  due_date: optionalDateInput,
 });
 export type DealTaskInput = z.infer<typeof dealTaskSchema>;
 
 export const contractSchema = z.object({
   contact_id: z.string().uuid("Choose a client"),
   title: z.string().trim().min(1, "Title is required").max(200),
-  monthly_value: z.coerce.number().min(0).max(100_000_000),
+  monthly_value: numeric(z.number().min(0, "Value can't be negative").max(100_000_000)),
   status: z.enum(["active", "paused", "completed", "cancelled"]),
-  start_date: z.string().min(1),
-  end_date: z.string().optional().or(z.literal("")),
-  notes: z.string().trim().max(2000).optional().or(z.literal("")),
+  start_date: dateInput,
+  end_date: optionalDateInput,
+  notes: optionalTextInput,
 });
 export type ContractInput = z.infer<typeof contractSchema>;
 

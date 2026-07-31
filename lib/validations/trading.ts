@@ -1,16 +1,17 @@
 import { z } from "zod";
+import { optionalTextInput, dateInput } from "@/lib/validation";
 
 const sentimentEnum = z.enum(["bullish", "bearish", "choppy"]);
 
 export const marketAnalysisSchema = z.object({
   pair: z.string().trim().min(1, "Pair is required").max(20),
-  analysis_date: z.string().min(1),
+  analysis_date: dateInput,
   weekly_sentiment: sentimentEnum.optional(),
-  weekly_notes: z.string().trim().max(2000).optional().or(z.literal("")),
+  weekly_notes: optionalTextInput,
   daily_sentiment: sentimentEnum.optional(),
-  daily_notes: z.string().trim().max(2000).optional().or(z.literal("")),
+  daily_notes: optionalTextInput,
   h4_sentiment: sentimentEnum.optional(),
-  h4_notes: z.string().trim().max(2000).optional().or(z.literal("")),
+  h4_notes: optionalTextInput,
 });
 export type MarketAnalysisInput = z.infer<typeof marketAnalysisSchema>;
 

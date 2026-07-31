@@ -1,33 +1,12 @@
 import "server-only";
-import type Groq from "groq-sdk";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
-import { getGroqClient, MENTOR_MODEL } from "@/lib/ai/groq";
+import { getMentorProvider } from "@/lib/ai/providers";
+import type { MentorChatMessage } from "@/lib/ai/providers/types";
 import { buildMentorContext } from "@/lib/ai/context-builder";
+import { buildPersonaPrefix } from "@/lib/ai/persona";
 
 type Client = SupabaseClient<Database>;
-
-interface BriefResult {
-  markdownBody: string;
-  focusAreas: string[];
-  strengths: string[];
-  weaknesses: string[];
-}
-
-function parseBrief(raw: string): BriefResult {
-  try {
-    const parsed = JSON.parse(raw);
-    const strings = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : []);
-    return {
-      markdownBody: typeof parsed.markdownBody === "string" ? parsed.markdownBody : raw,
-      focusAreas: strings(parsed.focusAreas),
-      strengths: strings(parsed.strengths),
-      weaknesses: strings(parsed.weaknesses),
-    };
-  } catch {
-    return { markdownBody: raw, focusAreas: [], strengths: [], weaknesses: [] };
-  }
-}
 
 const JSON_INSTRUCTION =
   'Respond with ONLY a JSON object matching this exact shape, no prose outside it: {"markdownBody": string, "focusAreas": string[], "strengths": string[], "weaknesses": string[]}.';
@@ -39,44 +18,19 @@ const DAILY_INSTRUCTIONS = `Write today's brief as markdown with these headers: 
 
 const WEEKLY_INSTRUCTIONS = `Write this week's review as markdown with these headers: ## Summary, ## Strengths, ## Weaknesses, ## Next Week's Focus. Be specific and reference the actual numbers/trends in the user's context. Keep markdownBody under 350 words.`;
 
-/** Groq's JSON mode support can vary by model — fall back to a plain completion if the param itself is rejected. */
-async function callMentorJson(client: Groq, systemPrompt: string): Promise<BriefResult> {
-  try {
-    const res = await client.chat.completions.create({
-      model: MENTOR_MODEL,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: "Generate it now." },
-      ],
-      response_format: { type: "json_object" },
-    });
-    return parseBrief(res.choices[0]?.message.content ?? "{}");
-  } catch {
-    const res = await client.chat.completions.create({
-      model: MENTOR_MODEL,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: "Generate it now." },
-      ],
-    });
-    return parseBrief(res.choices[0]?.message.content ?? "{}");
-  }
-}
-
 export async function generateDailyBrief(supabase: Client) {
-  const client = getGroqClient();
-  if (!client) throw new Error("GROQ_API_KEY is not configured");
-  const context = await buildMentorContext(supabase);
+  const provider = getMentorProvider();
+  const [context, persona] = await Promise.all([buildMentorContext(supabase), buildPersonaPrefix(supabase)]);
 
   const systemPrompt = [
-    "You are JARVIS, a sharp, encouraging personal AI mentor reviewing the user's life/finance/health/business dashboard.",
+    persona,
     DAILY_INSTRUCTIONS,
     VOICE_GUARDRAIL,
     JSON_INSTRUCTION,
     `The user's current context as JSON: ${JSON.stringify(context)}`,
   ].join("\n\n");
 
-  const brief = await callMentorJson(client, systemPrompt);
+  const brief = await provider.generateBrief(systemPrompt, "fast");
   const recDate = context.today;
 
   const { error } = await supabase.from("daily_recommendations").upsert(
@@ -86,7 +40,7 @@ export async function generateDailyBrief(supabase: Client) {
       focus_areas: brief.focusAreas,
       strengths: brief.strengths,
       weaknesses: brief.weaknesses,
-      model_used: MENTOR_MODEL,
+      model_used: "gemini (fast)",
     },
     { onConflict: "rec_date" },
   );
@@ -105,9 +59,8 @@ function startOfWeek(d: Date) {
 }
 
 export async function generateWeeklyReview(supabase: Client) {
-  const client = getGroqClient();
-  if (!client) throw new Error("GROQ_API_KEY is not configured");
-  const context = await buildMentorContext(supabase);
+  const provider = getMentorProvider();
+  const [context, persona] = await Promise.all([buildMentorContext(supabase), buildPersonaPrefix(supabase)]);
 
   const start = startOfWeek(new Date());
   const end = new Date(start);
@@ -115,14 +68,17 @@ export async function generateWeeklyReview(supabase: Client) {
   const toStr = (d: Date) => d.toISOString().slice(0, 10);
 
   const systemPrompt = [
-    "You are JARVIS, a sharp, encouraging personal AI mentor writing the user's weekly review across life/finance/health/business.",
+    persona,
     WEEKLY_INSTRUCTIONS,
     VOICE_GUARDRAIL,
     JSON_INSTRUCTION,
     `The user's current context as JSON: ${JSON.stringify(context)}`,
   ].join("\n\n");
 
-  const brief = await callMentorJson(client, systemPrompt);
+  // "deep" — the one weekly, once-a-week synthesis job, worth the heavier
+  // model the daily brief and both chats don't need. See
+  // gemini-mentor-provider.ts for which model that maps to and why.
+  const brief = await provider.generateBrief(systemPrompt, "deep");
   const weekStartDate = toStr(start);
   const weekEndDate = toStr(end);
 
@@ -134,7 +90,7 @@ export async function generateWeeklyReview(supabase: Client) {
       focus_areas: brief.focusAreas,
       strengths: brief.strengths,
       weaknesses: brief.weaknesses,
-      model_used: MENTOR_MODEL,
+      model_used: "gemini (deep)",
     },
     { onConflict: "week_start_date" },
   );
@@ -144,8 +100,7 @@ export async function generateWeeklyReview(supabase: Client) {
 }
 
 export async function runGeneralMentorChat(supabase: Client, userContent: string) {
-  const client = getGroqClient();
-  if (!client) throw new Error("GROQ_API_KEY is not configured");
+  const provider = getMentorProvider();
 
   const { error: insertUserErr } = await supabase
     .from("mentor_messages")
@@ -160,26 +115,19 @@ export async function runGeneralMentorChat(supabase: Client, userContent: string
     .limit(20);
   if (historyErr) throw new Error(historyErr.message);
 
-  const context = await buildMentorContext(supabase);
+  const [context, persona] = await Promise.all([buildMentorContext(supabase), buildPersonaPrefix(supabase)]);
   const systemPrompt = [
-    "You are JARVIS, the user's personal AI mentor with visibility into their tasks, habits, finances, health, and business pipeline.",
+    persona,
     "Answer questions, give advice, and reference specific numbers from their context when relevant. Keep replies concise (2-5 sentences) unless asked for depth.",
     VOICE_GUARDRAIL,
     `The user's current context as JSON: ${JSON.stringify(context)}`,
   ].join("\n\n");
 
-  const messages: Groq.Chat.ChatCompletionMessageParam[] = [
-    { role: "system", content: systemPrompt },
-    ...history.reverse().map(
-      (m): Groq.Chat.ChatCompletionMessageParam => ({
-        role: m.role as "user" | "assistant",
-        content: m.content,
-      }),
-    ),
-  ];
+  const messages: MentorChatMessage[] = history
+    .reverse()
+    .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
 
-  const res = await client.chat.completions.create({ model: MENTOR_MODEL, messages });
-  const replyContent = res.choices[0]?.message.content ?? "…";
+  const replyContent = await provider.chat(systemPrompt, messages);
 
   const { data: assistantRow, error: insertAssistantErr } = await supabase
     .from("mentor_messages")

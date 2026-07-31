@@ -1,3 +1,4 @@
+import { Wallet, TrendingUp, TrendingDown } from "lucide-react";
 import { StatTile } from "@/components/shared/stat-tile";
 
 function money(n: number) {
@@ -23,10 +24,12 @@ export function NetWorthWidget({
         tone={netWorth >= 0 ? "success" : "danger"}
         trend={netWorth >= 0 ? "up" : "down"}
         primary
+        icon={Wallet}
+        category="money"
         className="col-span-3 sm:col-span-1"
       />
-      <StatTile label="Total Assets" value={money(assets)} />
-      <StatTile label="Total Liabilities" value={money(liabilities)} />
+      <StatTile label="Total Assets" value={money(assets)} icon={TrendingUp} category="money" />
+      <StatTile label="Total Liabilities" value={money(liabilities)} icon={TrendingDown} category="finance" />
     </div>
   );
 }

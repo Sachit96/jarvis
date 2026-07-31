@@ -83,6 +83,38 @@ export async function getWaterTotalForDate(supabase: Client, date: string) {
   return data.reduce((sum, w) => sum + w.amount_ml, 0);
 }
 
+// ============================================================= Body metrics (weight)
+
+const BODY_METRICS_HISTORY_DAYS = 90;
+
+export async function getBodyMetrics(supabase: Client, days = BODY_METRICS_HISTORY_DAYS) {
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+  const { data, error } = await supabase
+    .from("body_metrics")
+    .select("*")
+    .gte("logged_at", since.toISOString().slice(0, 10))
+    .order("logged_at", { ascending: true });
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================= Sleep
+
+const SLEEP_HISTORY_DAYS = 30;
+
+export async function getSleepLogs(supabase: Client, days = SLEEP_HISTORY_DAYS) {
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+  const { data, error } = await supabase
+    .from("sleep_logs")
+    .select("*")
+    .gte("log_date", since.toISOString().slice(0, 10))
+    .order("log_date", { ascending: true });
+  if (error) throw error;
+  return data;
+}
+
 // ============================================================= Mentor chat
 
 const MENTOR_HISTORY_LIMIT = 30;

@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { deleteWorkoutAction, toggleWorkoutCompletedAction } from "@/actions/health-actions";
 import { computeWorkoutVolume } from "@/lib/db/queries/health";
+import { formatLbs } from "@/lib/units";
 import { AddSetForm } from "@/components/health/add-set-form";
 import { WorkoutSetItem } from "@/components/health/workout-set-item";
 import type { Database } from "@/lib/supabase/database.types";
@@ -25,6 +26,7 @@ export function WorkoutSessionCard({
   exercises: Exercise[];
 }) {
   const [completed, setCompleted] = useState(workout.completed);
+  const [expanded, setExpanded] = useState(false);
   const [isPending, startTransition] = useTransition();
   const exerciseNameById = new Map(exercises.map((e) => [e.id, e.name]));
 
@@ -44,6 +46,8 @@ export function WorkoutSessionCard({
   }
 
   const date = new Date(workout.started_at);
+  const exerciseCount = new Set(sets.map((s) => s.exercise_id)).size;
+  const volumeLbs = sets.length > 0 ? formatLbs(computeWorkoutVolume(sets)) : null;
 
   return (
     <div className={cn("rounded-lg border border-border bg-card p-4 transition-opacity", isPending && "opacity-70")}>
@@ -68,7 +72,9 @@ export function WorkoutSessionCard({
             </div>
             <p className="font-mono text-xs text-muted-foreground">
               {date.toLocaleDateString()} {date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-              {sets.length > 0 ? ` · ${computeWorkoutVolume(sets).toLocaleString()} kg volume` : ""}
+              {" · "}
+              {completed ? "Completed" : "In progress"}
+              {sets.length > 0 ? ` · ${exerciseCount} exercise${exerciseCount === 1 ? "" : "s"} · ${volumeLbs} lbs total volume` : ""}
             </p>
           </div>
         </div>
@@ -80,7 +86,17 @@ export function WorkoutSessionCard({
       {workout.notes ? <p className="mt-2 text-xs text-muted-foreground">{workout.notes}</p> : null}
 
       {sets.length > 0 ? (
-        <ul className="mt-3 space-y-1.5">
+        <button
+          onClick={() => setExpanded((e) => !e)}
+          className="mt-3 flex items-center gap-1 text-xs font-medium text-brand hover:underline"
+        >
+          {expanded ? "Hide" : "Show"} {sets.length} set{sets.length === 1 ? "" : "s"}
+          <ChevronDown className={cn("h-3 w-3 transition-transform", expanded && "rotate-180")} strokeWidth={2.5} />
+        </button>
+      ) : null}
+
+      {expanded && sets.length > 0 ? (
+        <ul className="mt-2 space-y-1.5 border-t border-border pt-2">
           {sets.map((s) => (
             <WorkoutSetItem key={s.id} set={s} exerciseName={exerciseNameById.get(s.exercise_id) ?? "?"} />
           ))}

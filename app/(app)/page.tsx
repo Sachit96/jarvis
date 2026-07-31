@@ -1,3 +1,4 @@
+import { Wallet, TrendingUp, HeartPulse, Target, CircleCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getPriorityTasks, getGoals } from "@/lib/db/queries/life";
 import { getAccounts, getMonthTransactions, computeAssetLiabilityTotals, computeMonthlyPnl } from "@/lib/db/queries/finance";
@@ -13,21 +14,29 @@ import { getDailyRecommendation } from "@/lib/db/queries/mentor";
 import { getPipelineStages, getDeals, getContracts, computeMrr, computePipelineSummary } from "@/lib/db/queries/business";
 import { getTodayRoutineItems } from "@/lib/db/queries/routine";
 import { getUpcoming, getRecentActivity } from "@/lib/db/queries/command-center";
+import { getLifeScoreSnapshot, getLifeScoreTrend } from "@/lib/db/queries/life-score";
 import { hasHevyKey } from "@/lib/providers/workout/hevy-client";
+import { getMemoryEntries } from "@/lib/db/queries/memory";
+import { formatLbs } from "@/lib/units";
+import { StatTile } from "@/components/shared/stat-tile";
 import { PriorityTasksWidget } from "@/components/dashboard/priority-tasks-widget";
 import { TodayRoutineCard } from "@/components/dashboard/today-routine-card";
-import { GoalProgressCard } from "@/components/dashboard/goal-progress-card";
 import { MentorInsightCard } from "@/components/dashboard/mentor-insight-card";
-import { BusinessSnapshotCard } from "@/components/dashboard/business-snapshot-card";
-import { HealthSnapshotCard } from "@/components/dashboard/health-snapshot-card";
 import { UpcomingCard } from "@/components/dashboard/upcoming-card";
 import { RecentActivityCard } from "@/components/dashboard/recent-activity-card";
-import { NetWorthWidget } from "@/components/finance/net-worth-widget";
-import { MonthlyPnlCard } from "@/components/finance/monthly-pnl-card";
+import { LifeScoreCard } from "@/components/dashboard/life-score-card";
+import { OverallProgressChart } from "@/components/dashboard/overall-progress-chart";
+import { DetailStatsCard } from "@/components/dashboard/detail-stats-card";
+import { GoalsRailCard } from "@/components/dashboard/goals-rail-card";
+import { NotesRailCard } from "@/components/dashboard/notes-rail-card";
 import { HevyAutoSync } from "@/components/health/hevy-auto-sync";
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
+}
+
+function money(n: number) {
+  return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 }
 
 export default async function DashboardPage() {
@@ -36,7 +45,6 @@ export default async function DashboardPage() {
 
   const [
     priorityTasks,
-    goals,
     accounts,
     monthTransactions,
     workouts,
@@ -49,9 +57,12 @@ export default async function DashboardPage() {
     routineItems,
     upcoming,
     recentActivity,
+    lifeScore,
+    lifeScoreTrend,
+    goals,
+    memoryEntries,
   ] = await Promise.all([
-    getPriorityTasks(supabase),
-    getGoals(supabase),
+    getPriorityTasks(supabase, 4),
     getAccounts(supabase),
     getMonthTransactions(supabase),
     getWorkouts(supabase),
@@ -62,8 +73,12 @@ export default async function DashboardPage() {
     getDeals(supabase),
     getContracts(supabase),
     getTodayRoutineItems(supabase),
-    getUpcoming(supabase),
-    getRecentActivity(supabase),
+    getUpcoming(supabase, 4),
+    getRecentActivity(supabase, 4),
+    getLifeScoreSnapshot(supabase),
+    getLifeScoreTrend(supabase),
+    getGoals(supabase),
+    getMemoryEntries(supabase),
   ]);
 
   const financeTotals = computeAssetLiabilityTotals(accounts);
@@ -81,47 +96,94 @@ export default async function DashboardPage() {
   const volume7d = computeWorkoutVolume(recentSets);
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col">
       {hasHevyKey() ? <HevyAutoSync /> : null}
 
-      <div>
-        <h1 className="text-title">Today</h1>
-        <p className="mt-0.5 text-body text-muted-foreground">
-          What you need to know and do today, in one place.
-        </p>
+      <h1 className="text-title">Today</h1>
+
+      <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-5">
+        <StatTile label="Net Worth" value={money(financeTotals.netWorth)} icon={Wallet} category="money" compact />
+        <StatTile label="Business Revenue" value={money(mrr)} icon={TrendingUp} category="business" compact />
+        <StatTile label="Health Score" value={`${lifeScore.health}/100`} icon={HeartPulse} category="health" compact />
+        <StatTile label="Discipline Score" value={`${lifeScore.habits}/100`} icon={Target} category="goals" compact />
+        <StatTile label="Goal Completion" value={`${lifeScore.goals}%`} icon={CircleCheck} category="goals" compact />
       </div>
 
-      <TodayRoutineCard items={routineItems} />
+      {/* Main dashboard — 4 column stacks. items-stretch (the grid default) equalizes
+          every column to the tallest one; each column's flex-1 card absorbs the
+          leftover space instead of leaving a void beneath a shorter neighbor.
+          2xl:max-h caps the row itself — without it, a column whose *content*
+          (not just its filler card) grows unusually tall becomes the tallest
+          thing on the page and drags every other column up with it; each
+          column's own overflow-y-auto children absorb the rest by scrolling. */}
+      <div className="mt-4 grid grid-cols-1 items-stretch gap-4 md:grid-cols-2 2xl:grid-cols-4 2xl:max-h-[calc(100vh-220px)]">
+        {/* Column 1 */}
+        <div className="flex h-full min-h-0 flex-col gap-4">
+          <GoalsRailCard goals={goals} className="flex-1" />
+          <NotesRailCard entries={memoryEntries} />
+        </div>
 
-      <MentorInsightCard markdownBody={dailyBrief?.markdown_body ?? null} focusAreas={dailyBrief?.focus_areas ?? []} />
+        {/* Column 2 */}
+        <div className="flex h-full min-h-0 flex-col gap-4">
+          <OverallProgressChart points={lifeScoreTrend} compact />
+          <TodayRoutineCard items={routineItems} compact className="flex-1" />
+          <DetailStatsCard
+            title="Finance"
+            compact
+            className="min-h-[190px]"
+            rows={[
+              { label: "Assets", value: money(financeTotals.assets) },
+              { label: "Liabilities", value: money(financeTotals.liabilities), tone: financeTotals.liabilities > 0 ? "danger" : "neutral" },
+              { label: "Income (mo)", value: money(pnl.income), tone: "success" },
+              { label: "Expenses (mo)", value: money(pnl.expense), tone: "danger" },
+            ]}
+            footerLabel="Finance Overview"
+            footerHref="/finance/overview"
+          />
+        </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <PriorityTasksWidget tasks={priorityTasks} />
-        <GoalProgressCard goals={goals} />
-      </div>
+        {/* Column 3 */}
+        <div className="flex h-full min-h-0 flex-col gap-4">
+          <LifeScoreCard score={lifeScore} compact />
+          <MentorInsightCard
+            markdownBody={dailyBrief?.markdown_body ?? null}
+            focusAreas={dailyBrief?.focus_areas ?? []}
+            compact
+            fill
+            className="flex-1"
+          />
+          <DetailStatsCard
+            title="Business"
+            compact
+            className="min-h-[140px]"
+            rows={[
+              { label: "Open Pipeline", value: `${money(pipelineSummary.openValue)} (${pipelineSummary.openCount})` },
+              { label: "Win Rate", value: `${pipelineSummary.winRate}%` },
+            ]}
+            footerLabel="Business Dashboard"
+            footerHref="/business/dashboard"
+          />
+          <DetailStatsCard
+            title="Health"
+            compact
+            className="min-h-[190px]"
+            rows={[
+              { label: "Trained Today", value: trainedToday ? "Yes" : "No", tone: trainedToday ? "success" : "neutral" },
+              { label: "Workouts", value: String(workouts.length) },
+              { label: "Volume (7d)", value: `${formatLbs(volume7d)} lbs` },
+              { label: "Calories Today", value: `${macroTotals.calories.toLocaleString()} / ${calorieTarget.toLocaleString()}` },
+            ]}
+            footerLabel="Health"
+            footerHref="/health/workouts"
+          />
+        </div>
 
-      <NetWorthWidget {...financeTotals} />
-      <MonthlyPnlCard {...pnl} />
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <BusinessSnapshotCard
-          openValue={pipelineSummary.openValue}
-          openCount={pipelineSummary.openCount}
-          winRate={pipelineSummary.winRate}
-          mrr={mrr}
-        />
-        <HealthSnapshotCard
-          trainedToday={trainedToday}
-          workoutsCount={workouts.length}
-          volume7d={volume7d}
-          caloriesToday={macroTotals.calories}
-          calorieTarget={calorieTarget}
-        />
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <UpcomingCard items={upcoming} />
-        <RecentActivityCard items={recentActivity} />
+        {/* Column 4 */}
+        <div className="flex h-full min-h-0 flex-col gap-4">
+          <PriorityTasksWidget tasks={priorityTasks} compact />
+          <UpcomingCard items={upcoming} compact />
+          <RecentActivityCard items={recentActivity} compact className="flex-1" />
+        </div>
       </div>
     </div>
   );

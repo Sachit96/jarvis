@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/lib/nav-items";
+import { categoryForHref, CATEGORY_TEXT_CLASS } from "@/lib/category-colors";
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -14,19 +15,18 @@ export function BottomNav() {
         const moduleSegment = `/${item.href.split("/")[1]}`;
         const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(moduleSegment);
         const Icon = item.icon;
+        const category = categoryForHref(item.href);
+        const activeColorClass = category ? CATEGORY_TEXT_CLASS[category] : "text-brand";
         return (
           <Link
             key={item.href}
             href={item.href}
             className={cn(
               "flex flex-1 flex-col items-center justify-center gap-1 text-caption transition-colors",
-              isActive ? "text-brand" : "text-muted-foreground hover:text-foreground",
+              isActive ? activeColorClass : "text-muted-foreground hover:text-foreground",
             )}
           >
-            <Icon
-              className={cn("h-5 w-5", isActive && "drop-shadow-[0_0_6px_var(--brand)]")}
-              strokeWidth={isActive ? 2.25 : 1.75}
-            />
+            <Icon className={cn("h-5 w-5")} strokeWidth={isActive ? 2.25 : 1.75} />
             <span>{item.label}</span>
           </Link>
         );

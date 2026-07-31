@@ -117,6 +117,36 @@ export type Database = {
           },
         ]
       }
+      body_metrics: {
+        Row: {
+          body_fat_pct: number | null
+          created_at: string
+          id: string
+          logged_at: string
+          notes: string | null
+          updated_at: string
+          weight_kg: number
+        }
+        Insert: {
+          body_fat_pct?: number | null
+          created_at?: string
+          id?: string
+          logged_at?: string
+          notes?: string | null
+          updated_at?: string
+          weight_kg: number
+        }
+        Update: {
+          body_fat_pct?: number | null
+          created_at?: string
+          id?: string
+          logged_at?: string
+          notes?: string | null
+          updated_at?: string
+          weight_kg?: number
+        }
+        Relationships: []
+      }
       budgets: {
         Row: {
           category: string
@@ -432,6 +462,21 @@ export type Database = {
         }
         Relationships: []
       }
+      gemini_usage: {
+        Row: {
+          request_count: number
+          usage_date: string
+        }
+        Insert: {
+          request_count?: number
+          usage_date: string
+        }
+        Update: {
+          request_count?: number
+          usage_date?: string
+        }
+        Relationships: []
+      }
       ghl_connections: {
         Row: {
           created_at: string
@@ -656,6 +701,93 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_research: {
+        Row: {
+          ai_summary: string | null
+          audit: Json
+          city: string | null
+          contact_id: string
+          country: string | null
+          created_at: string
+          deal_id: string | null
+          dismissed: boolean
+          google_place_id: string
+          id: string
+          industry: string | null
+          maps_url: string | null
+          opportunities: string[]
+          postal_code: string | null
+          rating: number | null
+          region: string | null
+          researched_at: string
+          review_count: number | null
+          score: number
+          score_breakdown: Json
+          updated_at: string
+        }
+        Insert: {
+          ai_summary?: string | null
+          audit?: Json
+          city?: string | null
+          contact_id: string
+          country?: string | null
+          created_at?: string
+          deal_id?: string | null
+          dismissed?: boolean
+          google_place_id: string
+          id?: string
+          industry?: string | null
+          maps_url?: string | null
+          opportunities?: string[]
+          postal_code?: string | null
+          rating?: number | null
+          region?: string | null
+          researched_at?: string
+          review_count?: number | null
+          score: number
+          score_breakdown?: Json
+          updated_at?: string
+        }
+        Update: {
+          ai_summary?: string | null
+          audit?: Json
+          city?: string | null
+          contact_id?: string
+          country?: string | null
+          created_at?: string
+          deal_id?: string | null
+          dismissed?: boolean
+          google_place_id?: string
+          id?: string
+          industry?: string | null
+          maps_url?: string | null
+          opportunities?: string[]
+          postal_code?: string | null
+          rating?: number | null
+          region?: string | null
+          researched_at?: string
+          review_count?: number | null
+          score?: number
+          score_breakdown?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_research_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_research_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       market_analyses: {
         Row: {
           analysis_date: string
@@ -695,6 +827,48 @@ export type Database = {
           updated_at?: string
           weekly_notes?: string | null
           weekly_sentiment?: string | null
+        }
+        Relationships: []
+      }
+      memory_entries: {
+        Row: {
+          body: string
+          confidence: number | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          pinned: boolean
+          source: string
+          tags: string[]
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          confidence?: number | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          pinned?: boolean
+          source?: string
+          tags?: string[]
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          confidence?: number | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          pinned?: boolean
+          source?: string
+          tags?: string[]
+          title?: string
+          type?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -888,6 +1062,84 @@ export type Database = {
           is_active?: boolean
           name?: string
           sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      research_runs: {
+        Row: {
+          audited_count: number
+          created_at: string
+          current_label: string | null
+          error_log: Json
+          failed_count: number
+          finished_at: string | null
+          found_count: number
+          id: string
+          inserted_count: number
+          params: Json
+          skipped_cached_count: number
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          audited_count?: number
+          created_at?: string
+          current_label?: string | null
+          error_log?: Json
+          failed_count?: number
+          finished_at?: string | null
+          found_count?: number
+          id?: string
+          inserted_count?: number
+          params: Json
+          skipped_cached_count?: number
+          started_at?: string | null
+          status?: string
+        }
+        Update: {
+          audited_count?: number
+          created_at?: string
+          current_label?: string | null
+          error_log?: Json
+          failed_count?: number
+          finished_at?: string | null
+          found_count?: number
+          id?: string
+          inserted_count?: number
+          params?: Json
+          skipped_cached_count?: number
+          started_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
+      sleep_logs: {
+        Row: {
+          created_at: string
+          hours_slept: number
+          id: string
+          log_date: string
+          notes: string | null
+          quality: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hours_slept: number
+          id?: string
+          log_date?: string
+          notes?: string | null
+          quality?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hours_slept?: number
+          id?: string
+          log_date?: string
+          notes?: string | null
+          quality?: number | null
           updated_at?: string
         }
         Relationships: []
@@ -1208,7 +1460,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_gemini_usage: {
+        Args: { p_date: string }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never

@@ -48,15 +48,17 @@ export function MentorChatWidget({ initialMessages, hasKey }: { initialMessages:
 
   return (
     <div className="flex flex-col rounded-2xl bg-card ring-1 ring-border">
-      <div className="flex items-center gap-2 border-b border-white/[0.08] px-5 py-3.5">
-        <Sparkles className="h-4 w-4 text-brand" />
+      <div className="flex items-center gap-2.5 border-b border-white/[0.08] px-5 py-3.5">
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand/15">
+          <Sparkles className="h-4 w-4 text-brand" />
+        </span>
         <p className="text-body font-medium">Ask your Mentor</p>
       </div>
 
       {!hasKey ? (
         <div className="mx-5 mt-3 flex items-start gap-2 rounded-xl bg-warn/10 p-3 text-label text-warn">
           <TriangleAlert className="h-4 w-4 shrink-0" />
-          <span>GROQ_API_KEY isn&apos;t configured yet, so the AI Mentor can&apos;t respond right now.</span>
+          <span>GEMINI_API_KEY isn&apos;t configured yet, so the AI Mentor can&apos;t respond right now.</span>
         </div>
       ) : null}
 

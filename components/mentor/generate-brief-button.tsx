@@ -31,7 +31,7 @@ export function GenerateBriefButton({
         <Sparkles className="h-3.5 w-3.5" />
         {isPending ? "Thinking…" : label}
       </Button>
-      {!hasKey ? <p className="mt-2 text-xs text-warn">GROQ_API_KEY isn&apos;t configured yet.</p> : null}
+      {!hasKey ? <p className="mt-2 text-xs text-warn">GEMINI_API_KEY isn&apos;t configured yet.</p> : null}
       {error ? <p className="mt-2 text-xs text-danger">{error}</p> : null}
     </div>
   );

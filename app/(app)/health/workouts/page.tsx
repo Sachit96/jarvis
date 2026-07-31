@@ -7,7 +7,7 @@ import { ExerciseForm } from "@/components/health/exercise-form";
 import { WorkoutSessionCard } from "@/components/health/workout-session-card";
 import { HevySyncButton } from "@/components/health/hevy-sync-button";
 import { HevyAutoSync } from "@/components/health/hevy-auto-sync";
-import { StreakHeatmap } from "@/components/shared/streak-heatmap";
+import { WorkoutCalendar } from "@/components/health/workout-calendar";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { HEALTH_TABS } from "@/lib/nav-items";
 
@@ -50,13 +50,10 @@ export default async function WorkoutsPage() {
       <ModuleTabs tabs={HEALTH_TABS} />
 
       <div className="rounded-lg border border-border bg-card p-4">
-        <div className="flex items-center justify-between">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Last 90 days</p>
+        <div className="mb-1 flex items-center justify-end">
           <HevySyncButton connected={connected} />
         </div>
-        <div className="mt-2">
-          <StreakHeatmap completedDates={trainedDates} days={90} />
-        </div>
+        <WorkoutCalendar trainedDates={trainedDates} />
       </div>
 
       {workouts.length === 0 ? (

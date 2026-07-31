@@ -2,10 +2,12 @@
 
 import { useActionState, useRef, useEffect, useState } from "react";
 import { Plus } from "lucide-react";
-import { createTradeAction, type ActionState } from "@/actions/finance-actions";
+import { createTradeAction } from "@/actions/finance-actions";
+import { fieldAria, type ActionState } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FieldError } from "@/components/ui/field-error";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -78,7 +80,8 @@ export function TradeForm({ checklistItems }: { checklistItems: ChecklistItem[] 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="asset_pair">Asset / Pair</Label>
-              <Input id="asset_pair" name="asset_pair" placeholder="BTC/USD" required autoFocus />
+              <Input id="asset_pair" name="asset_pair" placeholder="BTC/USD" required autoFocus {...fieldAria(state, "asset_pair")} />
+              <FieldError id="asset_pair-error" message={state.fieldErrors?.asset_pair} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="direction">Direction</Label>
@@ -87,8 +90,8 @@ export function TradeForm({ checklistItems }: { checklistItems: ChecklistItem[] 
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="long">Long</SelectItem>
-                  <SelectItem value="short">Short</SelectItem>
+                  <SelectItem value="long" label="Long">Long</SelectItem>
+                  <SelectItem value="short" label="Short">Short</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -97,38 +100,60 @@ export function TradeForm({ checklistItems }: { checklistItems: ChecklistItem[] 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="entry_price">Entry price</Label>
-              <Input id="entry_price" name="entry_price" type="number" step="any" min="0.00000001" required />
+              <Input id="entry_price" name="entry_price" type="number" step="any" min="0.00000001" required {...fieldAria(state, "entry_price")} />
+              <FieldError id="entry_price-error" message={state.fieldErrors?.entry_price} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="quantity">Quantity</Label>
-              <Input id="quantity" name="quantity" type="number" step="any" min="0.00000001" placeholder="Optional" />
+              <Input id="quantity" name="quantity" type="number" step="any" min="0.00000001" placeholder="Optional" {...fieldAria(state, "quantity")} />
+              <FieldError id="quantity-error" message={state.fieldErrors?.quantity} />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="exit_price">Exit price</Label>
-              <Input id="exit_price" name="exit_price" type="number" step="any" min="0.00000001" placeholder="Leave blank if open" />
+              <Input
+                id="exit_price"
+                name="exit_price"
+                type="number"
+                step="any"
+                min="0.00000001"
+                placeholder="Leave blank if open"
+                {...fieldAria(state, "exit_price")}
+              />
+              <FieldError id="exit_price-error" message={state.fieldErrors?.exit_price} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="fees">Fees</Label>
-              <Input id="fees" name="fees" type="number" step="0.01" min="0" defaultValue="0" />
+              <Input id="fees" name="fees" type="number" step="0.01" min="0" defaultValue="0" {...fieldAria(state, "fees")} />
+              <FieldError id="fees-error" message={state.fieldErrors?.fees} />
             </div>
           </div>
 
           <div className="space-y-1.5">
             <Label htmlFor="setup_category">Setup</Label>
-            <Input id="setup_category" name="setup_category" placeholder="Breakout, reversal, scalp…" />
+            <Input id="setup_category" name="setup_category" placeholder="Breakout, reversal, scalp…" {...fieldAria(state, "setup_category")} />
+            <FieldError id="setup_category-error" message={state.fieldErrors?.setup_category} />
           </div>
 
           <div className="space-y-1.5">
             <Label htmlFor="opened_at">Opened at</Label>
-            <Input id="opened_at" name="opened_at" type="datetime-local" defaultValue={nowLocalDatetime()} required />
+            <Input
+              id="opened_at"
+              name="opened_at"
+              type="datetime-local"
+              defaultValue={nowLocalDatetime()}
+              required
+              {...fieldAria(state, "opened_at")}
+            />
+            <FieldError id="opened_at-error" message={state.fieldErrors?.opened_at} />
           </div>
 
           <div className="space-y-1.5">
             <Label htmlFor="notes">Notes</Label>
-            <Textarea id="notes" name="notes" rows={2} />
+            <Textarea id="notes" name="notes" rows={2} {...fieldAria(state, "notes")} />
+            <FieldError id="notes-error" message={state.fieldErrors?.notes} />
           </div>
 
           {checklistItems.length > 0 ? (
@@ -150,7 +175,9 @@ export function TradeForm({ checklistItems }: { checklistItems: ChecklistItem[] 
           ) : null}
           <input type="hidden" name="confluence_checked" value={String(allChecked)} />
 
-          {state.error ? <p className="text-sm text-danger">{state.error}</p> : null}
+          {state.error ? (
+            <p className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{state.error}</p>
+          ) : null}
           <Button type="submit" className="w-full" disabled={isPending || !allChecked}>
             {isPending
               ? "Adding…"

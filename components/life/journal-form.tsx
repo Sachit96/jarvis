@@ -1,10 +1,12 @@
 "use client";
 
 import { useActionState, useRef, useEffect } from "react";
-import { createJournalEntryAction, type ActionState } from "@/actions/life-actions";
+import { createJournalEntryAction } from "@/actions/life-actions";
+import { fieldAria, type ActionState } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FieldError } from "@/components/ui/field-error";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -41,7 +43,15 @@ export function JournalForm() {
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label htmlFor="entry_date">Date</Label>
-          <Input id="entry_date" name="entry_date" type="date" defaultValue={todayStr()} required />
+          <Input
+            id="entry_date"
+            name="entry_date"
+            type="date"
+            defaultValue={todayStr()}
+            required
+            {...fieldAria(state, "entry_date")}
+          />
+          <FieldError id="entry_date-error" message={state.fieldErrors?.entry_date} />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="entry_type">Type</Label>
@@ -50,20 +60,22 @@ export function JournalForm() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="reflection">Reflection</SelectItem>
-              <SelectItem value="freeform">Freeform</SelectItem>
-              <SelectItem value="gratitude">Gratitude</SelectItem>
+              <SelectItem value="reflection" label="Reflection">Reflection</SelectItem>
+              <SelectItem value="freeform" label="Freeform">Freeform</SelectItem>
+              <SelectItem value="gratitude" label="Gratitude">Gratitude</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="title">Title (optional)</Label>
-        <Input id="title" name="title" />
+        <Input id="title" name="title" {...fieldAria(state, "title")} />
+        <FieldError id="title-error" message={state.fieldErrors?.title} />
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="body">Entry</Label>
-        <Textarea id="body" name="body" rows={5} required placeholder="What's on your mind?" />
+        <Textarea id="body" name="body" rows={5} required placeholder="What's on your mind?" {...fieldAria(state, "body")} />
+        <FieldError id="body-error" message={state.fieldErrors?.body} />
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="mood">Mood (1-5, optional)</Label>
@@ -73,14 +85,16 @@ export function JournalForm() {
           </SelectTrigger>
           <SelectContent>
             {[1, 2, 3, 4, 5].map((m) => (
-              <SelectItem key={m} value={String(m)}>
+              <SelectItem key={m} value={String(m)} label={String(m)}>
                 {m}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
-      {state.error ? <p className="text-sm text-danger">{state.error}</p> : null}
+      {state.error ? (
+        <p className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{state.error}</p>
+      ) : null}
       <Button type="submit" disabled={isPending}>
         {isPending ? "Saving…" : "Save entry"}
       </Button>

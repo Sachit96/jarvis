@@ -50,9 +50,9 @@ export default async function TransactionsPage({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All accounts</SelectItem>
+              <SelectItem value="all" label="All accounts">All accounts</SelectItem>
               {accounts.map((a) => (
-                <SelectItem key={a.id} value={a.id}>
+                <SelectItem key={a.id} value={a.id} label={a.name}>
                   {a.name}
                 </SelectItem>
               ))}

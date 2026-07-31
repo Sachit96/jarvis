@@ -8,10 +8,10 @@ type Account = Database["public"]["Tables"]["accounts"]["Row"];
 
 export function Topbar({ accounts }: { accounts: Account[] }) {
   return (
-    <header className="flex h-14 shrink-0 items-center justify-end border-b border-white/[0.08] bg-background/80 px-4 backdrop-blur-sm md:px-6">
+    <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-white/[0.08] bg-background/80 px-4 backdrop-blur-sm md:px-6">
+      <CommandPalette />
       <div className="flex items-center gap-1">
         <QuickActionModal accounts={accounts} />
-        <CommandPalette />
         <Link
           href="/settings"
           aria-label="Settings"

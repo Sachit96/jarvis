@@ -1,14 +1,16 @@
+import { CalendarClock } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getLatestWeeklyReview } from "@/lib/db/queries/mentor";
 import { generateWeeklyReviewAction } from "@/actions/mentor-actions";
 import { BriefCard } from "@/components/mentor/brief-card";
 import { GenerateBriefButton } from "@/components/mentor/generate-brief-button";
+import { EmptyState } from "@/components/shared/empty-state";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { MENTOR_TABS } from "@/lib/nav-items";
 
 export default async function WeeklyReviewPage() {
   const supabase = await createClient();
-  const hasGroqKey = Boolean(process.env.GROQ_API_KEY);
+  const hasGeminiKey = Boolean(process.env.GEMINI_API_KEY);
   const review = await getLatestWeeklyReview(supabase);
 
   return (
@@ -21,7 +23,7 @@ export default async function WeeklyReviewPage() {
       <ModuleTabs tabs={MENTOR_TABS} />
 
       {review ? (
-        <div className="space-y-2">
+        <div className="space-y-3">
           <BriefCard
             dateLabel={`${review.week_start_date} → ${review.week_end_date}`}
             markdownBody={review.markdown_body}
@@ -32,21 +34,23 @@ export default async function WeeklyReviewPage() {
           <GenerateBriefButton
             action={generateWeeklyReviewAction}
             label="Regenerate this week's review"
-            hasKey={hasGroqKey}
+            hasKey={hasGeminiKey}
           />
         </div>
       ) : (
-        <div className="space-y-3 rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            No weekly review yet — generate one from this week&apos;s activity across every module.
-          </p>
-          <div className="flex justify-center">
-            <GenerateBriefButton
-              action={generateWeeklyReviewAction}
-              label="Generate this week's review"
-              hasKey={hasGroqKey}
-            />
-          </div>
+        <div className="rounded-2xl bg-card ring-1 ring-border">
+          <EmptyState
+            icon={CalendarClock}
+            title="No weekly review yet"
+            description="Generate one from this week's activity across every module."
+            action={
+              <GenerateBriefButton
+                action={generateWeeklyReviewAction}
+                label="Generate this week's review"
+                hasKey={hasGeminiKey}
+              />
+            }
+          />
         </div>
       )}
     </div>

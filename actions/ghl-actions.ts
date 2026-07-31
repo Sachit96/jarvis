@@ -4,10 +4,8 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { ghlConnectionSchema } from "@/lib/validations/business";
 import { listGhlContacts, listGhlOpportunities, type GhlCredentials } from "@/lib/providers/crm/ghl-client";
+import { actionStateFromZodError, type ActionState } from "@/lib/validation";
 
-export interface ActionState {
-  error?: string;
-}
 
 export interface SyncResult {
   ok: boolean;
@@ -23,7 +21,7 @@ export async function saveGhlConnectionAction(
     location_id: formData.get("location_id"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   // Exactly one row ever exists — no user_id to key an upsert on, so fetch

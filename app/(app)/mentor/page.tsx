@@ -16,7 +16,7 @@ function todayStr() {
 export default async function MentorPage() {
   const supabase = await createClient();
   const today = todayStr();
-  const hasGroqKey = Boolean(process.env.GROQ_API_KEY);
+  const hasGeminiKey = Boolean(process.env.GEMINI_API_KEY);
 
   const [brief, messages] = await Promise.all([
     getDailyRecommendation(supabase, today),
@@ -41,7 +41,7 @@ export default async function MentorPage() {
             strengths={brief.strengths}
             weaknesses={brief.weaknesses}
           />
-          <GenerateBriefButton action={generateDailyBriefAction} label="Regenerate today's brief" hasKey={hasGroqKey} />
+          <GenerateBriefButton action={generateDailyBriefAction} label="Regenerate today's brief" hasKey={hasGeminiKey} />
         </div>
       ) : (
         <div className="rounded-2xl bg-card ring-1 ring-border">
@@ -49,12 +49,12 @@ export default async function MentorPage() {
             icon={Sparkles}
             title="No brief yet today"
             description="Generate one from your current tasks, habits, finances, health, and pipeline."
-            action={<GenerateBriefButton action={generateDailyBriefAction} label="Generate today's brief" hasKey={hasGroqKey} />}
+            action={<GenerateBriefButton action={generateDailyBriefAction} label="Generate today's brief" hasKey={hasGeminiKey} />}
           />
         </div>
       )}
 
-      <MentorChatWidget initialMessages={messages} hasKey={hasGroqKey} />
+      <MentorChatWidget initialMessages={messages} hasKey={hasGeminiKey} />
     </div>
   );
 }

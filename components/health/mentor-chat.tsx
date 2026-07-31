@@ -57,7 +57,7 @@ export function MentorChat({ initialMessages, hasKey }: { initialMessages: Mento
         <div className="mx-4 mt-3 flex items-start gap-2 rounded-md border border-warn/40 bg-warn/10 p-3 text-xs text-warn">
           <TriangleAlert className="h-4 w-4 shrink-0" />
           <span>
-            GROQ_API_KEY isn&apos;t configured yet, so the AI Mentor can&apos;t respond right now. Set it in your
+            GEMINI_API_KEY isn&apos;t configured yet, so the AI Mentor can&apos;t respond right now. Set it in your
             environment variables to enable chat.
           </span>
         </div>

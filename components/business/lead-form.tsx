@@ -2,10 +2,12 @@
 
 import { useActionState, useRef, useEffect, useState } from "react";
 import { Plus } from "lucide-react";
-import { createLeadAction, type ActionState } from "@/actions/business-actions";
+import { createLeadAction } from "@/actions/business-actions";
+import { fieldAria, type ActionState } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FieldError } from "@/components/ui/field-error";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -58,27 +60,32 @@ export function LeadForm({ stages }: { stages: Stage[] }) {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="contact_person">Contact person</Label>
-              <Input id="contact_person" name="contact_person" required autoFocus />
+              <Input id="contact_person" name="contact_person" required autoFocus {...fieldAria(state, "contact_person")} />
+              <FieldError id="contact_person-error" message={state.fieldErrors?.contact_person} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="company_name">Company</Label>
-              <Input id="company_name" name="company_name" />
+              <Input id="company_name" name="company_name" {...fieldAria(state, "company_name")} />
+              <FieldError id="company_name-error" message={state.fieldErrors?.company_name} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" />
+              <Input id="email" name="email" type="email" {...fieldAria(state, "email")} />
+              <FieldError id="email-error" message={state.fieldErrors?.email} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="phone">Phone</Label>
-              <Input id="phone" name="phone" type="tel" />
+              <Input id="phone" name="phone" type="tel" {...fieldAria(state, "phone")} />
+              <FieldError id="phone-error" message={state.fieldErrors?.phone} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="value">Deal value</Label>
-              <Input id="value" name="value" type="number" step="0.01" min="0" defaultValue="0" />
+              <Input id="value" name="value" type="number" step="0.01" min="0" defaultValue="0" {...fieldAria(state, "value")} />
+              <FieldError id="value-error" message={state.fieldErrors?.value} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="stage_id">Starting stage</Label>
@@ -88,7 +95,7 @@ export function LeadForm({ stages }: { stages: Stage[] }) {
                 </SelectTrigger>
                 <SelectContent>
                   {stages.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>
+                    <SelectItem key={s.id} value={s.id} label={s.name}>
                       {s.name}
                     </SelectItem>
                   ))}
@@ -98,9 +105,12 @@ export function LeadForm({ stages }: { stages: Stage[] }) {
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="notes">Notes</Label>
-            <Textarea id="notes" name="notes" rows={2} />
+            <Textarea id="notes" name="notes" rows={2} {...fieldAria(state, "notes")} />
+            <FieldError id="notes-error" message={state.fieldErrors?.notes} />
           </div>
-          {state.error ? <p className="text-sm text-danger">{state.error}</p> : null}
+          {state.error ? (
+            <p className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{state.error}</p>
+          ) : null}
           <Button type="submit" className="w-full" disabled={isPending || stages.length === 0}>
             {stages.length === 0 ? "Add a stage first" : isPending ? "Adding…" : "Add lead"}
           </Button>

@@ -32,6 +32,7 @@ export default async function RoutinePage() {
   const autoItems = routineItems.filter((i) => i.kind === "auto");
   const noG = habits.filter((h) => h.metric_type === "no_g");
   const rest = habits.filter((h) => h.metric_type !== "no_g");
+  const orderedHabits = [...noG, ...rest];
 
   return (
     <div className="space-y-6">
@@ -47,17 +48,9 @@ export default async function RoutinePage() {
 
       <AutoRoutineList items={autoItems} />
 
-      {noG.length > 0 ? (
+      {orderedHabits.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2">
-          {noG.map((habit) => (
-            <HabitCard key={habit.id} habit={habit} completedDates={datesByHabit.get(habit.id) ?? []} />
-          ))}
-        </div>
-      ) : null}
-
-      {rest.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {rest.map((habit) => (
+          {orderedHabits.map((habit) => (
             <HabitCard key={habit.id} habit={habit} completedDates={datesByHabit.get(habit.id) ?? []} />
           ))}
         </div>

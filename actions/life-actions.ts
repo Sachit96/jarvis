@@ -3,10 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { taskSchema, goalSchema, habitSchema, journalEntrySchema } from "@/lib/validations/life";
+import { actionStateFromZodError, type ActionState } from "@/lib/validation";
 
-export interface ActionState {
-  error?: string;
-}
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
@@ -33,7 +31,7 @@ export async function createTaskAction(
     due_date: formData.get("due_date"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   const { error } = await supabase.from("tasks").insert({
@@ -83,7 +81,7 @@ export async function createGoalAction(
     progress_percent: formData.get("progress_percent") || 0,
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   const { error } = await supabase.from("goals").insert({
@@ -134,7 +132,7 @@ export async function createHabitAction(
     target_count: formData.get("target_count") || undefined,
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   const { count } = await supabase.from("habits").select("id", { count: "exact", head: true });
@@ -251,7 +249,7 @@ export async function createJournalEntryAction(
     entry_date: formData.get("entry_date") || todayStr(),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   const { error } = await supabase.from("journal_entries").insert({

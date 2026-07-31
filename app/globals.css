@@ -54,6 +54,17 @@
   --color-danger: var(--danger);
   --color-success: var(--success);
 
+  /* Category accent colors — the same category always gets the same color
+     everywhere in the app (stat-tile icon badges, chart legends, activity
+     badges): green=money, purple=business, red=health, blue=goals/
+     discipline, orange=finance-category (budgets/spend), pink=habits. */
+  --color-cat-money: var(--cat-money);
+  --color-cat-business: var(--cat-business);
+  --color-cat-health: var(--cat-health);
+  --color-cat-goals: var(--cat-goals);
+  --color-cat-finance: var(--cat-finance);
+  --color-cat-habits: var(--cat-habits);
+
   /* Type scale — a deliberate small set of steps, not ad hoc sizing. Each
      name says what it's FOR, not how big it is, so usage stays disciplined.
      text-display: the one large moment per screen (a hero number, e.g. net
@@ -145,6 +156,21 @@
   --warn: oklch(0.77 0.15 70); /* amber */
   --danger: #ef4444;
   --success: #22c55e;
+
+  /* Category accents — one fixed color per domain, reused everywhere
+     (stat-tile badges, chart legends/lines, activity-feed badges) so the
+     same category always reads the same color across the whole app. */
+  --cat-money: #22c55e;
+  --cat-business: #8b5cf6;
+  --cat-health: #ef4444;
+  --cat-goals: #3b82f6;
+  --cat-finance: #f97316;
+  --cat-habits: #ec4899;
+
+  /* Primary brand gradient (logo mark, avatar, progress rings) — teal to
+     blue to violet, distinct from the flat --brand cyan used for smaller
+     accents like active nav icons and links. */
+  --gradient-brand: linear-gradient(135deg, #2dd4bf 0%, #3b82f6 55%, #8b5cf6 100%);
 }
 
 @layer base {
@@ -160,6 +186,16 @@
 }
 
 @layer utilities {
+  /* Teal→blue→violet brand gradient — logo mark, avatar, primary rings. */
+  .bg-gradient-brand {
+    background-image: var(--gradient-brand);
+  }
+  .text-gradient-brand {
+    background-image: var(--gradient-brand);
+    background-clip: text;
+    color: transparent;
+  }
+
   /* Reserved for genuinely interactive/important elements only — not every card. */
   .glow-brand {
     box-shadow: 0 0 0 1px color-mix(in oklch, var(--brand) 40%, transparent),

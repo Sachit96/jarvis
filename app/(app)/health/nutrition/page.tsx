@@ -36,7 +36,7 @@ export default async function NutritionPage() {
     getMentorMessages(supabase),
   ]);
   const totals = computeMacroTotals(logs);
-  const hasGroqKey = Boolean(process.env.GROQ_API_KEY);
+  const hasGeminiKey = Boolean(process.env.GEMINI_API_KEY);
 
   return (
     <div className="space-y-6">
@@ -78,7 +78,7 @@ export default async function NutritionPage() {
         })}
       </div>
 
-      <MentorChat initialMessages={mentorMessages} hasKey={hasGroqKey} />
+      <MentorChat initialMessages={mentorMessages} hasKey={hasGeminiKey} />
     </div>
   );
 }

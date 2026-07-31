@@ -2,10 +2,12 @@
 
 import { useActionState, useRef, useEffect, useState } from "react";
 import { Plus } from "lucide-react";
-import { createWorkoutAction, type ActionState } from "@/actions/health-actions";
+import { createWorkoutAction } from "@/actions/health-actions";
+import { fieldAria, type ActionState } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FieldError } from "@/components/ui/field-error";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
@@ -61,7 +63,9 @@ export function WorkoutForm() {
               defaultValue="Gym Session"
               required
               autoFocus
+              {...fieldAria(state, "session_label")}
             />
+            <FieldError id="session_label-error" message={state.fieldErrors?.session_label} />
             <datalist id="session-suggestions">
               <option value="Home Session" />
               <option value="Gym Session" />
@@ -75,13 +79,18 @@ export function WorkoutForm() {
               type="datetime-local"
               defaultValue={nowLocalDatetime()}
               required
+              {...fieldAria(state, "started_at")}
             />
+            <FieldError id="started_at-error" message={state.fieldErrors?.started_at} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="notes">Notes</Label>
-            <Textarea id="notes" name="notes" rows={2} />
+            <Textarea id="notes" name="notes" rows={2} {...fieldAria(state, "notes")} />
+            <FieldError id="notes-error" message={state.fieldErrors?.notes} />
           </div>
-          {state.error ? <p className="text-sm text-danger">{state.error}</p> : null}
+          {state.error ? (
+            <p className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{state.error}</p>
+          ) : null}
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? "Starting…" : "Start session"}
           </Button>

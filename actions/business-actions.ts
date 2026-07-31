@@ -12,10 +12,8 @@ import {
   DEFAULT_PIPELINE_STAGES,
   DEFAULT_ONBOARDING_TASKS,
 } from "@/lib/validations/business";
+import { actionStateFromZodError, type ActionState } from "@/lib/validation";
 
-export interface ActionState {
-  error?: string;
-}
 
 function revalidateBusiness() {
   revalidatePath("/business/pipeline");
@@ -55,7 +53,7 @@ export async function createPipelineStageAction(
 ): Promise<ActionState> {
   const parsed = pipelineStageSchema.safeParse({ name: formData.get("name") });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   const { count } = await supabase.from("pipeline_stages").select("id", { count: "exact", head: true });
@@ -90,7 +88,7 @@ export async function createLeadAction(
     notes: formData.get("notes"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const stageId = String(formData.get("stage_id") ?? "");
   if (!stageId) return { error: "Choose a starting stage" };
@@ -168,7 +166,7 @@ export async function createActivityAction(
     notes: formData.get("notes"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   const { error } = await supabase.from("activities").insert({
@@ -201,7 +199,7 @@ export async function createDealTaskAction(
     due_date: formData.get("due_date"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   const { error } = await supabase.from("deal_tasks").insert({
@@ -244,7 +242,7 @@ export async function createContractAction(
     notes: formData.get("notes"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   const { error } = await supabase.from("contracts").insert({
@@ -309,7 +307,7 @@ export async function createOnboardingTaskAction(
     label: formData.get("label"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   const { count } = await supabase

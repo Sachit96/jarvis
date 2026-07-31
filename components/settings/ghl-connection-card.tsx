@@ -3,10 +3,12 @@
 import { useActionState, useRef, useEffect, useState, useTransition } from "react";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { fieldAria, type ActionState } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { saveGhlConnectionAction, disconnectGhlAction, syncGhlAction, type ActionState } from "@/actions/ghl-actions";
+import { FieldError } from "@/components/ui/field-error";
+import { saveGhlConnectionAction, disconnectGhlAction, syncGhlAction } from "@/actions/ghl-actions";
 import type { Database } from "@/lib/supabase/database.types";
 
 type GhlConnection = Database["public"]["Tables"]["ghl_connections"]["Row"];
@@ -88,13 +90,24 @@ export function GhlConnectionCard({ connection }: { connection: GhlConnection | 
           <form ref={formRef} action={formAction} className="mt-3 space-y-3">
             <div className="space-y-1.5">
               <Label htmlFor="location_id">Location ID</Label>
-              <Input id="location_id" name="location_id" defaultValue={connection?.location_id} required autoFocus />
+              <Input
+                id="location_id"
+                name="location_id"
+                defaultValue={connection?.location_id}
+                required
+                autoFocus
+                {...fieldAria(state, "location_id")}
+              />
+              <FieldError id="location_id-error" message={state.fieldErrors?.location_id} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="private_token">Private Integration Token</Label>
-              <Input id="private_token" name="private_token" type="password" required />
+              <Input id="private_token" name="private_token" type="password" required {...fieldAria(state, "private_token")} />
+              <FieldError id="private_token-error" message={state.fieldErrors?.private_token} />
             </div>
-            {state.error ? <p className="text-xs text-danger">{state.error}</p> : null}
+            {state.error ? (
+              <p className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-xs text-danger">{state.error}</p>
+            ) : null}
             <div className="flex gap-2">
               <Button type="submit" size="sm" disabled={isPending}>
                 {isPending ? "Saving…" : "Save connection"}

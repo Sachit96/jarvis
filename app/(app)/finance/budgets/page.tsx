@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getBudgets, getMonthTransactions, computeSpendByCategory } from "@/lib/db/queries/finance";
 import { BudgetBar } from "@/components/finance/budget-bar";
 import { BudgetForm } from "@/components/finance/budget-form";
+import { SpendByCategoryChart } from "@/components/finance/spend-by-category-chart";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { FINANCE_TABS } from "@/lib/nav-items";
 
@@ -44,6 +45,8 @@ export default async function BudgetsPage() {
           ))}
         </div>
       )}
+
+      <SpendByCategoryChart spendByCategory={spendByCategory} />
     </div>
   );
 }

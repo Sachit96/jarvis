@@ -1,46 +1,47 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import type { Database } from "@/lib/supabase/database.types";
 
 type Task = Database["public"]["Tables"]["tasks"]["Row"];
 
-const PRIORITY_TONE: Record<string, string> = {
-  high: "text-danger border-danger/40",
-  medium: "text-warn border-warn/40",
-  low: "text-muted-foreground border-border",
+const PRIORITY_DOT: Record<string, string> = {
+  high: "bg-danger",
+  medium: "bg-warn",
+  low: "bg-muted-foreground",
 };
 
-export function PriorityTasksWidget({ tasks }: { tasks: Task[] }) {
+export function PriorityTasksWidget({ tasks, compact = false, className }: { tasks: Task[]; compact?: boolean; className?: string }) {
   return (
-    <Card>
-      <div className="flex items-center justify-between">
-        <p className="text-label uppercase tracking-wide text-muted-foreground">Priority tasks</p>
-        <Link href="/life/tasks" className="text-label text-brand hover:underline">
+    <Card padding={compact ? "compact" : "default"} className={cn("min-h-[170px]", className)}>
+      <header className="mb-3 flex shrink-0 items-center justify-between">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Priority tasks</p>
+        <Link href="/life/tasks" className="text-[13px] font-medium text-brand hover:underline">
           View all
         </Link>
+      </header>
+      <div className="flex min-h-0 flex-1 flex-col">
+        {tasks.length === 0 ? (
+          <p className="text-[13px] text-muted-foreground">Nothing outstanding — nice.</p>
+        ) : (
+          <ul className="-mx-2">
+            {tasks.map((task) => (
+              <li key={task.id} className="flex items-start gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-white/[0.04]">
+                <span className="mt-1.5 flex h-1.5 w-1.5 shrink-0 items-center justify-center">
+                  <span className={cn("h-1.5 w-1.5 rounded-full", PRIORITY_DOT[task.priority])} />
+                  <span className="sr-only">{task.priority} priority</span>
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="line-clamp-2 text-[13px]">{task.title}</p>
+                  {task.due_date ? (
+                    <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">{task.due_date}</p>
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-      {tasks.length === 0 ? (
-        <p className="mt-3 text-body text-muted-foreground">Nothing outstanding — nice.</p>
-      ) : (
-        <ul className="mt-2 -mx-2">
-          {tasks.map((task) => (
-            <li
-              key={task.id}
-              className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-body transition-colors hover:bg-white/[0.04]"
-            >
-              <Badge variant="outline" className={cn("shrink-0 font-mono text-caption uppercase", PRIORITY_TONE[task.priority])}>
-                {task.priority}
-              </Badge>
-              <span className="truncate">{task.title}</span>
-              {task.due_date ? (
-                <span className="ml-auto shrink-0 font-mono text-caption text-muted-foreground">{task.due_date}</span>
-              ) : null}
-            </li>
-          ))}
-        </ul>
-      )}
     </Card>
   );
 }

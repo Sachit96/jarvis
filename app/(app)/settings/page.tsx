@@ -1,14 +1,14 @@
 import { Download } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getGhlConnection, getGhlSyncLogs } from "@/lib/db/queries/business";
-import { GroqStatusCard } from "@/components/settings/groq-status-card";
+import { AiMentorStatusCard } from "@/components/settings/ai-mentor-status-card";
 import { GhlConnectionCard } from "@/components/settings/ghl-connection-card";
 import { GhlSyncLogs } from "@/components/settings/ghl-sync-logs";
-import { MENTOR_MODEL } from "@/lib/ai/groq";
+import { GEMINI_MODEL } from "@/lib/ai/providers/gemini-client";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
-  const hasGroqKey = Boolean(process.env.GROQ_API_KEY);
+  const hasGeminiKey = Boolean(process.env.GEMINI_API_KEY);
   const [ghlConnection, ghlLogs] = await Promise.all([getGhlConnection(supabase), getGhlSyncLogs(supabase)]);
 
   return (
@@ -18,7 +18,7 @@ export default async function SettingsPage() {
         <h1 className="text-xl font-semibold">Settings</h1>
       </div>
 
-      <GroqStatusCard hasKey={hasGroqKey} model={MENTOR_MODEL} />
+      <AiMentorStatusCard hasKey={hasGeminiKey} model={GEMINI_MODEL} />
 
       <GhlConnectionCard connection={ghlConnection} />
       <GhlSyncLogs logs={ghlLogs} />

@@ -2,10 +2,12 @@
 
 import { useActionState, useRef, useEffect, useState } from "react";
 import { Plus } from "lucide-react";
-import { createContractAction, type ActionState } from "@/actions/business-actions";
+import { createContractAction } from "@/actions/business-actions";
+import { fieldAria, type ActionState } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FieldError } from "@/components/ui/field-error";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -67,7 +69,11 @@ export function ContractForm({ contacts }: { contacts: Contact[] }) {
               </SelectTrigger>
               <SelectContent>
                 {contacts.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
+                  <SelectItem
+                    key={c.id}
+                    value={c.id}
+                    label={c.company_name ? `${c.contact_person} — ${c.company_name}` : c.contact_person}
+                  >
                     {c.contact_person}
                     {c.company_name ? ` — ${c.company_name}` : ""}
                   </SelectItem>
@@ -77,12 +83,22 @@ export function ContractForm({ contacts }: { contacts: Contact[] }) {
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="title">Title</Label>
-            <Input id="title" name="title" placeholder="Monthly retainer" required autoFocus />
+            <Input id="title" name="title" placeholder="Monthly retainer" required autoFocus {...fieldAria(state, "title")} />
+            <FieldError id="title-error" message={state.fieldErrors?.title} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="monthly_value">Monthly value</Label>
-              <Input id="monthly_value" name="monthly_value" type="number" step="0.01" min="0" required />
+              <Input
+                id="monthly_value"
+                name="monthly_value"
+                type="number"
+                step="0.01"
+                min="0"
+                required
+                {...fieldAria(state, "monthly_value")}
+              />
+              <FieldError id="monthly_value-error" message={state.fieldErrors?.monthly_value} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="status">Status</Label>
@@ -91,10 +107,10 @@ export function ContractForm({ contacts }: { contacts: Contact[] }) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="paused">Paused</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                  <SelectItem value="active" label="Active">Active</SelectItem>
+                  <SelectItem value="paused" label="Paused">Paused</SelectItem>
+                  <SelectItem value="completed" label="Completed">Completed</SelectItem>
+                  <SelectItem value="cancelled" label="Cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -102,18 +118,30 @@ export function ContractForm({ contacts }: { contacts: Contact[] }) {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="start_date">Start date</Label>
-              <Input id="start_date" name="start_date" type="date" defaultValue={todayStr()} required />
+              <Input
+                id="start_date"
+                name="start_date"
+                type="date"
+                defaultValue={todayStr()}
+                required
+                {...fieldAria(state, "start_date")}
+              />
+              <FieldError id="start_date-error" message={state.fieldErrors?.start_date} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="end_date">End date</Label>
-              <Input id="end_date" name="end_date" type="date" />
+              <Input id="end_date" name="end_date" type="date" {...fieldAria(state, "end_date")} />
+              <FieldError id="end_date-error" message={state.fieldErrors?.end_date} />
             </div>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="notes">Notes</Label>
-            <Textarea id="notes" name="notes" rows={2} />
+            <Textarea id="notes" name="notes" rows={2} {...fieldAria(state, "notes")} />
+            <FieldError id="notes-error" message={state.fieldErrors?.notes} />
           </div>
-          {state.error ? <p className="text-sm text-danger">{state.error}</p> : null}
+          {state.error ? (
+            <p className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{state.error}</p>
+          ) : null}
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? "Saving…" : "Add contract"}
           </Button>

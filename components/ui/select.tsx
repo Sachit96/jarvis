@@ -6,7 +6,46 @@ import { Select as SelectPrimitive } from "@base-ui/react/select"
 import { cn } from "@/lib/utils"
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
 
-const Select = SelectPrimitive.Root
+/**
+ * base-ui's `Select.Value` only auto-resolves the trigger's displayed label from the
+ * declarative `items` prop on `Select.Root` — it does NOT read it back out of `Select.Item`
+ * children when the popup is composed declaratively (our usage everywhere). Without this,
+ * the trigger falls back to rendering the raw `value` (e.g. a UUID or "medium" instead of
+ * "Medium"). We derive that `items` map here by walking the authored children tree once, so
+ * call sites just need `<SelectItem value={...} label={...}>` as usual.
+ */
+function collectItemLabels(children: React.ReactNode, map: Record<string, React.ReactNode>) {
+  React.Children.forEach(children, (child) => {
+    if (!React.isValidElement(child)) return;
+    const props = child.props as { value?: unknown; label?: React.ReactNode; children?: React.ReactNode };
+    if (child.type === SelectItem) {
+      if (props.value != null) {
+        map[String(props.value)] = props.label ?? (typeof props.children === "string" ? props.children : String(props.value));
+      }
+      return;
+    }
+    if (props.children) {
+      collectItemLabels(props.children, map);
+    }
+  });
+}
+
+function Select<Value = string, Multiple extends boolean | undefined = false>({
+  children,
+  ...props
+}: SelectPrimitive.Root.Props<Value, Multiple>) {
+  const items = React.useMemo(() => {
+    const map: Record<string, React.ReactNode> = {};
+    collectItemLabels(children, map);
+    return map;
+  }, [children]);
+
+  return (
+    <SelectPrimitive.Root items={items} {...props}>
+      {children}
+    </SelectPrimitive.Root>
+  )
+}
 
 function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
   return (

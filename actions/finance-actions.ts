@@ -9,10 +9,8 @@ import {
   tradeSchema,
   closeTradeSchema,
 } from "@/lib/validations/finance";
+import { actionStateFromZodError, type ActionState } from "@/lib/validation";
 
-export interface ActionState {
-  error?: string;
-}
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
@@ -48,7 +46,7 @@ export async function createAccountAction(
     current_balance: formData.get("current_balance") || 0,
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
 
@@ -107,7 +105,7 @@ export async function createTransactionAction(
     occurred_at: formData.get("occurred_at") || todayStr(),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
 
@@ -149,7 +147,7 @@ export async function createBudgetAction(
     monthly_limit: formData.get("monthly_limit"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   const { error } = await supabase.from("budgets").upsert(
@@ -190,7 +188,7 @@ export async function createTradeAction(
     confluence_checked: formData.get("confluence_checked") === "true",
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   const isClosed = parsed.data.exit_price !== undefined && parsed.data.quantity !== undefined;
@@ -234,7 +232,7 @@ export async function closeTradeAction(
     fees: formData.get("fees") || 0,
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const id = String(formData.get("id"));
   const direction = String(formData.get("direction")) as "long" | "short";

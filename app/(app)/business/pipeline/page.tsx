@@ -3,6 +3,7 @@ import { getPipelineStages, getDeals, getContacts, getDealTasks, computePipeline
 import { ensureDefaultPipelineStagesAction } from "@/actions/business-actions";
 import { LeadForm } from "@/components/business/lead-form";
 import { DealCard } from "@/components/business/deal-card";
+import { DealAgingCard, computeDealAging } from "@/components/business/deal-aging-card";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { BUSINESS_TABS } from "@/lib/nav-items";
 
@@ -32,6 +33,9 @@ export default async function PipelinePage() {
     tasksByDeal.set(t.deal_id, list);
   }
   const valueByStage = computePipelineValueByStage(deals);
+  const closedStageIds = new Set(stages.filter((s) => s.is_won || s.is_lost).map((s) => s.id));
+  const openDeals = deals.filter((d) => !closedStageIds.has(d.stage_id));
+  const dealAgingBuckets = computeDealAging(openDeals);
 
   return (
     <div className="space-y-6">
@@ -83,6 +87,8 @@ export default async function PipelinePage() {
           })}
         </div>
       )}
+
+      <DealAgingCard openDealCount={openDeals.length} buckets={dealAgingBuckets} />
     </div>
   );
 }

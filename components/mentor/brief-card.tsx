@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { MentorBriefSections } from "@/components/mentor/mentor-brief-sections";
 
 function TagList({ label, items, tone }: { label: string; items: string[]; tone: string }) {
   if (items.length === 0) return null;
@@ -33,12 +34,14 @@ export function BriefCard({
   return (
     <Card className="space-y-4 ring-brand/25">
       <p className="font-mono text-caption text-muted-foreground">{dateLabel}</p>
-      <p className="text-body leading-relaxed whitespace-pre-wrap">{markdownBody}</p>
-      <div className="space-y-3 border-t border-white/[0.08] pt-3.5">
-        <TagList label="Focus areas" items={focusAreas} tone="text-brand border-brand/40" />
-        <TagList label="Strengths" items={strengths} tone="text-success border-success/40" />
-        <TagList label="Weaknesses" items={weaknesses} tone="text-danger border-danger/40" />
-      </div>
+      <MentorBriefSections markdownBody={markdownBody} />
+      {focusAreas.length > 0 || strengths.length > 0 || weaknesses.length > 0 ? (
+        <div className="space-y-3 border-t border-white/[0.08] pt-3.5">
+          <TagList label="Focus areas" items={focusAreas} tone="text-brand border-brand/40" />
+          <TagList label="Strengths" items={strengths} tone="text-success border-success/40" />
+          <TagList label="Weaknesses" items={weaknesses} tone="text-danger border-danger/40" />
+        </div>
+      ) : null}
     </Card>
   );
 }

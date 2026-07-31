@@ -72,10 +72,10 @@ export function ContractCard({ contract, contact }: { contract: Contract; contac
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="paused">Paused</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
-            <SelectItem value="cancelled">Cancelled</SelectItem>
+            <SelectItem value="active" label="Active">Active</SelectItem>
+            <SelectItem value="paused" label="Paused">Paused</SelectItem>
+            <SelectItem value="completed" label="Completed">Completed</SelectItem>
+            <SelectItem value="cancelled" label="Cancelled">Cancelled</SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -1,9 +1,11 @@
 "use client";
 
 import { useActionState, useRef, useEffect } from "react";
-import { createDealTaskAction, type ActionState } from "@/actions/business-actions";
+import { createDealTaskAction } from "@/actions/business-actions";
+import { fieldAria, type ActionState } from "@/lib/validation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { FieldError } from "@/components/ui/field-error";
 
 const initialState: ActionState = {};
 
@@ -22,7 +24,10 @@ export function AddDealTaskForm({ dealId }: { dealId: string }) {
   return (
     <form ref={formRef} action={formAction} className="mt-1.5 flex items-center gap-1.5">
       <input type="hidden" name="deal_id" value={dealId} />
-      <Input name="title" placeholder="Follow-up task…" className="h-6 flex-1 text-xs" />
+      <div className="flex-1">
+        <Input name="title" placeholder="Follow-up task…" className="h-6 text-xs" {...fieldAria(state, "title")} />
+        <FieldError id="title-error" message={state.fieldErrors?.title} />
+      </div>
       <Button type="submit" size="sm" variant="ghost" className="h-6 px-2 text-xs" disabled={isPending}>
         Add
       </Button>

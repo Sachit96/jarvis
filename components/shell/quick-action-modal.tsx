@@ -17,14 +17,13 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { createTaskAction } from "@/actions/life-actions";
 import { createJournalEntryAction } from "@/actions/life-actions";
 import { createTradeAction, createTransactionAction } from "@/actions/finance-actions";
+import { fieldAria, type ActionState } from "@/lib/validation";
+import { FieldError } from "@/components/ui/field-error";
 import type { Database } from "@/lib/supabase/database.types";
 
 type Account = Database["public"]["Tables"]["accounts"]["Row"];
 
-interface QAState {
-  error?: string;
-}
-const initialState: QAState = {};
+const initialState: ActionState = {};
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
@@ -51,7 +50,8 @@ function TaskQuickForm({ onDone }: { onDone: () => void }) {
     <form ref={formRef} action={formAction} className="space-y-3">
       <div className="space-y-1.5">
         <Label htmlFor="qa-title">Title</Label>
-        <Input id="qa-title" name="title" required autoFocus />
+        <Input id="qa-title" name="title" required autoFocus {...fieldAria(state, "title")} />
+        <FieldError id="title-error" message={state.fieldErrors?.title} />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
@@ -61,18 +61,21 @@ function TaskQuickForm({ onDone }: { onDone: () => void }) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="high">High</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="low">Low</SelectItem>
+              <SelectItem value="high" label="High">High</SelectItem>
+              <SelectItem value="medium" label="Medium">Medium</SelectItem>
+              <SelectItem value="low" label="Low">Low</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="qa-due">Due date</Label>
-          <Input id="qa-due" name="due_date" type="date" />
+          <Input id="qa-due" name="due_date" type="date" {...fieldAria(state, "due_date")} />
+          <FieldError id="due_date-error" message={state.fieldErrors?.due_date} />
         </div>
       </div>
-      {state.error ? <p className="text-sm text-danger">{state.error}</p> : null}
+      {state.error ? (
+        <p className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{state.error}</p>
+      ) : null}
       <Button type="submit" className="w-full" disabled={isPending}>
         {isPending ? "Adding…" : "Add task"}
       </Button>
@@ -98,7 +101,8 @@ function TradeQuickForm({ onDone }: { onDone: () => void }) {
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label htmlFor="qa-pair">Asset / Pair</Label>
-          <Input id="qa-pair" name="asset_pair" placeholder="EUR/USD" required autoFocus />
+          <Input id="qa-pair" name="asset_pair" placeholder="EUR/USD" required autoFocus {...fieldAria(state, "asset_pair")} />
+          <FieldError id="asset_pair-error" message={state.fieldErrors?.asset_pair} />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="qa-direction">Direction</Label>
@@ -107,17 +111,20 @@ function TradeQuickForm({ onDone }: { onDone: () => void }) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="long">Long</SelectItem>
-              <SelectItem value="short">Short</SelectItem>
+              <SelectItem value="long" label="Long">Long</SelectItem>
+              <SelectItem value="short" label="Short">Short</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="qa-entry">Entry price</Label>
-        <Input id="qa-entry" name="entry_price" type="number" step="any" min="0.00000001" required />
+        <Input id="qa-entry" name="entry_price" type="number" step="any" min="0.00000001" required {...fieldAria(state, "entry_price")} />
+        <FieldError id="entry_price-error" message={state.fieldErrors?.entry_price} />
       </div>
-      {state.error ? <p className="text-sm text-danger">{state.error}</p> : null}
+      {state.error ? (
+        <p className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{state.error}</p>
+      ) : null}
       <Button type="submit" className="w-full" disabled={isPending}>
         {isPending ? "Adding…" : "Add trade"}
       </Button>
@@ -152,14 +159,15 @@ function TransactionQuickForm({ accounts, onDone }: { accounts: Account[]; onDon
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="expense">Expense</SelectItem>
-              <SelectItem value="income">Income</SelectItem>
+              <SelectItem value="expense" label="Expense">Expense</SelectItem>
+              <SelectItem value="income" label="Income">Income</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="qa-amount">Amount</Label>
-          <Input id="qa-amount" name="amount" type="number" step="0.01" min="0.01" required autoFocus />
+          <Input id="qa-amount" name="amount" type="number" step="0.01" min="0.01" required autoFocus {...fieldAria(state, "amount")} />
+          <FieldError id="amount-error" message={state.fieldErrors?.amount} />
         </div>
       </div>
       <div className="space-y-1.5">
@@ -170,18 +178,22 @@ function TransactionQuickForm({ accounts, onDone }: { accounts: Account[]; onDon
           </SelectTrigger>
           <SelectContent>
             {accounts.map((a) => (
-              <SelectItem key={a.id} value={a.id}>
+              <SelectItem key={a.id} value={a.id} label={a.name}>
                 {a.name}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
+        <FieldError id="account_id-error" message={state.fieldErrors?.account_id} />
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="qa-category">Category</Label>
-        <Input id="qa-category" name="category" placeholder="Business, Personal…" required />
+        <Input id="qa-category" name="category" placeholder="Business, Personal…" required {...fieldAria(state, "category")} />
+        <FieldError id="category-error" message={state.fieldErrors?.category} />
       </div>
-      {state.error ? <p className="text-sm text-danger">{state.error}</p> : null}
+      {state.error ? (
+        <p className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{state.error}</p>
+      ) : null}
       <Button type="submit" className="w-full" disabled={isPending}>
         {isPending ? "Adding…" : "Add transaction"}
       </Button>
@@ -207,9 +219,12 @@ function JournalQuickForm({ onDone }: { onDone: () => void }) {
       <input type="hidden" name="entry_type" value="freeform" />
       <div className="space-y-1.5">
         <Label htmlFor="qa-body">Quick note</Label>
-        <Input id="qa-body" name="body" placeholder="What's on your mind?" required autoFocus />
+        <Input id="qa-body" name="body" placeholder="What's on your mind?" required autoFocus {...fieldAria(state, "body")} />
+        <FieldError id="body-error" message={state.fieldErrors?.body} />
       </div>
-      {state.error ? <p className="text-sm text-danger">{state.error}</p> : null}
+      {state.error ? (
+        <p className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{state.error}</p>
+      ) : null}
       <Button type="submit" className="w-full" disabled={isPending}>
         {isPending ? "Saving…" : "Save entry"}
       </Button>

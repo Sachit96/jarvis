@@ -10,8 +10,9 @@ import {
   createOnboardingTaskAction,
   deleteOnboardingTaskAction,
   toggleOnboardingTaskAction,
-  type ActionState,
 } from "@/actions/business-actions";
+import { fieldAria, type ActionState } from "@/lib/validation";
+import { FieldError } from "@/components/ui/field-error";
 import type { Database } from "@/lib/supabase/database.types";
 
 type OnboardingTask = Database["public"]["Tables"]["client_onboarding_tasks"]["Row"];
@@ -75,7 +76,10 @@ export function OnboardingChecklist({ contactId, tasks }: { contactId: string; t
       ) : null}
       <form ref={formRef} action={formAction} className="mt-1.5 flex items-center gap-1.5">
         <input type="hidden" name="contact_id" value={contactId} />
-        <Input name="label" placeholder="Add checklist item…" className="h-6 flex-1 text-xs" />
+        <div className="flex-1">
+          <Input name="label" placeholder="Add checklist item…" className="h-6 text-xs" {...fieldAria(state, "label")} />
+          <FieldError id="label-error" message={state.fieldErrors?.label} />
+        </div>
         <Button type="submit" size="sm" variant="ghost" className="h-6 px-2 text-xs" disabled={isPending}>
           Add
         </Button>

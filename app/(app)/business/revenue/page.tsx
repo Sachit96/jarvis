@@ -1,3 +1,4 @@
+import { TrendingUp, FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getContracts, getContacts, computeMrr } from "@/lib/db/queries/business";
 import { ContractForm } from "@/components/business/contract-form";
@@ -26,8 +27,8 @@ export default async function RevenuePage() {
       <ModuleTabs tabs={BUSINESS_TABS} />
 
       <div className="grid grid-cols-2 gap-4">
-        <StatTile label="MRR" value={`$${mrr.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} tone="success" />
-        <StatTile label="Active Contracts" value={String(activeCount)} />
+        <StatTile label="MRR" value={`$${mrr.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} tone="success" icon={TrendingUp} category="business" />
+        <StatTile label="Active Contracts" value={String(activeCount)} icon={FileText} category="business" />
       </div>
 
       {contracts.length === 0 ? (

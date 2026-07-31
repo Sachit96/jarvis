@@ -2,10 +2,12 @@
 
 import { useActionState, useRef, useEffect, useState } from "react";
 import { Plus } from "lucide-react";
-import { createGoalAction, type ActionState } from "@/actions/life-actions";
+import { createGoalAction } from "@/actions/life-actions";
+import { fieldAria, type ActionState } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FieldError } from "@/components/ui/field-error";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -54,11 +56,13 @@ export function GoalForm({ defaultTimeframe }: { defaultTimeframe: "daily" | "we
         <form ref={formRef} action={formAction} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="title">Title</Label>
-            <Input id="title" name="title" required autoFocus />
+            <Input id="title" name="title" required autoFocus {...fieldAria(state, "title")} />
+            <FieldError id="title-error" message={state.fieldErrors?.title} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="description">Description</Label>
-            <Textarea id="description" name="description" rows={2} />
+            <Textarea id="description" name="description" rows={2} {...fieldAria(state, "description")} />
+            <FieldError id="description-error" message={state.fieldErrors?.description} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
@@ -68,23 +72,27 @@ export function GoalForm({ defaultTimeframe }: { defaultTimeframe: "daily" | "we
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectItem value="daily" label="Daily">Daily</SelectItem>
+                  <SelectItem value="weekly" label="Weekly">Weekly</SelectItem>
+                  <SelectItem value="monthly" label="Monthly">Monthly</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="target_date">Target date</Label>
-              <Input id="target_date" name="target_date" type="date" />
+              <Input id="target_date" name="target_date" type="date" {...fieldAria(state, "target_date")} />
+              <FieldError id="target_date-error" message={state.fieldErrors?.target_date} />
             </div>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="category">Category</Label>
-            <Input id="category" name="category" placeholder="Business, Health, Mind…" />
+            <Input id="category" name="category" placeholder="Business, Health, Mind…" {...fieldAria(state, "category")} />
+            <FieldError id="category-error" message={state.fieldErrors?.category} />
           </div>
           <input type="hidden" name="progress_percent" value="0" />
-          {state.error ? <p className="text-sm text-danger">{state.error}</p> : null}
+          {state.error ? (
+            <p className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{state.error}</p>
+          ) : null}
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? "Adding…" : "Add goal"}
           </Button>

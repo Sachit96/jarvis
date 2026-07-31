@@ -1,9 +1,11 @@
 "use client";
 
 import { useActionState, useRef, useEffect } from "react";
-import { addWorkoutSetAction, type ActionState } from "@/actions/health-actions";
+import { addWorkoutSetAction } from "@/actions/health-actions";
+import { fieldAria, type ActionState } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { FieldError } from "@/components/ui/field-error";
 import {
   Select,
   SelectContent,
@@ -51,18 +53,26 @@ export function AddSetForm({
         </SelectTrigger>
         <SelectContent>
           {exercises.map((ex) => (
-            <SelectItem key={ex.id} value={ex.id}>
+            <SelectItem key={ex.id} value={ex.id} label={ex.name}>
               {ex.name}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
-      <Input name="weight_kg" type="number" step="0.5" min="0" placeholder="kg" className="w-20" />
-      <Input name="reps" type="number" step="1" min="0" placeholder="reps" className="w-20" />
+      <div className="flex flex-col">
+        <Input name="weight_lbs" type="number" step="0.5" min="0" placeholder="lbs" className="w-20" {...fieldAria(state, "weight_lbs")} />
+        <FieldError id="weight_lbs-error" message={state.fieldErrors?.weight_lbs} />
+      </div>
+      <div className="flex flex-col">
+        <Input name="reps" type="number" step="1" min="0" placeholder="reps" className="w-20" {...fieldAria(state, "reps")} />
+        <FieldError id="reps-error" message={state.fieldErrors?.reps} />
+      </div>
       <Button type="submit" size="sm" variant="secondary" disabled={isPending}>
         {isPending ? "Adding…" : `Add set ${nextSetNumber}`}
       </Button>
-      {state.error ? <p className="w-full text-xs text-danger">{state.error}</p> : null}
+      {state.error ? (
+        <p className="w-full rounded-lg border border-danger/30 bg-danger/10 px-2 py-1 text-xs text-danger">{state.error}</p>
+      ) : null}
     </form>
   );
 }

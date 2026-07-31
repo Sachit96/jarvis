@@ -2,10 +2,12 @@
 
 import { useActionState, useRef, useEffect, useState } from "react";
 import { Plus } from "lucide-react";
-import { createAccountAction, type ActionState } from "@/actions/finance-actions";
+import { createAccountAction } from "@/actions/finance-actions";
+import { fieldAria, type ActionState } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FieldError } from "@/components/ui/field-error";
 import {
   Select,
   SelectContent,
@@ -55,7 +57,8 @@ export function AccountForm() {
         <form ref={formRef} action={formAction} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" name="name" required autoFocus />
+            <Input id="name" name="name" required autoFocus {...fieldAria(state, "name")} />
+            <FieldError id="name-error" message={state.fieldErrors?.name} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="account_type">Type</Label>
@@ -68,10 +71,10 @@ export function AccountForm() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="cash">Cash</SelectItem>
-                <SelectItem value="savings">Savings</SelectItem>
-                <SelectItem value="credit">Credit</SelectItem>
-                <SelectItem value="investment">Investment / Trading</SelectItem>
+                <SelectItem value="cash" label="Cash">Cash</SelectItem>
+                <SelectItem value="savings" label="Savings">Savings</SelectItem>
+                <SelectItem value="credit" label="Credit">Credit</SelectItem>
+                <SelectItem value="investment" label="Investment / Trading">Investment / Trading</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -86,9 +89,13 @@ export function AccountForm() {
               step="0.01"
               defaultValue="0"
               required
+              {...fieldAria(state, "current_balance")}
             />
+            <FieldError id="current_balance-error" message={state.fieldErrors?.current_balance} />
           </div>
-          {state.error ? <p className="text-sm text-danger">{state.error}</p> : null}
+          {state.error ? (
+            <p className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{state.error}</p>
+          ) : null}
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? "Adding…" : "Add account"}
           </Button>

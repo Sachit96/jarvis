@@ -87,7 +87,7 @@ export function DealCard({
           </SelectTrigger>
           <SelectContent>
             {stages.map((s) => (
-              <SelectItem key={s.id} value={s.id}>
+              <SelectItem key={s.id} value={s.id} label={s.name}>
                 {s.name}
               </SelectItem>
             ))}

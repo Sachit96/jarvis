@@ -3,12 +3,13 @@
 import { useActionState, useRef, useEffect, useTransition } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { fieldAria, type ActionState } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { FieldError } from "@/components/ui/field-error";
 import {
   createChecklistItemAction,
   deleteChecklistItemAction,
-  type ActionState,
 } from "@/actions/trading-actions";
 import type { Database } from "@/lib/supabase/database.types";
 
@@ -57,7 +58,10 @@ export function ChecklistManager({ items }: { items: ChecklistItem[] }) {
         </ul>
       ) : null}
       <form ref={formRef} action={formAction} className="mt-3 flex items-center gap-2">
-        <Input name="label" placeholder="Add a checklist item…" className="flex-1" />
+        <div className="flex-1">
+          <Input name="label" placeholder="Add a checklist item…" {...fieldAria(state, "label")} />
+          <FieldError id="label-error" message={state.fieldErrors?.label} />
+        </div>
         <Button type="submit" size="sm" variant="secondary" disabled={isPending} className="gap-1">
           <Plus className="h-3.5 w-3.5" /> Add
         </Button>

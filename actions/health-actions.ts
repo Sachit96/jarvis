@@ -9,14 +9,15 @@ import {
   nutritionTargetsSchema,
   nutritionLogSchema,
   waterLogSchema,
+  bodyMetricSchema,
+  sleepLogSchema,
   mentorMessageSchema,
   DEFAULT_EXERCISES,
 } from "@/lib/validations/health";
 import { runMentorChat } from "@/lib/ai/mentor";
+import { lbsToKg } from "@/lib/units";
+import { actionStateFromZodError, type ActionState } from "@/lib/validation";
 
-export interface ActionState {
-  error?: string;
-}
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
@@ -25,6 +26,7 @@ function todayStr() {
 function revalidateHealth() {
   revalidatePath("/health/workouts");
   revalidatePath("/health/nutrition");
+  revalidatePath("/health/body");
 }
 
 // ============================================================= Exercises
@@ -54,7 +56,7 @@ export async function createExerciseAction(
     muscle_group: formData.get("muscle_group"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   const { error } = await supabase.from("exercises").insert({
@@ -78,7 +80,7 @@ export async function createWorkoutAction(
     notes: formData.get("notes"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   const { error } = await supabase.from("workouts").insert({
@@ -113,18 +115,18 @@ export async function addWorkoutSetAction(
     workout_id: formData.get("workout_id"),
     exercise_id: formData.get("exercise_id"),
     set_number: formData.get("set_number") || 1,
-    weight_kg: formData.get("weight_kg") || undefined,
+    weight_lbs: formData.get("weight_lbs") || undefined,
     reps: formData.get("reps") || undefined,
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   const { error } = await supabase.from("workout_sets").insert({
     workout_id: parsed.data.workout_id,
     exercise_id: parsed.data.exercise_id,
     set_number: parsed.data.set_number,
-    weight_kg: parsed.data.weight_kg ?? null,
+    weight_kg: parsed.data.weight_lbs !== undefined ? lbsToKg(parsed.data.weight_lbs) : null,
     reps: parsed.data.reps ?? null,
   });
   if (error) return { error: error.message };
@@ -153,7 +155,7 @@ export async function upsertNutritionTargetsAction(
     target_water_ml: formData.get("target_water_ml"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   // Exactly one row ever exists — no user_id to key an upsert on, so fetch
@@ -181,7 +183,7 @@ export async function createNutritionLogAction(
     fat_g: formData.get("fat_g") || 0,
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   const { error } = await supabase.from("nutrition_logs").insert({
@@ -219,6 +221,82 @@ export async function addWaterAction(amountMl: number) {
   revalidatePath("/health/nutrition");
 }
 
+// ============================================================= Body metrics (weight)
+
+export async function createBodyMetricAction(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const parsed = bodyMetricSchema.safeParse({
+    logged_at: formData.get("logged_at") || todayStr(),
+    weight_lbs: formData.get("weight_lbs"),
+    body_fat_pct: formData.get("body_fat_pct") || undefined,
+    notes: formData.get("notes"),
+  });
+  if (!parsed.success) {
+    return actionStateFromZodError(parsed.error);
+  }
+  const supabase = await createClient();
+  // One entry per day (unique on logged_at) — upsert so re-logging the same
+  // day updates it instead of erroring.
+  const { error } = await supabase.from("body_metrics").upsert(
+    {
+      logged_at: parsed.data.logged_at,
+      weight_kg: lbsToKg(parsed.data.weight_lbs),
+      body_fat_pct: parsed.data.body_fat_pct ?? null,
+      notes: parsed.data.notes || null,
+    },
+    { onConflict: "logged_at" },
+  );
+  if (error) return { error: error.message };
+  revalidatePath("/health/body");
+  return {};
+}
+
+export async function deleteBodyMetricAction(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("body_metrics").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/health/body");
+}
+
+// ============================================================= Sleep
+
+export async function createSleepLogAction(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const parsed = sleepLogSchema.safeParse({
+    log_date: formData.get("log_date") || todayStr(),
+    hours_slept: formData.get("hours_slept"),
+    quality: formData.get("quality") || undefined,
+    notes: formData.get("notes"),
+  });
+  if (!parsed.success) {
+    return actionStateFromZodError(parsed.error);
+  }
+  const supabase = await createClient();
+  const { error } = await supabase.from("sleep_logs").upsert(
+    {
+      log_date: parsed.data.log_date,
+      hours_slept: parsed.data.hours_slept,
+      quality: parsed.data.quality ?? null,
+      notes: parsed.data.notes || null,
+    },
+    { onConflict: "log_date" },
+  );
+  if (error) return { error: error.message };
+  revalidatePath("/health/body");
+  return {};
+}
+
+export async function deleteSleepLogAction(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("sleep_logs").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/health/body");
+}
+
 // ============================================================= Mentor chat
 
 export interface MentorActionState {
@@ -229,7 +307,7 @@ export interface MentorActionState {
 export async function sendMentorMessageAction(content: string): Promise<MentorActionState> {
   const parsed = mentorMessageSchema.safeParse({ content });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid message" };
+    return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
   try {

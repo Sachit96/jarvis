@@ -2,10 +2,12 @@
 
 import { useActionState, useRef, useEffect, useState } from "react";
 import { Plus } from "lucide-react";
-import { createHabitAction, type ActionState } from "@/actions/life-actions";
+import { createHabitAction } from "@/actions/life-actions";
+import { fieldAria, type ActionState } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FieldError } from "@/components/ui/field-error";
 import {
   Select,
   SelectContent,
@@ -53,7 +55,8 @@ export function HabitForm() {
         <form ref={formRef} action={formAction} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" name="name" required autoFocus />
+            <Input id="name" name="name" required autoFocus {...fieldAria(state, "name")} />
+            <FieldError id="name-error" message={state.fieldErrors?.name} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="metric_type">Metric</Label>
@@ -62,18 +65,20 @@ export function HabitForm() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="sleep">Sleep</SelectItem>
-                <SelectItem value="focus">Focus</SelectItem>
-                <SelectItem value="training">Training</SelectItem>
-                <SelectItem value="screen_time">Screen Time</SelectItem>
-                <SelectItem value="consistency">Consistency</SelectItem>
-                <SelectItem value="no_g">No G</SelectItem>
-                <SelectItem value="custom">Custom</SelectItem>
+                <SelectItem value="sleep" label="Sleep">Sleep</SelectItem>
+                <SelectItem value="focus" label="Focus">Focus</SelectItem>
+                <SelectItem value="training" label="Training">Training</SelectItem>
+                <SelectItem value="screen_time" label="Screen Time">Screen Time</SelectItem>
+                <SelectItem value="consistency" label="Consistency">Consistency</SelectItem>
+                <SelectItem value="no_g" label="No G">No G</SelectItem>
+                <SelectItem value="custom" label="Custom">Custom</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <input type="hidden" name="kind" value="boolean" />
-          {state.error ? <p className="text-sm text-danger">{state.error}</p> : null}
+          {state.error ? (
+            <p className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">{state.error}</p>
+          ) : null}
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? "Adding…" : "Add habit"}
           </Button>
