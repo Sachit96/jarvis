@@ -1114,6 +1114,33 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_runs: {
+        Row: {
+          created_at: string
+          http_status: number | null
+          id: string
+          job_name: string
+          message: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          http_status?: number | null
+          id?: string
+          job_name: string
+          message?: string | null
+          status: string
+        }
+        Update: {
+          created_at?: string
+          http_status?: number | null
+          id?: string
+          job_name?: string
+          message?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       sleep_logs: {
         Row: {
           created_at: string
