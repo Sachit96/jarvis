@@ -1885,6 +1885,92 @@ export type Database = {
         }
         Relationships: []
       }
+      yt_scripts: {
+        Row: {
+          created_at: string
+          estimated_runtime_sec: number | null
+          hook: string | null
+          id: string
+          niche: string | null
+          research_grounded: boolean
+          research_summary: string | null
+          script_body: string | null
+          sections: Json
+          status: string
+          suggested_titles: string[]
+          topic: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          estimated_runtime_sec?: number | null
+          hook?: string | null
+          id?: string
+          niche?: string | null
+          research_grounded?: boolean
+          research_summary?: string | null
+          script_body?: string | null
+          sections?: Json
+          status?: string
+          suggested_titles?: string[]
+          topic: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          estimated_runtime_sec?: number | null
+          hook?: string | null
+          id?: string
+          niche?: string | null
+          research_grounded?: boolean
+          research_summary?: string | null
+          script_body?: string | null
+          sections?: Json
+          status?: string
+          suggested_titles?: string[]
+          topic?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      yt_thumbnails: {
+        Row: {
+          created_at: string
+          id: string
+          image_base64: string | null
+          mime_type: string
+          prompt: string
+          script_id: string
+          selected: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_base64?: string | null
+          mime_type?: string
+          prompt: string
+          script_id: string
+          selected?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_base64?: string | null
+          mime_type?: string
+          prompt?: string
+          script_id?: string
+          selected?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yt_thumbnails_script_id_fkey"
+            columns: ["script_id"]
+            isOneToOne: false
+            referencedRelation: "yt_scripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

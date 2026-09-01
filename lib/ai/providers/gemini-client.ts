@@ -102,12 +102,27 @@ export interface GeminiCallOptions {
   /** JSON mode — mutually exclusive with tools in practice (we never need both at once). Only reliable on "structured", or on flat (non-nested, non-enum) shapes on "high_volume" — see the tier doc comment. */
   responseSchema?: Record<string, unknown>;
   tools?: GeminiFunctionDeclaration[];
+  /**
+   * Gemini's built-in Google Search grounding tool — a DIFFERENT tools
+   * shape (`{google_search: {}}`) from function declarations above, so
+   * it's its own option rather than overloading `tools`. Mutually
+   * exclusive with both `tools` and `responseSchema` (verified live:
+   * "high_volume"/Gemma silently ignores this tool and answers from its
+   * own training data instead of erroring — never trust
+   * GeminiCallResult.grounded without checking it; don't assume this
+   * works on "structured" either without checking the same field, that
+   * combination wasn't reachable to test live tonight due to a real 429
+   * on the structured tier's daily quota).
+   */
+  enableSearchGrounding?: boolean;
   temperature?: number;
 }
 
 export interface GeminiCallResult {
   text: string | null;
   functionCalls: { name: string; args: Record<string, unknown> }[];
+  /** True only if the response actually came back with real grounding citations (groundingMetadata.groundingChunks present and non-empty) — requesting the tool is not the same as it firing. */
+  grounded: boolean;
 }
 
 /**
@@ -158,6 +173,7 @@ export async function callGemini(options: GeminiCallOptions): Promise<GeminiCall
     generationConfig,
   };
   if (options.tools) body.tools = [{ functionDeclarations: options.tools }];
+  if (options.enableSearchGrounding) body.tools = [{ google_search: {} }];
 
   const supabase = createAdminClient();
   let lastError: Error | null = null;
@@ -200,7 +216,9 @@ export async function callGemini(options: GeminiCallOptions): Promise<GeminiCall
       const functionCalls = parts
         .filter((p): p is GeminiPart & { functionCall: NonNullable<GeminiPart["functionCall"]> } => !!p.functionCall)
         .map((p) => p.functionCall);
-      return { text: textParts.length > 0 ? textParts.join("") : null, functionCalls };
+      const groundingChunks = data?.candidates?.[0]?.groundingMetadata?.groundingChunks;
+      const grounded = Array.isArray(groundingChunks) && groundingChunks.length > 0;
+      return { text: textParts.length > 0 ? textParts.join("") : null, functionCalls, grounded };
     }
 
     // Never log the response body (can echo request content on some error

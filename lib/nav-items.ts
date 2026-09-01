@@ -10,6 +10,7 @@ import {
   BrainCircuit,
   Mic,
   GraduationCap,
+  Clapperboard,
   Settings as SettingsIcon,
 } from "lucide-react";
 
@@ -36,6 +37,7 @@ export const SIDEBAR_ITEMS: NavItem[] = [
   { href: "/uni", label: "University", icon: GraduationCap },
   { href: "/mentor", label: "AI Mentor", icon: Sparkles },
   { href: "/voice", label: "Voice Mode", icon: Mic },
+  { href: "/youtube", label: "YouTube", icon: Clapperboard },
   { href: "/memory", label: "Memory", icon: BrainCircuit },
   { href: "/settings", label: "Settings", icon: SettingsIcon },
 ];
