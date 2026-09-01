@@ -1377,6 +1377,326 @@ export type Database = {
           },
         ]
       }
+      uni_assessment_requirements: {
+        Row: {
+          assessment_id: string
+          completed: boolean
+          created_at: string
+          id: string
+          requirement: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          assessment_id: string
+          completed?: boolean
+          created_at?: string
+          id?: string
+          requirement: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          assessment_id?: string
+          completed?: boolean
+          created_at?: string
+          id?: string
+          requirement?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uni_assessment_requirements_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "uni_assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      uni_assessments: {
+        Row: {
+          course_id: string
+          created_at: string
+          due_at: string | null
+          difficulty: number | null
+          earned_score: number | null
+          estimated_hours: number | null
+          id: string
+          max_score: number
+          notes: string | null
+          source: string
+          status: string
+          title: string
+          type: string
+          updated_at: string
+          weight_pct: number
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          due_at?: string | null
+          difficulty?: number | null
+          earned_score?: number | null
+          estimated_hours?: number | null
+          id?: string
+          max_score?: number
+          notes?: string | null
+          source?: string
+          status?: string
+          title: string
+          type: string
+          updated_at?: string
+          weight_pct: number
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          due_at?: string | null
+          difficulty?: number | null
+          earned_score?: number | null
+          estimated_hours?: number | null
+          id?: string
+          max_score?: number
+          notes?: string | null
+          source?: string
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          weight_pct?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uni_assessments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "uni_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      uni_courses: {
+        Row: {
+          archived: boolean
+          code: string
+          color: string | null
+          created_at: string
+          credit_weight: number
+          description: string | null
+          id: string
+          name: string
+          professor: string | null
+          professor_email: string | null
+          room: string | null
+          target_grade: number | null
+          term: string
+          updated_at: string
+        }
+        Insert: {
+          archived?: boolean
+          code: string
+          color?: string | null
+          created_at?: string
+          credit_weight?: number
+          description?: string | null
+          id?: string
+          name: string
+          professor?: string | null
+          professor_email?: string | null
+          room?: string | null
+          target_grade?: number | null
+          term: string
+          updated_at?: string
+        }
+        Update: {
+          archived?: boolean
+          code?: string
+          color?: string | null
+          created_at?: string
+          credit_weight?: number
+          description?: string | null
+          id?: string
+          name?: string
+          professor?: string | null
+          professor_email?: string | null
+          room?: string | null
+          target_grade?: number | null
+          term?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      uni_deadlines: {
+        Row: {
+          category: string
+          created_at: string
+          due_at: string
+          id: string
+          notes: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          due_at: string
+          id?: string
+          notes?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          due_at?: string
+          id?: string
+          notes?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      uni_materials: {
+        Row: {
+          body: string
+          course_id: string
+          created_at: string
+          id: string
+          title: string
+          type: string
+          updated_at: string
+          uploaded_at: string
+        }
+        Insert: {
+          body: string
+          course_id: string
+          created_at?: string
+          id?: string
+          title: string
+          type: string
+          updated_at?: string
+          uploaded_at?: string
+        }
+        Update: {
+          body?: string
+          course_id?: string
+          created_at?: string
+          id?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uni_materials_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "uni_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      uni_schedule_blocks: {
+        Row: {
+          course_id: string
+          created_at: string
+          day_of_week: number
+          end_time: string
+          id: string
+          room: string | null
+          start_time: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          day_of_week: number
+          end_time: string
+          id?: string
+          room?: string | null
+          start_time: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          room?: string | null
+          start_time?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uni_schedule_blocks_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "uni_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      uni_study_sessions: {
+        Row: {
+          actual_minutes: number | null
+          assessment_id: string | null
+          completed: boolean
+          course_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          planned_minutes: number
+          planned_start: string
+          updated_at: string
+        }
+        Insert: {
+          actual_minutes?: number | null
+          assessment_id?: string | null
+          completed?: boolean
+          course_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          planned_minutes: number
+          planned_start: string
+          updated_at?: string
+        }
+        Update: {
+          actual_minutes?: number | null
+          assessment_id?: string | null
+          completed?: boolean
+          course_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          planned_minutes?: number
+          planned_start?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uni_study_sessions_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "uni_assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "uni_study_sessions_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "uni_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       water_logs: {
         Row: {
           amount_ml: number
