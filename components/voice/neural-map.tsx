@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 
 /** 0-100 per region — computed in voice-mode-client.tsx from state the app already has, never randomized. */
 export interface RegionActivity {
@@ -111,14 +112,47 @@ interface LabelPosition {
   anchorY: number;
 }
 
-const LABEL_WIDTH = 176;
-const LABEL_HEIGHT = 40;
+// Reserved space (CSS px) for UI chrome above/below the map — the status
+// pill up top, and the subtitle/touch-controls/status-strip stack at the
+// bottom. Without this, the radial cluster layout uses the full container
+// height, and on a short/wide viewport (a laptop window, a tablet in
+// landscape) the bottom clusters collide with that stack instead of the
+// generous margin they get on a tall phone screen or a 1920x1080 desktop.
+const TOP_INSET = 90;
+const BOTTOM_INSET = 220;
 
-/** Push overlapping label boxes apart along their own leader line until none overlap. Computed once per layout (mount/resize), never per animation frame. */
-function resolveLabelCollisions(labels: LabelPosition[]): LabelPosition[] {
+/** Center + radial scale for the cluster layout, keeping clear of the reserved top/bottom chrome regardless of aspect ratio. */
+function layoutMetrics(width: number, height: number, topInset: number, bottomInset: number) {
+  const usableHeight = Math.max(160, height - topInset - bottomInset);
+  const cx = width / 2;
+  const cy = topInset + usableHeight / 2;
+  const scale = Math.min(width, usableHeight) / 2;
+  return { cx, cy, scale };
+}
+
+const LABEL_WIDTH_FULL = 176;
+const LABEL_HEIGHT_FULL = 40;
+const LABEL_WIDTH_COMPACT = 118;
+const LABEL_HEIGHT_COMPACT = 32;
+/** Below this container width, labels use the compact box size and font. */
+const COMPACT_BREAKPOINT = 560;
+
+/**
+ * Push overlapping label boxes apart along their own leader line until none
+ * overlap, then clamp every box to stay fully inside the container — without
+ * this, the push-apart loop can walk a label past the edge of a narrow
+ * (phone-width) viewport with nothing to stop it.
+ */
+function resolveLabelCollisions(
+  labels: LabelPosition[],
+  labelWidth: number,
+  labelHeight: number,
+  containerWidth: number,
+  containerHeight: number,
+): LabelPosition[] {
   const resolved = labels.map((l) => ({ ...l }));
   const overlaps = (a: LabelPosition, b: LabelPosition) =>
-    Math.abs(a.x - b.x) < LABEL_WIDTH && Math.abs(a.y - b.y) < LABEL_HEIGHT;
+    Math.abs(a.x - b.x) < labelWidth && Math.abs(a.y - b.y) < labelHeight;
 
   for (let pass = 0; pass < 12; pass++) {
     let anyOverlap = false;
@@ -136,6 +170,13 @@ function resolveLabelCollisions(labels: LabelPosition[]): LabelPosition[] {
     }
     if (!anyOverlap) break;
   }
+
+  const marginX = labelWidth / 2 + 6;
+  const marginY = labelHeight / 2 + 6;
+  for (const l of resolved) {
+    l.x = Math.min(Math.max(l.x, marginX), containerWidth - marginX);
+    l.y = Math.min(Math.max(l.y, marginY), containerHeight - marginY);
+  }
   return resolved;
 }
 
@@ -144,6 +185,7 @@ export function NeuralMap({ activity }: { activity: RegionActivity }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const activityRef = useRef(activity);
   const [labels, setLabels] = useState<LabelPosition[]>([]);
+  const [labelBox, setLabelBox] = useState({ width: LABEL_WIDTH_FULL, height: LABEL_HEIGHT_FULL, compact: false });
   const [displayActivity, setDisplayActivity] = useState(activity);
   const [reducedMotion, setReducedMotion] = useState(false);
 
@@ -205,9 +247,10 @@ export function NeuralMap({ activity }: { activity: RegionActivity }) {
       const container = containerRef.current;
       if (!container) return;
       const { width, height } = container.getBoundingClientRect();
-      const cx = width / 2;
-      const cy = height / 2;
-      const scale = Math.min(width, height) / 2;
+      const { cx, cy, scale } = layoutMetrics(width, height, TOP_INSET, BOTTOM_INSET);
+      const compact = width < COMPACT_BREAKPOINT;
+      const labelWidth = compact ? LABEL_WIDTH_COMPACT : LABEL_WIDTH_FULL;
+      const labelHeight = compact ? LABEL_HEIGHT_COMPACT : LABEL_HEIGHT_FULL;
 
       const raw: LabelPosition[] = REGIONS.map((region) => {
         const clusterX = cx + Math.cos(region.angle) * scale * region.radiusFactor;
@@ -216,7 +259,8 @@ export function NeuralMap({ activity }: { activity: RegionActivity }) {
         const labelY = cy + Math.sin(region.angle) * scale * Math.min(0.95, region.radiusFactor + 0.22);
         return { key: region.key, x: labelX, y: labelY, anchorX: clusterX, anchorY: clusterY };
       });
-      setLabels(resolveLabelCollisions(raw));
+      setLabelBox({ width: labelWidth, height: labelHeight, compact });
+      setLabels(resolveLabelCollisions(raw, labelWidth, labelHeight, width, height));
     }
     computeLayout();
     window.addEventListener("resize", computeLayout);
@@ -257,9 +301,7 @@ export function NeuralMap({ activity }: { activity: RegionActivity }) {
       const h = canvas!.height;
       ctx!.fillStyle = "#000000";
       ctx!.fillRect(0, 0, w, h);
-      const cx = w / 2;
-      const cy = h / 2;
-      const scale = Math.min(w, h) / 2;
+      const { cx, cy, scale } = layoutMetrics(w, h, TOP_INSET * dpr, BOTTOM_INSET * dpr);
       REGIONS.forEach((region, ri) => {
         const clusterX = cx + Math.cos(region.angle) * scale * region.radiusFactor;
         const clusterY = cy + Math.sin(region.angle) * scale * region.radiusFactor;
@@ -277,9 +319,7 @@ export function NeuralMap({ activity }: { activity: RegionActivity }) {
       if (!visible) return;
       const w = canvas!.width;
       const h = canvas!.height;
-      const cx = w / 2;
-      const cy = h / 2;
-      const scale = Math.min(w, h) / 2;
+      const { cx, cy, scale } = layoutMetrics(w, h, TOP_INSET * dpr, BOTTOM_INSET * dpr);
       const t = time / 1000;
 
       ctx!.fillStyle = "#000000";
@@ -450,14 +490,24 @@ export function NeuralMap({ activity }: { activity: RegionActivity }) {
           <div
             key={label.key}
             data-region={label.key}
-            className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-md bg-black/50 px-2 py-1 font-mono backdrop-blur-[1px]"
-            style={{ left: label.x, top: label.y, width: LABEL_WIDTH, border: `1px solid rgba(${r},${g},${b},0.55)` }}
+            className={cn(
+              "pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-md bg-black/50 backdrop-blur-[1px] font-mono",
+              labelBox.compact ? "px-1.5 py-0.5" : "px-2 py-1",
+            )}
+            style={{ left: label.x, top: label.y, width: labelBox.width, border: `1px solid rgba(${r},${g},${b},0.55)` }}
           >
-            <p className="truncate text-[10px] font-semibold uppercase tracking-wide" style={{ color: `rgb(${r},${g},${b})` }}>
+            <p
+              className={cn("truncate font-semibold uppercase tracking-wide", labelBox.compact ? "text-[8px]" : "text-[10px]")}
+              style={{ color: `rgb(${r},${g},${b})` }}
+            >
               {region.label}
             </p>
-            <p className="text-[9px] tabular-nums text-white/60">
-              {region.neurons} neurons &middot; firing {value.toFixed(1)}%
+            <p className={cn("truncate tabular-nums text-white/60", labelBox.compact ? "text-[7px]" : "text-[9px]")}>
+              {labelBox.compact ? (
+                <>{region.neurons} neurons &middot; {value.toFixed(1)}%</>
+              ) : (
+                <>{region.neurons} neurons &middot; firing {value.toFixed(1)}%</>
+              )}
             </p>
           </div>
         );
