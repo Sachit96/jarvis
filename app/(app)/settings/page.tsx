@@ -10,6 +10,7 @@ import { SmsStatusCard } from "@/components/settings/sms-status-card";
 import { AnthropicStatusCard } from "@/components/settings/anthropic-status-card";
 import { TIER_MODEL } from "@/lib/ai/providers/gemini-client";
 import { getAnthropicSpendCap, getAnthropicSpendToDate } from "@/lib/ai/providers/anthropic-client";
+import { isMissingRelation } from "@/lib/db/missing-relation";
 
 // Extracted so Date.now() isn't called directly inside the Server
 // Component body — same react-hooks/purity pattern as daysAgoIso() in
@@ -30,12 +31,16 @@ export default async function SettingsPage() {
   const smsConfigured = Boolean(
     process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER && process.env.OWNER_PHONE_NUMBER,
   );
-  const { count: smsRecentCount } = smsConfigured
-    ? await supabase
-        .from("sms_messages")
-        .select("*", { count: "exact", head: true })
-        .gte("created_at", oneDayAgoIso())
-    : { count: 0 };
+  // Degrades to 0 if migration 0024 hasn't run yet — see lib/db/missing-relation.ts.
+  let smsRecentCount = 0;
+  if (smsConfigured) {
+    const { count, error } = await supabase
+      .from("sms_messages")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", oneDayAgoIso());
+    if (error && !isMissingRelation(error)) throw error;
+    smsRecentCount = count ?? 0;
+  }
 
   const hasAnthropicKey = Boolean(process.env.ANTHROPIC_API_KEY);
   const [anthropicCap, anthropicSpent] = await Promise.all([getAnthropicSpendCap(), getAnthropicSpendToDate()]);
@@ -55,7 +60,7 @@ export default async function SettingsPage() {
       <GhlConnectionCard connection={ghlConnection} />
       <GhlSyncLogs logs={ghlLogs} />
       <SavedLeadSearchesCard searches={savedSearches} />
-      <SmsStatusCard configured={smsConfigured} ownerNumber={process.env.OWNER_PHONE_NUMBER ?? null} recentCount={smsRecentCount ?? 0} />
+      <SmsStatusCard configured={smsConfigured} ownerNumber={process.env.OWNER_PHONE_NUMBER ?? null} recentCount={smsRecentCount} />
       <AnthropicStatusCard hasKey={hasAnthropicKey} spentUsd={anthropicSpent} capUsd={anthropicCap} />
 
       <div className="rounded-lg border border-border bg-card p-4">

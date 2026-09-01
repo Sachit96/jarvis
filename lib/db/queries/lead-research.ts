@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 import type { ResearchRunParams, SavedLeadSearchInput } from "@/lib/validations/lead-research";
+import { isMissingRelation } from "@/lib/db/missing-relation";
 
 type Client = SupabaseClient<Database>;
 export type ResearchRun = Database["public"]["Tables"]["research_runs"]["Row"];
@@ -62,16 +63,11 @@ export async function getResearchLeads(supabase: Client) {
 
 // ==================================================== saved (recurring) search
 
-/** PGRST205 = table not in schema cache — true only until migration 0019 has been applied. */
-function isMissingSavedSearchesTable(error: { code?: string } | null): boolean {
-  return error?.code === "PGRST205";
-}
-
-/** Returns [] (never throws/blocks the Settings page) if migration 0019 hasn't been run yet — same graceful-degradation convention as gemini-usage.ts. */
+/** Returns [] (never throws/blocks the Settings page) if migration 0019 hasn't been run yet — see lib/db/missing-relation.ts. */
 export async function getSavedLeadSearches(supabase: Client): Promise<SavedLeadSearch[]> {
   const { data, error } = await supabase.from("saved_lead_searches").select("*").order("created_at", { ascending: false });
   if (error) {
-    if (isMissingSavedSearchesTable(error)) return [];
+    if (isMissingRelation(error)) return [];
     throw error;
   }
   return data;
@@ -107,7 +103,7 @@ export async function getDueSavedLeadSearches(supabase: Client): Promise<SavedLe
     .eq("enabled", true)
     .or(`last_run_at.is.null,last_run_at.lt.${sevenDaysAgo}`);
   if (error) {
-    if (isMissingSavedSearchesTable(error)) return [];
+    if (isMissingRelation(error)) return [];
     throw error;
   }
   return data;

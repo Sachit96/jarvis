@@ -101,6 +101,12 @@ export async function POST(request: NextRequest) {
     return new NextResponse(emptyTwiMl(), { status: 200, headers: { "Content-Type": "text/xml" } });
   }
 
+  // count intentionally read without checking `error` — if sms_messages
+  // doesn't exist yet (migration 0024), this degrades to "not rate
+  // limited" rather than throwing (see lib/db/missing-relation.ts). The
+  // insert calls throughout this route are the same: never destructure
+  // `error` from them, so a missing table can't crash the webhook — the
+  // reply just goes out without a logged row.
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
   const { count } = await supabase
     .from("sms_messages")

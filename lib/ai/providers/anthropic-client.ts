@@ -1,5 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isMissingRelation } from "@/lib/db/missing-relation";
 
 /**
  * Anthropic — the only paid path in this app. No ongoing free tier (a
@@ -54,9 +55,28 @@ export async function getAnthropicSpendToDate(): Promise<number> {
   return (data ?? []).reduce((sum, row) => sum + Number(row.cost_usd), 0);
 }
 
-/** True only when ANTHROPIC_API_KEY is set AND lifetime spend is still under the configured cap — the single gate getLeadQualifier() checks before ever choosing the Anthropic path. */
+/**
+ * True only when spend tracking is actually WORKING — anthropic_usage
+ * exists and is queryable — not just when a query returns no error-free
+ * rows. This matters more than the usual "degrade gracefully" case:
+ * before migration 0025 runs, a naive read of "0 spent so far" would
+ * read as safely under the cap and let isAnthropicAvailable() route real,
+ * PAID calls through with no working spend cap to stop them — the
+ * opposite of graceful degradation, an unmetered-spend hole. So this
+ * checks the query's own error code explicitly rather than reusing the
+ * "missing table = empty result" pattern the read-only query helpers use
+ * elsewhere.
+ */
+async function isSpendTrackingAvailable(): Promise<boolean> {
+  const supabase = createAdminClient();
+  const { error } = await supabase.from("anthropic_usage").select("id").limit(1);
+  return !isMissingRelation(error);
+}
+
+/** True only when ANTHROPIC_API_KEY is set, spend tracking is actually working, AND lifetime spend is still under the configured cap — the single gate getLeadQualifier() checks before ever choosing the Anthropic path. */
 export async function isAnthropicAvailable(): Promise<boolean> {
   if (!process.env.ANTHROPIC_API_KEY) return false;
+  if (!(await isSpendTrackingAvailable())) return false;
   const [cap, spent] = await Promise.all([getAnthropicSpendCap(), getAnthropicSpendToDate()]);
   return spent < cap;
 }
@@ -89,6 +109,15 @@ export interface AnthropicCallResult {
  * counter, just dollar-denominated instead of request-denominated.
  */
 export async function callAnthropic(options: AnthropicCallOptions): Promise<AnthropicCallResult> {
+  // Re-checked here too (not just by isAnthropicAvailable() upstream in
+  // getLeadQualifier()) since this function is itself exported and
+  // callable directly — and specifically checks that tracking is
+  // WORKING, not just "no spend recorded yet", so a missing
+  // anthropic_usage table blocks the call instead of reading as an
+  // empty-therefore-safe budget. See isSpendTrackingAvailable's comment.
+  if (!(await isSpendTrackingAvailable())) {
+    throw new Error("Anthropic spend tracking isn't set up yet (migration 0025 hasn't run) — refusing to make an unmetered paid call.");
+  }
   const [cap, spent] = await Promise.all([getAnthropicSpendCap(), getAnthropicSpendToDate()]);
   if (spent >= cap) {
     throw new Error(`Anthropic spend cap reached ($${spent.toFixed(2)} / $${cap.toFixed(2)}) — configure a higher cap in Settings to continue.`);
