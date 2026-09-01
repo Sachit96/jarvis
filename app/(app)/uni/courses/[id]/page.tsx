@@ -12,6 +12,9 @@ import { AssessmentForm } from "@/components/uni/assessment-form";
 import { AssessmentItem } from "@/components/uni/assessment-item";
 import { ScheduleBlockForm } from "@/components/uni/schedule-block-form";
 import { MaterialForm } from "@/components/uni/material-form";
+import { SyllabusUpload } from "@/components/uni/syllabus-upload";
+import { FlashcardStudy } from "@/components/uni/flashcard-study";
+import { MaterialQa } from "@/components/uni/material-qa";
 import { DeleteScheduleBlockButton, DeleteMaterialButton } from "@/components/uni/uni-delete-buttons";
 
 const DAY_LABEL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -55,6 +58,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
         </div>
         <div className="flex items-center gap-2">
           <RiskChip score={risk} />
+          <SyllabusUpload courseId={course.id} />
           <CourseForm course={course} />
         </div>
       </div>
@@ -101,7 +105,10 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
         <Card>
           <div className="flex items-center justify-between">
             <p className="text-caption uppercase tracking-wide text-muted-foreground">Materials</p>
-            <MaterialForm courseId={course.id} />
+            <div className="flex items-center gap-2">
+              <MaterialQa courseId={course.id} hasMaterials={materials.length > 0} />
+              <MaterialForm courseId={course.id} />
+            </div>
           </div>
           {materials.length === 0 ? (
             <p className="mt-3 text-sm text-muted-foreground/50">No materials uploaded</p>
@@ -114,7 +121,10 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
                     <span className="truncate text-foreground">{m.title}</span>
                     <Badge variant="outline" className="shrink-0 capitalize">{m.type.replace("_", " ")}</Badge>
                   </span>
-                  <DeleteMaterialButton id={m.id} courseId={course.id} />
+                  <span className="flex shrink-0 items-center gap-2">
+                    <FlashcardStudy materialId={m.id} courseId={course.id} />
+                    <DeleteMaterialButton id={m.id} courseId={course.id} />
+                  </span>
                 </li>
               ))}
             </ul>

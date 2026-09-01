@@ -22,6 +22,8 @@ import {
   computeStaleContacts,
 } from "@/lib/db/queries/business";
 import { getTodayRoutineItems } from "@/lib/db/queries/routine";
+import { getCourses, getAssessments } from "@/lib/db/queries/uni";
+import { courseGrade, riskScore, findOverloadedWeeks } from "@/lib/uni/grades";
 
 type Client = SupabaseClient<Database>;
 
@@ -48,6 +50,7 @@ export async function buildMentorContext(supabase: Client) {
     contracts,
     contacts,
     activities,
+    courses,
   ] = await Promise.all([
     getPriorityTasks(supabase, 10),
     getTodayRoutineItems(supabase),
@@ -63,7 +66,13 @@ export async function buildMentorContext(supabase: Client) {
     getContracts(supabase),
     getContacts(supabase),
     getAllActivities(supabase),
+    // Degrades to [] rather than throwing if migration 0021 hasn't run yet
+    // (matches this codebase's established convention — see
+    // gemini-usage.ts's isMissingUsageTracking) — the brief just omits the
+    // academics section instead of failing the whole context build.
+    getCourses(supabase).catch(() => []),
   ]);
+  const assessments = courses.length > 0 ? await getAssessments(supabase, courses.map((c) => c.id)).catch(() => []) : [];
 
   const financeTotals = computeAssetLiabilityTotals(accounts);
   const pnl = computeMonthlyPnl(monthTransactions);
@@ -80,6 +89,17 @@ export async function buildMentorContext(supabase: Client) {
   const mrr = computeMrr(contracts);
   const staleDeals = computeStaleDeals(deals, stages, contacts);
   const staleContacts = computeStaleContacts(contacts, activities);
+
+  // Academic risk engine (Work Order 3) — pure functions from
+  // lib/uni/grades.ts, no LLM call here; this rides along on the existing
+  // daily brief request rather than adding one, same principle as B3.
+  const coursesWithRisk = courses.map((c) => {
+    const courseAssessments = assessments.filter((a) => a.course_id === c.id);
+    return { code: c.code, grade: courseGrade(courseAssessments), target: c.target_grade, risk: riskScore(c, courseAssessments) };
+  });
+  const overloadedWeeks = findOverloadedWeeks(
+    assessments.map((a) => ({ ...a, title: a.title, courseCode: courses.find((c) => c.id === a.course_id)?.code ?? "?" })),
+  );
 
   return {
     today,
@@ -123,6 +143,12 @@ export async function buildMentorContext(supabase: Client) {
     followUps: {
       staleDeals: staleDeals.map((d) => ({ label: d.label, daysSinceStageChange: d.daysSinceStageChange })),
       staleContacts: staleContacts.map((c) => ({ label: c.label, daysSinceLastActivity: c.daysSinceLastActivity })),
+    },
+    // UniOS academics (Work Order 3) — empty arrays if no courses exist yet
+    // or migration 0021 hasn't run, not an error.
+    uni: {
+      courses: coursesWithRisk,
+      overloadedWeeks: overloadedWeeks.map((w) => ({ windowStart: w.windowStart, items: w.items.map((i) => `${i.courseCode} ${i.title}`) })),
     },
   };
 }

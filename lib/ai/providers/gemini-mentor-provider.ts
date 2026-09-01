@@ -1,5 +1,5 @@
 import "server-only";
-import { callGemini, type GeminiContent } from "@/lib/ai/providers/gemini-client";
+import { callGemini, stripMarkdownFence, type GeminiContent } from "@/lib/ai/providers/gemini-client";
 import type { MentorProvider, MentorChatMessage, MentorBriefResult, LoggedMealArgs } from "@/lib/ai/providers/types";
 
 // Tier routing (see gemini-client.ts for the full verified rationale): all
@@ -48,22 +48,6 @@ function toGeminiContents(history: MentorChatMessage[]): GeminiContent[] {
     role: m.role === "assistant" ? "model" : "user",
     parts: [{ text: m.content }],
   }));
-}
-
-/**
- * Cheap insurance for Gemma's structured output on "high_volume": verified
- * live that even a flat, reliably-clean schema can still get wrapped in a
- * markdown code fence in principle (the nested/enum schema did this 3/3
- * times; the flat brief schema tested clean but there's no guarantee that
- * holds on every input), so strip a leading/trailing ``` fence (with or
- * without a "json" language tag) before ever attempting JSON.parse.
- */
-function stripMarkdownFence(text: string): string {
-  return text
-    .trim()
-    .replace(/^```(?:json)?\s*/i, "")
-    .replace(/```\s*$/, "")
-    .trim();
 }
 
 export class GeminiMentorProvider implements MentorProvider {

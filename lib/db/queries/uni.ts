@@ -81,3 +81,22 @@ export async function getDeadlines(supabase: Client) {
   if (error) throw error;
   return data;
 }
+
+export async function getFlashcards(supabase: Client, materialId: string) {
+  const { data, error } = await supabase.from("uni_flashcards").select("*").eq("material_id", materialId).order("created_at", { ascending: true });
+  if (error) throw error;
+  return data;
+}
+
+/** Cards due now, across a set of materials (e.g. every material in a course) — the review queue. */
+export async function getDueFlashcards(supabase: Client, materialIds: string[]) {
+  if (materialIds.length === 0) return [];
+  const { data, error } = await supabase
+    .from("uni_flashcards")
+    .select("*")
+    .in("material_id", materialIds)
+    .lte("next_review", new Date().toISOString())
+    .order("next_review", { ascending: true });
+  if (error) throw error;
+  return data;
+}

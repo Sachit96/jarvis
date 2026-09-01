@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ASSESSMENT_STATUSES } from "@/lib/validations/uni";
+import { AssignmentBreakdown } from "@/components/uni/assignment-breakdown";
 import type { Database } from "@/lib/supabase/database.types";
 
 type Assessment = Database["public"]["Tables"]["uni_assessments"]["Row"];
@@ -83,6 +84,8 @@ export function AssessmentItem({ assessment, courseCode, courseColor }: { assess
           ))}
         </SelectContent>
       </Select>
+
+      <AssignmentBreakdown assessmentId={assessment.id} courseId={assessment.course_id} />
 
       <button
         type="button"

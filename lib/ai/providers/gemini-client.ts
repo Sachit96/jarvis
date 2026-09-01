@@ -77,6 +77,8 @@ export interface GeminiPart {
   thought?: boolean;
   functionCall?: { name: string; args: Record<string, unknown> };
   functionResponse?: { name: string; response: Record<string, unknown> };
+  /** File input (e.g. an uploaded syllabus PDF) — base64-encoded, sent inline rather than via the Files API, since these are one-shot single-request parses, not reused across calls. */
+  inlineData?: { mimeType: string; data: string };
 }
 
 export interface GeminiContent {
@@ -106,6 +108,24 @@ export interface GeminiCallOptions {
 export interface GeminiCallResult {
   text: string | null;
   functionCalls: { name: string; args: Record<string, unknown> }[];
+}
+
+/**
+ * Cheap insurance before any JSON.parse on a Gemini responseSchema result:
+ * verified live that even a flat, reliably-clean schema can still get
+ * wrapped in a markdown code fence in principle (a nested/enum schema on
+ * the "high_volume" tier did this 3/3 times; flat schemas have tested
+ * clean but there's no guarantee that holds on every input), so strip a
+ * leading/trailing ``` fence (with or without a "json" language tag)
+ * before ever attempting to parse. Shared across every JSON-mode caller —
+ * gemini-mentor-provider.ts, and any WO3 structured-output call site.
+ */
+export function stripMarkdownFence(text: string): string {
+  return text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/```\s*$/, "")
+    .trim();
 }
 
 function getApiKey(): string {

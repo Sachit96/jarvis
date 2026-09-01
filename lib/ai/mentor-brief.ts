@@ -14,9 +14,9 @@ const JSON_INSTRUCTION =
 const VOICE_GUARDRAIL =
   "The context below is internal data with camelCase keys (like monthlyIncome, openPipelineDealsCount, dailyRoutineToday) — never quote those key names, or any other variable/field name, back to the user. Translate every number into plain, natural language a calm human coach would actually say (e.g. say \"your income this month\" or \"open deals in your pipeline\", not the raw key). Keep it concise — a clear short sentence beats a long explained one.";
 
-const DAILY_INSTRUCTIONS = `Write today's brief as markdown with these headers: ## Focus Today, ## Wins, ## Watch-outs. Be specific and reference the actual numbers in the user's context. Keep markdownBody under 200 words.`;
+const DAILY_INSTRUCTIONS = `Write today's brief as markdown with these headers: ## Focus Today, ## Wins, ## Watch-outs, ## Academics. Be specific and reference the actual numbers in the user's context. Keep markdownBody under 220 words.`;
 
-const WEEKLY_INSTRUCTIONS = `Write this week's review as markdown with these headers: ## Summary, ## Strengths, ## Weaknesses, ## Next Week's Focus. Be specific and reference the actual numbers/trends in the user's context. Keep markdownBody under 350 words.`;
+const WEEKLY_INSTRUCTIONS = `Write this week's review as markdown with these headers: ## Summary, ## Strengths, ## Weaknesses, ## Academics, ## Next Week's Focus. Be specific and reference the actual numbers/trends in the user's context. Keep markdownBody under 370 words.`;
 
 /**
  * Follow-up watchdog (Work Order B3) — context.followUps is mechanically
@@ -27,6 +27,17 @@ const WEEKLY_INSTRUCTIONS = `Write this week's review as markdown with these hea
  */
 const FOLLOWUP_NUDGE = `If context.followUps.staleDeals or staleContacts is non-empty, name the most important one or two specifically (e.g. "Bianchi Roofing hasn't moved in 9 days") — surfacing exactly this kind of thing unprompted is the whole point of tracking it.`;
 
+/**
+ * Academic risk engine (Work Order 3) — context.uni.courses' risk/grade
+ * numbers and context.uni.overloadedWeeks are both pure-function output
+ * from lib/uni/grades.ts, not a model call; only the phrasing here is the
+ * model's job, same principle as FOLLOWUP_NUDGE. If context.uni.courses is
+ * empty, omit the Academics section entirely rather than writing a "no
+ * courses yet" filler paragraph — an unused domain should be invisible,
+ * not narrated.
+ */
+const ACADEMICS_NUDGE = `For the Academics section: if context.uni.courses is empty, skip the section entirely (don't mention it). Otherwise, call out any course with risk >= 61 by name with its current grade vs target, and name any entry in context.uni.overloadedWeeks specifically (e.g. "Three high-weight items land in the same week for QMS and STAT").`;
+
 export async function generateDailyBrief(supabase: Client) {
   const provider = getMentorProvider();
   const [context, persona] = await Promise.all([buildMentorContext(supabase), buildPersonaPrefix(supabase)]);
@@ -35,6 +46,7 @@ export async function generateDailyBrief(supabase: Client) {
     persona,
     DAILY_INSTRUCTIONS,
     FOLLOWUP_NUDGE,
+    ACADEMICS_NUDGE,
     VOICE_GUARDRAIL,
     JSON_INSTRUCTION,
     `The user's current context as JSON: ${JSON.stringify(context)}`,
@@ -81,6 +93,7 @@ export async function generateWeeklyReview(supabase: Client) {
     persona,
     WEEKLY_INSTRUCTIONS,
     FOLLOWUP_NUDGE,
+    ACADEMICS_NUDGE,
     VOICE_GUARDRAIL,
     JSON_INSTRUCTION,
     `The user's current context as JSON: ${JSON.stringify(context)}`,

@@ -1558,6 +1558,50 @@ export type Database = {
         }
         Relationships: []
       }
+      uni_flashcards: {
+        Row: {
+          answer: string
+          created_at: string
+          ease: number
+          id: string
+          last_reviewed: string | null
+          material_id: string
+          next_review: string
+          question: string
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          ease?: number
+          id?: string
+          last_reviewed?: string | null
+          material_id: string
+          next_review?: string
+          question: string
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          ease?: number
+          id?: string
+          last_reviewed?: string | null
+          material_id?: string
+          next_review?: string
+          question?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uni_flashcards_material_id_fkey"
+            columns: ["material_id"]
+            isOneToOne: false
+            referencedRelation: "uni_materials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       uni_materials: {
         Row: {
           body: string

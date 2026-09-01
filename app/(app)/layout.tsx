@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/shell/app-shell";
+import { Toaster } from "@/components/ui/sonner";
 
 // The Supabase service-role client (lib/supabase/server.ts) never touches
 // cookies()/headers(), so nothing here implicitly signals per-request
@@ -8,5 +9,11 @@ import { AppShell } from "@/components/shell/app-shell";
 export const dynamic = "force-dynamic";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
-  return <AppShell>{children}</AppShell>;
+  return (
+    <>
+      <AppShell>{children}</AppShell>
+      {/* Mounted once here — no ThemeProvider exists (the app is hard-coded dark-mode-only), so sonner falls back to its own default theming; the app's own dark CSS variables (--popover etc.) already drive its actual colors regardless. First real consumer: the command palette's "Ask JARVIS" result toast. */}
+      <Toaster />
+    </>
+  );
 }

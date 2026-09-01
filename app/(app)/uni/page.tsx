@@ -6,6 +6,7 @@ import { courseGrade, semesterAverage, riskScore } from "@/lib/uni/grades";
 import { StatTile } from "@/components/shared/stat-tile";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { RiskChip } from "@/components/uni/risk-chip";
+import { PlanTonight } from "@/components/uni/plan-tonight";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { UNI_TABS } from "@/lib/nav-items";
@@ -146,6 +147,8 @@ export default async function UniDashboardPage() {
               )}
             </Card>
           </div>
+
+          <PlanTonight assessmentCourseIds={Object.fromEntries(assessments.map((a) => [a.id, a.course_id]))} />
 
           <div>
             <p className="mb-3 text-caption uppercase tracking-wide text-muted-foreground">Courses</p>

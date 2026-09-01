@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Search, FileText } from "lucide-react";
+import { Search, FileText, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { SIDEBAR_ITEMS } from "@/lib/nav-items";
@@ -12,6 +13,7 @@ import {
   type SearchGroup,
   type SearchResult,
 } from "@/actions/search-actions";
+import { runUniCommandAction } from "@/actions/uni-command-actions";
 
 const PAGES: SearchResult[] = SIDEBAR_ITEMS.filter((i) => i.href !== "/").map((i) => ({
   id: i.href,
@@ -34,6 +36,7 @@ export function CommandPalette() {
   const [recent, setRecent] = useState<SearchResult[]>([]);
   const [highlighted, setHighlighted] = useState(0);
   const [isPending, startTransition] = useTransition();
+  const [isCommandPending, startCommandTransition] = useTransition();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -111,6 +114,28 @@ export function CommandPalette() {
   function navigateTo(item: SearchResult) {
     setOpen(false);
     router.push(item.href);
+  }
+
+  /**
+   * UniOS command bar extension (Work Order 3) — opt-in, not automatic on
+   * every keystroke: this only runs when the user explicitly picks the
+   * "Ask JARVIS" row, both to avoid a Gemini call per debounced keystroke
+   * and because the palette's default job is search; natural-language
+   * actions are a deliberate escalation from that, never a silent guess.
+   */
+  function runCommand() {
+    const text = query.trim();
+    if (!text) return;
+    startCommandTransition(async () => {
+      const result = await runUniCommandAction(text);
+      if (result.matched) {
+        toast.success(result.message);
+        setOpen(false);
+        router.refresh();
+      } else {
+        toast(result.message);
+      }
+    });
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -219,6 +244,21 @@ export function CommandPalette() {
               ))
             )}
           </div>
+
+          {query.trim().length >= 3 ? (
+            <div className="border-t border-border p-2">
+              <button
+                onClick={runCommand}
+                disabled={isCommandPending}
+                className="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-sm text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground"
+              >
+                <Sparkles className="h-3.5 w-3.5 shrink-0" />
+                <span className="min-w-0 flex-1 truncate">
+                  {isCommandPending ? "Asking JARVIS…" : <>Ask JARVIS: &ldquo;{query}&rdquo;</>}
+                </span>
+              </button>
+            </div>
+          ) : null}
 
           {!showingRecent && totalKnown > 20 ? (
             <div className="border-t border-border px-4 py-2 text-center text-xs text-muted-foreground">
