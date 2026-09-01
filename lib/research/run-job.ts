@@ -133,7 +133,8 @@ export async function runResearchJob(runId: string, params: ResearchRunParams): 
     if ((await getResearchRunStatus(supabase, runId)) === "cancelled") break;
 
     await updateResearchRun(supabase, runId, { current_label: `Qualifying ${batch.length} businesses…` });
-    const outcomes = await getLeadQualifier().qualifyLeads(batch.map((item) => item.signals));
+    const qualifier = await getLeadQualifier();
+    const outcomes = await qualifier.qualifyLeads(batch.map((item) => item.signals));
 
     for (let i = 0; i < batch.length; i++) {
       const item = batch[i];

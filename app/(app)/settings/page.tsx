@@ -7,7 +7,16 @@ import { GhlConnectionCard } from "@/components/settings/ghl-connection-card";
 import { GhlSyncLogs } from "@/components/settings/ghl-sync-logs";
 import { SavedLeadSearchesCard } from "@/components/settings/saved-lead-searches-card";
 import { SmsStatusCard } from "@/components/settings/sms-status-card";
+import { AnthropicStatusCard } from "@/components/settings/anthropic-status-card";
 import { TIER_MODEL } from "@/lib/ai/providers/gemini-client";
+import { getAnthropicSpendCap, getAnthropicSpendToDate } from "@/lib/ai/providers/anthropic-client";
+
+// Extracted so Date.now() isn't called directly inside the Server
+// Component body — same react-hooks/purity pattern as daysAgoIso() in
+// lib/db/queries/voice.ts.
+function oneDayAgoIso() {
+  return new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+}
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -25,8 +34,11 @@ export default async function SettingsPage() {
     ? await supabase
         .from("sms_messages")
         .select("*", { count: "exact", head: true })
-        .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+        .gte("created_at", oneDayAgoIso())
     : { count: 0 };
+
+  const hasAnthropicKey = Boolean(process.env.ANTHROPIC_API_KEY);
+  const [anthropicCap, anthropicSpent] = await Promise.all([getAnthropicSpendCap(), getAnthropicSpendToDate()]);
 
   return (
     <div className="space-y-6">
@@ -44,6 +56,7 @@ export default async function SettingsPage() {
       <GhlSyncLogs logs={ghlLogs} />
       <SavedLeadSearchesCard searches={savedSearches} />
       <SmsStatusCard configured={smsConfigured} ownerNumber={process.env.OWNER_PHONE_NUMBER ?? null} recentCount={smsRecentCount ?? 0} />
+      <AnthropicStatusCard hasKey={hasAnthropicKey} spentUsd={anthropicSpent} capUsd={anthropicCap} />
 
       <div className="rounded-lg border border-border bg-card p-4">
         <p className="text-xs uppercase tracking-wider text-muted-foreground">Data export</p>

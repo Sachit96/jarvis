@@ -39,6 +39,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      anthropic_settings: {
+        Row: {
+          id: boolean
+          spend_cap_usd: number
+        }
+        Insert: {
+          id?: boolean
+          spend_cap_usd?: number
+        }
+        Update: {
+          id?: boolean
+          spend_cap_usd?: number
+        }
+        Relationships: []
+      }
+      anthropic_usage: {
+        Row: {
+          cost_usd: number
+          id: string
+          incurred_at: string
+          input_tokens: number
+          model: string
+          output_tokens: number
+        }
+        Insert: {
+          cost_usd: number
+          id?: string
+          incurred_at?: string
+          input_tokens: number
+          model: string
+          output_tokens: number
+        }
+        Update: {
+          cost_usd?: number
+          id?: string
+          incurred_at?: string
+          input_tokens?: number
+          model?: string
+          output_tokens?: number
+        }
+        Relationships: []
+      }
       accounts: {
         Row: {
           account_type: string
