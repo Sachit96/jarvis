@@ -1210,6 +1210,36 @@ export type Database = {
         }
         Relationships: []
       }
+      sms_messages: {
+        Row: {
+          action_taken: string | null
+          body: string
+          created_at: string
+          from_number: string
+          id: string
+          reply: string
+          status: string
+        }
+        Insert: {
+          action_taken?: string | null
+          body: string
+          created_at?: string
+          from_number: string
+          id?: string
+          reply: string
+          status?: string
+        }
+        Update: {
+          action_taken?: string | null
+          body?: string
+          created_at?: string
+          from_number?: string
+          id?: string
+          reply?: string
+          status?: string
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
           completed_at: string | null

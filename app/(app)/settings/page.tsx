@@ -6,6 +6,7 @@ import { AiMentorStatusCard } from "@/components/settings/ai-mentor-status-card"
 import { GhlConnectionCard } from "@/components/settings/ghl-connection-card";
 import { GhlSyncLogs } from "@/components/settings/ghl-sync-logs";
 import { SavedLeadSearchesCard } from "@/components/settings/saved-lead-searches-card";
+import { SmsStatusCard } from "@/components/settings/sms-status-card";
 import { TIER_MODEL } from "@/lib/ai/providers/gemini-client";
 
 export default async function SettingsPage() {
@@ -16,6 +17,16 @@ export default async function SettingsPage() {
     getGhlSyncLogs(supabase),
     getSavedLeadSearches(supabase),
   ]);
+
+  const smsConfigured = Boolean(
+    process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER && process.env.OWNER_PHONE_NUMBER,
+  );
+  const { count: smsRecentCount } = smsConfigured
+    ? await supabase
+        .from("sms_messages")
+        .select("*", { count: "exact", head: true })
+        .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+    : { count: 0 };
 
   return (
     <div className="space-y-6">
@@ -32,6 +43,7 @@ export default async function SettingsPage() {
       <GhlConnectionCard connection={ghlConnection} />
       <GhlSyncLogs logs={ghlLogs} />
       <SavedLeadSearchesCard searches={savedSearches} />
+      <SmsStatusCard configured={smsConfigured} ownerNumber={process.env.OWNER_PHONE_NUMBER ?? null} recentCount={smsRecentCount ?? 0} />
 
       <div className="rounded-lg border border-border bg-card p-4">
         <p className="text-xs uppercase tracking-wider text-muted-foreground">Data export</p>

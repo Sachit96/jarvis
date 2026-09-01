@@ -25,7 +25,8 @@ const BRIEF_RESPONSE_SCHEMA = {
   required: ["markdownBody", "focusAreas", "strengths", "weaknesses"],
 };
 
-const LOG_NUTRITION_TOOL = {
+/** Exported so the SMS webhook (Work Order 5) can reuse this exact tool declaration rather than redefining a shape that could drift from the one actually wired to logNutritionEntry's real column names. */
+export const LOG_NUTRITION_TOOL = {
   name: "log_nutrition_entry",
   description: "Log a meal or food the user describes into their nutrition diary, with your best estimate of its macros.",
   parameters: {
