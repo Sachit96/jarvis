@@ -45,7 +45,9 @@ export const journalEntrySchema = z.object({
 });
 export type JournalEntryInput = z.infer<typeof journalEntrySchema>;
 
-export const prayerSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(60),
-});
-export type PrayerInput = z.infer<typeof prayerSchema>;
+// prayerSchema removed (Session 2, Phase 4 cleanup) — "Pray to God" has
+// been a Daily Routine checklist item since migration 0011, and the
+// standalone prayers/prayer_logs tables have had no UI or actions since.
+// The tables themselves are untouched — dropping them is a real schema
+// change, deliberately NOT bundled into this migration list; see
+// supabase/migrations/0029_drop_prayers.sql and the morning report.
