@@ -134,7 +134,6 @@ export class AnthropicLeadQualifier implements LeadQualifierProvider {
         userContent: buildBatchPrompt(signalsList),
         jsonSchema: BATCH_JSON_SCHEMA,
         maxTokens: 4096,
-        temperature: 0.4,
       });
       const parsed = JSON.parse(text);
       if (!Array.isArray(parsed) || parsed.length !== signalsList.length) return null;

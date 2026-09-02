@@ -87,7 +87,6 @@ export interface AnthropicCallOptions {
   /** JSON Schema (standard lowercase types — NOT Gemini's uppercase OpenAPI dialect), per output_config.format:{type:"json_schema"}. */
   jsonSchema?: Record<string, unknown>;
   maxTokens?: number;
-  temperature?: number;
 }
 
 export interface AnthropicCallResult {
@@ -128,7 +127,13 @@ export async function callAnthropic(options: AnthropicCallOptions): Promise<Anth
     max_tokens: options.maxTokens ?? 4096,
     system: options.system,
     messages: [{ role: "user", content: options.userContent }],
-    temperature: options.temperature ?? 0.4,
+    // No `temperature` — verified live tonight that claude-sonnet-5
+    // rejects it outright: {"type":"invalid_request_error","message":
+    // "`temperature` is deprecated for this model."}. Sampling params
+    // are removed on the current Claude generation; this was actually in
+    // the claude-api skill's own capability table when this file was
+    // first written and got missed. Caught via a real failed call, not
+    // assumed.
   };
   if (options.jsonSchema) {
     body.output_config = { format: { type: "json_schema", schema: options.jsonSchema } };

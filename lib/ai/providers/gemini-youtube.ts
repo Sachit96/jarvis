@@ -13,23 +13,47 @@ import { scriptResultSchema, SCRIPT_RESPONSE_SCHEMA, type ScriptResult } from "@
  * building this: "high_volume" (Gemma) silently IGNORES the google_search
  * tool declaration — no error, it just answers from its own training data
  * as if the tool didn't exist — so grounding is never attempted there.
- * Whether "structured" (Flash-Lite) actually grounds couldn't be verified
- * live tonight (its free-tier daily quota was already exhausted from
- * earlier testing — a real 429 RESOURCE_EXHAUSTED, not a guess). Either
- * way, `grounded` in the return value reflects whether the response
+ * Whether "structured" (Flash-Lite) actually grounds was UNVERIFIABLE at
+ * first (its daily quota looked exhausted), then verified more precisely
+ * the next session: plain text generation on Flash-Lite works fine right
+ * now, but a request carrying the google_search tool gets a real 429
+ * RESOURCE_EXHAUSTED every time — grounding has its own, separate quota
+ * from the model's regular text quota, and it's the one that's tapped
+ * out. `grounded` in the return value reflects whether the response
  * actually came back with real citations, not whether grounding was
  * requested — callers and the UI must check it rather than assume.
+ *
+ * Falls back to an ungrounded call if the grounded attempt fails for ANY
+ * reason (not just this specific quota — a transient error shouldn't
+ * fail the whole feature either) — found live tonight that without this,
+ * one exhausted quota on a nice-to-have enhancement was taking down
+ * script generation entirely. The fallback still honestly reports
+ * grounded: false; it never pretends the failed attempt succeeded.
  */
 export async function researchTopic(topic: string, niche?: string): Promise<{ summary: string; grounded: boolean }> {
-  const { text, grounded } = await callGemini({
-    tier: "structured",
-    systemInstruction:
-      "You research current YouTube video formats and angles for a given topic. Paraphrase only — describe approaches and patterns in your own words; never reproduce transcripts, scripts, or substantial verbatim text from any source. If you were not actually able to search and are reasoning from general knowledge instead, do not claim otherwise — just answer plainly.",
-    contents: [{ role: "user", parts: [{ text: `Topic: ${topic}${niche ? ` (niche: ${niche})` : ""}. What formats and angles are currently working for this kind of video? 3-5 sentences.` }] }],
-    enableSearchGrounding: true,
-    temperature: 0.5,
-  });
-  return { summary: text ?? "No research summary was generated.", grounded };
+  const prompt = `Topic: ${topic}${niche ? ` (niche: ${niche})` : ""}. What formats and angles are currently working for this kind of video? 3-5 sentences.`;
+  const systemInstruction =
+    "You research current YouTube video formats and angles for a given topic. Paraphrase only — describe approaches and patterns in your own words; never reproduce transcripts, scripts, or substantial verbatim text from any source. If you were not actually able to search and are reasoning from general knowledge instead, do not claim otherwise — just answer plainly.";
+
+  try {
+    const { text, grounded } = await callGemini({
+      tier: "structured",
+      systemInstruction,
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      enableSearchGrounding: true,
+      temperature: 0.5,
+    });
+    return { summary: text ?? "No research summary was generated.", grounded };
+  } catch (err) {
+    console.error("[researchTopic] grounded attempt failed, falling back to ungrounded:", err instanceof Error ? err.message : err);
+    const { text } = await callGemini({
+      tier: "structured",
+      systemInstruction,
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      temperature: 0.5,
+    });
+    return { summary: text ?? "No research summary was generated.", grounded: false };
+  }
 }
 
 const SCRIPT_SYSTEM_INSTRUCTION = `You write a YouTube video script outline from a topic and (if given) research notes.
