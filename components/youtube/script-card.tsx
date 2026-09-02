@@ -8,12 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { YT_STATUSES } from "@/lib/validations/youtube";
+import { UploadToYoutube } from "@/components/youtube/upload-to-youtube";
 import type { Database } from "@/lib/supabase/database.types";
 
 type Script = Database["public"]["Tables"]["yt_scripts"]["Row"];
 type Thumbnail = Database["public"]["Tables"]["yt_thumbnails"]["Row"];
 
-export function ScriptCard({ script, thumbnails }: { script: Script; thumbnails: Thumbnail[] }) {
+export function ScriptCard({ script, thumbnails, youtubeConnected }: { script: Script; thumbnails: Thumbnail[]; youtubeConnected: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [thumbError, setThumbError] = useState<string | null>(null);
@@ -122,6 +123,15 @@ export function ScriptCard({ script, thumbnails }: { script: Script; thumbnails:
               </div>
             ) : null}
           </div>
+
+          <UploadToYoutube
+            scriptId={script.id}
+            title={script.suggested_titles[0] ?? script.topic}
+            description={script.script_body ?? ""}
+            youtubeVideoId={script.youtube_video_id}
+            privacyStatus={script.youtube_privacy_status}
+            connected={youtubeConnected}
+          />
         </div>
       ) : null}
     </Card>

@@ -1957,6 +1957,42 @@ export type Database = {
         }
         Relationships: []
       }
+      yt_connections: {
+        Row: {
+          access_token: string
+          channel_id: string | null
+          channel_title: string | null
+          connected_at: string
+          id: boolean
+          refresh_token: string
+          scope: string
+          token_expires_at: string
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          channel_id?: string | null
+          channel_title?: string | null
+          connected_at?: string
+          id?: boolean
+          refresh_token: string
+          scope: string
+          token_expires_at: string
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          channel_id?: string | null
+          channel_title?: string | null
+          connected_at?: string
+          id?: boolean
+          refresh_token?: string
+          scope?: string
+          token_expires_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       yt_scripts: {
         Row: {
           created_at: string
@@ -1972,6 +2008,8 @@ export type Database = {
           suggested_titles: string[]
           topic: string
           updated_at: string
+          youtube_video_id: string | null
+          youtube_privacy_status: string | null
         }
         Insert: {
           created_at?: string
@@ -1987,6 +2025,8 @@ export type Database = {
           suggested_titles?: string[]
           topic: string
           updated_at?: string
+          youtube_video_id?: string | null
+          youtube_privacy_status?: string | null
         }
         Update: {
           created_at?: string
@@ -2002,6 +2042,8 @@ export type Database = {
           suggested_titles?: string[]
           topic?: string
           updated_at?: string
+          youtube_video_id?: string | null
+          youtube_privacy_status?: string | null
         }
         Relationships: []
       }

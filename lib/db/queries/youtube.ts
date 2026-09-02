@@ -33,3 +33,13 @@ export async function getThumbnails(supabase: Client, scriptId: string) {
   }
   return data;
 }
+
+/** Null if never connected, or if migration 0026 hasn't run yet. */
+export async function getYtConnection(supabase: Client) {
+  const { data, error } = await supabase.from("yt_connections").select("*").eq("id", true).maybeSingle();
+  if (error) {
+    if (isMissingRelation(error)) return null;
+    throw error;
+  }
+  return data;
+}

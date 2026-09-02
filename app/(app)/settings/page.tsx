@@ -1,13 +1,15 @@
-import { Download } from "lucide-react";
+import { Download, CheckCircle2, XCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getGhlConnection, getGhlSyncLogs } from "@/lib/db/queries/business";
 import { getSavedLeadSearches } from "@/lib/db/queries/lead-research";
+import { getYtConnection } from "@/lib/db/queries/youtube";
 import { AiMentorStatusCard } from "@/components/settings/ai-mentor-status-card";
 import { GhlConnectionCard } from "@/components/settings/ghl-connection-card";
 import { GhlSyncLogs } from "@/components/settings/ghl-sync-logs";
 import { SavedLeadSearchesCard } from "@/components/settings/saved-lead-searches-card";
 import { SmsStatusCard } from "@/components/settings/sms-status-card";
 import { AnthropicStatusCard } from "@/components/settings/anthropic-status-card";
+import { YoutubeConnectionCard } from "@/components/settings/youtube-connection-card";
 import { TIER_MODEL } from "@/lib/ai/providers/gemini-client";
 import { getAnthropicSpendCap, getAnthropicSpendToDate } from "@/lib/ai/providers/anthropic-client";
 import { isMissingRelation } from "@/lib/db/missing-relation";
@@ -19,13 +21,27 @@ function oneDayAgoIso() {
   return new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 }
 
-export default async function SettingsPage() {
+const YOUTUBE_ERROR_MESSAGE: Record<string, string> = {
+  access_denied: "YouTube connection cancelled.",
+  invalid_state: "YouTube connection failed a security check — try connecting again.",
+  no_refresh_token: "Google didn't return a refresh token — try connecting again (this usually resolves itself).",
+  storage_failed: "Connected, but saving the connection failed — try again.",
+  token_exchange_failed: "YouTube connection failed during token exchange.",
+};
+
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ youtube_connected?: string; youtube_error?: string }>;
+}) {
+  const { youtube_connected, youtube_error } = await searchParams;
   const supabase = await createClient();
   const hasGeminiKey = Boolean(process.env.GEMINI_API_KEY);
-  const [ghlConnection, ghlLogs, savedSearches] = await Promise.all([
+  const [ghlConnection, ghlLogs, savedSearches, ytConnection] = await Promise.all([
     getGhlConnection(supabase),
     getGhlSyncLogs(supabase),
     getSavedLeadSearches(supabase),
+    getYtConnection(supabase),
   ]);
 
   const smsConfigured = Boolean(
@@ -44,6 +60,7 @@ export default async function SettingsPage() {
 
   const hasAnthropicKey = Boolean(process.env.ANTHROPIC_API_KEY);
   const [anthropicCap, anthropicSpent] = await Promise.all([getAnthropicSpendCap(), getAnthropicSpendToDate()]);
+  const hasYoutubeKeys = Boolean(process.env.YOUTUBE_CLIENT_ID && process.env.YOUTUBE_CLIENT_SECRET);
 
   return (
     <div className="space-y-6">
@@ -51,6 +68,16 @@ export default async function SettingsPage() {
         <p className="text-xs uppercase tracking-wider text-muted-foreground">System</p>
         <h1 className="text-xl font-semibold">Settings</h1>
       </div>
+
+      {youtube_connected ? (
+        <div className="flex items-center gap-2 rounded-lg border border-success/30 bg-success/10 px-3 py-2 text-sm text-success">
+          <CheckCircle2 className="h-4 w-4" /> YouTube connected.
+        </div>
+      ) : youtube_error ? (
+        <div className="flex items-center gap-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
+          <XCircle className="h-4 w-4" /> {YOUTUBE_ERROR_MESSAGE[youtube_error] ?? "YouTube connection failed."}
+        </div>
+      ) : null}
 
       <AiMentorStatusCard
         hasKey={hasGeminiKey}
@@ -62,6 +89,12 @@ export default async function SettingsPage() {
       <SavedLeadSearchesCard searches={savedSearches} />
       <SmsStatusCard configured={smsConfigured} ownerNumber={process.env.OWNER_PHONE_NUMBER ?? null} recentCount={smsRecentCount} />
       <AnthropicStatusCard hasKey={hasAnthropicKey} spentUsd={anthropicSpent} capUsd={anthropicCap} />
+      <YoutubeConnectionCard
+        configured={hasYoutubeKeys}
+        connected={!!ytConnection}
+        channelTitle={ytConnection?.channel_title ?? null}
+        connectedAt={ytConnection?.connected_at ?? null}
+      />
 
       <div className="rounded-lg border border-border bg-card p-4">
         <p className="text-xs uppercase tracking-wider text-muted-foreground">Data export</p>

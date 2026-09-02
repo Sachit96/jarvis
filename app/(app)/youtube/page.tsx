@@ -1,13 +1,13 @@
 import { Clapperboard } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getScripts, getThumbnails } from "@/lib/db/queries/youtube";
+import { getScripts, getThumbnails, getYtConnection } from "@/lib/db/queries/youtube";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ScriptGenerateForm } from "@/components/youtube/script-generate-form";
 import { ScriptCard } from "@/components/youtube/script-card";
 
 export default async function YouTubePage() {
   const supabase = await createClient();
-  const scripts = await getScripts(supabase);
+  const [scripts, connection] = await Promise.all([getScripts(supabase), getYtConnection(supabase)]);
   const thumbnailsByScript = await Promise.all(scripts.map((s) => getThumbnails(supabase, s.id)));
 
   return (
@@ -24,7 +24,7 @@ export default async function YouTubePage() {
       ) : (
         <div className="space-y-3">
           {scripts.map((s, i) => (
-            <ScriptCard key={s.id} script={s} thumbnails={thumbnailsByScript[i]} />
+            <ScriptCard key={s.id} script={s} thumbnails={thumbnailsByScript[i]} youtubeConnected={!!connection} />
           ))}
         </div>
       )}
