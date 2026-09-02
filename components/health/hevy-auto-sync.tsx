@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { syncHevyAction } from "@/actions/hevy-actions";
 
 const THROTTLE_KEY = "hevy-last-auto-sync";
 const THROTTLE_MS = 5 * 60 * 1000;
@@ -27,10 +28,10 @@ export function HevyAutoSync() {
     const last = Number(sessionStorage.getItem(THROTTLE_KEY) ?? 0);
     if (Date.now() - last < THROTTLE_MS) return;
 
-    fetch("/api/hevy", { method: "POST" })
-      .then((res) => {
+    syncHevyAction()
+      .then((result) => {
         sessionStorage.setItem(THROTTLE_KEY, String(Date.now()));
-        if (res.ok) router.refresh();
+        if (result.ok) router.refresh();
       })
       .catch(() => {
         // Best-effort — a Hevy outage should never surface to the user here.

@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { syncHevyAction } from "@/actions/hevy-actions";
 
 export function HevySyncButton({ connected }: { connected: boolean }) {
   const router = useRouter();
@@ -15,10 +16,9 @@ export function HevySyncButton({ connected }: { connected: boolean }) {
     setMessage(null);
     startTransition(async () => {
       try {
-        const res = await fetch("/api/hevy", { method: "POST" });
-        const body = await res.json();
-        setMessage(body.message ?? (body.error as string) ?? "Sync failed");
-        if (res.ok) router.refresh();
+        const result = await syncHevyAction();
+        setMessage(result.message ?? (result.ok ? "Synced" : "Sync failed"));
+        if (result.ok) router.refresh();
       } catch {
         setMessage("Sync failed");
       }

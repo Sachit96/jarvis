@@ -1114,6 +1114,24 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limit_events: {
+        Row: {
+          created_at: string
+          id: string
+          route: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          route: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          route?: string
+        }
+        Relationships: []
+      }
       research_runs: {
         Row: {
           audited_count: number

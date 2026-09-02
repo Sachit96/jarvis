@@ -1,4 +1,5 @@
-import { Download, CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, XCircle } from "lucide-react";
+import { ExportBackupButton } from "@/components/settings/export-backup-button";
 import { createClient } from "@/lib/supabase/server";
 import { getGhlConnection, getGhlSyncLogs } from "@/lib/db/queries/business";
 import { getSavedLeadSearches } from "@/lib/db/queries/lead-research";
@@ -101,13 +102,7 @@ export default async function SettingsPage({
         <p className="mt-2 text-sm text-muted-foreground">
           Download every record you own across all modules as a single JSON file.
         </p>
-        <a
-          href="/api/export/json"
-          download
-          className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-secondary px-3 py-1.5 text-sm text-secondary-foreground hover:bg-secondary/80"
-        >
-          <Download className="h-3.5 w-3.5" /> Export JSON backup
-        </a>
+        <ExportBackupButton />
       </div>
     </div>
   );

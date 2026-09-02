@@ -1,56 +1,39 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import type { NextRequest } from "next/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { buildExportPayload } from "@/lib/export";
+import { hasValidBearerToken } from "@/lib/api-auth";
+import { isRateLimited, recordRateLimitEvent } from "@/lib/rate-limit";
 
-const EXPORT_TABLES = [
-  "tasks",
-  "goals",
-  "habits",
-  "habit_logs",
-  "journal_entries",
-  "prayers",
-  "prayer_logs",
-  "accounts",
-  "transactions",
-  "budgets",
-  "trades",
-  "exercises",
-  "workouts",
-  "workout_sets",
-  "nutrition_targets",
-  "nutrition_logs",
-  "water_logs",
-  "mentor_messages",
-  "market_analyses",
-  "trade_checklist_items",
-  "pipeline_stages",
-  "contacts",
-  "deals",
-  "activities",
-  "deal_tasks",
-  "contracts",
-  "client_onboarding_tasks",
-  "ghl_sync_logs",
-  // ghl_connections is intentionally excluded — it holds the raw GHL private
-  // integration token, which shouldn't be included in a downloadable backup.
-  "daily_recommendations",
-  "weekly_reviews",
-] as const;
+const ROUTE = "export/json";
+const RATE_LIMIT_MAX = 10;
+const RATE_LIMIT_WINDOW_MINUTES = 60;
 
-export async function GET() {
-  const supabase = await createClient();
+/**
+ * Dumps ~30 tables including finances and health data. Previously
+ * protected only by the site-wide Basic Auth gate (proxy.ts) — that
+ * password gets resent by the browser automatically for every request to
+ * the origin once entered, so anyone who ever got that far could hit this
+ * URL directly and pull everything in one shot with no further friction.
+ * Requires the same Authorization: Bearer <CRON_SECRET> as
+ * /api/mentor/run now, as real defense-in-depth on top of that. The
+ * Settings page's own "Export JSON backup" button goes through
+ * exportJsonBackupAction (actions/export-actions.ts) instead of this
+ * route — a Server Action, protected by Next.js's own same-origin check,
+ * so the browser UI never needs the secret shipped to client code.
+ */
+export async function GET(request: NextRequest) {
+  if (!hasValidBearerToken(request, "CRON_SECRET")) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-  const results = await Promise.all(
-    EXPORT_TABLES.map(async (table) => {
-      const { data, error } = await supabase.from(table).select("*");
-      if (error) throw new Error(`${table}: ${error.message}`);
-      return [table, data] as const;
-    }),
-  );
+  const supabase = createAdminClient();
+  if (await isRateLimited(supabase, ROUTE, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MINUTES)) {
+    return NextResponse.json({ error: "Rate limited — try again later" }, { status: 429 });
+  }
 
-  const payload = {
-    exportedAt: new Date().toISOString(),
-    data: Object.fromEntries(results),
-  };
+  const payload = await buildExportPayload(supabase);
+  await recordRateLimitEvent(supabase, ROUTE);
 
   return new NextResponse(JSON.stringify(payload, null, 2), {
     headers: {
