@@ -10,7 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { FieldError } from "@/components/ui/field-error";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fieldAria, type ActionState } from "@/lib/validation";
-import { updateMemoryEntryAction, deleteMemoryEntryAction } from "@/actions/memory-actions";
+import { updateMemoryEntryAction, deleteMemoryEntryAction, getMemoryEntryBacklinksAction } from "@/actions/memory-actions";
+import { Backlinks } from "@/components/shared/backlinks";
+import type { Backlink } from "@/lib/obsidian/wikilinks";
 import { MEMORY_TYPES, MEMORY_TYPE_LABEL, type MemoryType } from "@/lib/validations/memory";
 import { MemoryTypeBadge } from "@/components/memory/memory-type-badge";
 import { MarkdownBody } from "@/components/memory/markdown-body";
@@ -35,6 +37,7 @@ export function MemoryDrawer({
   const [state, formAction, isPending] = useActionState(updateMemoryEntryAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   const wasPending = useRef(false);
+  const [backlinks, setBacklinks] = useState<Backlink[]>([]);
 
   useEffect(() => {
     if (wasPending.current && !isPending && !state.error) {
@@ -42,6 +45,20 @@ export function MemoryDrawer({
     }
     wasPending.current = isPending;
   }, [isPending, state.error]);
+
+  useEffect(() => {
+    if (!entry) {
+      const id = setTimeout(() => setBacklinks([]), 0);
+      return () => clearTimeout(id);
+    }
+    let cancelled = false;
+    getMemoryEntryBacklinksAction(entry.id).then((result) => {
+      if (!cancelled) setBacklinks(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [entry]);
 
   if (!entry) return null;
 
@@ -119,6 +136,8 @@ export function MemoryDrawer({
                 <p>Created {formatDate(entry.created_at)}</p>
                 <p>Updated {formatDate(entry.updated_at)}</p>
               </div>
+
+              <Backlinks backlinks={backlinks} />
 
               <div className="border-t border-border pt-3">
                 <p className="text-label uppercase tracking-wide text-muted-foreground">Referenced by</p>

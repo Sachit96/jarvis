@@ -944,6 +944,36 @@ export type Database = {
         }
         Relationships: []
       }
+      note_links: {
+        Row: {
+          created_at: string
+          id: string
+          link_text: string
+          source_id: string
+          source_type: string
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          link_text: string
+          source_id: string
+          source_type: string
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          link_text?: string
+          source_id?: string
+          source_type?: string
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: []
+      }
       nutrition_logs: {
         Row: {
           calories: number
@@ -1018,6 +1048,35 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      obsidian_sync_state: {
+        Row: {
+          last_synced_at: string
+          last_synced_content_hash: string
+          memory_entry_id: string
+          vault_relative_path: string
+        }
+        Insert: {
+          last_synced_at?: string
+          last_synced_content_hash: string
+          memory_entry_id: string
+          vault_relative_path: string
+        }
+        Update: {
+          last_synced_at?: string
+          last_synced_content_hash?: string
+          memory_entry_id?: string
+          vault_relative_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "obsidian_sync_state_memory_entry_id_fkey"
+            columns: ["memory_entry_id"]
+            isOneToOne: true
+            referencedRelation: "memory_entries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pipeline_stages: {
         Row: {

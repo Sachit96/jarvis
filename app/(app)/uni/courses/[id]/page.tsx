@@ -16,6 +16,8 @@ import { SyllabusUpload } from "@/components/uni/syllabus-upload";
 import { FlashcardStudy } from "@/components/uni/flashcard-study";
 import { MaterialQa } from "@/components/uni/material-qa";
 import { DeleteScheduleBlockButton, DeleteMaterialButton } from "@/components/uni/uni-delete-buttons";
+import { Backlinks } from "@/components/shared/backlinks";
+import { getBacklinks } from "@/lib/obsidian/wikilinks";
 
 const DAY_LABEL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -25,10 +27,11 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
   const course = await getCourse(supabase, id);
   if (!course) notFound();
 
-  const [assessments, scheduleBlocks, materials] = await Promise.all([
+  const [assessments, scheduleBlocks, materials, backlinks] = await Promise.all([
     getAssessments(supabase, [id]),
     getScheduleBlocks(supabase, [id]),
     getMaterials(supabase, id),
+    getBacklinks(supabase, "uni_course", id),
   ]);
 
   const grade = courseGrade(assessments);
@@ -149,6 +152,8 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
           </div>
         )}
       </div>
+
+      <Backlinks backlinks={backlinks} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { taskSchema, goalSchema, habitSchema, journalEntrySchema } from "@/lib/validations/life";
 import { actionStateFromZodError, type ActionState } from "@/lib/validation";
+import { syncOutgoingLinksForRow } from "@/lib/obsidian/wikilinks";
 
 
 function todayStr() {
@@ -252,14 +253,20 @@ export async function createJournalEntryAction(
     return actionStateFromZodError(parsed.error);
   }
   const supabase = await createClient();
-  const { error } = await supabase.from("journal_entries").insert({
-    title: parsed.data.title || null,
-    body: parsed.data.body,
-    mood: parsed.data.mood ?? null,
-    entry_type: parsed.data.entry_type,
-    entry_date: parsed.data.entry_date,
-  });
+  const { data, error } = await supabase
+    .from("journal_entries")
+    .insert({
+      title: parsed.data.title || null,
+      body: parsed.data.body,
+      mood: parsed.data.mood ?? null,
+      entry_type: parsed.data.entry_type,
+      entry_date: parsed.data.entry_date,
+    })
+    .select("id")
+    .single();
   if (error) return { error: error.message };
+  // [[wikilinks]] in the body, same as memory entries — never blocks the write itself.
+  await syncOutgoingLinksForRow(supabase, "journal_entry", data.id, { body: parsed.data.body }).catch(() => {});
   revalidatePath("/life/journal");
   return {};
 }
@@ -268,6 +275,9 @@ export async function deleteJournalEntryAction(id: string) {
   const supabase = await createClient();
   const { error } = await supabase.from("journal_entries").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  // Same manual cleanup as deleteMemoryEntryAction — note_links has no FK here.
+  await supabase.from("note_links").delete().eq("source_type", "journal_entry").eq("source_id", id);
+  await supabase.from("note_links").delete().eq("target_type", "journal_entry").eq("target_id", id);
   revalidatePath("/life/journal");
 }
 
