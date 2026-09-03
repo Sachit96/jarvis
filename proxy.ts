@@ -13,7 +13,25 @@ import type { NextRequest } from "next/server";
 // No matcher on purpose: this must run on every route including
 // `_next/static`/`_next/image`, which a typical negative-matcher exclusion
 // list is written to skip.
+//
+// EXCEPT the two genuine server-to-server inbound webhooks below — found
+// live (Business Pipeline Cockpit session, verifying SMS signature
+// validation): Twilio and GoHighLevel POST directly to these URLs and have
+// no way to attach the site's Basic Auth credentials, so this gate was
+// unconditionally 401-ing every real webhook delivery before it ever
+// reached the route handler's OWN authentication (Twilio's X-Twilio-
+// Signature HMAC, GHL's ?secret= query param — see each route's comment).
+// Both have been unreachable from the real services since this file was
+// written. Every other route, including the OAuth callback a browser
+// redirects back to (which still carries the site's cached Basic Auth),
+// stays gated.
+const UNGATED_WEBHOOK_PATHS = ["/api/sms/webhook", "/api/webhooks/ghl"];
+
 export function proxy(request: NextRequest) {
+  if (UNGATED_WEBHOOK_PATHS.includes(request.nextUrl.pathname)) {
+    return NextResponse.next();
+  }
+
   const password = process.env.SITE_PASSWORD;
   // Unset = not gated. Matches this app's convention elsewhere (Hevy, GHL,
   // Gemini all degrade to "not configured" rather than hard-failing) — but
