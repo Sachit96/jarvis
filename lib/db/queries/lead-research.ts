@@ -45,16 +45,40 @@ export async function getLeadResearchByPlaceId(supabase: Client, googlePlaceId: 
   return data;
 }
 
+/** By its own id — the Lead Research page's row actions (force refresh, dismiss) address a lead this way, not by google_place_id. */
+export async function getLeadResearchById(supabase: Client, id: string): Promise<LeadResearchRow | null> {
+  const { data, error } = await supabase.from("lead_research").select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+/** Row action, not a re-audit — the lead stays in lead_research (and its contact/deal keep existing) but drops out of the default "working the list" view. */
+export async function dismissLead(supabase: Client, id: string): Promise<void> {
+  const { error } = await supabase.from("lead_research").update({ dismissed: true }).eq("id", id);
+  if (error) throw error;
+}
+
 export function isCached(row: LeadResearchRow, forceRefresh: boolean): boolean {
   if (forceRefresh) return false;
   const ageMs = Date.now() - new Date(row.researched_at).getTime();
   return ageMs < CACHE_WINDOW_DAYS * 24 * 60 * 60 * 1000;
 }
 
+/**
+ * Deliberately no nested `contacts(*)`/`deals(*)` embed here — the FK
+ * columns aren't declared unique in the schema, so supabase-js's generated
+ * types describe the embed as an array even though PostgREST returns a
+ * single object at runtime for this many-to-one direction, and getting
+ * that wrong silently is worse than not trying. The Lead Research page
+ * instead fetches contacts/deals separately (getContacts/getDeals, same
+ * lib/db/queries/business.ts functions every other Business page already
+ * uses) and joins by id in a Map — the established pattern in this
+ * codebase (see PipelinePage's contactById).
+ */
 export async function getResearchLeads(supabase: Client) {
   const { data, error } = await supabase
     .from("lead_research")
-    .select("*, contacts(*), deals(*)")
+    .select("*")
     .eq("dismissed", false)
     .order("score", { ascending: false });
   if (error) throw error;

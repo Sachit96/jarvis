@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import Link from "next/link";
 import { Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +31,9 @@ export function ContactCard({
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <p className="truncate text-sm font-medium">{contact.contact_person}</p>
+            <Link href={`/business/clients/${contact.id}`} className="truncate text-sm font-medium hover:underline">
+              {contact.contact_person}
+            </Link>
             {contact.source === "ghl" ? (
               <Badge variant="outline" className="text-[10px] uppercase">
                 GHL

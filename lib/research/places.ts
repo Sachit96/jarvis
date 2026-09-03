@@ -3,6 +3,7 @@ import type { PlaceResult } from "@/lib/research/types";
 import type { ResearchRunParams } from "@/lib/validations/lead-research";
 
 const SEARCH_TEXT_ENDPOINT = "https://places.googleapis.com/v1/places:searchText";
+const PLACE_DETAILS_ENDPOINT = "https://places.googleapis.com/v1/places";
 
 // Only what we store (lib/db/queries mirrors this into contacts/deals/lead_research) —
 // Places New bills by which fields you request, so this field mask is deliberately
@@ -134,4 +135,29 @@ export async function searchPlaces(params: ResearchRunParams): Promise<PlaceResu
     });
 
   return results.slice(0, params.max_results);
+}
+
+/**
+ * Place Details (New) — a single business by its already-known place_id.
+ * Used only by the Lead Research page's per-lead "force refresh" action:
+ * unlike Discovery (a new search from scratch), refreshing one existing
+ * lead already has the place_id, so this fetches current rating/review
+ * count/website/phone directly rather than re-running Text Search and
+ * hoping the same business resolves back to the top of a fresh query.
+ * Same field mask discipline as FIELD_MASK above — only what's stored.
+ */
+export async function getPlaceDetails(placeId: string): Promise<PlaceResult> {
+  const res = await fetch(`${PLACE_DETAILS_ENDPOINT}/${encodeURIComponent(placeId)}`, {
+    headers: {
+      "X-Goog-Api-Key": getApiKey(),
+      "X-Goog-FieldMask": FIELD_MASK.replace(/places\./g, "").replace(",nextPageToken", ""),
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`Place Details failed: ${res.status} ${res.statusText}`);
+  }
+  const raw: RawPlace = await res.json();
+  const place = toPlaceResult(raw);
+  if (!place) throw new Error(`Place Details returned incomplete data for ${placeId}`);
+  return place;
 }

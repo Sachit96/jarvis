@@ -9,10 +9,13 @@ import {
   contractSchema,
   onboardingTaskSchema,
   pipelineStageSchema,
+  updateContactNotesSchema,
+  updateDealNotesSchema,
   DEFAULT_PIPELINE_STAGES,
   DEFAULT_ONBOARDING_TASKS,
 } from "@/lib/validations/business";
 import { actionStateFromZodError, type ActionState } from "@/lib/validation";
+import { syncOutgoingLinksForRow, getBacklinks, type Backlink } from "@/lib/obsidian/wikilinks";
 
 
 function revalidateBusiness() {
@@ -20,6 +23,7 @@ function revalidateBusiness() {
   revalidatePath("/business/clients");
   revalidatePath("/business/revenue");
   revalidatePath("/business/dashboard");
+  revalidatePath("/business/leads");
 }
 
 // ============================================================= Pipeline stages
@@ -118,6 +122,10 @@ export async function createLeadAction(
     return { error: dealError.message };
   }
 
+  if (parsed.data.notes) {
+    await syncOutgoingLinksForRow(supabase, "contact", contact.id, { notes: parsed.data.notes }).catch(() => {});
+  }
+
   revalidateBusiness();
   return {};
 }
@@ -177,6 +185,8 @@ export async function createActivityAction(
   });
   if (error) return { error: error.message };
   revalidatePath("/business/clients");
+  revalidatePath(`/business/clients/${parsed.data.contact_id}`);
+  if (parsed.data.deal_id) revalidatePath(`/business/pipeline/${parsed.data.deal_id}`);
   return {};
 }
 
@@ -278,6 +288,21 @@ export async function deleteContractAction(id: string) {
 
 // ============================================================= Client onboarding checklist
 
+/**
+ * Bug found live tonight (Business Pipeline Cockpit verification): this is
+ * called at the top of a Server Component's render body — both the
+ * existing /business/clients page and the new /business/clients/[id]
+ * detail page — same pattern ensureDefaultPipelineStagesAction's own
+ * comment already documents as the only safe way to call it. It used to
+ * end with `revalidatePath("/business/clients")`, which Next.js 16
+ * rejects outright ("used revalidatePath ... during render") — but ONLY
+ * on the branch that actually inserts rows (a brand-new contact with zero
+ * onboarding tasks yet), so it silently worked for every already-seeded
+ * contact and only crashed the page the first time a truly new contact
+ * was opened. Removed for the same reason ensureDefaultPipelineStagesAction
+ * has none: the page's own query right after this already sees the fresh
+ * rows within the same request, no revalidation needed.
+ */
 export async function ensureOnboardingTasksAction(contactId: string) {
   const supabase = await createClient();
   const { count, error: countError } = await supabase
@@ -295,7 +320,6 @@ export async function ensureOnboardingTasksAction(contactId: string) {
     })),
   );
   if (error) throw new Error(error.message);
-  revalidatePath("/business/clients");
 }
 
 export async function createOnboardingTaskAction(
@@ -337,4 +361,50 @@ export async function deleteOnboardingTaskAction(id: string) {
   const { error } = await supabase.from("client_onboarding_tasks").delete().eq("id", id);
   if (error) throw new Error(error.message);
   revalidatePath("/business/clients");
+}
+
+// ============================================================= Detail pages: notes + backlinks
+
+/** /business/clients/[id]'s inline notes editor. Re-syncs outgoing [[wikilinks]] on save (see lib/obsidian/wikilinks.ts) — notes is the one free-text field a contact has to link out to a memory entry, course, or journal entry. */
+export async function updateContactNotesAction(_prevState: ActionState, formData: FormData): Promise<ActionState> {
+  const parsed = updateContactNotesSchema.safeParse({
+    id: formData.get("id"),
+    notes: formData.get("notes"),
+  });
+  if (!parsed.success) return actionStateFromZodError(parsed.error);
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("contacts").update({ notes: parsed.data.notes ?? null }).eq("id", parsed.data.id);
+  if (error) return { error: error.message };
+  await syncOutgoingLinksForRow(supabase, "contact", parsed.data.id, { notes: parsed.data.notes ?? "" }).catch(() => {});
+  revalidatePath(`/business/clients/${parsed.data.id}`);
+  revalidatePath("/business/clients");
+  return {};
+}
+
+/** /business/pipeline/[id]'s inline notes editor — same reasoning as updateContactNotesAction. */
+export async function updateDealNotesAction(_prevState: ActionState, formData: FormData): Promise<ActionState> {
+  const parsed = updateDealNotesSchema.safeParse({
+    id: formData.get("id"),
+    notes: formData.get("notes"),
+  });
+  if (!parsed.success) return actionStateFromZodError(parsed.error);
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("deals").update({ notes: parsed.data.notes ?? null }).eq("id", parsed.data.id);
+  if (error) return { error: error.message };
+  await syncOutgoingLinksForRow(supabase, "deal", parsed.data.id, { notes: parsed.data.notes ?? "" }).catch(() => {});
+  revalidatePath(`/business/pipeline/${parsed.data.id}`);
+  revalidatePath("/business/pipeline");
+  return {};
+}
+
+export async function getContactBacklinksAction(id: string): Promise<Backlink[]> {
+  const supabase = await createClient();
+  return getBacklinks(supabase, "contact", id);
+}
+
+export async function getDealBacklinksAction(id: string): Promise<Backlink[]> {
+  const supabase = await createClient();
+  return getBacklinks(supabase, "deal", id);
 }

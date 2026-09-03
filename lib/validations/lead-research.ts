@@ -65,6 +65,18 @@ export const qualificationResultSchema = z.object({
 });
 export type QualificationResult = z.infer<typeof qualificationResultSchema>;
 
+/** Score bands for the Lead Research results table — "which of these do I call first." */
+export const SCORE_BANDS = ["hot", "warm", "skip"] as const;
+export type ScoreBand = (typeof SCORE_BANDS)[number];
+
+export function scoreBand(score: number): ScoreBand {
+  if (score >= 70) return "hot";
+  if (score >= 40) return "warm";
+  return "skip";
+}
+
+export const SCORE_BAND_LABEL: Record<ScoreBand, string> = { hot: "Hot", warm: "Warm", skip: "Skip" };
+
 /** "score is computed in code, don't trust the model's math" — the model is never asked for a total, this is the only place one gets produced. */
 export function computeScore(breakdown: QualificationResult["score_breakdown"]): number {
   return (
@@ -75,6 +87,18 @@ export function computeScore(breakdown: QualificationResult["score_breakdown"]):
     breakdown.digital_presence
   );
 }
+
+/** One-click "log call outcome" row action on the Lead Research page — each maps to a fixed activities.notes string rather than free text, so working the list stays one click, not a form per call. */
+export const CALL_OUTCOMES = ["connected", "voicemail", "no_answer", "not_interested", "booked_call"] as const;
+export type CallOutcome = (typeof CALL_OUTCOMES)[number];
+
+export const CALL_OUTCOME_LABEL: Record<CallOutcome, string> = {
+  connected: "Connected",
+  voicemail: "Left voicemail",
+  no_answer: "No answer",
+  not_interested: "Not interested",
+  booked_call: "Booked a call",
+};
 
 // ============================================================= discovery form
 

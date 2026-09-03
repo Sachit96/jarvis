@@ -16,7 +16,8 @@ import {
 
 const initialState: ActionState = {};
 
-export function ActivityForm({ contactId }: { contactId: string }) {
+/** dealId is optional — omitted on the contact detail page (a general, contact-level note) and set on the deal detail page, so the logged activity shows up in getActivitiesForDeal's deal-scoped timeline too, not just the contact's. */
+export function ActivityForm({ contactId, dealId }: { contactId: string; dealId?: string }) {
   const [state, formAction, isPending] = useActionState(createActivityAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   const wasPending = useRef(false);
@@ -31,6 +32,7 @@ export function ActivityForm({ contactId }: { contactId: string }) {
   return (
     <form ref={formRef} action={formAction} className="flex items-center gap-1.5">
       <input type="hidden" name="contact_id" value={contactId} />
+      {dealId ? <input type="hidden" name="deal_id" value={dealId} /> : null}
       <Select name="type" defaultValue="note">
         <SelectTrigger className="h-7 w-28 text-xs">
           <SelectValue />

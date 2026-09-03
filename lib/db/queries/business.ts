@@ -26,10 +26,34 @@ export async function getContacts(supabase: Client) {
   return data;
 }
 
+/** Single contact — the /business/clients/[id] detail page. Null means "not found," not an error, so the page can render a 404 rather than crash. */
+export async function getContact(supabase: Client, id: string) {
+  const { data, error } = await supabase.from("contacts").select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
 export async function getDeals(supabase: Client) {
   const { data, error } = await supabase
     .from("deals")
     .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
+/** Single deal — the /business/pipeline/[id] detail page. */
+export async function getDeal(supabase: Client, id: string) {
+  const { data, error } = await supabase.from("deals").select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function getDealsForContact(supabase: Client, contactId: string) {
+  const { data, error } = await supabase
+    .from("deals")
+    .select("*")
+    .eq("contact_id", contactId)
     .order("created_at", { ascending: false });
   if (error) throw error;
   return data;
@@ -65,11 +89,33 @@ export async function getAllActivities(supabase: Client) {
   return data;
 }
 
+/** Deal-scoped activity timeline — the /business/pipeline/[id] detail page. Distinct from getActivitiesForContact: a contact can have several deals, and a deal's own page should show only its own interactions, not every activity ever logged against the contact. */
+export async function getActivitiesForDeal(supabase: Client, dealId: string) {
+  const { data, error } = await supabase
+    .from("activities")
+    .select("*")
+    .eq("deal_id", dealId)
+    .order("occurred_at", { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
 export async function getContracts(supabase: Client) {
   const { data, error } = await supabase
     .from("contracts")
     .select("*")
     .order("status", { ascending: true })
+    .order("start_date", { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
+/** Contact-scoped — the /business/clients/[id] detail page's own contracts section, distinct from the all-contracts list on /business/revenue. */
+export async function getContractsForContact(supabase: Client, contactId: string) {
+  const { data, error } = await supabase
+    .from("contracts")
+    .select("*")
+    .eq("contact_id", contactId)
     .order("start_date", { ascending: false });
   if (error) throw error;
   return data;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -55,7 +56,9 @@ export function DealCard({
     <div className={cn("rounded-lg border border-border bg-card p-3", isPending && "opacity-70")}>
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium">{contact?.contact_person ?? "Unknown contact"}</p>
+          <Link href={`/business/pipeline/${deal.id}`} className="truncate text-sm font-medium hover:underline">
+            {contact?.contact_person ?? "Unknown contact"}
+          </Link>
           {contact?.company_name ? (
             <p className="truncate text-xs text-muted-foreground">{contact.company_name}</p>
           ) : null}

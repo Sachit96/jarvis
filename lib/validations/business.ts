@@ -65,6 +65,19 @@ export const pipelineStageSchema = z.object({
 });
 export type PipelineStageInput = z.infer<typeof pipelineStageSchema>;
 
+/** Contact/deal detail pages' inline notes editor — notes is also the text field wikilinks are parsed from (see lib/obsidian/wikilinks.ts's DOMAINS), so editing it here re-syncs outgoing [[links]] too. */
+export const updateContactNotesSchema = z.object({
+  id: z.string().uuid(),
+  notes: optionalTextInput,
+});
+export type UpdateContactNotesInput = z.infer<typeof updateContactNotesSchema>;
+
+export const updateDealNotesSchema = z.object({
+  id: z.string().uuid(),
+  notes: optionalTextInput,
+});
+export type UpdateDealNotesInput = z.infer<typeof updateDealNotesSchema>;
+
 export const ghlConnectionSchema = z.object({
   private_token: z.string().trim().min(10, "Token looks too short").max(500),
   location_id: z.string().trim().min(1, "Location ID is required").max(100),

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Link2 } from "lucide-react";
 import type { Backlink, NoteLinkType } from "@/lib/obsidian/wikilinks";
 
-/** Where a backlink's source actually lives — used to make its title clickable. Mirrors the five LINKABLE_TYPES in lib/obsidian/wikilinks.ts; contacts and deals have no dedicated detail page yet, so those two just aren't links. */
+/** Where a backlink's source actually lives — used to make its title clickable. Mirrors the five LINKABLE_TYPES in lib/obsidian/wikilinks.ts. */
 function hrefFor(type: NoteLinkType, id: string): string | null {
   switch (type) {
     case "memory_entry":
@@ -12,8 +12,9 @@ function hrefFor(type: NoteLinkType, id: string): string | null {
     case "journal_entry":
       return `/life/journal`;
     case "contact":
+      return `/business/clients/${id}`;
     case "deal":
-      return null;
+      return `/business/pipeline/${id}`;
   }
 }
 
