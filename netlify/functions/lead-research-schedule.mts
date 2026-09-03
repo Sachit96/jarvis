@@ -25,11 +25,21 @@ const HARD_MAX_RESULTS = 25;
 
 export default async () => {
   const baseUrl = process.env.URL;
+  const secret = process.env.CRON_SECRET;
   const supabase = createAdminClient();
 
   if (!baseUrl) {
     console.error(`[${JOB_NAME}] process.env.URL is not set — cannot call the site's own API.`);
     await supabase.from("scheduled_runs").insert({ job_name: JOB_NAME, status: "error", message: "process.env.URL is not set" });
+    return;
+  }
+  // Found live (Business Pipeline Cockpit Phase 0): this call was missing
+  // entirely, unlike mentor-daily-schedule.mts/mentor-weekly-schedule.mts's
+  // identical pattern — /api/research/runs's hasValidBearerToken check has
+  // been rejecting every dispatch from this function since it was written.
+  if (!secret) {
+    console.error(`[${JOB_NAME}] CRON_SECRET is not set — /api/research/runs would reject this anyway.`);
+    await supabase.from("scheduled_runs").insert({ job_name: JOB_NAME, status: "error", message: "CRON_SECRET is not set" });
     return;
   }
 
@@ -70,7 +80,7 @@ export default async () => {
     try {
       const res = await fetch(`${baseUrl}/api/research/runs`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${secret}` },
         body: JSON.stringify(params),
       });
       const body = await res.text();

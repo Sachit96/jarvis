@@ -14,21 +14,41 @@ import type { NextRequest } from "next/server";
 // `_next/static`/`_next/image`, which a typical negative-matcher exclusion
 // list is written to skip.
 //
-// EXCEPT the two genuine server-to-server inbound webhooks below — found
-// live (Business Pipeline Cockpit session, verifying SMS signature
-// validation): Twilio and GoHighLevel POST directly to these URLs and have
-// no way to attach the site's Basic Auth credentials, so this gate was
-// unconditionally 401-ing every real webhook delivery before it ever
-// reached the route handler's OWN authentication (Twilio's X-Twilio-
-// Signature HMAC, GHL's ?secret= query param — see each route's comment).
-// Both have been unreachable from the real services since this file was
-// written. Every other route, including the OAuth callback a browser
-// redirects back to (which still carries the site's cached Basic Auth),
-// stays gated.
-const UNGATED_WEBHOOK_PATHS = ["/api/sms/webhook", "/api/webhooks/ghl"];
+// EXCEPT the server-to-server routes below, each independently
+// authenticated and unreachable by their real caller through this gate:
+//
+// - /api/sms/webhook, /api/webhooks/ghl — Twilio and GoHighLevel POST
+//   directly to these and have no way to attach the site's Basic Auth
+//   credentials (found verifying SMS signature validation). Own auth:
+//   Twilio's X-Twilio-Signature HMAC, GHL's ?secret= query param.
+// - /api/mentor/run, /api/research/runs(/*) — Netlify Scheduled Functions
+//   (netlify/functions/*-schedule.mts) call these with
+//   `Authorization: Bearer <CRON_SECRET>` and nothing else. Found live
+//   (Business Pipeline Cockpit Phase 0): this collides on the SAME header
+//   this gate reads for "Basic <password>" — a request can only ever send
+//   one Authorization value, so these have been 401-ing at the proxy
+//   before the route's own bearer check ever ran a single time since this
+//   file was written. That means the recurring Lead Research schedule and
+//   the daily/weekly AI Mentor briefs have never actually fired in
+//   production — only their manual/dev-mode paths were ever exercised.
+//
+// /api/hevy and /api/export/json are NOT included here on purpose: their
+// own comments frame CRON_SECRET as defense-in-depth ON TOP OF this gate
+// (deliberately two factors on the most sensitive routes), which the same
+// single-header collision makes structurally impossible as coded — but
+// fixing that means picking a real second channel (a distinct header, not
+// reusing Authorization), a design decision left to a real work order
+// rather than folded into this fix.
+//
+// Every other route, including the OAuth callback a browser redirects
+// back to (which still carries the site's cached Basic Auth), stays
+// gated.
+const UNGATED_WEBHOOK_PATHS = ["/api/sms/webhook", "/api/webhooks/ghl", "/api/mentor/run"];
+const UNGATED_PREFIXES = ["/api/research/runs"];
 
 export function proxy(request: NextRequest) {
-  if (UNGATED_WEBHOOK_PATHS.includes(request.nextUrl.pathname)) {
+  const { pathname } = request.nextUrl;
+  if (UNGATED_WEBHOOK_PATHS.includes(pathname) || UNGATED_PREFIXES.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }
 

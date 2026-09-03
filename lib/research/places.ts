@@ -44,6 +44,25 @@ function getApiKey(): string {
   return key;
 }
 
+/**
+ * Surfaces Google's actual response body on a non-2xx, not just the HTTP
+ * status — found live tonight: this was the third time this project lost
+ * debugging time to an error handler that discarded the server's own
+ * explanation (the raw PostgREST dump, the generic "Invalid input", now
+ * this). Google's Places errors are a JSON body with a real `message`
+ * (e.g. "Unknown name \"circle\" at 'location_restriction'") that a bare
+ * `${res.status} ${res.statusText}` throws away entirely.
+ */
+async function readErrorBody(res: Response): Promise<string> {
+  const text = await res.text().catch(() => "");
+  try {
+    const parsed = JSON.parse(text);
+    return parsed?.error?.message ?? text;
+  } catch {
+    return text;
+  }
+}
+
 async function searchText(body: Record<string, unknown>, fieldMask: string): Promise<{ places: RawPlace[]; nextPageToken?: string }> {
   const res = await fetch(SEARCH_TEXT_ENDPOINT, {
     method: "POST",
@@ -55,7 +74,7 @@ async function searchText(body: Record<string, unknown>, fieldMask: string): Pro
     body: JSON.stringify(body),
   });
   if (!res.ok) {
-    throw new Error(`Places Text Search failed: ${res.status} ${res.statusText}`);
+    throw new Error(`Places Text Search failed: ${res.status} ${res.statusText} — ${await readErrorBody(res)}`);
   }
   const data = await res.json();
   return { places: data.places ?? [], nextPageToken: data.nextPageToken };
@@ -96,6 +115,32 @@ function toPlaceResult(raw: RawPlace): PlaceResult | null {
 }
 
 /**
+ * A square bounding box that circumscribes the requested radius, centered
+ * on the resolved centroid. Places (New) SearchText.locationRestriction
+ * only accepts `rectangle` — NOT `circle` (`locationBias.circle` exists,
+ * `locationRestriction.circle` does not). Confirmed live tonight: sending
+ * `locationRestriction: { circle: {...} }` (what this code sent before)
+ * gets a real 400 from Google — `Invalid JSON payload received. Unknown
+ * name "circle" at 'location_restriction': Cannot find field.` — every
+ * single time, which is why Lead Research has never once returned a
+ * result. A circumscribing square is the standard approximation for "no
+ * circle available": it always covers the full requested radius, at the
+ * cost of also admitting results out toward the square's corners,
+ * slightly beyond params.radius_km on the diagonal. Longitude degrees
+ * shrink with distance from the equator (by cos(latitude)); latitude
+ * degrees don't, so each axis needs its own conversion.
+ */
+function boundingRectangle(center: { latitude: number; longitude: number }, radiusMeters: number) {
+  const METERS_PER_DEGREE_LAT = 111_320;
+  const latDelta = radiusMeters / METERS_PER_DEGREE_LAT;
+  const lngDelta = radiusMeters / (METERS_PER_DEGREE_LAT * Math.cos((center.latitude * Math.PI) / 180));
+  return {
+    low: { latitude: center.latitude - latDelta, longitude: center.longitude - lngDelta },
+    high: { latitude: center.latitude + latDelta, longitude: center.longitude + lngDelta },
+  };
+}
+
+/**
  * Discovery stage. textQuery is the keyword ONLY (see resolveCentroid's
  * comment for why) — location targeting happens entirely through
  * locationRestriction, which unlike locationBias is a hard filter Places
@@ -104,6 +149,7 @@ function toPlaceResult(raw: RawPlace): PlaceResult | null {
 export async function searchPlaces(params: ResearchRunParams): Promise<PlaceResult[]> {
   const centroid = await resolveCentroid(params.city, params.region, params.country);
   const radiusMeters = Math.min(params.radius_km * 1000, 50000); // Places caps circle radius at 50km
+  const rectangle = boundingRectangle(centroid, radiusMeters);
 
   const collected: RawPlace[] = [];
   let pageToken: string | undefined;
@@ -112,7 +158,7 @@ export async function searchPlaces(params: ResearchRunParams): Promise<PlaceResu
     const { places, nextPageToken } = await searchText(
       {
         textQuery: params.keyword,
-        locationRestriction: { circle: { center: centroid, radius: radiusMeters } },
+        locationRestriction: { rectangle },
         pageSize: Math.min(20, Math.max(remaining, 1)),
         ...(pageToken ? { pageToken } : {}),
       },
@@ -154,7 +200,7 @@ export async function getPlaceDetails(placeId: string): Promise<PlaceResult> {
     },
   });
   if (!res.ok) {
-    throw new Error(`Place Details failed: ${res.status} ${res.statusText}`);
+    throw new Error(`Place Details failed: ${res.status} ${res.statusText} — ${await readErrorBody(res)}`);
   }
   const raw: RawPlace = await res.json();
   const place = toPlaceResult(raw);

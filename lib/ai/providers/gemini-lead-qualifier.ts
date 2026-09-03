@@ -1,6 +1,6 @@
 import "server-only";
 import type { LeadSignals } from "@/lib/research/types";
-import { OPPORTUNITY_TAGS, qualificationResultSchema } from "@/lib/validations/lead-research";
+import { OPPORTUNITY_TAGS, SCORE_CATEGORY_MAX, qualificationResultSchema } from "@/lib/validations/lead-research";
 import type { LeadQualifierProvider, LeadQualifyOutcome } from "@/lib/ai/providers/types";
 import { callGemini } from "@/lib/ai/providers/gemini-client";
 
@@ -25,11 +25,18 @@ const PER_BUSINESS_SCHEMA = {
     score_breakdown: {
       type: "OBJECT",
       properties: {
-        website_quality: { type: "INTEGER" },
-        conversion_readiness: { type: "INTEGER" },
-        seo_basics: { type: "INTEGER" },
-        performance: { type: "INTEGER" },
-        digital_presence: { type: "INTEGER" },
+        // minimum/maximum added the same night as the same fix in
+        // anthropic-lead-qualifier.ts: neither the schema nor the prompt
+        // ever stated the actual per-category ceilings, so an unbounded
+        // model output would fail qualificationResultSchema's Zod .max()
+        // every time regardless of which provider answered — confirmed
+        // live against the real 400 -> schema-validation chain this
+        // shares with the Anthropic path (same qualificationResultSchema).
+        website_quality: { type: "INTEGER", minimum: 0, maximum: SCORE_CATEGORY_MAX.website_quality },
+        conversion_readiness: { type: "INTEGER", minimum: 0, maximum: SCORE_CATEGORY_MAX.conversion_readiness },
+        seo_basics: { type: "INTEGER", minimum: 0, maximum: SCORE_CATEGORY_MAX.seo_basics },
+        performance: { type: "INTEGER", minimum: 0, maximum: SCORE_CATEGORY_MAX.performance },
+        digital_presence: { type: "INTEGER", minimum: 0, maximum: SCORE_CATEGORY_MAX.digital_presence },
       },
       required: ["website_quality", "conversion_readiness", "seo_basics", "performance", "digital_presence"],
     },
@@ -57,7 +64,7 @@ Hard rules, applied independently to EACH business:
 - If audit_blocked is true, or a website is entirely absent, signals are thin — say so explicitly in audit_summary and score conservatively (don't max out categories you have no real evidence for).
 - opportunities.tag must be one of the fixed taxonomy values provided — never invent a new tag.
 - ai_summary is 2-3 sentences a salesperson reads right before dialing the phone — concrete and specific to that business, not generic.
-- score_breakdown values are integers within each category's stated max. Do not attempt to compute or report a total score — that's handled by the caller.`;
+- score_breakdown values are integers within each category's max: website_quality 0-${SCORE_CATEGORY_MAX.website_quality}, conversion_readiness 0-${SCORE_CATEGORY_MAX.conversion_readiness}, seo_basics 0-${SCORE_CATEGORY_MAX.seo_basics}, performance 0-${SCORE_CATEGORY_MAX.performance}, digital_presence 0-${SCORE_CATEGORY_MAX.digital_presence}. Do not attempt to compute or report a total score — that's handled by the caller.`;
 
 function buildBusinessSection(signals: LeadSignals, index: number, total: number): string {
   const { place, hasWebsite, audit, pageSpeed } = signals;
@@ -172,13 +179,23 @@ export class GeminiLeadQualifier implements LeadQualifierProvider {
         console.log("[gemini-lead-qualifier] raw batch response (pre-Zod):", JSON.stringify(parsed, null, 2));
       }
 
-      if (!Array.isArray(parsed) || parsed.length !== signalsList.length) return null;
+      if (!Array.isArray(parsed) || parsed.length !== signalsList.length) {
+        console.error(`[GeminiLeadQualifier] response array length mismatch: got ${Array.isArray(parsed) ? parsed.length : typeof parsed} for a ${signalsList.length}-business batch`);
+        return null;
+      }
 
       return parsed.map((item): LeadQualifyOutcome => {
         const result = qualificationResultSchema.safeParse(item);
         return result.success ? { result: result.data } : { error: `Schema validation failed: ${result.error.message}` };
       });
-    } catch {
+    } catch (err) {
+      // Same discard-the-real-reason bug as anthropic-lead-qualifier.ts
+      // and lib/research/places.ts had — this returning bare `null` is
+      // still correct for the retry/individual-fallback control flow
+      // above, but silently doing so with no logged reason at all was
+      // exactly what hid the additionalProperties/minimum-maximum bugs on
+      // the Anthropic path for as long as it did.
+      console.error("[GeminiLeadQualifier] batch call threw:", err instanceof Error ? err.message : err);
       return null;
     }
   }

@@ -150,8 +150,22 @@ export async function callAnthropic(options: AnthropicCallOptions): Promise<Anth
   });
 
   if (!res.ok) {
-    // Never log the response body or the key.
-    throw new Error(`Anthropic request failed: ${res.status} ${res.statusText}`);
+    // Surface Anthropic's own error message (e.g. "`temperature` is
+    // deprecated for this model") — found live tonight this was the same
+    // discard-the-server's-explanation bug as Places' error handling,
+    // just here specifically. "Never log the key" still holds (the key is
+    // a REQUEST header, never present in Anthropic's response body), but
+    // the response body itself is Anthropic's own safe, secret-free
+    // explanation of what was wrong with the request — the thing that
+    // actually gets debugging done instead of a bare status code.
+    const bodyText = await res.text().catch(() => "");
+    let detail = bodyText;
+    try {
+      detail = JSON.parse(bodyText)?.error?.message ?? bodyText;
+    } catch {
+      // not JSON — use the raw text as-is
+    }
+    throw new Error(`Anthropic request failed: ${res.status} ${res.statusText} — ${detail}`);
   }
 
   const data = await res.json();
