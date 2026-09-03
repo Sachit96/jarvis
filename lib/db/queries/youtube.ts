@@ -25,15 +25,6 @@ export async function getScript(supabase: Client, id: string) {
   return data;
 }
 
-export async function getThumbnails(supabase: Client, scriptId: string) {
-  const { data, error } = await supabase.from("yt_thumbnails").select("*").eq("script_id", scriptId).order("created_at", { ascending: true });
-  if (error) {
-    if (isMissingRelation(error)) return [];
-    throw error;
-  }
-  return data;
-}
-
 /** Null if never connected, or if migration 0026 hasn't run yet. */
 export async function getYtConnection(supabase: Client) {
   const { data, error } = await supabase.from("yt_connections").select("*").eq("id", true).maybeSingle();

@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { ChevronDown, ChevronUp, Image as ImageIcon, Trash2, Search, BrainCircuit } from "lucide-react";
-import { setScriptStatusAction, deleteScriptAction, generateThumbnailsAction, selectThumbnailAction } from "@/actions/youtube-actions";
+import { ChevronDown, ChevronUp, Trash2, Search, BrainCircuit } from "lucide-react";
+import { setScriptStatusAction, deleteScriptAction } from "@/actions/youtube-actions";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { YT_STATUSES } from "@/lib/validations/youtube";
@@ -12,21 +11,11 @@ import { UploadToYoutube } from "@/components/youtube/upload-to-youtube";
 import type { Database } from "@/lib/supabase/database.types";
 
 type Script = Database["public"]["Tables"]["yt_scripts"]["Row"];
-type Thumbnail = Database["public"]["Tables"]["yt_thumbnails"]["Row"];
 
-export function ScriptCard({ script, thumbnails, youtubeConnected }: { script: Script; thumbnails: Thumbnail[]; youtubeConnected: boolean }) {
+export function ScriptCard({ script, youtubeConnected }: { script: Script; youtubeConnected: boolean }) {
   const [expanded, setExpanded] = useState(false);
-  const [isPending, startTransition] = useTransition();
-  const [thumbError, setThumbError] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
   const sections = (script.sections as { label: string; startSec: number; content: string }[] | null) ?? [];
-
-  function handleGenerateThumbnails() {
-    setThumbError(null);
-    startTransition(async () => {
-      const res = await generateThumbnailsAction(script.id, script.hook ?? script.topic);
-      if (!res.ok) setThumbError(res.error ?? "Failed");
-    });
-  }
 
   return (
     <Card>
@@ -96,32 +85,6 @@ export function ScriptCard({ script, thumbnails, youtubeConnected }: { script: S
                 <Badge key={i} variant={i === 0 ? "default" : "outline"}>{t}</Badge>
               ))}
             </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between">
-              <p className="text-caption uppercase tracking-wide text-muted-foreground">Thumbnails</p>
-              <Button size="sm" variant="secondary" className="gap-1.5" onClick={handleGenerateThumbnails} disabled={isPending}>
-                <ImageIcon className="h-3.5 w-3.5" /> {isPending ? "Generating…" : "Generate 3 variants"}
-              </Button>
-            </div>
-            {thumbError ? <p className="mt-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-xs text-danger">{thumbError}</p> : null}
-            {thumbnails.length > 0 ? (
-              <div className="mt-2 grid grid-cols-3 gap-2">
-                {thumbnails.map((t) => (
-                  <button
-                    key={t.id}
-                    onClick={() => startTransition(() => selectThumbnailAction(t.id, script.id))}
-                    className={`overflow-hidden rounded-lg ring-2 ${t.selected ? "ring-brand" : "ring-transparent"}`}
-                  >
-                    {t.image_base64 ? (
-                      // eslint-disable-next-line @next/next/no-img-element -- base64 data URI, not a remote asset next/image can optimize
-                      <img src={`data:${t.mime_type};base64,${t.image_base64}`} alt="Thumbnail variant" className="aspect-video w-full object-cover" />
-                    ) : null}
-                  </button>
-                ))}
-              </div>
-            ) : null}
           </div>
 
           <UploadToYoutube

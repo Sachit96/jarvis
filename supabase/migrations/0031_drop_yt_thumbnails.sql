@@ -1,0 +1,16 @@
+-- Thumbnail generation was removed from the app this session (Cleanup and
+-- close-out work order, Phase 1d) — every image-capable model on the
+-- configured GEMINI_API_KEY (gemini-2.5-flash-image, gemini-3-pro-image,
+-- gemini-3-pro-image-preview, gemini-3.1-flash-image,
+-- gemini-3.1-flash-image-preview, gemini-3.1-flash-lite-image) returns a
+-- real 429 with an explicit QuotaFailure detail naming `limit: 0` for
+-- generate_content_free_tier_requests — confirmed live across all of them,
+-- not assumed. No UI, action, or query references yt_thumbnails anymore
+-- as of this migration.
+--
+-- Written but NOT applied, same as 0029_drop_prayers.sql — your call, not
+-- run automatically. If image generation becomes viable later (paid
+-- billing, or a project with nonzero quota), re-add the table from
+-- migration 0023_youtube_scripts.sql's original definition rather than
+-- running this.
+drop table if exists public.yt_thumbnails;

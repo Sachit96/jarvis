@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { researchTopic, generateScript, generateThumbnail } from "@/lib/ai/providers/gemini-youtube";
+import { researchTopic, generateScript } from "@/lib/ai/providers/gemini-youtube";
 
 export interface GenerateScriptResult {
   ok: boolean;
@@ -56,44 +56,13 @@ export async function deleteScriptAction(id: string): Promise<void> {
   revalidatePath("/youtube");
 }
 
-export interface GenerateThumbnailsResult {
-  ok: boolean;
-  error?: string;
-  count?: number;
-}
-
-/** Generates 3 variants per the work order. Each is tracked/attempted independently — if the API has zero free quota (verified tonight), the first failure's message is returned and the rest aren't attempted. */
-export async function generateThumbnailsAction(scriptId: string, hookOrTitle: string): Promise<GenerateThumbnailsResult> {
-  const supabase = await createClient();
-  const prompts = [
-    `YouTube thumbnail background, bold and high-contrast, for a video about: ${hookOrTitle}. Abstract/graphic style, no text overlay, no real people.`,
-    `YouTube thumbnail background, vibrant colors, dramatic lighting, for a video about: ${hookOrTitle}. No text overlay, no real people.`,
-    `YouTube thumbnail background, minimalist composition, for a video about: ${hookOrTitle}. No text overlay, no real people.`,
-  ];
-
-  let count = 0;
-  for (const prompt of prompts) {
-    const result = await generateThumbnail(prompt);
-    if (!result.ok) {
-      if (count === 0) return { ok: false, error: result.error };
-      break; // partial success — keep what we got
-    }
-    await supabase.from("yt_thumbnails").insert({
-      script_id: scriptId,
-      prompt,
-      image_base64: result.imageBase64,
-      mime_type: result.mimeType ?? "image/png",
-    });
-    count += 1;
-  }
-
-  revalidatePath("/youtube");
-  return { ok: count > 0, count, error: count === 0 ? "No thumbnails generated" : undefined };
-}
-
-export async function selectThumbnailAction(id: string, scriptId: string): Promise<void> {
-  const supabase = await createClient();
-  await supabase.from("yt_thumbnails").update({ selected: false }).eq("script_id", scriptId);
-  await supabase.from("yt_thumbnails").update({ selected: true }).eq("id", id);
-  revalidatePath("/youtube");
-}
+// Thumbnail generation (generateThumbnailsAction/selectThumbnailAction) was
+// removed this session — every image-capable model on this Gemini key
+// (gemini-2.5-flash-image, gemini-3-pro-image(-preview),
+// gemini-3.1-flash-image(-preview), gemini-3.1-flash-lite-image) returns a
+// real 429 with an explicit QuotaFailure detail naming `limit: 0` for
+// generate_content_free_tier_requests — confirmed live, not assumed, across
+// all of them. A button that can never succeed is worse than no button
+// (Business Pipeline Cockpit / Lead Research cleanup work order, Phase 1d).
+// The yt_thumbnails table itself was left alone rather than dropped — see
+// migrations/0031_drop_yt_thumbnails.sql, written but not applied, your call.
