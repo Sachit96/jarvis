@@ -34,8 +34,17 @@ export function GoalsRailCard({ goals, className }: { goals: Goal[]; className?:
           <div className="flex-1 space-y-3 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {visible.map((goal) => (
               <div key={goal.id}>
-                <div className="flex items-baseline justify-between gap-2">
-                  <p className="min-w-0 flex-1 truncate text-[13px] font-medium">{goal.title}</p>
+                {/* line-clamp-2, not truncate (single-line) — found live at
+                    768px (Cleanup work order Phase 4): the md-breakpoint
+                    2-column layout gives this card a narrower column than
+                    either the 390px single-column or the 1440px 2-column
+                    layout, and truncate was cutting real goal titles down
+                    to a few words ("Week 1 — first client clos…") even
+                    though the exact same titles render in full at both
+                    narrower and wider viewports. Matches the pattern
+                    PriorityTasksWidget already uses for the same reason. */}
+                <div className="flex items-start justify-between gap-2">
+                  <p className="min-w-0 flex-1 line-clamp-2 text-[13px] font-medium">{goal.title}</p>
                   <span className="shrink-0 text-right font-mono text-[13px] font-medium tabular-nums text-brand">
                     {goal.progress_percent}%
                   </span>
