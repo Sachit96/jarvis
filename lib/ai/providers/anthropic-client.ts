@@ -31,10 +31,16 @@ export const ANTHROPIC_PRICING: Record<string, { inputPerMTok: number; outputPer
   "claude-haiku-4-5": { inputPerMTok: 1.0, outputPerMTok: 5.0 },
 };
 
-function computeCostUsd(model: string, inputTokens: number, outputTokens: number): number {
+/** Exported for tests/anthropic-client.test.ts — the actual tokens x rate -> dollars math, not a copy of it. */
+export function computeCostUsd(model: string, inputTokens: number, outputTokens: number): number {
   const rate = ANTHROPIC_PRICING[model];
   if (!rate) return 0; // unknown model — never block on a pricing-table gap, but this should be caught in review before it ships
   return (inputTokens / 1_000_000) * rate.inputPerMTok + (outputTokens / 1_000_000) * rate.outputPerMTok;
+}
+
+/** The exact boundary callAnthropic's spend guard checks (`spent >= cap` blocks) — extracted so it's directly testable without mocking Supabase. */
+export function isOverSpendCap(spent: number, cap: number): boolean {
+  return spent >= cap;
 }
 
 function getApiKey(): string {
@@ -78,7 +84,7 @@ export async function isAnthropicAvailable(): Promise<boolean> {
   if (!process.env.ANTHROPIC_API_KEY) return false;
   if (!(await isSpendTrackingAvailable())) return false;
   const [cap, spent] = await Promise.all([getAnthropicSpendCap(), getAnthropicSpendToDate()]);
-  return spent < cap;
+  return !isOverSpendCap(spent, cap);
 }
 
 export interface AnthropicCallOptions {
@@ -118,7 +124,7 @@ export async function callAnthropic(options: AnthropicCallOptions): Promise<Anth
     throw new Error("Anthropic spend tracking isn't set up yet (migration 0025 hasn't run) — refusing to make an unmetered paid call.");
   }
   const [cap, spent] = await Promise.all([getAnthropicSpendCap(), getAnthropicSpendToDate()]);
-  if (spent >= cap) {
+  if (isOverSpendCap(spent, cap)) {
     throw new Error(`Anthropic spend cap reached ($${spent.toFixed(2)} / $${cap.toFixed(2)}) — configure a higher cap in Settings to continue.`);
   }
 

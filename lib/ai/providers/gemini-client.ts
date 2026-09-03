@@ -66,9 +66,20 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function withJitter(ms: number) {
+/** Exported for tests/gemini-client.test.ts — the actual ±25% jitter math, not a copy of it. */
+export function withJitter(ms: number) {
   const jitter = ms * JITTER_FRACTION * (Math.random() * 2 - 1); // ±25%
   return Math.max(0, Math.round(ms + jitter));
+}
+
+/** 429 (rate limit) and 503 (transient "high demand", observed live on the free-tier Gemma endpoint) are both worth retrying; anything else is a real failure. Extracted so the exact retry decision is unit-testable without mocking fetch. */
+export function isRetryableStatus(status: number): boolean {
+  return status === 429 || status === 503;
+}
+
+/** The exact boundary callGemini's budget guard checks — extracted so "does N count as over the limit" is directly testable without mocking Supabase. count is 1-indexed (the value incrementGeminiUsage returns after recording this call), so count === dailyLimit is still within budget; only count > dailyLimit trips it. */
+export function isOverDailyLimit(count: number, dailyLimit: number): boolean {
+  return count > dailyLimit;
 }
 
 export interface GeminiPart {
@@ -189,7 +200,7 @@ export async function callGemini(options: GeminiCallOptions): Promise<GeminiCall
     // five more times for the same logical request. Tracked per-model, not
     // shared — the two tiers have independent, very different ceilings.
     const count = await incrementGeminiUsage(supabase, model);
-    if (count > dailyLimit) {
+    if (isOverDailyLimit(count, dailyLimit)) {
       // No fallback to the other tier here, ever — a call routed to
       // "structured" needs responseSchema/tools reliability that
       // "high_volume" can't guarantee (see the tier doc comment above),
@@ -227,7 +238,7 @@ export async function callGemini(options: GeminiCallOptions): Promise<GeminiCall
     // 429 (rate limit) and 503 (transient "high demand" — observed live,
     // twice, on the free-tier Gemma endpoint during verification) are both
     // worth retrying; anything else is a real failure.
-    if ((res.status !== 429 && res.status !== 503) || attempt === RETRY_DELAYS_MS.length) break;
+    if (!isRetryableStatus(res.status) || attempt === RETRY_DELAYS_MS.length) break;
     await sleep(withJitter(RETRY_DELAYS_MS[attempt]));
   }
 
