@@ -13,6 +13,7 @@ import {
 import { getDailyRecommendation } from "@/lib/db/queries/mentor";
 import { getPipelineStages, getDeals, getContracts, computeMrr, computePipelineSummary } from "@/lib/db/queries/business";
 import { getTodayRoutineItems } from "@/lib/db/queries/routine";
+import { getHabits, getHabitLogsForHeatmap } from "@/lib/db/queries/life";
 import { getUpcoming, getRecentActivity } from "@/lib/db/queries/command-center";
 import { getLifeScoreSnapshot, getLifeScoreTrend } from "@/lib/db/queries/life-score";
 import { hasHevyKey } from "@/lib/providers/workout/hevy-client";
@@ -29,6 +30,7 @@ import { OverallProgressChart } from "@/components/dashboard/overall-progress-ch
 import { DetailStatsCard } from "@/components/dashboard/detail-stats-card";
 import { GoalsRailCard } from "@/components/dashboard/goals-rail-card";
 import { NotesRailCard } from "@/components/dashboard/notes-rail-card";
+import { HabitHeatmapCard } from "@/components/dashboard/habit-heatmap-card";
 import { HevyAutoSync } from "@/components/health/hevy-auto-sync";
 
 function todayStr() {
@@ -61,6 +63,7 @@ export default async function DashboardPage() {
     lifeScoreTrend,
     goals,
     memoryEntries,
+    habits,
   ] = await Promise.all([
     getPriorityTasks(supabase, 4),
     getAccounts(supabase),
@@ -79,6 +82,7 @@ export default async function DashboardPage() {
     getLifeScoreTrend(supabase),
     getGoals(supabase),
     getMemoryEntries(supabase),
+    getHabits(supabase),
   ]);
 
   const financeTotals = computeAssetLiabilityTotals(accounts);
@@ -94,6 +98,22 @@ export default async function DashboardPage() {
   const recentWorkoutIds = workouts.filter((w) => new Date(w.started_at) >= sevenDaysAgo).map((w) => w.id);
   const recentSets = await getWorkoutSets(supabase, recentWorkoutIds);
   const volume7d = computeWorkoutVolume(recentSets);
+
+  // 84 days = the 12 weeks HabitHeatmapCard actually renders — the Routine
+  // page's own getHabitLogsForHeatmap call only asks for 35 (its own
+  // narrower view), so this needs its own wider window, not the default.
+  const habitLogs = await getHabitLogsForHeatmap(
+    supabase,
+    habits.map((h) => h.id),
+    84,
+  );
+  const datesByHabit = new Map<string, Set<string>>();
+  for (const log of habitLogs) {
+    if (!log.completed) continue;
+    const set = datesByHabit.get(log.habit_id) ?? new Set<string>();
+    set.add(log.log_date);
+    datesByHabit.set(log.habit_id, set);
+  }
 
   return (
     <div className="flex flex-col">
@@ -185,6 +205,11 @@ export default async function DashboardPage() {
           <RecentActivityCard items={recentActivity} compact className="flex-1" />
         </div>
       </div>
+
+      {/* Habit history — full width, below the 4-column grid, per the
+          dashboard spec. HabitHeatmapCard was fully built to this spec but
+          never wired in until now (Cleanup work order follow-up). */}
+      <HabitHeatmapCard habits={habits} datesByHabit={datesByHabit} className="mt-4" />
     </div>
   );
 }

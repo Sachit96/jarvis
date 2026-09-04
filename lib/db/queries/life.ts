@@ -52,10 +52,11 @@ export async function getHabits(supabase: Client) {
 
 const HEATMAP_DAYS = 35;
 
-export async function getHabitLogsForHeatmap(supabase: Client, habitIds: string[]) {
+/** days defaults to the Routine page's own 35-day view — HabitHeatmapCard on the home page (12 weeks = 84 days) passes its own wider window rather than changing what every other caller gets. */
+export async function getHabitLogsForHeatmap(supabase: Client, habitIds: string[], days: number = HEATMAP_DAYS) {
   if (habitIds.length === 0) return [];
   const since = new Date();
-  since.setDate(since.getDate() - HEATMAP_DAYS);
+  since.setDate(since.getDate() - days);
   const sinceStr = since.toISOString().slice(0, 10);
 
   const { data, error } = await supabase
