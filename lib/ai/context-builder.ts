@@ -24,6 +24,8 @@ import {
 import { getTodayRoutineItems } from "@/lib/db/queries/routine";
 import { getCourses, getAssessments } from "@/lib/db/queries/uni";
 import { courseGrade, riskScore, findOverloadedWeeks } from "@/lib/uni/grades";
+import { getMemoryEntries } from "@/lib/db/queries/memory";
+import { buildNoteContext } from "@/lib/obsidian/context";
 
 type Client = SupabaseClient<Database>;
 
@@ -51,6 +53,7 @@ export async function buildMentorContext(supabase: Client) {
     contacts,
     activities,
     courses,
+    memoryEntries,
   ] = await Promise.all([
     getPriorityTasks(supabase, 10),
     getTodayRoutineItems(supabase),
@@ -71,6 +74,9 @@ export async function buildMentorContext(supabase: Client) {
     // gemini-usage.ts's isMissingUsageTracking) — the brief just omits the
     // academics section instead of failing the whole context build.
     getCourses(supabase).catch(() => []),
+    // Degrades to [] the same way if migration 0014 hasn't run — see
+    // getMemoryEntries' own isMissingTable check.
+    getMemoryEntries(supabase),
   ]);
   const assessments = courses.length > 0 ? await getAssessments(supabase, courses.map((c) => c.id)).catch(() => []) : [];
 
@@ -100,6 +106,20 @@ export async function buildMentorContext(supabase: Client) {
   const overloadedWeeks = findOverloadedWeeks(
     assessments.map((a) => ({ ...a, title: a.title, courseCode: courses.find((c) => c.id === a.course_id)?.code ?? "?" })),
   );
+
+  // Memory entries, most-important-first (getMemoryEntries already orders
+  // pinned first, then most-recently-updated — exactly the order
+  // buildNoteContext expects). Excludes expired entries — an entry past
+  // its expires_at shouldn't be handed to the model as current truth, even
+  // though the Memory UI itself still lists it (a separate concern this
+  // doesn't touch). lib/obsidian/context.ts was fully built to this exact
+  // ~4000-char budget for the original Obsidian integration spec but had
+  // no caller anywhere — this is that wiring: daily brief, weekly review,
+  // and the general mentor chat all read buildMentorContext, so all three
+  // gain pinned/recent memory as context, not just Obsidian-authored notes
+  // specifically (the budget function itself is source-agnostic).
+  const activeMemoryEntries = memoryEntries.filter((e) => !e.expires_at || e.expires_at >= today);
+  const noteContext = buildNoteContext(activeMemoryEntries.map((e) => ({ title: e.title, body: e.body })));
 
   return {
     today,
@@ -149,6 +169,17 @@ export async function buildMentorContext(supabase: Client) {
     uni: {
       courses: coursesWithRisk,
       overloadedWeeks: overloadedWeeks.map((w) => ({ windowStart: w.windowStart, items: w.items.map((i) => `${i.courseCode} ${i.title}`) })),
+    },
+    // Pinned/recent memory entries packed into ~4000 chars, most-important-
+    // first — see the comment above where this is built. truncated/
+    // omittedCount let the model (and the FOLLOWUP_NUDGE-style prompt
+    // instructions in mentor-brief.ts) know when it's seeing a partial
+    // picture rather than silently treating the budget cutoff as "that's
+    // everything."
+    notes: {
+      text: noteContext.text,
+      includedCount: noteContext.usedTitles.length,
+      omittedCount: activeMemoryEntries.length - noteContext.usedTitles.length,
     },
   };
 }

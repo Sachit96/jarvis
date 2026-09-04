@@ -38,6 +38,14 @@ const FOLLOWUP_NUDGE = `If context.followUps.staleDeals or staleContacts is non-
  */
 const ACADEMICS_NUDGE = `For the Academics section: if context.uni.courses is empty, skip the section entirely (don't mention it). Otherwise, call out any course with risk >= 61 by name with its current grade vs target, and name any entry in context.uni.overloadedWeeks specifically (e.g. "Three high-weight items land in the same week for QMS and STAT").`;
 
+/**
+ * lib/obsidian/context.ts's note-context budget, wired in here — see its
+ * own comment for why this needed a real call site. context.notes.text is
+ * pinned/recently-updated memory entries (facts, preferences, protocols),
+ * not a summary the model should just restate.
+ */
+const NOTES_NUDGE = `context.notes.text holds pinned/recent entries from the user's persistent memory system — facts, preferences, and protocols they've explicitly saved for you to know. If context.notes.text is empty, ignore it. Otherwise, weave in anything genuinely relevant to what you're writing right now — don't summarize or list the notes themselves, and don't force one in if nothing actually applies. If context.notes.omittedCount > 0, that just means older/lower-priority entries didn't fit the budget — never mention the omission itself to the user.`;
+
 export async function generateDailyBrief(supabase: Client) {
   const provider = getMentorProvider();
   const [context, persona] = await Promise.all([buildMentorContext(supabase), buildPersonaPrefix(supabase)]);
@@ -46,6 +54,7 @@ export async function generateDailyBrief(supabase: Client) {
     persona,
     DAILY_INSTRUCTIONS,
     FOLLOWUP_NUDGE,
+    NOTES_NUDGE,
     ACADEMICS_NUDGE,
     VOICE_GUARDRAIL,
     JSON_INSTRUCTION,
@@ -93,6 +102,7 @@ export async function generateWeeklyReview(supabase: Client) {
     persona,
     WEEKLY_INSTRUCTIONS,
     FOLLOWUP_NUDGE,
+    NOTES_NUDGE,
     ACADEMICS_NUDGE,
     VOICE_GUARDRAIL,
     JSON_INSTRUCTION,
@@ -144,6 +154,7 @@ export async function runGeneralMentorChat(supabase: Client, userContent: string
     persona,
     "Answer questions, give advice, and reference specific numbers from their context when relevant. Keep replies concise (2-5 sentences) unless asked for depth.",
     FOLLOWUP_NUDGE,
+    NOTES_NUDGE,
     VOICE_GUARDRAIL,
     `The user's current context as JSON: ${JSON.stringify(context)}`,
   ].join("\n\n");
