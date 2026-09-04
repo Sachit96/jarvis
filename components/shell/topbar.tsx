@@ -15,7 +15,7 @@ export function Topbar({ accounts }: { accounts: Account[] }) {
         <Link
           href="/settings"
           aria-label="Settings"
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground ring-1 ring-border transition-colors hover:bg-white/[0.04] hover:text-foreground md:hidden"
+          className="relative flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground ring-1 ring-border transition-colors after:absolute after:-inset-1.5 hover:bg-white/[0.04] hover:text-foreground md:hidden"
         >
           <Settings className="h-[18px] w-[18px]" />
         </Link>

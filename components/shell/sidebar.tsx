@@ -107,7 +107,12 @@ export function Sidebar() {
               href={item.href}
               title={collapsed ? item.label : undefined}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2 text-body transition-colors",
+                // relative + after:-inset-y-0.5 — rows measure ~40px tall
+                // from py-2 alone; this closes the last 4px to a true 44px
+                // tap target without changing the visible row padding/
+                // rhythm across all 12 items (Cleanup work order follow-
+                // up, tap targets).
+                "relative flex items-center gap-3 rounded-xl px-3 py-2 text-body transition-colors after:absolute after:-inset-y-0.5",
                 collapsed && "justify-center px-0",
                 isActive
                   ? "bg-sidebar-accent text-sidebar-foreground"
@@ -142,7 +147,7 @@ export function Sidebar() {
               <Link
                 href="/settings"
                 aria-label="Settings"
-                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors after:absolute after:-inset-2 hover:bg-sidebar-accent hover:text-sidebar-foreground"
               >
                 <SettingsIcon className="h-4 w-4" strokeWidth={1.75} />
               </Link>
@@ -154,7 +159,7 @@ export function Sidebar() {
           onClick={toggle}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           className={cn(
-            "mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2 text-body text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
+            "relative mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2 text-body text-sidebar-foreground/60 transition-colors after:absolute after:-inset-y-0.5 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
             collapsed && "justify-center px-0",
           )}
         >

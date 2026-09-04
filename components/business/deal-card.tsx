@@ -66,7 +66,7 @@ export function DealCard({
         <button
           onClick={() => startTransition(() => deleteDealAction(deal.id))}
           aria-label="Delete deal"
-          className="shrink-0 text-muted-foreground hover:text-danger"
+          className="relative after:absolute after:-inset-3.5 shrink-0 text-muted-foreground hover:text-danger"
         >
           <Trash2 className="h-3.5 w-3.5" />
         </button>

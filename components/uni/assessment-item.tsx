@@ -90,7 +90,7 @@ export function AssessmentItem({ assessment, courseCode, courseColor }: { assess
       <button
         type="button"
         onClick={() => startTransition(() => deleteAssessmentAction(assessment.id, assessment.course_id))}
-        className="text-muted-foreground/60 hover:text-danger"
+        className="relative after:absolute after:-inset-3.5 text-muted-foreground/60 hover:text-danger"
         aria-label="Delete assessment"
       >
         <Trash2 className="h-3.5 w-3.5" />

@@ -78,7 +78,7 @@ export function WorkoutSessionCard({
             </p>
           </div>
         </div>
-        <button onClick={handleDelete} aria-label="Delete session" className="text-muted-foreground hover:text-danger">
+        <button onClick={handleDelete} aria-label="Delete session" className="relative after:absolute after:-inset-3.5 text-muted-foreground hover:text-danger">
           <Trash2 className="h-4 w-4" />
         </button>
       </div>

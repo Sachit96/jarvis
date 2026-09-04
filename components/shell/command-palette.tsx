@@ -159,7 +159,7 @@ export function CommandPalette() {
       <button
         onClick={() => setOpen(true)}
         aria-label="Search everything"
-        className="hidden h-8 w-56 items-center gap-2 rounded-lg px-2.5 text-muted-foreground ring-1 ring-border transition-colors hover:bg-white/[0.04] hover:text-foreground sm:flex lg:w-72"
+        className="relative hidden h-8 w-56 items-center gap-2 rounded-lg px-2.5 text-muted-foreground ring-1 ring-border transition-colors after:absolute after:-inset-y-2 hover:bg-white/[0.04] hover:text-foreground sm:flex lg:w-72"
       >
         <Search className="h-3.5 w-3.5 shrink-0" />
         <span className="flex-1 truncate text-left text-caption">Search anything...</span>
@@ -170,7 +170,7 @@ export function CommandPalette() {
       <button
         onClick={() => setOpen(true)}
         aria-label="Search everything"
-        className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground ring-1 ring-border transition-colors hover:bg-white/[0.04] hover:text-foreground sm:hidden"
+        className="relative flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground ring-1 ring-border transition-colors after:absolute after:-inset-1.5 hover:bg-white/[0.04] hover:text-foreground sm:hidden"
       >
         <Search className="h-[18px] w-[18px]" />
       </button>

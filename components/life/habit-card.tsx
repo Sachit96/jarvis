@@ -115,10 +115,19 @@ export function HabitCard({
           <button
             onClick={handleTogglePin}
             aria-label={pinned ? "Unpin" : "Pin to top"}
-            className={cn("hover:text-foreground", pinned ? "text-brand" : "text-muted-foreground")}
+            className={cn("relative after:absolute after:-inset-3.5 hover:text-foreground", pinned ? "text-brand" : "text-muted-foreground")}
           >
             <Pin className="h-3.5 w-3.5" fill={pinned ? "currentColor" : "none"} />
           </button>
+          {/* Move up/down: NOT given the same after:-inset-3.5 tap-target
+              expansion as every other icon button in this pass — the two
+              are stacked directly against each other with no gap, so a
+              44px expansion on each would make their tap zones overlap
+              each other more than they'd cover empty space, actively
+              making mis-taps between "up" and "down" more likely, not
+              less. A real fix needs more vertical space between them than
+              this compact stepper has; left as a known exception rather
+              than a naive copy-paste of the same fix. */}
           <div className="flex flex-col">
             <button onClick={() => handleMove("up")} aria-label="Move up" className="text-muted-foreground hover:text-foreground">
               <ChevronUp className="h-3.5 w-3.5" />
@@ -127,7 +136,7 @@ export function HabitCard({
               <ChevronDown className="h-3.5 w-3.5" />
             </button>
           </div>
-          <button onClick={handleDelete} aria-label="Delete habit" className="text-muted-foreground hover:text-danger">
+          <button onClick={handleDelete} aria-label="Delete habit" className="relative after:absolute after:-inset-3.5 text-muted-foreground hover:text-danger">
             <Trash2 className="h-4 w-4" />
           </button>
         </div>

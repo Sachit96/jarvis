@@ -23,7 +23,7 @@ export function WorkoutSetItem({ set, exerciseName }: { set: WorkoutSet; exercis
         {set.weight_kg !== null ? ` · ${formatLbs(Number(set.weight_kg), 1)} lbs` : ""}
         {set.reps !== null ? ` × ${set.reps}` : ""}
       </span>
-      <button onClick={handleDelete} aria-label="Delete set" className="text-muted-foreground hover:text-danger">
+      <button onClick={handleDelete} aria-label="Delete set" className="relative after:absolute after:-inset-3.5 text-muted-foreground hover:text-danger">
         <X className="h-3.5 w-3.5" />
       </button>
     </li>

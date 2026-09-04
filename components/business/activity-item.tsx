@@ -24,7 +24,7 @@ export function ActivityItem({ activity }: { activity: Activity }) {
       <button
         onClick={() => startTransition(() => deleteActivityAction(activity.id))}
         aria-label="Delete activity"
-        className="shrink-0 text-muted-foreground hover:text-danger"
+        className="relative after:absolute after:-inset-3.5 shrink-0 text-muted-foreground hover:text-danger"
       >
         <X className="h-3 w-3" />
       </button>

@@ -41,7 +41,7 @@ function OnboardingTaskRow({ task }: { task: OnboardingTask }) {
       <button
         onClick={() => startTransition(() => deleteOnboardingTaskAction(task.id))}
         aria-label="Delete onboarding task"
-        className="text-muted-foreground hover:text-danger"
+        className="relative after:absolute after:-inset-3.5 text-muted-foreground hover:text-danger"
       >
         <X className="h-3 w-3" />
       </button>

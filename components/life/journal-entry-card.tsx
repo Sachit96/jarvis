@@ -43,7 +43,7 @@ export function JournalEntryCard({ entry }: { entry: JournalEntry }) {
         <button
           onClick={handleDelete}
           aria-label="Delete entry"
-          className="shrink-0 text-muted-foreground hover:text-danger"
+          className="relative after:absolute after:-inset-3.5 shrink-0 text-muted-foreground hover:text-danger"
         >
           <Trash2 className="h-4 w-4" />
         </button>

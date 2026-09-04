@@ -29,7 +29,7 @@ export function BudgetBar({ budget, spent }: { budget: Budget; spent: number }) 
         <button
           onClick={handleDelete}
           aria-label="Delete budget"
-          className="text-muted-foreground hover:text-danger"
+          className="relative after:absolute after:-inset-3.5 text-muted-foreground hover:text-danger"
         >
           <Trash2 className="h-4 w-4" />
         </button>

@@ -43,10 +43,10 @@ export function ScriptCard({ script, youtubeConnected }: { script: Script; youtu
               ))}
             </SelectContent>
           </Select>
-          <button onClick={() => startTransition(() => deleteScriptAction(script.id))} className="text-muted-foreground/60 hover:text-danger" aria-label="Delete script">
+          <button onClick={() => startTransition(() => deleteScriptAction(script.id))} className="relative after:absolute after:-inset-3.5 text-muted-foreground/60 hover:text-danger" aria-label="Delete script">
             <Trash2 className="h-3.5 w-3.5" />
           </button>
-          <button onClick={() => setExpanded((e) => !e)} className="text-muted-foreground hover:text-foreground" aria-label="Toggle details">
+          <button onClick={() => setExpanded((e) => !e)} className="relative after:absolute after:-inset-3.5 text-muted-foreground hover:text-foreground" aria-label="Toggle details">
             {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
         </div>

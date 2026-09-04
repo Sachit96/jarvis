@@ -17,7 +17,12 @@ export function ModuleTabs({ tabs }: { tabs: ModuleTab[] }) {
             key={tab.href}
             href={tab.href}
             className={cn(
-              "shrink-0 border-b-2 px-3 py-2 text-sm whitespace-nowrap transition-colors",
+              // relative + after:-inset-y-1.5 — real sub-navigation
+              // (Dashboard/Pipeline/Clients/... on every domain page),
+              // ~38px tall from py-2 alone; closed to 44px+ the same way
+              // as the sidebar's own nav items (Cleanup work order
+              // follow-up, tap targets).
+              "relative shrink-0 border-b-2 px-3 py-2 text-sm whitespace-nowrap transition-colors after:absolute after:-inset-y-1.5",
               isActive
                 ? "border-brand text-brand"
                 : "border-transparent text-muted-foreground hover:text-foreground",

@@ -89,7 +89,7 @@ export function MemoryDrawer({
               <button
                 onClick={() => setConfirmingDelete(true)}
                 aria-label="Delete"
-                className="rounded-md p-1.5 text-muted-foreground hover:bg-danger/10 hover:text-danger"
+                className="relative after:absolute after:-inset-3.5 rounded-md p-1.5 text-muted-foreground hover:bg-danger/10 hover:text-danger"
               >
                 <Trash2 className="h-4 w-4" />
               </button>

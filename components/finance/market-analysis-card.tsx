@@ -51,7 +51,7 @@ export function MarketAnalysisCard({ analysis }: { analysis: MarketAnalysis }) {
         <button
           onClick={() => startTransition(() => deleteMarketAnalysisAction(analysis.id))}
           aria-label="Delete analysis"
-          className="text-muted-foreground hover:text-danger"
+          className="relative after:absolute after:-inset-3.5 text-muted-foreground hover:text-danger"
         >
           <Trash2 className="h-4 w-4" />
         </button>
