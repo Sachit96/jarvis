@@ -2,13 +2,15 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { refreshAccessToken } from "@/lib/youtube/oauth";
 
-const UPLOAD_ENDPOINT = "https://www.googleapis.com/upload/youtube/v3/videos";
+const RESUMABLE_INIT_ENDPOINT = "https://www.googleapis.com/upload/youtube/v3/videos";
 const VIDEOS_ENDPOINT = "https://www.googleapis.com/youtube/v3/videos";
 
 type Connection = { access_token: string; refresh_token: string; token_expires_at: string };
 
-/** Refreshes the stored access token if it's expired (or close to it), persisting the new one — every upload/publish call goes through this first rather than assuming the stored token is still good. */
-async function getValidAccessToken(connection: Connection): Promise<string> {
+/**
+ * Refreshes the stored access token if it's expired (or close to it), persisting the new one — every upload/publish call goes through this first rather than assuming the stored token is still good. Exported (was private) — the resumable-upload flow's session-initiation step needs a valid token too, and per initiateResumableSession's own comment, so does the browser for the direct-to-YouTube PUT that follows it.
+ */
+export async function getValidAccessToken(connection: Connection): Promise<string> {
   const expiresAt = new Date(connection.token_expires_at).getTime();
   const bufferMs = 60_000; // refresh a minute early rather than racing an actual expiry
   if (Date.now() < expiresAt - bufferMs) return connection.access_token;
@@ -22,34 +24,50 @@ async function getValidAccessToken(connection: Connection): Promise<string> {
   return refreshed.access_token;
 }
 
-export interface UploadVideoInput {
+export interface InitiateResumableInput {
   title: string;
   description: string;
-  videoBytes: Uint8Array;
+  fileSizeBytes: number;
   mimeType: string;
 }
 
-export interface UploadVideoResult {
-  videoId: string;
+export interface ResumableSession {
+  sessionUri: string;
+  /**
+   * Handed to the BROWSER so it can PUT the video bytes directly to
+   * `sessionUri` — YouTube's resumable upload protocol requires
+   * `Authorization: Bearer <token>` on that PUT too (verified against
+   * Google's current docs before building this), not just on this
+   * session-initiation call, and there's no way to pre-authorize the
+   * session URI itself to skip that. This is the deliberate point of the
+   * whole rebuild: routing an access token to the client, once, for a
+   * request the client makes directly to googleapis.com, is the tradeoff
+   * that lets video BYTES skip this app's own backend entirely — the
+   * alternative (proxying the bytes through a Server Action, the old
+   * approach) is what hit Netlify's real ~6MB function body ceiling
+   * regardless of the 100MB Next.js config, and would keep hitting it no
+   * matter how the proxy were written. Access tokens here are short-lived
+   * (Google's standard ~1hr expiry) and scoped to youtube.upload only
+   * (see oauth.ts's YOUTUBE_OAUTH_SCOPE) — acceptable for a single-user
+   * personal app; never logged, never persisted client-side, used exactly
+   * once for the PUT that immediately follows.
+   */
+  accessToken: string;
 }
 
 /**
- * videos.insert via the "multipart" upload type — a single request
- * combining the metadata JSON and the video binary in one
- * multipart/related body (RFC 2387), not the "resumable" upload type.
- * Resumable is what Google recommends for large files or flaky
- * connections (chunked, resumable session), but is meaningfully more
- * implementation complexity (a session-init request, then chunked PUTs
- * with Content-Range headers, retry/resume bookkeeping) — multipart is a
- * deliberate simplicity tradeoff for a personal, single-user tool
- * uploading occasional videos, not a production video pipeline. Revisit
- * if uploads start timing out on larger files.
+ * Step 1 of YouTube's resumable upload protocol (developers.google.com/
+ * youtube/v3/guides/using_resumable_upload_protocol, verified against
+ * that page before building this, not recalled) — a small, metadata-only
+ * POST (no video bytes) that returns a session URI in the response's
+ * Location header. Step 2 (the actual byte PUT to that URI) happens
+ * entirely client-side — see ResumableSession's own comment for why.
  *
- * privacyStatus is always "private" here — never anything else. Making a
- * video public is exclusively approveToPublish()'s job (videos.update),
- * a separate explicit action, never a parameter this function accepts.
+ * privacyStatus is always "private" here — never anything else, same
+ * invariant the old uploadVideo() enforced. Making a video public stays
+ * exclusively setVideoPublic()'s job below, a separate explicit action.
  */
-export async function uploadVideo(connection: Connection, input: UploadVideoInput): Promise<UploadVideoResult> {
+export async function initiateResumableSession(connection: Connection, input: InitiateResumableInput): Promise<ResumableSession> {
   const accessToken = await getValidAccessToken(connection);
 
   const metadata = {
@@ -57,27 +75,25 @@ export async function uploadVideo(connection: Connection, input: UploadVideoInpu
     status: { privacyStatus: "private" },
   };
 
-  const boundary = `jarvis_yt_upload_${Date.now()}`;
-  const metadataPart = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadata)}\r\n`;
-  const videoPartHeader = `--${boundary}\r\nContent-Type: ${input.mimeType}\r\n\r\n`;
-  const closing = `\r\n--${boundary}--`;
-
-  const body = Buffer.concat([Buffer.from(metadataPart, "utf8"), Buffer.from(videoPartHeader, "utf8"), Buffer.from(input.videoBytes), Buffer.from(closing, "utf8")]);
-
-  const res = await fetch(`${UPLOAD_ENDPOINT}?uploadType=multipart&part=snippet,status`, {
+  const res = await fetch(`${RESUMABLE_INIT_ENDPOINT}?uploadType=resumable&part=snippet,status`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
-      "Content-Type": `multipart/related; boundary=${boundary}`,
+      "Content-Type": "application/json; charset=UTF-8",
+      "X-Upload-Content-Length": String(input.fileSizeBytes),
+      "X-Upload-Content-Type": input.mimeType,
     },
-    body,
+    body: JSON.stringify(metadata),
   });
 
   if (!res.ok) {
-    throw new Error(`YouTube upload failed: ${res.status} ${res.statusText}`);
+    throw new Error(`YouTube resumable session init failed: ${res.status} ${res.statusText}`);
   }
-  const data = await res.json();
-  return { videoId: data.id };
+  const sessionUri = res.headers.get("Location");
+  if (!sessionUri) {
+    throw new Error("YouTube didn't return a resumable session URI (missing Location header)");
+  }
+  return { sessionUri, accessToken };
 }
 
 /** The ONLY path in this app that makes a video public — videos.update with part=status. Never called automatically; only from the explicit "Approve to publish" action, which exists specifically so no upload goes public without a real click. */

@@ -5,16 +5,18 @@ const nextConfig: NextConfig = {
   devIndicators: {
     position: "bottom-right",
   },
-  // Default Server Action body limit is 1MB — nowhere near enough for
-  // uploadVideoToYouTubeAction's video-file input (Work Order 7).
-  // Verified against Next.js's own current docs before setting this (not
-  // guessed). NOT verified: whether Netlify's deployed function runtime
-  // enforces its own lower request-body ceiling regardless of this
-  // app-level config — test with a real, small video file first once
-  // YouTube is connected, before assuming large uploads will go through.
+  // Was 100mb for uploadVideoToYouTubeAction's video-file input (Work
+  // Order 7) — that path routed the whole video through a Server Action
+  // and got rebuilt as a resumable upload straight to YouTube instead
+  // (Cleanup work order follow-up) specifically because Netlify's real
+  // function body ceiling is ~6MB regardless of this app-level config, so
+  // 100mb here was never actually reachable in production. Nothing left
+  // in this app sends more than a syllabus PDF (components/uni/syllabus-
+  // upload.tsx) through a Server Action — 10mb is generous headroom for
+  // that with no reason to leave a much larger ceiling open.
   experimental: {
     serverActions: {
-      bodySizeLimit: "100mb",
+      bodySizeLimit: "10mb",
     },
   },
 };

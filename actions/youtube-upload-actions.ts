@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getYtConnection } from "@/lib/db/queries/youtube";
-import { uploadVideo, setVideoPublic } from "@/lib/youtube/upload";
+import { initiateResumableSession, setVideoPublic } from "@/lib/youtube/upload";
 
 export async function disconnectYouTubeAction(): Promise<void> {
   const supabase = await createClient();
@@ -11,45 +11,58 @@ export async function disconnectYouTubeAction(): Promise<void> {
   revalidatePath("/settings");
 }
 
-export interface UploadVideoResult {
+export interface InitiateUploadResult {
   ok: boolean;
   error?: string;
-  videoId?: string;
+  sessionUri?: string;
+  accessToken?: string;
 }
 
 /**
- * The videos.insert call path. Always uploads as privacyStatus: "private"
- * (enforced in lib/youtube/upload.ts, not a parameter here) — going
- * public is exclusively approveToPublishAction's job below.
+ * Step 1 only — hands the browser a resumable session URI + a short-lived
+ * access token, then gets out of the way. The video bytes themselves never
+ * reach this server: the browser PUTs them directly to sessionUri (see
+ * components/youtube/upload-to-youtube.tsx). This is the actual fix for
+ * the old uploadVideoToYouTubeAction, which routed the full multipart body
+ * (metadata + video bytes, one request) through this Server Action —
+ * Netlify's real function body ceiling is ~6MB (confirmed against
+ * Netlify's own docs, not assumed), regardless of the 100MB Next.js
+ * bodySizeLimit config, so anything past a few MB would 413 before ever
+ * reaching YouTube. This request is metadata-only (title/description/file
+ * size/mime type as JSON, no bytes) — comfortably small regardless of how
+ * large the actual video is.
  */
-export async function uploadVideoToYouTubeAction(formData: FormData): Promise<UploadVideoResult> {
-  const scriptId = String(formData.get("script_id") ?? "");
-  const title = String(formData.get("title") ?? "");
-  const description = String(formData.get("description") ?? "");
-  const file = formData.get("video");
-
+export async function initiateUploadAction(scriptId: string, title: string, description: string, fileSizeBytes: number, mimeType: string): Promise<InitiateUploadResult> {
   if (!scriptId || !title) return { ok: false, error: "Missing script or title" };
-  if (!(file instanceof File)) return { ok: false, error: "No video file provided" };
 
   const supabase = await createClient();
   const connection = await getYtConnection(supabase);
   if (!connection) return { ok: false, error: "YouTube isn't connected — connect it in Settings first." };
 
   try {
-    const videoBytes = new Uint8Array(await file.arrayBuffer());
-    const result = await uploadVideo(connection, { title, description, videoBytes, mimeType: file.type || "video/mp4" });
-
-    const { error } = await supabase
-      .from("yt_scripts")
-      .update({ youtube_video_id: result.videoId, youtube_privacy_status: "private", status: "used" })
-      .eq("id", scriptId);
-    if (error) return { ok: false, error: error.message };
-
-    revalidatePath("/youtube");
-    return { ok: true, videoId: result.videoId };
+    const session = await initiateResumableSession(connection, { title, description, fileSizeBytes, mimeType });
+    return { ok: true, sessionUri: session.sessionUri, accessToken: session.accessToken };
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : "Upload failed" };
+    return { ok: false, error: err instanceof Error ? err.message : "Couldn't start the upload" };
   }
+}
+
+/**
+ * Step 2's follow-up — called by the browser after it PUTs the video bytes
+ * directly to YouTube and gets a real video id back. This is just a DB
+ * write (no bytes, no external call), recording what the browser already
+ * confirmed happened.
+ */
+export async function recordUploadedVideoAction(scriptId: string, videoId: string): Promise<{ ok: boolean; error?: string }> {
+  if (!scriptId || !videoId) return { ok: false, error: "Missing script or video id" };
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("yt_scripts")
+    .update({ youtube_video_id: videoId, youtube_privacy_status: "private", status: "used" })
+    .eq("id", scriptId);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/youtube");
+  return { ok: true };
 }
 
 /**
