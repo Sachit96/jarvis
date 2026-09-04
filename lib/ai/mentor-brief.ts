@@ -46,6 +46,15 @@ const ACADEMICS_NUDGE = `For the Academics section: if context.uni.courses is em
  */
 const NOTES_NUDGE = `context.notes.text holds pinned/recent entries from the user's persistent memory system — facts, preferences, and protocols they've explicitly saved for you to know. If context.notes.text is empty, ignore it. Otherwise, weave in anything genuinely relevant to what you're writing right now — don't summarize or list the notes themselves, and don't force one in if nothing actually applies. If context.notes.omittedCount > 0, that just means older/lower-priority entries didn't fit the budget — never mention the omission itself to the user.`;
 
+/**
+ * Found live testing (2026-09-04): without this, a real pipeline of
+ * researched leads got reduced to "10 open deals, a leading indicator of
+ * interest" — technically true, useless in practice. context.business.
+ * topLeads is the antidote — name real businesses and real scores instead
+ * of citing the count.
+ */
+const LEADS_NUDGE = `If context.business.topLeads is non-empty, name 1-3 of the highest-scored ones specifically in whatever section fits best (e.g. "C Plus Roofing scored 78 — needs a website redesign, has a phone on file, call them today") — this is what actually turns a pipeline count into something to act on. Don't just restate context.business.researchedLeadsCount as a bare number if topLeads has real entries to name instead. Name the 1-3 and stop — don't add a line trying to account for or count the rest of the pipeline ("call the other N leads" reads as filler and the arithmetic is usually wrong anyway).`;
+
 export async function generateDailyBrief(supabase: Client) {
   const provider = getMentorProvider();
   const [context, persona] = await Promise.all([buildMentorContext(supabase), buildPersonaPrefix(supabase)]);
@@ -55,6 +64,7 @@ export async function generateDailyBrief(supabase: Client) {
     DAILY_INSTRUCTIONS,
     FOLLOWUP_NUDGE,
     NOTES_NUDGE,
+    LEADS_NUDGE,
     ACADEMICS_NUDGE,
     VOICE_GUARDRAIL,
     JSON_INSTRUCTION,
@@ -103,6 +113,7 @@ export async function generateWeeklyReview(supabase: Client) {
     WEEKLY_INSTRUCTIONS,
     FOLLOWUP_NUDGE,
     NOTES_NUDGE,
+    LEADS_NUDGE,
     ACADEMICS_NUDGE,
     VOICE_GUARDRAIL,
     JSON_INSTRUCTION,
@@ -155,6 +166,7 @@ export async function runGeneralMentorChat(supabase: Client, userContent: string
     "Answer questions, give advice, and reference specific numbers from their context when relevant. Keep replies concise (2-5 sentences) unless asked for depth.",
     FOLLOWUP_NUDGE,
     NOTES_NUDGE,
+    LEADS_NUDGE,
     VOICE_GUARDRAIL,
     `The user's current context as JSON: ${JSON.stringify(context)}`,
   ].join("\n\n");

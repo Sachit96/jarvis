@@ -26,6 +26,8 @@ import { getCourses, getAssessments } from "@/lib/db/queries/uni";
 import { courseGrade, riskScore, findOverloadedWeeks } from "@/lib/uni/grades";
 import { getMemoryEntries } from "@/lib/db/queries/memory";
 import { buildNoteContext } from "@/lib/obsidian/context";
+import { getResearchLeads } from "@/lib/db/queries/lead-research";
+import { OPPORTUNITY_LABEL, type OpportunityTag } from "@/lib/validations/lead-research";
 
 type Client = SupabaseClient<Database>;
 
@@ -54,6 +56,7 @@ export async function buildMentorContext(supabase: Client) {
     activities,
     courses,
     memoryEntries,
+    researchLeads,
   ] = await Promise.all([
     getPriorityTasks(supabase, 10),
     getTodayRoutineItems(supabase),
@@ -77,6 +80,8 @@ export async function buildMentorContext(supabase: Client) {
     // Degrades to [] the same way if migration 0014 hasn't run — see
     // getMemoryEntries' own isMissingTable check.
     getMemoryEntries(supabase),
+    // Degrades to [] if migration 0015 hasn't run — same convention.
+    getResearchLeads(supabase).catch(() => []),
   ]);
   const assessments = courses.length > 0 ? await getAssessments(supabase, courses.map((c) => c.id)).catch(() => []) : [];
 
@@ -95,6 +100,30 @@ export async function buildMentorContext(supabase: Client) {
   const mrr = computeMrr(contracts);
   const staleDeals = computeStaleDeals(deals, stages, contacts);
   const staleContacts = computeStaleContacts(contacts, activities);
+
+  /**
+   * Found live testing the daily brief against real data (2026-09-04): the
+   * business context above only ever had a raw open-deal count, so a real
+   * pipeline of 10 freshly-researched leads produced "10 open deals, a
+   * leading indicator of interest" — true, but useless for actually
+   * working the list, and exactly the kind of vague filler this was
+   * supposed to avoid. lead_research carries a real 0-100 score and
+   * opportunity tags per business that the brief had zero access to.
+   * Top 5 by score, contact-joined for a name to actually say out loud —
+   * not filtered to score>=70 ("hot") only, since a thin pipeline with no
+   * hot leads yet should still be able to say "your best lead so far is a
+   * 52" rather than silently having nothing here at all.
+   */
+  const contactById = new Map(contacts.map((c) => [c.id, c]));
+  const topLeads = researchLeads.slice(0, 5).map((l) => {
+    const contact = contactById.get(l.contact_id);
+    return {
+      business: contact?.company_name || contact?.contact_person || "Unknown business",
+      score: l.score,
+      hasPhone: Boolean(contact?.phone),
+      topOpportunities: l.opportunities.slice(0, 2).map((tag) => OPPORTUNITY_LABEL[tag as OpportunityTag] ?? tag),
+    };
+  });
 
   // Academic risk engine (Work Order 3) — pure functions from
   // lib/uni/grades.ts, no LLM call here; this rides along on the existing
@@ -155,6 +184,11 @@ export async function buildMentorContext(supabase: Client) {
       openPipelineValue: openDeals.reduce((sum, d) => sum + Number(d.value), 0),
       wonDealsAllTime: wonDeals.length,
       monthlyRecurringRevenue: mrr,
+      // See topLeads' own comment above for why this exists — the daily
+      // brief/weekly review/general chat can now name specific leads and
+      // their score instead of only ever citing the raw pipeline count.
+      researchedLeadsCount: researchLeads.length,
+      topLeads,
     },
     // Follow-up watchdog (Work Order B3) — mechanically computed (a SQL-shaped
     // query, not a model call), so the daily brief/weekly review/general chat
