@@ -2,7 +2,7 @@ import "server-only";
 import type { LeadSignals } from "@/lib/research/types";
 import { OPPORTUNITY_TAGS, SCORE_CATEGORY_MAX, qualificationResultSchema } from "@/lib/validations/lead-research";
 import type { LeadQualifierProvider, LeadQualifyOutcome } from "@/lib/ai/providers/types";
-import { callAnthropic } from "@/lib/ai/providers/anthropic-client";
+import { callAnthropic, type AnthropicCallOptions, type AnthropicCallResult } from "@/lib/ai/providers/anthropic-client";
 
 /**
  * Anthropic implementation of the same LeadQualifierProvider interface
@@ -134,6 +134,15 @@ function buildBatchPrompt(signalsList: LeadSignals[]): string {
 }
 
 export class AnthropicLeadQualifier implements LeadQualifierProvider {
+  /**
+   * Defaults to the real callAnthropic — every production call site
+   * (`new AnthropicLeadQualifier()` in providers/index.ts) is unaffected.
+   * Injectable so the bisection logic (qualifyBatchWithBisection/tryBatch
+   * below) is unit-testable with a stubbed responder — no network call,
+   * no spend — see tests/anthropic-lead-qualifier-bisection.test.ts.
+   */
+  constructor(private readonly callModel: (options: AnthropicCallOptions) => Promise<AnthropicCallResult> = callAnthropic) {}
+
   async qualifyLeads(signalsList: LeadSignals[]): Promise<LeadQualifyOutcome[]> {
     if (signalsList.length === 0) return [];
     const outcomes: LeadQualifyOutcome[] = [];
@@ -186,7 +195,7 @@ export class AnthropicLeadQualifier implements LeadQualifierProvider {
 
   private async tryBatch(signalsList: LeadSignals[]): Promise<LeadQualifyOutcome[] | { error: string; truncated?: boolean }> {
     try {
-      const { text } = await callAnthropic({
+      const { text } = await this.callModel({
         system: SYSTEM_INSTRUCTION,
         userContent: buildBatchPrompt(signalsList),
         jsonSchema: BATCH_JSON_SCHEMA,

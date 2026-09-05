@@ -46,9 +46,26 @@ import type { NextRequest } from "next/server";
 const UNGATED_WEBHOOK_PATHS = ["/api/sms/webhook", "/api/webhooks/ghl", "/api/mentor/run"];
 const UNGATED_PREFIXES = ["/api/research/runs"];
 
+/**
+ * Segment-aware, not a bare startsWith — found walking this carve-out
+ * (Cleanup work order, "walk the auth carve-out"): plain
+ * `pathname.startsWith(p)` also matches a path that merely shares p's
+ * characters as a prefix with no path separator after it, e.g. a
+ * hypothetical future `/api/research/runsomethingelse` would match
+ * "/api/research/runs" under startsWith even though it isn't really a
+ * sub-path. No such route exists today (verified: exactly 3 real route
+ * files live under /api/research/runs*, each with its own enforced
+ * hasValidBearerToken check — walked all of them, not assumed), so this
+ * hasn't bitten anyone yet, but the check itself should be correct
+ * regardless of what gets added later.
+ */
+export function matchesUngatedPrefix(pathname: string, prefix: string): boolean {
+  return pathname === prefix || pathname.startsWith(`${prefix}/`);
+}
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  if (UNGATED_WEBHOOK_PATHS.includes(pathname) || UNGATED_PREFIXES.some((p) => pathname.startsWith(p))) {
+  if (UNGATED_WEBHOOK_PATHS.includes(pathname) || UNGATED_PREFIXES.some((p) => matchesUngatedPrefix(pathname, p))) {
     return NextResponse.next();
   }
 
