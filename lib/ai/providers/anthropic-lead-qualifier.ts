@@ -139,48 +139,74 @@ export class AnthropicLeadQualifier implements LeadQualifierProvider {
     const outcomes: LeadQualifyOutcome[] = [];
     for (let i = 0; i < signalsList.length; i += ANTHROPIC_LEAD_QUALIFIER_BATCH_SIZE) {
       const batch = signalsList.slice(i, i + ANTHROPIC_LEAD_QUALIFIER_BATCH_SIZE);
-      const result = await this.tryBatch(batch);
-      if (Array.isArray(result)) {
-        outcomes.push(...result);
-      } else {
-        // Same reason: this discarded the real failure ("Anthropic
-        // qualification failed for this batch" told you nothing) — found
-        // live tonight it was masking a real, fixable cause (batches of 10
-        // truncating a 4096-token response mid-JSON). Logged AND
-        // propagated into the per-lead error so it reaches
-        // research_runs.error_log, not just the server console.
-        console.error("[AnthropicLeadQualifier] batch failed:", result.error);
-        outcomes.push(...batch.map(() => ({ error: `Anthropic qualification failed: ${result.error}` })));
-      }
+      outcomes.push(...(await this.qualifyBatchWithBisection(batch)));
     }
     return outcomes;
   }
 
-  private async tryBatch(signalsList: LeadSignals[]): Promise<LeadQualifyOutcome[] | { error: string }> {
+  /**
+   * Raising maxTokens 4096 -> 8192 fixed one observed 8-business truncation
+   * but doesn't bound the actual worst case — a batch with more verbose
+   * audit findings than that specific run could truncate again at 8192,
+   * and a bigger fixed ceiling just delays the same failure to a larger N
+   * instead of ruling it out (flagged explicitly after that fix landed).
+   * The real fix is adaptive, not a bigger fixed number: on a truncation-
+   * shaped failure (invalid JSON, or a parsed array of the wrong length —
+   * both consistent with the response getting cut off mid-output), split
+   * the batch in half and retry each half independently, recursing down
+   * to batches of 1 if needed. A non-truncation failure (schema
+   * validation, auth, network) is NOT retried this way — bisecting a
+   * batch that failed for a reason unrelated to size just repeats the
+   * same failure at smaller N for no benefit, and burns extra calls doing
+   * it.
+   */
+  private async qualifyBatchWithBisection(signalsList: LeadSignals[]): Promise<LeadQualifyOutcome[]> {
+    const result = await this.tryBatch(signalsList);
+    if (Array.isArray(result)) return result;
+
+    if (result.truncated && signalsList.length > 1) {
+      const mid = Math.ceil(signalsList.length / 2);
+      console.error(`[AnthropicLeadQualifier] batch of ${signalsList.length} looked truncated, splitting into ${mid} + ${signalsList.length - mid} and retrying:`, result.error);
+      const [first, second] = await Promise.all([
+        this.qualifyBatchWithBisection(signalsList.slice(0, mid)),
+        this.qualifyBatchWithBisection(signalsList.slice(mid)),
+      ]);
+      return [...first, ...second];
+    }
+
+    // Same reason: this discarded the real failure ("Anthropic
+    // qualification failed for this batch" told you nothing) — found live
+    // this session it was masking a real, fixable cause (batches
+    // truncating a too-small maxTokens response mid-JSON). Logged AND
+    // propagated into the per-lead error so it reaches
+    // research_runs.error_log, not just the server console.
+    console.error("[AnthropicLeadQualifier] batch failed:", result.error);
+    return signalsList.map(() => ({ error: `Anthropic qualification failed: ${result.error}` }));
+  }
+
+  private async tryBatch(signalsList: LeadSignals[]): Promise<LeadQualifyOutcome[] | { error: string; truncated?: boolean }> {
     try {
       const { text } = await callAnthropic({
         system: SYSTEM_INSTRUCTION,
         userContent: buildBatchPrompt(signalsList),
         jsonSchema: BATCH_JSON_SCHEMA,
-        // 4096 (the previous value) truncated a real 8-business batch mid-
-        // JSON — found live tonight via the fixed error surfacing above,
-        // which is what made this diagnosable at all instead of reading as
-        // another mystery "qualification failed." Each business's own
-        // output (audit_summary + up to several opportunities with a why
-        // each + ai_summary) runs a few hundred tokens; 8 of them can
-        // exceed 4096 depending on how much the model has to say. 8192
-        // gives real headroom without changing ANTHROPIC_LEAD_QUALIFIER_
-        // BATCH_SIZE, which is deliberately 8 for fewer/larger calls.
+        // Headroom for a normal-sized batch (see ANTHROPIC_LEAD_QUALIFIER_
+        // BATCH_SIZE, 8) — the real bound on batch size is now
+        // qualifyBatchWithBisection's adaptive splitting above, not this
+        // number, so raising it further isn't the lever to pull if
+        // truncation shows up again.
         maxTokens: 8192,
       });
       let parsed: unknown;
       try {
         parsed = JSON.parse(text);
       } catch (err) {
-        return { error: `response wasn't valid JSON (${err instanceof Error ? err.message : "parse error"}) — likely truncated at the maxTokens limit for a ${signalsList.length}-business batch. Raw tail: ${text.slice(-200)}` };
+        return { truncated: true, error: `response wasn't valid JSON (${err instanceof Error ? err.message : "parse error"}) — likely truncated at the maxTokens limit for a ${signalsList.length}-business batch. Raw tail: ${text.slice(-200)}` };
       }
       if (!Array.isArray(parsed)) return { error: `response was not a JSON array (got ${typeof parsed})` };
-      if (parsed.length !== signalsList.length) return { error: `response had ${parsed.length} entries for a ${signalsList.length}-business batch` };
+      if (parsed.length !== signalsList.length) {
+        return { truncated: true, error: `response had ${parsed.length} entries for a ${signalsList.length}-business batch` };
+      }
       return parsed.map((item): LeadQualifyOutcome => {
         const result = qualificationResultSchema.safeParse(item);
         return result.success ? { result: result.data } : { error: `Schema validation failed: ${result.error.message}` };
