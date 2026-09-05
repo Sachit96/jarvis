@@ -2,6 +2,7 @@ import { Wallet, TrendingUp, HeartPulse, Target, CircleCheck } from "lucide-reac
 import { createClient } from "@/lib/supabase/server";
 import { getPriorityTasks, getGoals } from "@/lib/db/queries/life";
 import { getAccounts, getMonthTransactions, computeAssetLiabilityTotals, computeMonthlyPnl } from "@/lib/db/queries/finance";
+import { todayStr } from "@/lib/date";
 import {
   getWorkouts,
   getWorkoutSets,
@@ -32,10 +33,6 @@ import { GoalsRailCard } from "@/components/dashboard/goals-rail-card";
 import { NotesRailCard } from "@/components/dashboard/notes-rail-card";
 import { HabitHeatmapCard } from "@/components/dashboard/habit-heatmap-card";
 import { HevyAutoSync } from "@/components/health/hevy-auto-sync";
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 function money(n: number) {
   return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;

@@ -1,12 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 import { isMissingRelation } from "@/lib/db/missing-relation";
+import { todayStr } from "@/lib/date";
 
 type Client = SupabaseClient<Database>;
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 export interface ModelUsage {
   model: string;

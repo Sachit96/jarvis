@@ -4,6 +4,7 @@ import type { Database } from "@/lib/supabase/database.types";
 import { getMentorProvider } from "@/lib/ai/providers";
 import type { LoggedMealArgs, MentorChatMessage } from "@/lib/ai/providers/types";
 import { buildPersonaPrefix } from "@/lib/ai/persona";
+import { todayStr } from "@/lib/date";
 import {
   getNutritionTargets,
   getNutritionLogsForDate,
@@ -12,10 +13,6 @@ import {
 } from "@/lib/db/queries/health";
 
 type Client = SupabaseClient<Database>;
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 async function buildSystemPrompt(supabase: Client) {
   const today = todayStr();

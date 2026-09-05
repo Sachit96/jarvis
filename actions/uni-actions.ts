@@ -32,6 +32,8 @@ export async function createCourseAction(_prevState: ActionState, formData: Form
     room: formData.get("room"),
     description: formData.get("description"),
     term: formData.get("term"),
+    term_start: formData.get("term_start"),
+    term_end: formData.get("term_end"),
     color: formData.get("color"),
     credit_weight: formData.get("credit_weight") || "3",
     target_grade: formData.get("target_grade"),
@@ -46,6 +48,12 @@ export async function createCourseAction(_prevState: ActionState, formData: Form
     room: parsed.data.room ?? null,
     description: parsed.data.description ?? null,
     term: parsed.data.term,
+    // Left out of the payload entirely when unset (undefined, not null) —
+    // until migration 0032 is applied, term_start/term_end don't exist as
+    // real columns, and a key with any value (including null) would 400.
+    // See courseSchema's comment.
+    term_start: parsed.data.term_start ?? undefined,
+    term_end: parsed.data.term_end ?? undefined,
     color: parsed.data.color ?? null,
     credit_weight: parsed.data.credit_weight,
     target_grade: parsed.data.target_grade ?? null,
@@ -66,6 +74,8 @@ export async function updateCourseAction(_prevState: ActionState, formData: Form
     room: formData.get("room"),
     description: formData.get("description"),
     term: formData.get("term"),
+    term_start: formData.get("term_start"),
+    term_end: formData.get("term_end"),
     color: formData.get("color"),
     credit_weight: formData.get("credit_weight") || "3",
     target_grade: formData.get("target_grade"),
@@ -82,6 +92,8 @@ export async function updateCourseAction(_prevState: ActionState, formData: Form
       room: parsed.data.room ?? null,
       description: parsed.data.description ?? null,
       term: parsed.data.term,
+      term_start: parsed.data.term_start ?? undefined,
+      term_end: parsed.data.term_end ?? undefined,
       color: parsed.data.color ?? null,
       credit_weight: parsed.data.credit_weight,
       target_grade: parsed.data.target_grade ?? null,

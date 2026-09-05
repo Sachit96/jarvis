@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { StreakHeatmap } from "@/components/shared/streak-heatmap";
 import { computeStreak } from "@/lib/db/queries/life";
+import { todayStr } from "@/lib/date";
 import {
   deleteHabitAction,
   toggleHabitTodayAction,
@@ -26,10 +27,6 @@ const METRIC_LABEL: Record<string, string> = {
   no_g: "No G",
   custom: "Custom",
 };
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 export function HabitCard({
   habit,

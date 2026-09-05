@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldError } from "@/components/ui/field-error";
 import { Textarea } from "@/components/ui/textarea";
+import { todayStr } from "@/lib/date";
 import {
   Select,
   SelectContent,
@@ -28,10 +29,6 @@ import type { Database } from "@/lib/supabase/database.types";
 type Contact = Database["public"]["Tables"]["contacts"]["Row"];
 
 const initialState: ActionState = {};
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 export function ContractForm({ contacts }: { contacts: Contact[] }) {
   const [open, setOpen] = useState(false);

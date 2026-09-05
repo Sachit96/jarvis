@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { validateTwilioSignature, twiMlReply, emptyTwiMl } from "@/lib/sms/twilio-signature";
 import { callGemini, type GeminiFunctionDeclaration } from "@/lib/ai/providers/gemini-client";
 import { LOG_NUTRITION_TOOL } from "@/lib/ai/providers/gemini-mentor-provider";
+import { todayStr } from "@/lib/date";
 
 // Inbound SMS logging engine (Work Order 5) — Twilio POSTs here on every
 // message to TWILIO_PHONE_NUMBER. Inert (returns empty TwiML immediately)
@@ -60,10 +61,6 @@ const TOOLS: GeminiFunctionDeclaration[] = [
 ];
 
 const SYSTEM_INSTRUCTION = `You parse a text message from the user into exactly one logging action. Only call a specific tool (log_workout, log_nutrition_entry, complete_task, log_study_session) if the message clearly and unambiguously matches it. If it's ambiguous, vague, or doesn't clearly match one of those, call add_journal_entry with the message's content instead — never guess at a specific action you're not confident about.`;
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 export async function POST(request: NextRequest) {
   const accountSid = process.env.TWILIO_ACCOUNT_SID;

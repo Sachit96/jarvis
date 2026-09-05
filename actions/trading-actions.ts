@@ -2,17 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { todayStr } from "@/lib/date";
 import {
   marketAnalysisSchema,
   checklistItemSchema,
   DEFAULT_CHECKLIST_ITEMS,
 } from "@/lib/validations/trading";
 import { actionStateFromZodError, type ActionState } from "@/lib/validation";
-
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 // ============================================================= Market analysis
 

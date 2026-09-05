@@ -74,6 +74,22 @@ export function CourseForm({ course, term }: { course?: Course; term?: string })
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
+              <Label htmlFor="term_start">Term starts</Label>
+              <Input id="term_start" name="term_start" type="date" defaultValue={course?.term_start ?? ""} {...fieldAria(state, "term_start")} />
+              <FieldError id="term_start-error" message={state.fieldErrors?.term_start} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="term_end">Term ends</Label>
+              <Input id="term_end" name="term_end" type="date" defaultValue={course?.term_end ?? ""} {...fieldAria(state, "term_end")} />
+              <FieldError id="term_end-error" message={state.fieldErrors?.term_end} />
+            </div>
+          </div>
+          {/* Optional — clamps the calendar's recurring class projection to
+              when the course actually runs (lib/uni/schedule-occurrences.ts).
+              Blank is fine; the calendar falls back to its current wide
+              window when either date is unset for a course. */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
               <Label htmlFor="professor">Professor</Label>
               <Input id="professor" name="professor" defaultValue={course?.professor ?? ""} {...fieldAria(state, "professor")} />
             </div>

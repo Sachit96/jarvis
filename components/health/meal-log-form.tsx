@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldError } from "@/components/ui/field-error";
+import { todayStr } from "@/lib/date";
 import {
   Select,
   SelectContent,
@@ -24,10 +25,6 @@ import {
 } from "@/components/ui/dialog";
 
 const initialState: ActionState = {};
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 export function MealLogForm({ defaultMealType }: { defaultMealType: string }) {
   const [open, setOpen] = useState(false);

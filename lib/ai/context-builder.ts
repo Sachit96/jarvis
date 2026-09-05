@@ -2,6 +2,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 import { getPriorityTasks, getJournalEntries } from "@/lib/db/queries/life";
+import { todayStr } from "@/lib/date";
 import {
   getAccounts,
   computeAssetLiabilityTotals,
@@ -30,10 +31,6 @@ import { getResearchLeads } from "@/lib/db/queries/lead-research";
 import { OPPORTUNITY_LABEL, type OpportunityTag } from "@/lib/validations/lead-research";
 
 type Client = SupabaseClient<Database>;
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 /** Aggregates a snapshot across every module for the AI Mentor to reason over. */
 export async function buildMentorContext(supabase: Client) {

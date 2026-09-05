@@ -1641,6 +1641,8 @@ export type Database = {
           room: string | null
           target_grade: number | null
           term: string
+          term_start: string | null
+          term_end: string | null
           updated_at: string
         }
         Insert: {
@@ -1657,6 +1659,8 @@ export type Database = {
           room?: string | null
           target_grade?: number | null
           term: string
+          term_start?: string | null
+          term_end?: string | null
           updated_at?: string
         }
         Update: {
@@ -1673,6 +1677,8 @@ export type Database = {
           room?: string | null
           target_grade?: number | null
           term?: string
+          term_start?: string | null
+          term_end?: string | null
           updated_at?: string
         }
         Relationships: []

@@ -121,6 +121,9 @@ export function computeDailyCashflow(transactions: Pick<TransactionRow, "type" |
 
   const points: { date: string; income: number; expense: number; net: number }[] = [];
   const cursor = new Date();
+  // Reset to local midnight first — see business/dashboard/page.tsx's
+  // computeDealsPerDay for why this matters (same bug, same fix).
+  cursor.setHours(0, 0, 0, 0);
   cursor.setDate(cursor.getDate() - days + 1);
   for (let i = 0; i < days; i++) {
     const key = cursor.toISOString().slice(0, 10);

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { todayStr } from "@/lib/date";
 import {
   accountSchema,
   transactionSchema,
@@ -10,11 +11,6 @@ import {
   closeTradeSchema,
 } from "@/lib/validations/finance";
 import { actionStateFromZodError, type ActionState } from "@/lib/validation";
-
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 function computePnl(
   direction: "long" | "short",

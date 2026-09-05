@@ -18,7 +18,13 @@ export function WorkoutCalendar({ trainedDates }: { trainedDates: Set<string> })
   const firstOfMonth = new Date(year, month, 1);
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const leadingBlanks = firstOfMonth.getDay();
-  const todayKey = now.toISOString().slice(0, 10);
+  // NOT now.toISOString().slice(0, 10) — `now` still carries the current
+  // time-of-day, and that plus the UTC offset rolls into the next
+  // calendar date after ~8pm Eastern (the exact bug found and fixed in
+  // uni-calendar.tsx's dayKey — same root cause, different file, found by
+  // grepping for the pattern rather than assuming one fix caught it all).
+  // Building from local Y/M/D is correct regardless of time-of-day.
+  const todayKey = `${year}-${String(month + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 
   const cells: { key: string; day: number }[] = [];
   for (let d = 1; d <= daysInMonth; d++) {

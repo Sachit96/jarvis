@@ -3,6 +3,7 @@ import type { Database } from "@/lib/supabase/database.types";
 import { getHabits, getHabitLogsForHeatmap, getTasks, getJournalEntries, computeStreak } from "@/lib/db/queries/life";
 import { getWorkouts, getNutritionTargets, getNutritionLogsForDate, computeMacroTotals } from "@/lib/db/queries/health";
 import { getDailyRecommendation } from "@/lib/db/queries/mentor";
+import { todayStr } from "@/lib/date";
 
 type Client = SupabaseClient<Database>;
 
@@ -13,10 +14,6 @@ export interface RoutineItem {
   /** Manual items are habit rows the user toggles themselves; auto items are read-only, derived from data tracked elsewhere. */
   kind: "manual" | "auto";
   streak?: { current: number; best: number };
-}
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
 }
 
 /**

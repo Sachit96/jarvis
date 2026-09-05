@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { todayStr } from "@/lib/date";
 import {
   exerciseSchema,
   workoutSchema,
@@ -17,11 +18,6 @@ import {
 import { runMentorChat } from "@/lib/ai/mentor";
 import { lbsToKg } from "@/lib/units";
 import { actionStateFromZodError, type ActionState } from "@/lib/validation";
-
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 function revalidateHealth() {
   revalidatePath("/health/workouts");

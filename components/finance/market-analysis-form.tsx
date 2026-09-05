@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldError } from "@/components/ui/field-error";
 import { Textarea } from "@/components/ui/textarea";
+import { todayStr } from "@/lib/date";
 import {
   Select,
   SelectContent,
@@ -25,10 +26,6 @@ import {
 } from "@/components/ui/dialog";
 
 const initialState: ActionState = {};
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 function SentimentSelect({ name, label }: { name: string; label: string }) {
   return (

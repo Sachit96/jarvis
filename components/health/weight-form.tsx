@@ -9,12 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldError } from "@/components/ui/field-error";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { todayStr } from "@/lib/date";
 
 const initialState: ActionState = {};
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 export function WeightForm() {
   const [open, setOpen] = useState(false);

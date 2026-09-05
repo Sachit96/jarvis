@@ -24,6 +24,14 @@ function computeDealsPerDay(deals: { created_at: string }[], days = SPARKLINE_DA
   }
   const points: { date: string; count: number }[] = [];
   const cursor = new Date();
+  // Reset to local midnight before the day-walk — cursor otherwise keeps
+  // whatever time-of-day "now" happened to be, and toISOString() rolls
+  // that into the next calendar date once the local time-of-day plus the
+  // runtime's UTC offset crosses midnight (same bug found and fixed in
+  // uni-calendar.tsx and workout-calendar.tsx — a runtime-timezone-
+  // dependent landmine either way, so worth closing here regardless of
+  // what timezone this specific process happens to run in today).
+  cursor.setHours(0, 0, 0, 0);
   cursor.setDate(cursor.getDate() - days + 1);
   for (let i = 0; i < days; i++) {
     const key = cursor.toISOString().slice(0, 10);

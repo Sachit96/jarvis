@@ -8,10 +8,7 @@ import { MentorChatWidget } from "@/components/mentor/mentor-chat-widget";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { MENTOR_TABS } from "@/lib/nav-items";
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
+import { todayStr } from "@/lib/date";
 
 export default async function MentorPage() {
   const supabase = await createClient();

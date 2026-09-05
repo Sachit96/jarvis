@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
+import { todayStr } from "@/lib/date";
 
 type Client = SupabaseClient<Database>;
 
@@ -9,10 +10,6 @@ export interface UpcomingItem {
   date: string;
   kind: "task" | "goal";
   href: string;
-}
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
 }
 
 /** Due tasks and goal target dates, merged and sorted — the closest real substitute for a calendar since JARVIS has no events feature. */

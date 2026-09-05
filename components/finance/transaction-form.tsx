@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldError } from "@/components/ui/field-error";
+import { todayStr } from "@/lib/date";
 import {
   Select,
   SelectContent,
@@ -28,10 +29,6 @@ import type { Database } from "@/lib/supabase/database.types";
 type Account = Database["public"]["Tables"]["accounts"]["Row"];
 
 const initialState: ActionState = {};
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 export function TransactionForm({ accounts }: { accounts: Account[] }) {
   const [open, setOpen] = useState(false);

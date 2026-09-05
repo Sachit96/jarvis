@@ -5,6 +5,7 @@ import { CirclePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { todayStr } from "@/lib/date";
 import {
   Select,
   SelectContent,
@@ -25,9 +26,6 @@ type Account = Database["public"]["Tables"]["accounts"]["Row"];
 
 const initialState: ActionState = {};
 
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 function nowLocalDatetime() {
   const d = new Date();
   d.setMinutes(d.getMinutes() - d.getTimezoneOffset());

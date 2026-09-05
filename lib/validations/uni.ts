@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { numeric, optionalNumeric, optionalTextInput } from "@/lib/validation";
+import { numeric, optionalNumeric, optionalTextInput, optionalDateInput } from "@/lib/validation";
 
 export const ASSESSMENT_TYPES = ["assignment", "quiz", "midterm", "final", "presentation", "participation"] as const;
 export const ASSESSMENT_STATUSES = ["not_started", "in_progress", "submitted", "graded"] as const;
@@ -18,6 +18,15 @@ export const courseSchema = z.object({
   room: optionalTextInput,
   description: optionalTextInput,
   term: z.string().min(1, "Required").max(40),
+  // Optional on purpose, and separate from the free-text `term` label above
+  // (e.g. "Fall 2026") — this is the real, queryable range the calendar
+  // clamps recurring class occurrences to (see lib/uni/schedule-
+  // occurrences.ts). Both undefined until the term_start/term_end columns
+  // exist (migration 0032) — omitted from the insert/update payload
+  // entirely when unset, so creating/editing a course never fails on a
+  // column that isn't there yet.
+  term_start: optionalDateInput,
+  term_end: optionalDateInput,
   color: optionalTextInput,
   credit_weight: numeric(z.number().positive().max(20)),
   target_grade: optionalNumeric(z.number().min(0).max(100)),

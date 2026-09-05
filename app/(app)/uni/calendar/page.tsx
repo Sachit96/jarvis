@@ -28,14 +28,37 @@ export default async function UniCalendarPage() {
 
   // Recurring weekly classes have no due_at of their own (see
   // schedule-occurrences.ts's own comment) — projected across a wide
-  // window centered on today (not the unstructured, free-text `term`
-  // field) so month navigation in either direction still shows real
-  // class times without depending on parsing a term date range that
-  // doesn't exist as a real column anywhere in this schema.
+  // window centered on today so month navigation in either direction
+  // still shows real class times, then clamped per-course below to when
+  // that course's own term actually runs.
   const now = new Date();
   const rangeStart = new Date(now.getFullYear(), now.getMonth() - 2, 1);
   const rangeEnd = new Date(now.getFullYear(), now.getMonth() + 6, 0);
-  const classOccurrences = expandWeeklyOccurrences(scheduleBlocks, rangeStart, rangeEnd);
+  const courseById = new Map(courses.map((c) => [c.id, c]));
+
+  /**
+   * Found live (2026-09-05, the morning after seeding Fall 2026): MKT 100
+   * showed up on the calendar meeting Saturday Sept 5 — three days before
+   * the real Sept 8 term start. The wide window above has nothing clamping
+   * it to when a course's term actually runs, because uni_courses never
+   * had a real date range before migration 0032 (term_start/term_end,
+   * nullable). Filtered here rather than by narrowing the window itself,
+   * since each course can have its own term dates — a single global
+   * window can't clamp per-course.
+   *
+   * Degrades to "show everything in the wide window" (today's behavior,
+   * unclamped) for any course whose term_start/term_end isn't set yet —
+   * true for every course until 0032 is applied AND real dates are filled
+   * in, not an error state. Once both exist for a course, occurrences
+   * outside [term_start, term_end] are dropped. Plain string comparison
+   * is correct here — both are "YYYY-MM-DD", which sorts chronologically
+   * as text.
+   */
+  const classOccurrences = expandWeeklyOccurrences(scheduleBlocks, rangeStart, rangeEnd).filter(({ date, item: block }) => {
+    const course = courseById.get(block.course_id);
+    if (!course?.term_start || !course?.term_end) return true;
+    return date >= course.term_start && date <= course.term_end;
+  });
 
   const items: CalendarItem[] = [
     ...assessments

@@ -12,6 +12,13 @@ function dateKey(d: Date) {
 
 function daysAgo(n: number) {
   const d = new Date();
+  // Reset to local midnight before shifting — d otherwise keeps whatever
+  // time-of-day "now" happened to be, and dateKey()'s toISOString() rolls
+  // that into the next calendar date once local time-of-day plus the
+  // runtime's UTC offset crosses midnight (same bug found and fixed
+  // elsewhere this session — every caller of daysAgo, including the
+  // trend chart's own day-cursor below, inherits this fix for free).
+  d.setHours(0, 0, 0, 0);
   d.setDate(d.getDate() - n);
   return d;
 }

@@ -5,11 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { taskSchema, goalSchema, habitSchema, journalEntrySchema } from "@/lib/validations/life";
 import { actionStateFromZodError, type ActionState } from "@/lib/validation";
 import { syncOutgoingLinksForRow } from "@/lib/obsidian/wikilinks";
-
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
+import { todayStr } from "@/lib/date";
 
 function parseTags(raw: FormDataEntryValue | null): string[] {
   return String(raw ?? "")

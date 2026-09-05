@@ -10,12 +10,9 @@ import { getMemoryEntries } from "@/lib/db/queries/memory";
 import { getGoals } from "@/lib/db/queries/life";
 import { getGeminiUsageToday } from "@/lib/db/queries/gemini-usage";
 import { TIER_MODEL, TIER_DAILY_LIMIT, type GeminiTier } from "@/lib/ai/providers/gemini-client";
+import { todayStr } from "@/lib/date";
 
 type Client = SupabaseClient<Database>;
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 function daysAgoIso(n: number) {
   const d = new Date();

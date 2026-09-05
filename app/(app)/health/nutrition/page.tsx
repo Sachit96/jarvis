@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { todayStr } from "@/lib/date";
 import {
   getNutritionTargets,
   getNutritionLogsForDate,
@@ -21,10 +22,6 @@ const MEAL_SECTIONS = [
   { key: "dinner", label: "Dinner" },
   { key: "snack", label: "Snacks" },
 ] as const;
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 export default async function NutritionPage() {
   const supabase = await createClient();
