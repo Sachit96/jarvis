@@ -14,8 +14,28 @@ export interface CalendarItem {
 
 const WEEKDAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
 
+/**
+ * Local calendar date, NOT toISOString().slice(0, 10) — found live testing
+ * the new class-occurrence wiring (2026-09-04, evening): weekDays below is
+ * built by copying `now`'s full timestamp (via `new Date(startOfWeek)`)
+ * and only changing the day-of-month, so each entry keeps *today's actual
+ * time-of-day*, not midnight. Past ~8pm in a UTC-negative zone (EDT is
+ * UTC-4), that local time-of-day plus the UTC offset rolls past midnight,
+ * so toISOString() silently returns the NEXT calendar date — every item
+ * in week view was landing one day off from its real label whenever this
+ * ran in the evening. Month view's day CELLS were unaffected (each is
+ * built via new Date(year, month, day), local midnight already) — but
+ * its "is this today" highlight uses dayKey(now) too, the same as week/
+ * day view's todayKey, so the highlighted cell was also off by one in
+ * the evening even though the grid itself was correct. Building the key
+ * from local getFullYear/getMonth/getDate instead is correct regardless
+ * of the Date's time-of-day.
+ */
 function dayKey(d: Date) {
-  return d.toISOString().slice(0, 10);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 
 /**

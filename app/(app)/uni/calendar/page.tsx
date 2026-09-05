@@ -1,14 +1,41 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCourses, getAssessments, getDeadlines } from "@/lib/db/queries/uni";
+import { getCourses, getAssessments, getDeadlines, getScheduleBlocks } from "@/lib/db/queries/uni";
+import { expandWeeklyOccurrences } from "@/lib/uni/schedule-occurrences";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { Card } from "@/components/ui/card";
 import { UniCalendar, type CalendarItem } from "@/components/uni/uni-calendar";
 import { UNI_TABS } from "@/lib/nav-items";
 
+function formatTime(t: string) {
+  const [h, m] = t.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  return `${hour12}:${String(m).padStart(2, "0")}${period}`;
+}
+
+const SCHEDULE_TYPE_LABEL: Record<string, string> = {
+  lecture: "Lecture",
+  tutorial: "Tutorial",
+  lab: "Lab",
+  office_hours: "Office Hours",
+};
+
 export default async function UniCalendarPage() {
   const supabase = await createClient();
   const [courses, deadlines] = await Promise.all([getCourses(supabase), getDeadlines(supabase)]);
-  const assessments = await getAssessments(supabase, courses.map((c) => c.id));
+  const courseIds = courses.map((c) => c.id);
+  const [assessments, scheduleBlocks] = await Promise.all([getAssessments(supabase, courseIds), getScheduleBlocks(supabase, courseIds)]);
+
+  // Recurring weekly classes have no due_at of their own (see
+  // schedule-occurrences.ts's own comment) — projected across a wide
+  // window centered on today (not the unstructured, free-text `term`
+  // field) so month navigation in either direction still shows real
+  // class times without depending on parsing a term date range that
+  // doesn't exist as a real column anywhere in this schema.
+  const now = new Date();
+  const rangeStart = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+  const rangeEnd = new Date(now.getFullYear(), now.getMonth() + 6, 0);
+  const classOccurrences = expandWeeklyOccurrences(scheduleBlocks, rangeStart, rangeEnd);
 
   const items: CalendarItem[] = [
     ...assessments
@@ -24,6 +51,16 @@ export default async function UniCalendarPage() {
         };
       }),
     ...deadlines.map((d): CalendarItem => ({ id: `d-${d.id}`, title: d.title, due_at: d.due_at, color: "#f97316", sublabel: d.category })),
+    ...classOccurrences.map(({ date, item: block }): CalendarItem => {
+      const course = courses.find((c) => c.id === block.course_id);
+      return {
+        id: `c-${block.id}-${date}`,
+        title: `${course?.code ?? ""} — ${SCHEDULE_TYPE_LABEL[block.type] ?? block.type}`,
+        due_at: `${date}T${block.start_time}`,
+        color: course?.color ?? "#8b5cf6",
+        sublabel: `${formatTime(block.start_time)}–${formatTime(block.end_time)}${block.room ? ` · ${block.room}` : ""}`,
+      };
+    }),
   ];
 
   return (
