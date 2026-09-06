@@ -12,6 +12,13 @@ interface UseSpeechRecognitionOptions {
 interface UseSpeechRecognitionResult {
   isSupported: boolean;
   isListening: boolean;
+  /** Human-readable guidance for the errors a user can actually do something
+   * about (permission denied, no mic hardware) — found live (2026-09-06
+   * audit): every non-transient recognition error was console.error-only,
+   * so denying the mic prompt left the toggle silently non-functional with
+   * no on-screen explanation. Cleared automatically on the next successful
+   * start. */
+  error: string | null;
   /** Deliberately stop — e.g. right before speechSynthesis.speak() (gotcha 2: TTS feeding back into the mic). */
   pause: () => void;
   /** Resume after a deliberate pause — e.g. an utterance's onend. */
@@ -21,6 +28,13 @@ interface UseSpeechRecognitionResult {
 function hasSpeechRecognition() {
   return typeof window !== "undefined" && !!(window.SpeechRecognition ?? window.webkitSpeechRecognition);
 }
+
+const ERROR_MESSAGE: Record<string, string> = {
+  "not-allowed": "Microphone access was denied. Allow the microphone for this site in your browser's settings, then reload.",
+  "service-not-allowed": "Microphone access was denied. Allow the microphone for this site in your browser's settings, then reload.",
+  "audio-capture": "No microphone was found. Check that one is connected and not in use by another app.",
+  network: "Speech recognition needs a network connection — check yours and try again.",
+};
 
 /**
  * Wraps webkitSpeechRecognition with the two things that make continuous
@@ -42,6 +56,7 @@ export function useSpeechRecognition({
 }: UseSpeechRecognitionOptions): UseSpeechRecognitionResult {
   const [isSupported] = useState(hasSpeechRecognition);
   const [isListening, setIsListening] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const deliberateStopRef = useRef(true);
   const enabledRef = useRef(enabled);
@@ -67,7 +82,10 @@ export function useSpeechRecognition({
     recognition.interimResults = true;
     recognition.lang = "en-US";
 
-    recognition.onstart = () => setIsListening(true);
+    recognition.onstart = () => {
+      setIsListening(true);
+      setError(null);
+    };
 
     recognition.onresult = (event) => {
       let interim = "";
@@ -100,6 +118,7 @@ export function useSpeechRecognition({
       // are not real problems — onend follows immediately and restarts.
       if (event.error !== "no-speech" && event.error !== "aborted") {
         console.error("[voice] speech recognition error:", event.error);
+        setError(ERROR_MESSAGE[event.error] ?? "Something went wrong with the microphone — try again.");
       }
     };
 
@@ -143,5 +162,5 @@ export function useSpeechRecognition({
     }
   }, []);
 
-  return { isSupported, isListening, pause, resume };
+  return { isSupported, isListening, error, pause, resume };
 }

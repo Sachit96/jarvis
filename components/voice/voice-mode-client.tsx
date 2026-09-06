@@ -306,6 +306,13 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
           This browser doesn&apos;t support speech recognition (Chrome-based browsers only) — push-to-talk and wake
           word won&apos;t work here.
         </div>
+      ) : recognition.error ? (
+        <div
+          role="alert"
+          className="absolute inset-x-0 top-16 z-10 mx-auto max-w-md rounded-lg border border-danger/30 bg-danger/10 px-4 py-2.5 text-center text-xs text-danger"
+        >
+          {recognition.error}
+        </div>
       ) : null}
 
       {/* Bottom control zone — one flex column so the mobile hold-to-talk row
@@ -371,6 +378,13 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
             micOn ? "border-danger/50 bg-danger/10 text-danger" : "border-white/20 bg-white/5 text-white/70 hover:bg-white/10",
           )}
           aria-pressed={micOn}
+          // Explicit, distinct from the mobile toggle's "Start/Stop listening"
+          // aria-label — found live (2026-09-06 audit): both buttons control
+          // the same micOn state and are only ever CSS-hidden (2xl:hidden /
+          // hidden 2xl:flex), not unmounted, so an accessibility tree walk
+          // sees both regardless of viewport and hears "Start listening"
+          // twice with no way to tell them apart.
+          aria-label={micOn ? "Stop listening (desktop toggle)" : "Start listening (desktop toggle)"}
         >
           {micOn ? <Mic className="h-3.5 w-3.5" /> : <MicOff className="h-3.5 w-3.5" />}
           {micOn ? "Listening — click to stop" : "Start listening"}
@@ -381,12 +395,18 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
         </p>
       </div>
 
+      {/* Made more prominent — found live (2026-09-06 audit): this full-bleed
+          screen replaces all app navigation with no other way back, but the
+          only way out was a bare 36px icon at low contrast (white/60 on
+          near-black) in a corner, easy to miss on a screen this dense with
+          motion. Bigger tap target, a visible label, higher-contrast border. */}
       <Link
         href="/"
         aria-label="Exit voice mode"
-        className="absolute right-6 top-6 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+        className="absolute right-4 top-4 z-20 flex h-10 items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3.5 text-xs font-medium text-white/90 backdrop-blur-sm transition-colors hover:border-white/30 hover:bg-white/15 hover:text-white sm:right-6 sm:top-6"
       >
         <X className="h-4 w-4" />
+        <span className="hidden sm:inline">Exit</span>
       </Link>
     </div>
   );
