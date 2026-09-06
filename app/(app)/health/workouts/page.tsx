@@ -4,7 +4,7 @@ import { ensureDefaultExercisesAction } from "@/actions/health-actions";
 import { hasHevyKey } from "@/lib/providers/workout/hevy-client";
 import { WorkoutForm } from "@/components/health/workout-form";
 import { ExerciseForm } from "@/components/health/exercise-form";
-import { WorkoutSessionCard } from "@/components/health/workout-session-card";
+import { WorkoutsList } from "@/components/health/workouts-list";
 import { HevySyncButton } from "@/components/health/hevy-sync-button";
 import { HevyAutoSync } from "@/components/health/hevy-auto-sync";
 import { WorkoutCalendar } from "@/components/health/workout-calendar";
@@ -61,16 +61,10 @@ export default async function WorkoutsPage() {
           No sessions logged yet — start one above.
         </p>
       ) : (
-        <div className="space-y-3">
-          {workouts.map((workout) => (
-            <WorkoutSessionCard
-              key={workout.id}
-              workout={workout}
-              sets={setsByWorkout.get(workout.id) ?? []}
-              exercises={exercises}
-            />
-          ))}
-        </div>
+        <WorkoutsList
+          rows={workouts.map((workout) => ({ workout, sets: setsByWorkout.get(workout.id) ?? [] }))}
+          exercises={exercises}
+        />
       )}
     </div>
   );

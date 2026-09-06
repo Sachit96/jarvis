@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { ConfirmDeleteButton } from "@/components/shared/confirm-delete-button";
 import { deleteGoalAction, updateGoalProgressAction } from "@/actions/life-actions";
 import type { Database } from "@/lib/supabase/database.types";
 
@@ -45,13 +46,7 @@ export function GoalCard({ goal }: { goal: Goal }) {
             <p className="mt-0.5 text-xs text-muted-foreground">{goal.description}</p>
           ) : null}
         </div>
-        <button
-          onClick={handleDelete}
-          aria-label="Delete goal"
-          className="relative after:absolute after:-inset-3.5 shrink-0 text-muted-foreground hover:text-danger"
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
+        <ConfirmDeleteButton onDelete={handleDelete} isPending={isPending} label="goal" />
       </div>
 
       <div className="mt-3 flex items-center gap-2">

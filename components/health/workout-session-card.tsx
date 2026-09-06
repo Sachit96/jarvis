@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Trash2, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ConfirmDeleteButton } from "@/components/shared/confirm-delete-button";
 import { deleteWorkoutAction, toggleWorkoutCompletedAction } from "@/actions/health-actions";
 import { computeWorkoutVolume } from "@/lib/db/queries/health";
 import { formatLbs } from "@/lib/units";
@@ -78,34 +79,38 @@ export function WorkoutSessionCard({
             </p>
           </div>
         </div>
-        <button onClick={handleDelete} aria-label="Delete session" className="relative after:absolute after:-inset-3.5 text-muted-foreground hover:text-danger">
-          <Trash2 className="h-4 w-4" />
-        </button>
+        <ConfirmDeleteButton onDelete={handleDelete} isPending={isPending} label="session" />
       </div>
 
       {workout.notes ? <p className="mt-2 text-xs text-muted-foreground">{workout.notes}</p> : null}
 
-      {sets.length > 0 ? (
-        <button
-          onClick={() => setExpanded((e) => !e)}
-          className="mt-3 flex items-center gap-1 text-xs font-medium text-brand hover:underline"
-        >
-          {expanded ? "Hide" : "Show"} {sets.length} set{sets.length === 1 ? "" : "s"}
-          <ChevronDown className={cn("h-3 w-3 transition-transform", expanded && "rotate-180")} strokeWidth={2.5} />
-        </button>
-      ) : null}
+      <button
+        onClick={() => setExpanded((e) => !e)}
+        className="mt-3 flex items-center gap-1 text-xs font-medium text-brand hover:underline"
+      >
+        {expanded ? "Hide" : sets.length > 0 ? `Show ${sets.length} set${sets.length === 1 ? "" : "s"}` : "Log a set"}
+        <ChevronDown className={cn("h-3 w-3 transition-transform", expanded && "rotate-180")} strokeWidth={2.5} />
+      </button>
 
-      {expanded && sets.length > 0 ? (
-        <ul className="mt-2 space-y-1.5 border-t border-border pt-2">
-          {sets.map((s) => (
-            <WorkoutSetItem key={s.id} set={s} exerciseName={exerciseNameById.get(s.exercise_id) ?? "?"} />
-          ))}
-        </ul>
-      ) : null}
+      {expanded ? (
+        <>
+          {sets.length > 0 ? (
+            <ul className="mt-2 space-y-1.5 border-t border-border pt-2">
+              {sets.map((s) => (
+                <WorkoutSetItem key={s.id} set={s} exerciseName={exerciseNameById.get(s.exercise_id) ?? "?"} />
+              ))}
+            </ul>
+          ) : null}
 
-      <div className="mt-3">
-        <AddSetForm workoutId={workout.id} exercises={exercises} nextSetNumber={sets.length + 1} />
-      </div>
+          {/* Mounted only while expanded — with 20+ sessions on screen at
+              once, an always-mounted form per card (select + 2 inputs +
+              button, per session) was most of the "138 inputs, 97 buttons"
+              found live auditing this page (2026-09-06). */}
+          <div className="mt-3">
+            <AddSetForm workoutId={workout.id} exercises={exercises} nextSetNumber={sets.length + 1} />
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }
