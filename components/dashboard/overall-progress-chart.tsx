@@ -29,16 +29,35 @@ function ProgressTooltip({ active, payload, label }: { active?: boolean; payload
   );
 }
 
+/** How much a series has to move over the whole window before it's worth
+ * charting rather than describing in one line — found live (2026-09-06
+ * audit): 30 days of four lines each wobbling within a ~10-point band all
+ * read as "near-flat," which is a real signal (there's genuinely not much
+ * happening yet) but not one a line chart communicates well at a glance. */
+const MEANINGFUL_RANGE = 20;
+
+function seriesRange(points: LifeScoreTrendPoint[], key: keyof Omit<LifeScoreTrendPoint, "date">): number {
+  const values = points.map((p) => p[key]);
+  return Math.max(...values) - Math.min(...values);
+}
+
 export function OverallProgressChart({
   points,
   compact = false,
   className,
+  narrative,
 }: {
   points: LifeScoreTrendPoint[];
   compact?: boolean;
   className?: string;
+  /** Short, real per-category lines (e.g. "Business: 0 deals won this week") shown instead of the chart when none of the four series moves enough to be worth charting yet. Omit to always show the chart/its own empty state. */
+  narrative?: string[];
 }) {
   const hasActivity = points.some((p) => p.business + p.health + p.finance + p.habits > 0);
+  const hasMeaningfulVariance = (["business", "health", "finance", "habits"] as const).some(
+    (cat) => seriesRange(points, cat) >= MEANINGFUL_RANGE,
+  );
+  const showNarrative = Boolean(narrative?.length) && (!hasActivity || !hasMeaningfulVariance);
 
   return (
     <Card padding={compact ? "compact" : "default"} className={cn(compact && "min-h-[200px]", className)}>
@@ -47,7 +66,16 @@ export function OverallProgressChart({
       </header>
       <div className="flex min-h-0 flex-1 flex-col">
         <div className={compact ? "h-[132px] w-full" : "h-64 w-full"}>
-          {hasActivity ? (
+          {showNarrative ? (
+            <ul className="flex h-full flex-col items-start justify-center gap-2 pl-2 text-body text-foreground">
+              {narrative!.map((line) => (
+                <li key={line} className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+                  {line}
+                </li>
+              ))}
+            </ul>
+          ) : hasActivity ? (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={points} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
                 <defs>

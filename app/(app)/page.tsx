@@ -96,6 +96,23 @@ export default async function DashboardPage() {
   const recentSets = await getWorkoutSets(supabase, recentWorkoutIds);
   const volume7d = computeWorkoutVolume(recentSets);
 
+  // Real per-category counts for the last 7 days — a short narrative line
+  // for OverallProgressChart to fall back to when the smoothed 0-100
+  // series aren't moving enough to be worth charting yet (found live,
+  // 2026-09-06 audit: four near-flat lines over 30 days).
+  const dealsWonThisWeek = deals.filter((d) => {
+    if (!d.closed_at || new Date(d.closed_at) < sevenDaysAgo) return false;
+    return stages.find((s) => s.id === d.stage_id)?.is_won;
+  }).length;
+  const transactionsThisWeek = monthTransactions.filter((t) => new Date(t.occurred_at) >= sevenDaysAgo).length;
+  const habitsDoneToday = routineItems.filter((i) => i.completed).length;
+  const progressNarrative = [
+    `Business: ${dealsWonThisWeek} deal(s) won this week`,
+    `Health: ${recentWorkoutIds.length} workout(s) this week`,
+    `Finance: ${transactionsThisWeek} transaction(s) this week`,
+    `Habits: ${habitsDoneToday}/${routineItems.length} done today`,
+  ];
+
   // 84 days = the 12 weeks HabitHeatmapCard actually renders — the Routine
   // page's own getHabitLogsForHeatmap call only asks for 35 (its own
   // narrower view), so this needs its own wider window, not the default.
@@ -157,7 +174,7 @@ export default async function DashboardPage() {
 
         {/* Column 2 */}
         <div className="flex h-full min-h-0 flex-col gap-4">
-          <OverallProgressChart points={lifeScoreTrend} compact />
+          <OverallProgressChart points={lifeScoreTrend} narrative={progressNarrative} compact />
           <TodayRoutineCard items={routineItems} compact className="flex-1" />
           <DetailStatsCard
             title="Finance"

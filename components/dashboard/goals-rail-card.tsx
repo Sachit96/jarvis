@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -21,6 +21,11 @@ export function GoalsRailCard({ goals, className }: { goals: Goal[]; className?:
     .filter((g) => g.status !== "achieved")
     .sort((a, b) => (a.target_date ?? "9999").localeCompare(b.target_date ?? "9999"));
   const visible = active.slice(0, MAX_VISIBLE_GOALS);
+  // Found live (2026-09-06 audit): a fresh set of goals renders as a full
+  // column of empty progress bars — real, but not worth this much space
+  // until at least one has actually moved. One compact line + a way in
+  // beats spending the whole card on N copies of "0%".
+  const noneStarted = visible.length > 0 && visible.every((g) => g.progress_percent === 0);
 
   return (
     <Card padding="compact" className={cn("min-h-0", className)}>
@@ -30,6 +35,11 @@ export function GoalsRailCard({ goals, className }: { goals: Goal[]; className?:
       <div className="flex min-h-0 flex-1 flex-col">
         {active.length === 0 ? (
           <p className="text-[13px] text-muted-foreground">No active goals.</p>
+        ) : noneStarted ? (
+          <div className="flex items-center gap-2.5 text-[13px] text-muted-foreground">
+            <Target className="h-4 w-4 shrink-0 text-muted-foreground/70" strokeWidth={1.75} />
+            {visible.length} goal{visible.length === 1 ? "" : "s"} set, none started yet.
+          </div>
         ) : (
           <div className="flex-1 space-y-3 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {visible.map((goal) => (
