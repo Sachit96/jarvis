@@ -36,7 +36,18 @@ async function logOutcome(status: "success" | "error", httpStatus: number | null
   }
 }
 
-export default async () => {
+// Netlify's documented scheduled-function contract (verified live against
+// current docs, 2026-09-06, not recalled) is `async (req: Request) => {...}`
+// — this handler took zero parameters instead, since the day it was
+// written. Extra JS args are normally silently ignored, but this
+// function's registered invocation model is "stream" (a Request/Response-
+// oriented contract), and a handler that never engages with that contract
+// is the leading candidate for why invocation produces literally zero log
+// output — not even this file's own pre-import BOOT line — while Netlify
+// still reports success and advances the schedule. `req` isn't otherwise
+// used; the real payload only carries `next_run`, which this job doesn't need.
+export default async (req: Request) => {
+  void req;
   const baseUrl = process.env.URL;
   const secret = process.env.CRON_SECRET;
 
