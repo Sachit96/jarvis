@@ -17,6 +17,21 @@
  * Fix: read local Y/M/D components directly — getFullYear/getMonth/
  * getDate are already timezone-aware and never round-trip through UTC,
  * so there's no boundary left to cross.
+ *
+ * This project has now hit three distinct "now" bugs, each a different
+ * mechanism, same root cause — code and prose both silently assume they
+ * know the current date/time instead of asking for it: (1) this file's
+ * own toISOString()-vs-local bug above; (2) stale hand-typed dates
+ * written into mentor-persona prose that drifted from reality as time
+ * passed; (3) the SMS webhook's add_deadline tool (found live,
+ * 2026-09-06) having Gemma hallucinate a training-data-era year for a
+ * year-less date, fixed by anchoring the system instruction with
+ * todayStr() (see app/api/sms/webhook/route.ts's buildSystemInstruction,
+ * same pattern as computeLiveClockBlock in lib/ai/persona.ts). None of
+ * the three were caught by a unit test — a unit test's "now" is whatever
+ * the test author typed, so it can't see a real clock/calendar drift.
+ * Anything that touches "now" needs a live assertion against the actual
+ * current date/time, not just a unit test, before it's trusted.
  */
 export function todayStr(d: Date = new Date()): string {
   const y = d.getFullYear();
