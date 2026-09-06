@@ -8,7 +8,20 @@
 // Relative imports, not the app's "@/..." alias — this file is bundled by
 // Netlify's own function bundler, separately from the Next.js build, and
 // isn't guaranteed to resolve tsconfig path aliases the same way.
-import { runResearchJob } from "../../lib/research/run-job";
+//
+// runResearchJob comes from the _shared/research/ duplicate, NOT
+// lib/research/run-job.ts directly — found live (2026-09-06): that file
+// (and 7 more it transitively imports — places.ts, audit.ts, pagespeed.ts,
+// gemini-lead-qualifier.ts, anthropic-lead-qualifier.ts, anthropic-
+// client.ts, lib/ai/providers.ts) all open with `import "server-only"`,
+// whose unconditional real implementation crashes at module load under
+// any bundler that isn't Next.js's own. That crash happened before this
+// function ever reached a single line of the actual research pipeline,
+// for every invocation since research-run.mts was written — see
+// _shared/admin-client.ts's comment for the full mechanism.
+// researchRunParamsSchema has no such guard (plain Zod, no "server-only"),
+// so it's still imported directly from the real file.
+import { runResearchJob } from "./_shared/research/run-job";
 import { researchRunParamsSchema } from "../../lib/validations/lead-research";
 
 export default async (req: Request) => {

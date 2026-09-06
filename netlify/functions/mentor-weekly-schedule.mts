@@ -2,9 +2,9 @@
 // review. POST /api/mentor/run?kind=weekly has existed since Phase 5 but had
 // nothing calling it on a schedule; this closes that gap. See
 // mentor-daily-schedule.mts for the full rationale (relative imports, the
-// admin.ts type-only "@/" reference, the logging pattern) — this file
-// mirrors it exactly, just for the weekly cadence.
-import { createAdminClient } from "../../lib/supabase/admin";
+// _shared/admin-client.ts duplicate and why it exists, the logging
+// pattern) — this file mirrors it exactly, just for the weekly cadence.
+import { createAdminClient } from "./_shared/admin-client";
 
 const JOB_NAME = "mentor_weekly_review";
 

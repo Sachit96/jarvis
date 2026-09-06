@@ -7,11 +7,15 @@
 // Relative imports for the same reason as mentor-daily-schedule.mts: this
 // file is bundled separately by Netlify's own function bundler, and its
 // own entry point isn't guaranteed to resolve tsconfig path aliases.
-// lib/supabase/admin.ts and lib/db/queries/lead-research.ts both only
-// reference "@/..." in `import type` positions, which any TS-aware
-// bundler erases at compile time regardless of alias resolution, so both
-// are safe to pull in via relative paths here.
-import { createAdminClient } from "../../lib/supabase/admin";
+//
+// createAdminClient comes from the _shared/ duplicate, not lib/supabase/
+// admin.ts directly — that file's `import "server-only"` crashes at
+// module load under Netlify's bundler (found live, 2026-09-06; see
+// _shared/admin-client.ts's comment for the full mechanism). This is why
+// this function's own scheduled_runs writes had never once succeeded.
+// lib/db/queries/lead-research.ts has no such guard (only `import type`
+// "@/..." references, erased at compile time) — safe to pull in directly.
+import { createAdminClient } from "./_shared/admin-client";
 import { getDueSavedLeadSearches, markSavedLeadSearchRun } from "../../lib/db/queries/lead-research";
 
 const JOB_NAME = "lead_research_saved_search";

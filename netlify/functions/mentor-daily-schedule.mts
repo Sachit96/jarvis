@@ -2,14 +2,19 @@
 // brief. POST /api/mentor/run?kind=daily has existed since Phase 5 but had
 // nothing calling it on a schedule; this closes that gap.
 //
-// Relative imports, not the app's "@/..." alias — same reasoning as
-// netlify/functions/research-run.mts: this file is bundled by Netlify's own
-// function bundler, separately from the Next.js build, and its own entry
-// point isn't guaranteed to resolve tsconfig path aliases. (lib/supabase/
-// admin.ts's only "@/" reference is an `import type`, which any TS-aware
-// bundler erases at compile time regardless of alias resolution, so it's
-// safe to pull in via a relative path here.)
-import { createAdminClient } from "../../lib/supabase/admin";
+// Relative imports, not the app's "@/..." alias — this file is bundled by
+// Netlify's own function bundler, separately from the Next.js build, and
+// its own entry point isn't guaranteed to resolve tsconfig path aliases.
+//
+// createAdminClient comes from the _shared/ duplicate, NOT lib/supabase/
+// admin.ts directly — found live (2026-09-06): admin.ts opens with
+// `import "server-only"`, whose unconditional real implementation crashes
+// at module load under any bundler that isn't Next.js's own (Netlify's
+// function bundler has no "react-server" condition configured). That
+// crash happened before this file's own try/catch or logOutcome ever ran,
+// for every invocation since this file was written — see
+// _shared/admin-client.ts's own comment for the full mechanism.
+import { createAdminClient } from "./_shared/admin-client";
 
 const JOB_NAME = "mentor_daily_brief";
 
