@@ -18,6 +18,17 @@ interface StatTileProps {
   category?: Category;
   /** Trims padding/icon size for dense grids (e.g. the one-screen Home layout). */
   compact?: boolean;
+  /**
+   * A qualifying footnote for when `value` is a real "0"/"$0" that isn't a
+   * genuine "nothing happening" measurement — e.g. "10 deals, values not
+   * set yet" or "no account connected". Found live (2026-09-06 audit): a
+   * bare $0 next to a real deal count reads as a broken measurement, not
+   * an unset field. Renders muted, below delta, never fights it for
+   * attention — this is a footnote on the headline number, not a second one.
+   */
+  note?: string;
+  /** Dims the big number itself — pair with `note` when the value is a placeholder rather than a real reading (e.g. $0 with no accounts yet). */
+  unmeasured?: boolean;
   className?: string;
 }
 
@@ -39,6 +50,8 @@ export function StatTile({
   category = "money",
   compact = false,
   className,
+  note,
+  unmeasured = false,
 }: StatTileProps) {
   const TrendIcon = trend === "up" ? TrendingUp : trend === "down" ? TrendingDown : null;
 
@@ -51,7 +64,7 @@ export function StatTile({
         className={cn(
           "font-mono tabular-nums",
           compact ? "mt-1 text-[20px] font-semibold" : "mt-1.5 text-title",
-          primary ? "text-brand" : "text-foreground",
+          unmeasured ? "text-muted-foreground/50" : primary ? "text-brand" : "text-foreground",
         )}
       >
         {value}
@@ -62,6 +75,7 @@ export function StatTile({
           {delta}
         </p>
       ) : null}
+      {note ? <p className="mt-1 text-caption text-muted-foreground">{note}</p> : null}
     </>
   );
 

@@ -34,6 +34,7 @@ export function DetailStatsCard({
   compact = false,
   fill = false,
   className,
+  footnote,
 }: {
   title: string;
   rows: DetailRow[];
@@ -42,11 +43,14 @@ export function DetailStatsCard({
   compact?: boolean;
   fill?: boolean;
   className?: string;
+  /** Card-level qualifier for when the rows below are real zeros that aren't a real measurement (e.g. "No accounts connected yet") — found live (2026-09-06 audit): a bare $0 row reads as a broken number, not an unset one. */
+  footnote?: string;
 }) {
   return (
     <Card padding={compact ? "compact" : "default"} className={cn("min-h-0", className)}>
-      <header className="mb-3 flex shrink-0 items-center justify-between">
+      <header className="mb-3 flex shrink-0 flex-col gap-0.5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">{title}</p>
+        {footnote ? <p className="text-caption text-muted-foreground/80">{footnote}</p> : null}
       </header>
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="space-y-2.5">

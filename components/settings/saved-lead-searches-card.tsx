@@ -1,9 +1,10 @@
 "use client";
 
 import { useActionState, useRef, useEffect, useState, useTransition } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Search, Trash2 } from "lucide-react";
 import { fieldAria, type ActionState } from "@/lib/validation";
 import { timeAgo } from "@/lib/time";
+import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,7 +63,13 @@ function SavedSearchRow({ search }: { search: SavedLeadSearch }) {
 }
 
 export function SavedLeadSearchesCard({ searches }: { searches: SavedLeadSearch[] }) {
-  const [showForm, setShowForm] = useState(searches.length === 0);
+  // Was `searches.length === 0` — auto-expanded the full 9-field form on
+  // first load of a page that's supposed to be a status summary, purely
+  // because "no searches yet" and "show the form" happened to share a
+  // condition. Found live (2026-09-06 audit): a settings page shouldn't
+  // dump a form on you by default — the empty state below now carries its
+  // own explicit "New saved search" action instead.
+  const [showForm, setShowForm] = useState(false);
   const [state, formAction, isPending] = useActionState(createSavedLeadSearchAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   const wasPending = useRef(false);
@@ -79,7 +86,7 @@ export function SavedLeadSearchesCard({ searches }: { searches: SavedLeadSearch[
     <div className="rounded-lg border border-border bg-card p-4">
       <div className="flex items-center justify-between">
         <p className="text-xs uppercase tracking-wider text-muted-foreground">Recurring Lead Research</p>
-        {!showForm ? (
+        {!showForm && searches.length > 0 ? (
           <Button size="sm" variant="secondary" className="gap-1.5" onClick={() => setShowForm(true)}>
             <Plus className="h-3.5 w-3.5" /> New saved search
           </Button>
@@ -98,7 +105,16 @@ export function SavedLeadSearchesCard({ searches }: { searches: SavedLeadSearch[
           ))}
         </div>
       ) : !showForm ? (
-        <p className="mt-3 text-xs text-muted-foreground">No saved searches yet.</p>
+        <EmptyState
+          icon={Search}
+          title="No saved searches yet"
+          description="Save a search once, and it re-runs automatically every Monday morning."
+          action={
+            <Button size="sm" variant="secondary" className="gap-1.5" onClick={() => setShowForm(true)}>
+              <Plus className="h-3.5 w-3.5" /> New saved search
+            </Button>
+          }
+        />
       ) : null}
 
       {showForm ? (

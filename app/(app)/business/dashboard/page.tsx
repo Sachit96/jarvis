@@ -72,7 +72,15 @@ export default async function BusinessDashboardPage() {
       <ModuleTabs tabs={BUSINESS_TABS} />
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatTile label="Open Pipeline" value={money(summary.openValue)} delta={`${summary.openCount} deal(s)`} icon={Briefcase} category="business" />
+        <StatTile
+          label="Open Pipeline"
+          value={money(summary.openValue)}
+          delta={`${summary.openCount} deal(s)`}
+          icon={Briefcase}
+          category="business"
+          unmeasured={summary.openValue === 0 && summary.openCount > 0}
+          note={summary.openValue === 0 && summary.openCount > 0 ? "Deal values not set yet" : undefined}
+        />
         <StatTile label="Won (all time)" value={money(summary.wonValue)} tone="success" delta={`${summary.wonCount} deal(s)`} icon={Trophy} category="business" />
         <StatTile label="Win Rate" value={`${summary.winRate}%`} delta={`${summary.closedCount} closed`} icon={Target} category="business" />
         <StatTile label="MRR" value={money(mrr)} tone="success" icon={TrendingUp} category="business" />

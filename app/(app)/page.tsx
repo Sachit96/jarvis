@@ -119,9 +119,24 @@ export default async function DashboardPage() {
       <h1 className="text-title">Today</h1>
 
       <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-5">
-        <StatTile label="Net Worth" value={money(financeTotals.netWorth)} icon={Wallet} category="money" compact />
+        <StatTile
+          label="Net Worth"
+          value={money(financeTotals.netWorth)}
+          icon={Wallet}
+          category="money"
+          compact
+          unmeasured={accounts.length === 0}
+          note={accounts.length === 0 ? "No accounts yet" : undefined}
+        />
         <StatTile label="Business Revenue" value={money(mrr)} icon={TrendingUp} category="business" compact />
-        <StatTile label="Health Score" value={`${lifeScore.health}/100`} icon={HeartPulse} category="health" compact />
+        <StatTile
+          label="Health Score"
+          value={`${lifeScore.health}/100`}
+          icon={HeartPulse}
+          category="health"
+          compact
+          note={lifeScore.health === 0 && workouts.length > 0 ? "No workout/nutrition logged today" : undefined}
+        />
         <StatTile label="Discipline Score" value={`${lifeScore.habits}/100`} icon={Target} category="goals" compact />
         <StatTile label="Goal Completion" value={`${lifeScore.goals}%`} icon={CircleCheck} category="goals" compact />
       </div>
@@ -148,6 +163,7 @@ export default async function DashboardPage() {
             title="Finance"
             compact
             className="min-h-[190px]"
+            footnote={accounts.length === 0 ? "No accounts connected yet" : undefined}
             rows={[
               { label: "Assets", value: money(financeTotals.assets) },
               { label: "Liabilities", value: money(financeTotals.liabilities), tone: financeTotals.liabilities > 0 ? "danger" : "neutral" },
@@ -173,6 +189,11 @@ export default async function DashboardPage() {
             title="Business"
             compact
             className="min-h-[140px]"
+            footnote={
+              pipelineSummary.openValue === 0 && pipelineSummary.openCount > 0
+                ? `${pipelineSummary.openCount} deal(s), values not set yet`
+                : undefined
+            }
             rows={[
               { label: "Open Pipeline", value: `${money(pipelineSummary.openValue)} (${pipelineSummary.openCount})` },
               { label: "Win Rate", value: `${pipelineSummary.winRate}%` },

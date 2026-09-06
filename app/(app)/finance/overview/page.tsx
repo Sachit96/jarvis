@@ -44,7 +44,7 @@ export default async function FinanceOverviewPage() {
 
       <ModuleTabs tabs={FINANCE_TABS} />
 
-      <NetWorthWidget {...totals} />
+      <NetWorthWidget {...totals} accountCount={accounts.length} />
       <MonthlyPnlCard {...pnl} />
 
       <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
