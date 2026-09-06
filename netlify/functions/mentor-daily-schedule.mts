@@ -1,3 +1,10 @@
+console.log("BOOT mentor-daily-schedule");
+// DIAGNOSTIC (2026-09-06) — temporary, remove once resolved. The line
+// above is the literal first line of this file, above every import, so
+// nothing can throw before it runs. If it doesn't appear in the function
+// log after a real invocation, the module was never loaded at all — a
+// bundling/registration problem, not a runtime crash inside the handler.
+//
 // Netlify Scheduled Function — the actual trigger for the daily AI Mentor
 // brief. POST /api/mentor/run?kind=daily has existed since Phase 5 but had
 // nothing calling it on a schedule; this closes that gap.
