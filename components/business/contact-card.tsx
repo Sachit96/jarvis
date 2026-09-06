@@ -4,7 +4,6 @@ import { useTransition } from "react";
 import Link from "next/link";
 import { Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { deleteContactAction } from "@/actions/business-actions";
 import { ActivityForm } from "@/components/business/activity-form";
 import { ActivityItem } from "@/components/business/activity-item";
@@ -34,11 +33,6 @@ export function ContactCard({
             <Link href={`/business/clients/${contact.id}`} className="truncate text-sm font-medium hover:underline">
               {contact.contact_person}
             </Link>
-            {contact.source === "ghl" ? (
-              <Badge variant="outline" className="text-[10px] uppercase">
-                GHL
-              </Badge>
-            ) : null}
           </div>
           {contact.company_name ? (
             <p className="truncate text-xs text-muted-foreground">{contact.company_name}</p>

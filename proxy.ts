@@ -17,10 +17,9 @@ import type { NextRequest } from "next/server";
 // EXCEPT the server-to-server routes below, each independently
 // authenticated and unreachable by their real caller through this gate:
 //
-// - /api/sms/webhook, /api/webhooks/ghl — Twilio and GoHighLevel POST
-//   directly to these and have no way to attach the site's Basic Auth
-//   credentials (found verifying SMS signature validation). Own auth:
-//   Twilio's X-Twilio-Signature HMAC, GHL's ?secret= query param.
+// - /api/sms/webhook — Twilio POSTs directly to this and has no way to
+//   attach the site's Basic Auth credentials (found verifying SMS
+//   signature validation). Own auth: Twilio's X-Twilio-Signature HMAC.
 // - /api/mentor/run, /api/research/runs(/*) — Netlify Scheduled Functions
 //   (netlify/functions/*-schedule.mts) call these with
 //   `Authorization: Bearer <CRON_SECRET>` and nothing else. Found live
@@ -43,7 +42,7 @@ import type { NextRequest } from "next/server";
 // Every other route, including the OAuth callback a browser redirects
 // back to (which still carries the site's cached Basic Auth), stays
 // gated.
-const UNGATED_WEBHOOK_PATHS = ["/api/sms/webhook", "/api/webhooks/ghl", "/api/mentor/run"];
+const UNGATED_WEBHOOK_PATHS = ["/api/sms/webhook", "/api/mentor/run"];
 const UNGATED_PREFIXES = ["/api/research/runs"];
 
 /**
@@ -70,7 +69,7 @@ export function proxy(request: NextRequest) {
   }
 
   const password = process.env.SITE_PASSWORD;
-  // Unset = not gated. Matches this app's convention elsewhere (Hevy, GHL,
+  // Unset = not gated. Matches this app's convention elsewhere (Hevy,
   // Gemini all degrade to "not configured" rather than hard-failing) — but
   // unlike those, an unset SITE_PASSWORD means a fully public site, so it's
   // worth being loud about that instead of silently doing nothing.

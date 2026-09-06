@@ -177,21 +177,6 @@ export function computePipelineSummary(
   };
 }
 
-export async function getGhlConnection(supabase: Client) {
-  const { data, error } = await supabase.from("ghl_connections").select("*").maybeSingle();
-  if (error) throw error;
-  return data;
-}
-
-export async function getGhlSyncLogs(supabase: Client, limit = 20) {
-  const { data, error } = await supabase
-    .from("ghl_sync_logs")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(limit);
-  if (error) throw error;
-  return data;
-}
 
 // ==================================================== follow-up watchdog (B3)
 

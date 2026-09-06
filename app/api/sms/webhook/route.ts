@@ -10,7 +10,7 @@ import { todayStr } from "@/lib/date";
 // message to TWILIO_PHONE_NUMBER. Inert (returns empty TwiML immediately)
 // until all four env vars below are set; "not configured" is the
 // established graceful-degradation convention this app already uses for
-// Hevy/GHL/Gemini, applied here too.
+// Hevy/Gemini, applied here too.
 const RATE_LIMIT_PER_HOUR = 20;
 
 const TOOLS: GeminiFunctionDeclaration[] = [

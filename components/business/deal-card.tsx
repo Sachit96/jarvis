@@ -4,7 +4,6 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -74,11 +73,6 @@ export function DealCard({
 
       <div className="mt-2 flex items-center gap-2">
         <p className="font-mono text-sm text-brand">{money(Number(deal.value))}</p>
-        {deal.source === "ghl" ? (
-          <Badge variant="outline" className="text-[10px] uppercase">
-            GHL
-          </Badge>
-        ) : null}
       </div>
 
       {deal.notes ? <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{deal.notes}</p> : null}

@@ -77,9 +77,3 @@ export const updateDealNotesSchema = z.object({
   notes: optionalTextInput,
 });
 export type UpdateDealNotesInput = z.infer<typeof updateDealNotesSchema>;
-
-export const ghlConnectionSchema = z.object({
-  private_token: z.string().trim().min(10, "Token looks too short").max(500),
-  location_id: z.string().trim().min(1, "Location ID is required").max(100),
-});
-export type GhlConnectionInput = z.infer<typeof ghlConnectionSchema>;

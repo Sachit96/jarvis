@@ -1,12 +1,9 @@
 import { CheckCircle2, XCircle } from "lucide-react";
 import { ExportBackupButton } from "@/components/settings/export-backup-button";
 import { createClient } from "@/lib/supabase/server";
-import { getGhlConnection, getGhlSyncLogs } from "@/lib/db/queries/business";
 import { getSavedLeadSearches } from "@/lib/db/queries/lead-research";
 import { getYtConnection } from "@/lib/db/queries/youtube";
 import { AiMentorStatusCard } from "@/components/settings/ai-mentor-status-card";
-import { GhlConnectionCard } from "@/components/settings/ghl-connection-card";
-import { GhlSyncLogs } from "@/components/settings/ghl-sync-logs";
 import { SavedLeadSearchesCard } from "@/components/settings/saved-lead-searches-card";
 import { SmsStatusCard } from "@/components/settings/sms-status-card";
 import { AnthropicStatusCard } from "@/components/settings/anthropic-status-card";
@@ -38,9 +35,7 @@ export default async function SettingsPage({
   const { youtube_connected, youtube_error } = await searchParams;
   const supabase = await createClient();
   const hasGeminiKey = Boolean(process.env.GEMINI_API_KEY);
-  const [ghlConnection, ghlLogs, savedSearches, ytConnection] = await Promise.all([
-    getGhlConnection(supabase),
-    getGhlSyncLogs(supabase),
+  const [savedSearches, ytConnection] = await Promise.all([
     getSavedLeadSearches(supabase),
     getYtConnection(supabase),
   ]);
@@ -85,8 +80,6 @@ export default async function SettingsPage({
         model={`${TIER_MODEL.high_volume} (high-volume) + ${TIER_MODEL.structured} (structured)`}
       />
 
-      <GhlConnectionCard connection={ghlConnection} />
-      <GhlSyncLogs logs={ghlLogs} />
       <SavedLeadSearchesCard searches={savedSearches} />
       <SmsStatusCard configured={smsConfigured} ownerNumber={process.env.OWNER_PHONE_NUMBER ?? null} recentCount={smsRecentCount} />
       <AnthropicStatusCard hasKey={hasAnthropicKey} spentUsd={anthropicSpent} capUsd={anthropicCap} />

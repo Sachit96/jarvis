@@ -1,4 +1,4 @@
-import { Users, UserPlus, Link2 } from "lucide-react";
+import { Users, UserPlus, Search } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getContacts, getAllActivities, getAllOnboardingTasks } from "@/lib/db/queries/business";
 import { ensureOnboardingTasksAction } from "@/actions/business-actions";
@@ -44,7 +44,7 @@ export default async function ClientsPage() {
         <div className="grid grid-cols-3 gap-4">
           <StatTile label="Total Clients" value={String(contacts.length)} icon={Users} category="business" />
           <StatTile label="Manual" value={String(contacts.filter((c) => c.source === "manual").length)} icon={UserPlus} category="business" />
-          <StatTile label="From GHL" value={String(contacts.filter((c) => c.source === "ghl").length)} icon={Link2} category="business" />
+          <StatTile label="From Lead Research" value={String(contacts.filter((c) => c.source === "research_agent").length)} icon={Search} category="business" />
         </div>
       ) : null}
 
