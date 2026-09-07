@@ -57,6 +57,20 @@ export async function getAssessments(supabase: Client, courseIds?: string[]) {
   return data;
 }
 
+export async function getAssessmentGroups(supabase: Client, courseIds?: string[]) {
+  let query = supabase.from("uni_assessment_groups").select("*");
+  if (courseIds) {
+    if (courseIds.length === 0) return [];
+    query = query.in("course_id", courseIds);
+  }
+  const { data, error } = await query;
+  if (error) {
+    if (isMissingRelation(error)) return [];
+    throw error;
+  }
+  return data;
+}
+
 export async function getAssessment(supabase: Client, id: string) {
   const { data, error } = await supabase.from("uni_assessments").select("*").eq("id", id).maybeSingle();
   if (error) {
@@ -108,6 +122,16 @@ export async function getMaterials(supabase: Client, courseId: string) {
 
 export async function getDeadlines(supabase: Client) {
   const { data, error } = await supabase.from("uni_deadlines").select("*").order("due_at", { ascending: true });
+  if (error) {
+    if (isMissingRelation(error)) return [];
+    throw error;
+  }
+  return data;
+}
+
+/** University-wide (course_id null) and per-course no-class date ranges — see uni_no_class_periods, consumed by expandWeeklyOccurrences's caller. */
+export async function getNoClassPeriods(supabase: Client) {
+  const { data, error } = await supabase.from("uni_no_class_periods").select("*");
   if (error) {
     if (isMissingRelation(error)) return [];
     throw error;

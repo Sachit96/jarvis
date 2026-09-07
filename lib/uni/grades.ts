@@ -9,18 +9,93 @@ export type AssessmentStatus = "not_started" | "in_progress" | "submitted" | "gr
 
 export interface GradeAssessment {
   id: string;
-  weight_pct: number;
+  /** Percentage of the course this assessment is worth. Null means genuinely unknown (not 0) — every function below excludes null-weight assessments from all weight sums entirely, rather than treating them as worth nothing. */
+  weight_pct: number | null;
   max_score: number;
   earned_score: number | null;
   /** Plain string, not the narrow AssessmentStatus union — DB rows come back with status typed as a generic check-constrained text column, and these functions only ever compare against the literal "graded"/"submitted", so a wider type here avoids forcing a cast at every call site. */
   status: string;
   due_at: string | null;
+  /** Best-N-of-M membership — null/absent means ungrouped. Resolved against `groups` by resolveEffectiveAssessments before any weighted sum runs. */
+  group_id?: string | null;
+}
+
+export interface GradeAssessmentGroup {
+  id: string;
+  /** How many of this group's lowest-scoring graded members to exclude entirely (not just zero-weight) from every weighted calculation, once more than (member count - this) are graded. 0 = grouping is display-only, no dropping. */
+  drop_lowest_count: number;
 }
 
 export interface GradeCourse {
   id: string;
   credit_weight: number;
   target_grade: number | null;
+}
+
+/** Number of assessments whose weight is genuinely unknown — surface this so the UI can warn that grade projections are incomplete rather than silently treating the course as fully accounted for. */
+export function unresolvedWeightCount(assessments: GradeAssessment[]): number {
+  return assessments.filter((a) => a.weight_pct == null).length;
+}
+
+function hasWeight(a: GradeAssessment): a is GradeAssessment & { weight_pct: number } {
+  return a.weight_pct != null;
+}
+
+/**
+ * Resolves best-N-of-M groups against a flat assessment list, returning a
+ * new list where excess low-scoring graded members of a group are dropped
+ * entirely (not present in the result, so every downstream weighted-sum
+ * formula — which was already correct for a flat list — produces the
+ * correct redistributed result with no further change). Each surviving
+ * member is expected to already carry its "if this counts" weight (e.g.
+ * groupTotal / (memberCount - dropLowestCount)) — that convention, not
+ * this function, is what makes the redistribution land on the right total.
+ *
+ * Deliberately conservative: only drops what's already certain. With
+ * `memberCount - dropLowestCount` = keepCount, if `keepCount` or fewer
+ * members are graded so far, nothing is dropped yet — the current worst
+ * scorer might still end up beaten by a not-yet-graded member. Once more
+ * than `keepCount` are graded, the excess lowest-scoring graded members
+ * are dropped one at a time as grading progresses, self-correcting to the
+ * final correct set once the whole group is graded.
+ */
+function resolveEffectiveAssessments(assessments: GradeAssessment[], groups: GradeAssessmentGroup[]): GradeAssessment[] {
+  if (groups.length === 0) return assessments;
+  const groupById = new Map(groups.map((g) => [g.id, g]));
+  const byGroup = new Map<string, GradeAssessment[]>();
+  const result: GradeAssessment[] = [];
+
+  for (const a of assessments) {
+    const group = a.group_id ? groupById.get(a.group_id) : undefined;
+    if (!group || group.drop_lowest_count <= 0) {
+      result.push(a);
+      continue;
+    }
+    const list = byGroup.get(group.id) ?? [];
+    list.push(a);
+    byGroup.set(group.id, list);
+  }
+
+  for (const [groupId, members] of byGroup) {
+    const group = groupById.get(groupId)!;
+    const graded = members.filter((a) => a.status === "graded" && a.earned_score != null && a.max_score > 0);
+    const keepCount = members.length - group.drop_lowest_count;
+
+    if (graded.length <= keepCount) {
+      result.push(...members);
+      continue;
+    }
+
+    const dropCount = graded.length - keepCount;
+    const droppedIds = new Set(
+      [...graded].sort((a, b) => a.earned_score! / a.max_score - b.earned_score! / b.max_score).slice(0, dropCount).map((a) => a.id),
+    );
+    for (const a of members) {
+      if (!droppedIds.has(a.id)) result.push(a);
+    }
+  }
+
+  return result;
 }
 
 /**
@@ -30,18 +105,23 @@ export interface GradeCourse {
  * course ended today," the number a student actually expects to see.
  * Returns null when nothing is graded yet (there is no "current grade").
  */
-export function courseGrade(assessments: GradeAssessment[]): number | null {
-  const graded = assessments.filter((a) => a.status === "graded" && a.earned_score != null && a.max_score > 0);
-  const totalWeightGraded = graded.reduce((sum, a) => sum + a.weight_pct, 0);
+export function courseGrade(assessments: GradeAssessment[], groups: GradeAssessmentGroup[] = []): number | null {
+  const effective = resolveEffectiveAssessments(assessments, groups);
+  const graded = effective.filter((a) => a.status === "graded" && a.earned_score != null && a.max_score > 0 && hasWeight(a));
+  const totalWeightGraded = graded.reduce((sum, a) => sum + a.weight_pct!, 0);
   if (totalWeightGraded <= 0) return null;
-  const weightedSum = graded.reduce((sum, a) => sum + (a.earned_score! / a.max_score) * a.weight_pct, 0);
+  const weightedSum = graded.reduce((sum, a) => sum + (a.earned_score! / a.max_score) * a.weight_pct!, 0);
   return (weightedSum / totalWeightGraded) * 100;
 }
 
 /**
  * Credit-weighted average across courses that have a current grade
  * (courseGrade() !== null). Courses with nothing graded yet don't drag the
- * average toward 0 — they're excluded, not counted as failing.
+ * average toward 0 — they're excluded, not counted as failing. This
+ * function has no visibility into WHY a course's grade is null (no
+ * assessments imported vs. assessments imported but ungraded) — callers
+ * that need to disclose "N of M courses counted" should do so themselves
+ * using their own per-course assessment counts (see app/(app)/uni/page.tsx).
  */
 export function semesterAverage(courses: { credit_weight: number; grade: number | null }[]): number | null {
   const withGrades = courses.filter((c) => c.grade != null);
@@ -58,17 +138,26 @@ export interface NeededOnRemainingResult {
   possible: boolean;
   /** True when there's nothing left to grade — the final grade is already locked in. */
   locked: boolean;
+  /** True when there are zero assessment rows at all — distinct from `locked`, which means everything IS graded. Check this first: a course with no assessment structure imported yet is not "locked" or "missed," it just has nothing to compute against. */
+  noData: boolean;
 }
 
 /**
  * What average score is needed on the remaining (non-graded) assessments
  * to hit `targetGrade` as the FINAL course grade — unlike courseGrade(),
  * this projects against the course's full weight (assumed to sum to
- * ~100), not just the weight graded so far.
+ * ~100), not just the weight graded so far. Assessments with unresolved
+ * (null) weight are excluded entirely from every sum here — see
+ * unresolvedWeightCount() to surface that the projection is incomplete.
  */
-export function neededOnRemaining(assessments: GradeAssessment[], targetGrade: number): NeededOnRemainingResult {
-  const totalWeight = assessments.reduce((sum, a) => sum + a.weight_pct, 0);
-  const graded = assessments.filter((a) => a.status === "graded" && a.earned_score != null && a.max_score > 0);
+export function neededOnRemaining(assessments: GradeAssessment[], targetGrade: number, groups: GradeAssessmentGroup[] = []): NeededOnRemainingResult {
+  if (assessments.length === 0) {
+    return { requiredAvgPct: 0, possible: true, locked: false, noData: true };
+  }
+
+  const effective = resolveEffectiveAssessments(assessments, groups).filter(hasWeight);
+  const totalWeight = effective.reduce((sum, a) => sum + a.weight_pct, 0);
+  const graded = effective.filter((a) => a.status === "graded" && a.earned_score != null && a.max_score > 0);
   const gradedWeight = graded.reduce((sum, a) => sum + a.weight_pct, 0);
   const remainingWeight = totalWeight - gradedWeight;
   const earnedPoints = graded.reduce((sum, a) => sum + (a.earned_score! / a.max_score) * a.weight_pct, 0);
@@ -78,7 +167,7 @@ export function neededOnRemaining(assessments: GradeAssessment[], targetGrade: n
     // Nothing left to grade — the final grade is exactly earnedPoints (as
     // a % of totalWeight), already decided either way.
     const finalPct = totalWeight > 0 ? (earnedPoints / totalWeight) * 100 : 0;
-    return { requiredAvgPct: 0, possible: finalPct >= targetGrade, locked: true };
+    return { requiredAvgPct: 0, possible: finalPct >= targetGrade, locked: true, noData: false };
   }
 
   const requiredAvgPct = (neededPoints / remainingWeight) * 100;
@@ -86,6 +175,7 @@ export function neededOnRemaining(assessments: GradeAssessment[], targetGrade: n
     requiredAvgPct: Math.max(0, requiredAvgPct),
     possible: requiredAvgPct <= 100,
     locked: false,
+    noData: false,
   };
 }
 
@@ -95,20 +185,31 @@ export function neededOnRemaining(assessments: GradeAssessment[], targetGrade: n
  * graded, then reuses courseGrade()'s exact running-average semantics.
  * hypotheticalPct values are percentages (0-100), not raw scores.
  */
-export function simulate(assessments: GradeAssessment[], hypotheticalPct: Record<string, number>): number | null {
+export function simulate(assessments: GradeAssessment[], hypotheticalPct: Record<string, number>, groups: GradeAssessmentGroup[] = []): number | null {
   const merged = assessments.map((a): GradeAssessment => {
     const pct = hypotheticalPct[a.id];
     if (pct == null) return a;
     return { ...a, status: "graded", earned_score: (pct / 100) * a.max_score };
   });
-  return courseGrade(merged);
+  return courseGrade(merged, groups);
 }
 
-/** Projected FINAL grade assuming every remaining (non-graded) assessment scores `remainingPct`. Shared implementation for bestCase/worstCase. */
-function projectFinal(assessments: GradeAssessment[], remainingPct: number): number {
+/**
+ * Projected FINAL grade assuming every remaining (non-graded) assessment
+ * scores `remainingPct`. Shared implementation for bestCase/worstCase.
+ * Deliberately NOT group-aware beyond the shared resolveEffectiveAssessments
+ * pass: dropping a group's lowest scorer is always neutral-or-favorable to
+ * the student, and resolveEffectiveAssessments only ever excludes already-
+ * GRADED members, so a still-open group's ungraded members flow into the
+ * best/worst-case assumption unchanged — there's no scenario where a
+ * rational worst case wants a currently-ungraded item to count instead of
+ * landing in the dropped set.
+ */
+function projectFinal(assessments: GradeAssessment[], remainingPct: number, groups: GradeAssessmentGroup[] = []): number {
+  const effective = resolveEffectiveAssessments(assessments, groups).filter(hasWeight);
   let totalWeight = 0;
   let weightedSum = 0;
-  for (const a of assessments) {
+  for (const a of effective) {
     totalWeight += a.weight_pct;
     if (a.status === "graded" && a.earned_score != null && a.max_score > 0) {
       weightedSum += (a.earned_score / a.max_score) * a.weight_pct;
@@ -120,13 +221,13 @@ function projectFinal(assessments: GradeAssessment[], remainingPct: number): num
 }
 
 /** Projected final grade assuming 100% on everything not yet graded. */
-export function bestCase(assessments: GradeAssessment[]): number {
-  return projectFinal(assessments, 100);
+export function bestCase(assessments: GradeAssessment[], groups: GradeAssessmentGroup[] = []): number {
+  return projectFinal(assessments, 100, groups);
 }
 
 /** Projected final grade assuming 0% on everything not yet graded. */
-export function worstCase(assessments: GradeAssessment[]): number {
-  return projectFinal(assessments, 0);
+export function worstCase(assessments: GradeAssessment[], groups: GradeAssessmentGroup[] = []): number {
+  return projectFinal(assessments, 0, groups);
 }
 
 /**
@@ -147,18 +248,24 @@ export function worstCase(assessments: GradeAssessment[]): number {
  * A course with nothing graded yet and a distant deadline scores low —
  * risk should reflect an actual problem, not just "the semester started."
  */
-export function riskScore(course: { target_grade: number | null }, assessments: GradeAssessment[], now: Date = new Date()): number {
+export function riskScore(
+  course: { target_grade: number | null },
+  assessments: GradeAssessment[],
+  now: Date = new Date(),
+  groups: GradeAssessmentGroup[] = [],
+): number {
   let score = 0;
 
-  const current = courseGrade(assessments);
+  const current = courseGrade(assessments, groups);
   const target = course.target_grade ?? 80;
   if (current != null) {
     const gap = Math.max(0, target - current);
     score += Math.min(40, gap * 2);
   }
 
-  const totalWeight = assessments.reduce((sum, a) => sum + a.weight_pct, 0);
-  const gradedWeight = assessments.filter((a) => a.status === "graded").reduce((sum, a) => sum + a.weight_pct, 0);
+  const effective = resolveEffectiveAssessments(assessments, groups).filter(hasWeight);
+  const totalWeight = effective.reduce((sum, a) => sum + a.weight_pct, 0);
+  const gradedWeight = effective.filter((a) => a.status === "graded").reduce((sum, a) => sum + a.weight_pct, 0);
   const remainingWeightFrac = totalWeight > 0 ? (totalWeight - gradedWeight) / totalWeight : 0;
   score += remainingWeightFrac * 20;
 
@@ -187,7 +294,7 @@ export function findOverloadedWeeks(
   weightThreshold = 15,
 ): { windowStart: string; items: { title: string; courseCode: string; due_at: string }[] }[] {
   const heavy = assessments
-    .filter((a) => a.due_at && a.weight_pct >= weightThreshold && new Date(a.due_at) >= now && a.status !== "graded")
+    .filter((a) => a.due_at && a.weight_pct != null && a.weight_pct >= weightThreshold && new Date(a.due_at) >= now && a.status !== "graded")
     .sort((a, b) => new Date(a.due_at!).getTime() - new Date(b.due_at!).getTime());
 
   const windows: { windowStart: string; items: { title: string; courseCode: string; due_at: string }[] }[] = [];

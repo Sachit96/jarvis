@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AlertTriangle, GraduationCap } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getCourses, getAssessments, getScheduleBlocks, getDeadlines } from "@/lib/db/queries/uni";
+import { getCourses, getAssessments, getAssessmentGroups, getScheduleBlocks, getDeadlines } from "@/lib/db/queries/uni";
 import { courseGrade, semesterAverage, riskScore } from "@/lib/uni/grades";
 import { StatTile } from "@/components/shared/stat-tile";
 import { ModuleTabs } from "@/components/shared/module-tabs";
@@ -10,6 +10,7 @@ import { PlanTonight } from "@/components/uni/plan-tonight";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { UNI_TABS } from "@/lib/nav-items";
+import { cn } from "@/lib/utils";
 
 const DAY_LABEL = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -17,10 +18,17 @@ export default async function UniDashboardPage() {
   const supabase = await createClient();
   const [courses, deadlines] = await Promise.all([getCourses(supabase), getDeadlines(supabase)]);
   const courseIds = courses.map((c) => c.id);
-  const [assessments, scheduleBlocks] = await Promise.all([
+  const [assessments, groups, scheduleBlocks] = await Promise.all([
     getAssessments(supabase, courseIds),
+    getAssessmentGroups(supabase, courseIds),
     getScheduleBlocks(supabase, courseIds),
   ]);
+  const groupsByCourse = new Map<string, typeof groups>();
+  for (const g of groups) {
+    const list = groupsByCourse.get(g.course_id) ?? [];
+    list.push(g);
+    groupsByCourse.set(g.course_id, list);
+  }
 
   const now = new Date();
   const todayDow = now.getDay();
@@ -30,9 +38,18 @@ export default async function UniDashboardPage() {
 
   const coursesWithGrades = courses.map((c) => {
     const courseAssessments = assessments.filter((a) => a.course_id === c.id);
-    return { ...c, grade: courseGrade(courseAssessments), risk: riskScore(c, courseAssessments), assessmentCount: courseAssessments.length };
+    const courseGroups = groupsByCourse.get(c.id) ?? [];
+    return {
+      ...c,
+      grade: courseGrade(courseAssessments, courseGroups),
+      risk: riskScore(c, courseAssessments, now, courseGroups),
+      assessmentCount: courseAssessments.length,
+      needsVerificationCount: courseAssessments.filter((a) => a.needs_verification).length,
+    };
   });
   const average = semesterAverage(coursesWithGrades);
+  const coursesWithData = coursesWithGrades.filter((c) => c.assessmentCount > 0).length;
+  const coursesWithoutData = coursesWithGrades.filter((c) => c.assessmentCount === 0).map((c) => c.code);
 
   const overdue = assessments.filter((a) => a.due_at && new Date(a.due_at) < now && a.status !== "submitted" && a.status !== "graded");
 
@@ -97,7 +114,18 @@ export default async function UniDashboardPage() {
           ) : null}
 
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            <StatTile label="Semester Average" value={average != null ? `${average.toFixed(1)}%` : "—"} icon={GraduationCap} category="goals" />
+            <StatTile
+              label="Semester Average"
+              value={average != null ? `${average.toFixed(1)}%` : "—"}
+              unmeasured={average == null}
+              note={
+                coursesWithData < courses.length
+                  ? `Based on ${coursesWithData} of ${courses.length} courses — ${coursesWithoutData.join(", ")} ${coursesWithoutData.length > 1 ? "have" : "has"} no assessments recorded`
+                  : undefined
+              }
+              icon={GraduationCap}
+              category="goals"
+            />
             <StatTile label="Courses" value={String(courses.length)} />
             <StatTile label="Overdue" value={String(overdue.length)} tone={overdue.length > 0 ? "danger" : "neutral"} />
             <StatTile label="Due in 7 Days" value={String(next7Days.length)} />
@@ -163,7 +191,15 @@ export default async function UniDashboardPage() {
                       </div>
                       <RiskChip score={c.risk} />
                     </div>
-                    <p className="mt-2 font-mono text-lg tabular-nums text-foreground">{c.grade != null ? `${c.grade.toFixed(1)}%` : "—"}</p>
+                    <p className={cn("mt-2 font-mono text-lg tabular-nums", c.assessmentCount === 0 ? "text-caption text-muted-foreground/50" : "text-foreground")}>
+                      {c.assessmentCount === 0 ? "No assessments" : c.grade != null ? `${c.grade.toFixed(1)}%` : "—"}
+                    </p>
+                    {c.needsVerificationCount > 0 ? (
+                      <p className="mt-1 flex items-center gap-1 text-caption text-warn">
+                        <AlertTriangle className="h-3 w-3" strokeWidth={2.5} />
+                        {c.needsVerificationCount} need{c.needsVerificationCount === 1 ? "s" : ""} verification
+                      </p>
+                    ) : null}
                   </Card>
                 </Link>
               ))}

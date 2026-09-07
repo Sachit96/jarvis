@@ -50,7 +50,7 @@ export function planStudySessions(
       const daysAway = (new Date(a.due_at).getTime() - now.getTime()) / 86_400_000;
       urgencyScore = daysAway <= 0 ? 40 : daysAway <= 1 ? 35 : daysAway <= 3 ? 25 : daysAway <= 7 ? 15 : 5;
     }
-    const weightScore = Math.min(30, a.weight_pct);
+    const weightScore = Math.min(30, a.weight_pct ?? 0);
     const riskContribution = risk * 0.3;
 
     return { assessment: a, course, priorityScore: urgencyScore + weightScore + riskContribution };

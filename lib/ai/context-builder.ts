@@ -23,7 +23,7 @@ import {
   computeStaleContacts,
 } from "@/lib/db/queries/business";
 import { getTodayRoutineItems } from "@/lib/db/queries/routine";
-import { getCourses, getAssessments } from "@/lib/db/queries/uni";
+import { getCourses, getAssessments, getAssessmentGroups } from "@/lib/db/queries/uni";
 import { courseGrade, riskScore, findOverloadedWeeks } from "@/lib/uni/grades";
 import { getMemoryEntries } from "@/lib/db/queries/memory";
 import { buildNoteContext } from "@/lib/obsidian/context";
@@ -81,6 +81,7 @@ export async function buildMentorContext(supabase: Client) {
     getResearchLeads(supabase).catch(() => []),
   ]);
   const assessments = courses.length > 0 ? await getAssessments(supabase, courses.map((c) => c.id)).catch(() => []) : [];
+  const assessmentGroups = courses.length > 0 ? await getAssessmentGroups(supabase, courses.map((c) => c.id)).catch(() => []) : [];
 
   const financeTotals = computeAssetLiabilityTotals(accounts);
   const pnl = computeMonthlyPnl(monthTransactions);
@@ -127,7 +128,14 @@ export async function buildMentorContext(supabase: Client) {
   // daily brief request rather than adding one, same principle as B3.
   const coursesWithRisk = courses.map((c) => {
     const courseAssessments = assessments.filter((a) => a.course_id === c.id);
-    return { code: c.code, grade: courseGrade(courseAssessments), target: c.target_grade, risk: riskScore(c, courseAssessments) };
+    const courseGroups = assessmentGroups.filter((g) => g.course_id === c.id);
+    return {
+      code: c.code,
+      grade: courseGrade(courseAssessments, courseGroups),
+      target: c.target_grade,
+      risk: riskScore(c, courseAssessments, new Date(), courseGroups),
+      assessmentCount: courseAssessments.length,
+    };
   });
   const overloadedWeeks = findOverloadedWeeks(
     assessments.map((a) => ({ ...a, title: a.title, courseCode: courses.find((c) => c.id === a.course_id)?.code ?? "?" })),

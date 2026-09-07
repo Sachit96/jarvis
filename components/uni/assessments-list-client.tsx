@@ -33,7 +33,7 @@ export function AssessmentsListClient({ assessments, courses }: { assessments: A
         return a.due_at.localeCompare(b.due_at);
       });
     } else {
-      list.sort((a, b) => b.weight_pct - a.weight_pct);
+      list.sort((a, b) => (b.weight_pct ?? 0) - (a.weight_pct ?? 0));
     }
     return list;
   }, [assessments, statusFilter, courseFilter, sortBy]);

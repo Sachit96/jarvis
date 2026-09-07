@@ -1,9 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCourses, getAssessments, getDeadlines, getScheduleBlocks } from "@/lib/db/queries/uni";
+import { getCourses, getAssessments, getDeadlines, getScheduleBlocks, getNoClassPeriods } from "@/lib/db/queries/uni";
 import { expandWeeklyOccurrences } from "@/lib/uni/schedule-occurrences";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { Card } from "@/components/ui/card";
-import { UniCalendar, type CalendarItem } from "@/components/uni/uni-calendar";
+import { UniCalendar, type CalendarItem, type UndatedItem } from "@/components/uni/uni-calendar";
 import { UNI_TABS } from "@/lib/nav-items";
 
 function formatTime(t: string) {
@@ -20,9 +20,26 @@ const SCHEDULE_TYPE_LABEL: Record<string, string> = {
   office_hours: "Office Hours",
 };
 
+/** Local-date walk from "YYYY-MM-DD" to "YYYY-MM-DD", both inclusive — mirrors schedule-occurrences.ts's own dayKeyLocal convention (no UTC parsing, since a break spanning a DST boundary must not silently lose or gain a day). */
+function dateRangeKeys(startDate: string, endDate: string): string[] {
+  const [sy, sm, sd] = startDate.split("-").map(Number);
+  const [ey, em, ed] = endDate.split("-").map(Number);
+  const cursor = new Date(sy, sm - 1, sd);
+  const end = new Date(ey, em - 1, ed);
+  const keys: string[] = [];
+  while (cursor <= end) {
+    const y = cursor.getFullYear();
+    const m = String(cursor.getMonth() + 1).padStart(2, "0");
+    const d = String(cursor.getDate()).padStart(2, "0");
+    keys.push(`${y}-${m}-${d}`);
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return keys;
+}
+
 export default async function UniCalendarPage() {
   const supabase = await createClient();
-  const [courses, deadlines] = await Promise.all([getCourses(supabase), getDeadlines(supabase)]);
+  const [courses, deadlines, noClassPeriods] = await Promise.all([getCourses(supabase), getDeadlines(supabase), getNoClassPeriods(supabase)]);
   const courseIds = courses.map((c) => c.id);
   const [assessments, scheduleBlocks] = await Promise.all([getAssessments(supabase, courseIds), getScheduleBlocks(supabase, courseIds)]);
 
@@ -54,11 +71,31 @@ export default async function UniCalendarPage() {
    * is correct here — both are "YYYY-MM-DD", which sorts chronologically
    * as text.
    */
-  const classOccurrences = expandWeeklyOccurrences(scheduleBlocks, rangeStart, rangeEnd).filter(({ date, item: block }) => {
-    const course = courseById.get(block.course_id);
-    if (!course?.term_start || !course?.term_end) return true;
-    return date >= course.term_start && date <= course.term_end;
-  });
+  // uni_no_class_periods (holidays, reading week) — course_id null applies
+  // to every course. expandWeeklyOccurrences takes one exclusion set per
+  // call, and a course-specific break must not suppress OTHER courses'
+  // classes on the same dates, so this runs once per course with that
+  // course's own applicable set, rather than once globally.
+  const globalExcludedDates = new Set(noClassPeriods.filter((p) => p.course_id === null).flatMap((p) => dateRangeKeys(p.start_date, p.end_date)));
+  const blocksByCourse = new Map<string, typeof scheduleBlocks>();
+  for (const b of scheduleBlocks) {
+    const list = blocksByCourse.get(b.course_id) ?? [];
+    list.push(b);
+    blocksByCourse.set(b.course_id, list);
+  }
+  const classOccurrences = Array.from(blocksByCourse.entries())
+    .flatMap(([courseId, blocks]) => {
+      const courseExcluded = new Set([
+        ...globalExcludedDates,
+        ...noClassPeriods.filter((p) => p.course_id === courseId).flatMap((p) => dateRangeKeys(p.start_date, p.end_date)),
+      ]);
+      return expandWeeklyOccurrences(blocks, rangeStart, rangeEnd, courseExcluded);
+    })
+    .filter(({ date, item: block }) => {
+      const course = courseById.get(block.course_id);
+      if (!course?.term_start || !course?.term_end) return true;
+      return date >= course.term_start && date <= course.term_end;
+    });
 
   const items: CalendarItem[] = [
     ...assessments
@@ -70,7 +107,7 @@ export default async function UniCalendarPage() {
           title: `${course?.code ?? ""} — ${a.title}`,
           due_at: a.due_at!,
           color: course?.color ?? "#8b5cf6",
-          sublabel: `${a.weight_pct}%`,
+          sublabel: a.weight_pct != null ? `${a.weight_pct}%` : "weight TBD",
         };
       }),
     ...deadlines.map((d): CalendarItem => ({ id: `d-${d.id}`, title: d.title, due_at: d.due_at, color: "#f97316", sublabel: d.category })),
@@ -86,6 +123,21 @@ export default async function UniCalendarPage() {
     }),
   ];
 
+  // Assessments with no due_at (final exam dates TBD/TBA, etc.) have no
+  // calendar cell to render in — surfaced here instead so they're still
+  // visible somewhere rather than only findable via the course detail page.
+  const undatedItems: UndatedItem[] = assessments
+    .filter((a) => !a.due_at)
+    .map((a) => {
+      const course = courses.find((c) => c.id === a.course_id);
+      return {
+        id: `u-${a.id}`,
+        title: `${course?.code ?? ""} — ${a.title}`,
+        color: course?.color ?? "#8b5cf6",
+        sublabel: a.weight_pct != null ? `${a.weight_pct}%` : "weight TBD",
+      };
+    });
+
   return (
     <div className="space-y-6">
       <div>
@@ -96,7 +148,7 @@ export default async function UniCalendarPage() {
       <ModuleTabs tabs={UNI_TABS} />
 
       <Card>
-        <UniCalendar items={items} />
+        <UniCalendar items={items} undatedItems={undatedItems} />
       </Card>
     </div>
   );

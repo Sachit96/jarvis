@@ -12,6 +12,13 @@ export interface CalendarItem {
   sublabel?: string;
 }
 
+export interface UndatedItem {
+  id: string;
+  title: string;
+  color: string;
+  sublabel?: string;
+}
+
 const WEEKDAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
 
 /**
@@ -46,7 +53,7 @@ function dayKey(d: Date) {
  * lists rather than a full react-big-calendar-style grid — drag-and-drop
  * and week/day date navigation are both explicitly out of scope tonight.
  */
-export function UniCalendar({ items }: { items: CalendarItem[] }) {
+export function UniCalendar({ items, undatedItems = [] }: { items: CalendarItem[]; undatedItems?: UndatedItem[] }) {
   const [view, setView] = useState<"month" | "week" | "day">("month");
   const [monthOffset, setMonthOffset] = useState(0);
 
@@ -188,6 +195,21 @@ export function UniCalendar({ items }: { items: CalendarItem[] }) {
                 ))}
             </ul>
           )}
+        </div>
+      ) : null}
+
+      {undatedItems.length > 0 ? (
+        <div className="mt-4 rounded-xl bg-white/[0.03] p-3">
+          <p className="text-xs font-medium text-muted-foreground">Undated / TBD</p>
+          <ul className="mt-1.5 space-y-1">
+            {undatedItems.map((item) => (
+              <li key={item.id} className="flex items-center gap-2 text-sm">
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: item.color }} />
+                <span className="text-foreground">{item.title}</span>
+                {item.sublabel ? <span className="text-caption text-muted-foreground">{item.sublabel}</span> : null}
+              </li>
+            ))}
+          </ul>
         </div>
       ) : null}
     </div>

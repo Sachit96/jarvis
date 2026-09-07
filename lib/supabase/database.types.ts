@@ -1564,6 +1564,41 @@ export type Database = {
           },
         ]
       }
+      uni_assessment_groups: {
+        Row: {
+          course_id: string
+          created_at: string
+          drop_lowest_count: number
+          id: string
+          label: string
+          updated_at: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          drop_lowest_count?: number
+          id?: string
+          label: string
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          drop_lowest_count?: number
+          id?: string
+          label?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uni_assessment_groups_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "uni_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       uni_assessments: {
         Row: {
           course_id: string
@@ -1572,15 +1607,18 @@ export type Database = {
           difficulty: number | null
           earned_score: number | null
           estimated_hours: number | null
+          group_id: string | null
           id: string
           max_score: number
+          needs_verification: boolean
           notes: string | null
           source: string
           status: string
           title: string
           type: string
           updated_at: string
-          weight_pct: number
+          verification_note: string | null
+          weight_pct: number | null
         }
         Insert: {
           course_id: string
@@ -1589,15 +1627,18 @@ export type Database = {
           difficulty?: number | null
           earned_score?: number | null
           estimated_hours?: number | null
+          group_id?: string | null
           id?: string
           max_score?: number
+          needs_verification?: boolean
           notes?: string | null
           source?: string
           status?: string
           title: string
           type: string
           updated_at?: string
-          weight_pct: number
+          verification_note?: string | null
+          weight_pct?: number | null
         }
         Update: {
           course_id?: string
@@ -1606,15 +1647,18 @@ export type Database = {
           difficulty?: number | null
           earned_score?: number | null
           estimated_hours?: number | null
+          group_id?: string | null
           id?: string
           max_score?: number
+          needs_verification?: boolean
           notes?: string | null
           source?: string
           status?: string
           title?: string
           type?: string
           updated_at?: string
-          weight_pct?: number
+          verification_note?: string | null
+          weight_pct?: number | null
         }
         Relationships: [
           {
@@ -1622,6 +1666,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "uni_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "uni_assessments_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "uni_assessment_groups"
             referencedColumns: ["id"]
           },
         ]
@@ -1688,6 +1739,7 @@ export type Database = {
           category: string
           created_at: string
           due_at: string
+          end_at: string | null
           id: string
           notes: string | null
           title: string
@@ -1697,6 +1749,7 @@ export type Database = {
           category: string
           created_at?: string
           due_at: string
+          end_at?: string | null
           id?: string
           notes?: string | null
           title: string
@@ -1706,6 +1759,7 @@ export type Database = {
           category?: string
           created_at?: string
           due_at?: string
+          end_at?: string | null
           id?: string
           notes?: string | null
           title?: string
@@ -1791,6 +1845,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "uni_materials_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "uni_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      uni_no_class_periods: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          end_date: string
+          id: string
+          label: string
+          start_date: string
+          updated_at: string
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          end_date: string
+          id?: string
+          label: string
+          start_date: string
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          end_date?: string
+          id?: string
+          label?: string
+          start_date?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uni_no_class_periods_course_id_fkey"
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "uni_courses"

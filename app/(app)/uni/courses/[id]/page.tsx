@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import { FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getCourse, getAssessments, getScheduleBlocks, getMaterials } from "@/lib/db/queries/uni";
-import { courseGrade, neededOnRemaining, bestCase, worstCase, riskScore } from "@/lib/uni/grades";
+import { getCourse, getAssessments, getAssessmentGroups, getScheduleBlocks, getMaterials } from "@/lib/db/queries/uni";
+import { courseGrade, neededOnRemaining, bestCase, worstCase, riskScore, unresolvedWeightCount } from "@/lib/uni/grades";
 import { StatTile } from "@/components/shared/stat-tile";
 import { RiskChip } from "@/components/uni/risk-chip";
 import { Card } from "@/components/ui/card";
@@ -27,18 +27,20 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
   const course = await getCourse(supabase, id);
   if (!course) notFound();
 
-  const [assessments, scheduleBlocks, materials, backlinks] = await Promise.all([
+  const [assessments, groups, scheduleBlocks, materials, backlinks] = await Promise.all([
     getAssessments(supabase, [id]),
+    getAssessmentGroups(supabase, [id]),
     getScheduleBlocks(supabase, [id]),
     getMaterials(supabase, id),
     getBacklinks(supabase, "uni_course", id),
   ]);
 
-  const grade = courseGrade(assessments);
-  const risk = riskScore(course, assessments);
-  const needed = course.target_grade != null ? neededOnRemaining(assessments, course.target_grade) : null;
-  const best = bestCase(assessments);
-  const worst = worstCase(assessments);
+  const grade = courseGrade(assessments, groups);
+  const risk = riskScore(course, assessments, new Date(), groups);
+  const needed = course.target_grade != null ? neededOnRemaining(assessments, course.target_grade, groups) : null;
+  const best = bestCase(assessments, groups);
+  const worst = worstCase(assessments, groups);
+  const unresolvedWeight = unresolvedWeightCount(assessments);
 
   const sortedBlocks = [...scheduleBlocks].sort((a, b) => a.day_of_week - b.day_of_week || a.start_time.localeCompare(b.start_time));
 
@@ -67,18 +69,26 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
       </div>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatTile label="Current Grade" value={grade != null ? `${grade.toFixed(1)}%` : "—"} primary />
+        <StatTile
+          label="Current Grade"
+          value={assessments.length === 0 ? "No assessments recorded" : grade != null ? `${grade.toFixed(1)}%` : "—"}
+          unmeasured={assessments.length === 0}
+          note={unresolvedWeight > 0 ? `${unresolvedWeight} assessment${unresolvedWeight > 1 ? "s" : ""} with unresolved weight — projections incomplete` : undefined}
+          primary
+        />
         <StatTile label="Target" value={course.target_grade != null ? `${course.target_grade}%` : "Not set"} />
-        {needed ? (
+        {needed && !needed.noData ? (
           <StatTile
             label="Needed on Remaining"
             value={needed.locked ? (needed.possible ? "Locked in" : "Missed") : `${needed.requiredAvgPct.toFixed(1)}%`}
             tone={needed.possible ? "success" : "danger"}
           />
+        ) : needed?.noData ? (
+          <StatTile label="Needed on Remaining" value="No assessments recorded" unmeasured />
         ) : (
           <StatTile label="Needed on Remaining" value="Set a target" />
         )}
-        <StatTile label="Best / Worst Case" value={`${best.toFixed(0)}% / ${worst.toFixed(0)}%`} />
+        <StatTile label="Best / Worst Case" value={assessments.length === 0 ? "—" : `${best.toFixed(0)}% / ${worst.toFixed(0)}%`} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">

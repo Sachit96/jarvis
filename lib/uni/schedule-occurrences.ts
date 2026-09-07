@@ -28,8 +28,20 @@ function dayKeyLocal(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
-/** Both bounds inclusive. Time-of-day on rangeStart/rangeEnd is ignored — only the calendar date matters. */
-export function expandWeeklyOccurrences<T extends WeeklyOccurrenceInput>(items: T[], rangeStart: Date, rangeEnd: Date): DatedOccurrence<T>[] {
+/**
+ * Both bounds inclusive. Time-of-day on rangeStart/rangeEnd is ignored —
+ * only the calendar date matters. `excludedDates`, when given, is a set of
+ * "YYYY-MM-DD" local date keys (e.g. a holiday/reading-week range) that get
+ * skipped entirely — no occurrence is emitted for any item on those dates,
+ * regardless of day_of_week match. Callers build this set from
+ * uni_no_class_periods.
+ */
+export function expandWeeklyOccurrences<T extends WeeklyOccurrenceInput>(
+  items: T[],
+  rangeStart: Date,
+  rangeEnd: Date,
+  excludedDates?: Set<string>,
+): DatedOccurrence<T>[] {
   const results: DatedOccurrence<T>[] = [];
   if (items.length === 0) return results;
 
@@ -45,9 +57,9 @@ export function expandWeeklyOccurrences<T extends WeeklyOccurrenceInput>(items: 
   }
 
   while (cursor <= end) {
-    const matches = byDow.get(cursor.getDay());
+    const date = dayKeyLocal(cursor);
+    const matches = excludedDates?.has(date) ? undefined : byDow.get(cursor.getDay());
     if (matches) {
-      const date = dayKeyLocal(cursor);
       for (const item of matches) results.push({ date, item });
     }
     cursor.setDate(cursor.getDate() + 1);

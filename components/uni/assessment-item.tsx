@@ -6,6 +6,7 @@ import { recordGradeAction, setAssessmentStatusAction, deleteAssessmentAction } 
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { ASSESSMENT_STATUSES } from "@/lib/validations/uni";
 import { AssignmentBreakdown } from "@/components/uni/assignment-breakdown";
 import type { Database } from "@/lib/supabase/database.types";
@@ -46,10 +47,18 @@ export function AssessmentItem({ assessment, courseCode, courseColor }: { assess
         <p className="truncate text-sm font-medium text-foreground">
           {courseCode ? <span className="text-muted-foreground">{courseCode} · </span> : null}
           {assessment.title}
+          {assessment.needs_verification ? (
+            <Badge variant="outline" className="ml-2 border-warn/40 text-warn" title={assessment.verification_note ?? undefined}>
+              Needs verification
+            </Badge>
+          ) : null}
         </p>
         <p className={cn("text-caption", typeof due === "object" && due.overdue && assessment.status !== "graded" && assessment.status !== "submitted" ? "text-danger" : "text-muted-foreground")}>
-          {typeof due === "string" ? due : due.label} · {assessment.weight_pct}%
+          {typeof due === "string" ? due : due.label} · {assessment.weight_pct != null ? `${assessment.weight_pct}%` : "weight TBD"}
         </p>
+        {assessment.needs_verification && assessment.verification_note ? (
+          <p className="mt-0.5 text-caption text-warn/80">{assessment.verification_note}</p>
+        ) : null}
       </div>
 
       <div className="flex items-center gap-1.5">

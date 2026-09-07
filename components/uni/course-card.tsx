@@ -1,14 +1,25 @@
 import Link from "next/link";
+import { AlertTriangle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { RiskChip } from "@/components/uni/risk-chip";
-import { courseGrade, riskScore, type GradeAssessment } from "@/lib/uni/grades";
+import { cn } from "@/lib/utils";
+import { courseGrade, riskScore, type GradeAssessment, type GradeAssessmentGroup } from "@/lib/uni/grades";
 import type { Database } from "@/lib/supabase/database.types";
 
 type Course = Database["public"]["Tables"]["uni_courses"]["Row"];
 
-export function CourseCard({ course, assessments }: { course: Course; assessments: GradeAssessment[] }) {
-  const grade = courseGrade(assessments);
-  const risk = riskScore(course, assessments);
+export function CourseCard({
+  course,
+  assessments,
+  groups = [],
+}: {
+  course: Course;
+  assessments: (GradeAssessment & { needs_verification: boolean })[];
+  groups?: GradeAssessmentGroup[];
+}) {
+  const grade = courseGrade(assessments, groups);
+  const risk = riskScore(course, assessments, new Date(), groups);
+  const needsVerificationCount = assessments.filter((a) => a.needs_verification).length;
 
   return (
     <Link href={`/uni/courses/${course.id}`} className="block outline-none focus-visible:ring-3 focus-visible:ring-ring/50 rounded-2xl">
@@ -26,7 +37,9 @@ export function CourseCard({ course, assessments }: { course: Course; assessment
         <div className="mt-4 flex items-baseline justify-between">
           <div>
             <p className="text-caption uppercase tracking-wide text-muted-foreground">Current grade</p>
-            <p className="mt-1 font-mono text-title tabular-nums text-foreground">{grade != null ? `${grade.toFixed(1)}%` : "—"}</p>
+            <p className={cn("mt-1 font-mono text-title tabular-nums", assessments.length === 0 ? "text-muted-foreground/50" : "text-foreground")}>
+              {assessments.length === 0 ? "No assessments" : grade != null ? `${grade.toFixed(1)}%` : "—"}
+            </p>
           </div>
           {course.target_grade != null ? (
             <div className="text-right">
@@ -35,6 +48,12 @@ export function CourseCard({ course, assessments }: { course: Course; assessment
             </div>
           ) : null}
         </div>
+        {needsVerificationCount > 0 ? (
+          <p className="mt-2 flex items-center gap-1 text-caption text-warn">
+            <AlertTriangle className="h-3 w-3" strokeWidth={2.5} />
+            {needsVerificationCount} need{needsVerificationCount === 1 ? "s" : ""} verification
+          </p>
+        ) : null}
         {course.professor ? <p className="mt-3 text-caption text-muted-foreground">{course.professor}{course.room ? ` · ${course.room}` : ""}</p> : null}
       </Card>
     </Link>
