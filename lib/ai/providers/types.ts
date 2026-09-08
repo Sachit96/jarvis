@@ -71,6 +71,24 @@ export interface AgentTraceEntry {
   name: string;
   label: string;
   ok: boolean;
+  /**
+   * The arguments the model actually passed, after validation.
+   *
+   * Server-side only. Next's Server Actions guide is explicit that action
+   * return values are serialized to the client and should be shaped to what
+   * the UI renders — so the two operator actions map this away before
+   * returning, and only the live QA harness (which calls runAgentTurn
+   * directly) ever reads it. It exists so a test matrix can report what was
+   * called WITH, not merely what was called.
+   */
+  args: Record<string, unknown>;
+}
+
+/** The subset of a trace entry that is safe to serialize to the browser. */
+export type ClientTraceEntry = Pick<AgentTraceEntry, "name" | "label" | "ok">;
+
+export function toClientTrace(trace: AgentTraceEntry[]): ClientTraceEntry[] {
+  return trace.map(({ name, label, ok }) => ({ name, label, ok }));
 }
 
 export interface AgentChatResult {

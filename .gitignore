@@ -49,3 +49,4 @@ next-env.d.ts
 # Personal Obsidian vault read by the Memory module (lib/obsidian.ts) —
 # real notes, never committed. See app/(app)/memory/page.tsx.
 /Jarvis Memory/
+operator-live-report.json
