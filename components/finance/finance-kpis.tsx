@@ -92,7 +92,7 @@ export function FinanceKpis({
               ? "No prior month to compare"
               : `Was ${prevSavingsRate.toFixed(0)}% last month`
         }
-        action={savingsDelta !== null ? <DeltaBadge percent={savingsDelta} /> : undefined}
+        action={savingsDelta !== null ? <DeltaBadge percent={savingsDelta} unit="pp" /> : undefined}
       />
     </KpiGrid>
   );

@@ -29,6 +29,7 @@ function CommandDialog({
   children,
   className,
   showCloseButton = false,
+  commandProps,
   ...props
 }: Omit<React.ComponentProps<typeof Dialog>, 'children'> & {
   title?: string
@@ -36,6 +37,12 @@ function CommandDialog({
   className?: string
   showCloseButton?: boolean
   children: React.ReactNode
+  /**
+   * Forwarded to the inner <Command> root — most usefully
+   * `shouldFilter={false}`, for a palette whose results are already filtered
+   * server-side and must not be filtered a second time on the client.
+   */
+  commandProps?: Omit<React.ComponentProps<typeof Command>, 'children'>
 }) {
   return (
     <Dialog {...props}>
@@ -47,7 +54,10 @@ function CommandDialog({
         className={cn('top-1/3 translate-y-0 overflow-hidden rounded-xl! p-0', className)}
         showCloseButton={showCloseButton}
       >
-        {children}
+        {/* The Command root has to live inside the dialog: CommandInput,
+            CommandList and CommandItem all read cmdk's context, so without
+            it every child throws. */}
+        <Command {...commandProps}>{children}</Command>
       </DialogContent>
     </Dialog>
   )

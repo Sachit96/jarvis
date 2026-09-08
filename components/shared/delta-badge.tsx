@@ -16,6 +16,13 @@ interface DeltaBadgeProps {
    * the metric doesn't support.
    */
   neutral?: boolean;
+  /**
+   * Set for a delta between two figures that are themselves percentages (a
+   * savings rate, a win rate). The difference is in percentage points, and
+   * rendering "-0.7%" for a 57%→56% move invites reading it as a 0.7%
+   * relative change — a different, smaller number. "pp" says which it is.
+   */
+  unit?: "%" | "pp";
   className?: string;
 }
 
@@ -27,7 +34,7 @@ interface DeltaBadgeProps {
  * never the only cue: the arrow icon and the signed number both carry the
  * same information for anyone who can't separate the two hues.
  */
-export function DeltaBadge({ percent, goodDirection = "up", neutral, className }: DeltaBadgeProps) {
+export function DeltaBadge({ percent, goodDirection = "up", neutral, unit = "%", className }: DeltaBadgeProps) {
   const rounded = Math.round(percent * 10) / 10;
   const rising = rounded > 0;
   // Exactly zero is neither good nor bad; treating it as "good" would paint
@@ -49,7 +56,8 @@ export function DeltaBadge({ percent, goodDirection = "up", neutral, className }
     >
       {rounded === 0 ? null : <Icon className="size-3" strokeWidth={2.25} aria-hidden />}
       {rounded > 0 ? "+" : ""}
-      {rounded}%
+      {rounded}
+      {unit}
     </span>
   );
 }

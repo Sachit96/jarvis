@@ -1,3 +1,5 @@
+import { mergeProps } from '@base-ui/react/merge-props'
+import { useRender } from '@base-ui/react/use-render'
 import { ChevronRightIcon, MoreHorizontalIcon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
@@ -20,10 +22,19 @@ function BreadcrumbItem({ className, ...props }: React.ComponentProps<'li'>) {
   return <li data-slot='breadcrumb-item' className={cn('inline-flex items-center gap-1.5', className)} {...props} />
 }
 
-function BreadcrumbLink({ className, ...props }: React.ComponentProps<'a'>) {
-  return (
-    <a data-slot='breadcrumb-link' className={cn('hover:text-foreground transition-colors', className)} {...props} />
-  )
+// Takes Base UI's `render` prop like the rest of the primitives here, so a
+// crumb can be a Next <Link> and keep client-side navigation — a bare <a>
+// full-page-reloads every crumb.
+function BreadcrumbLink({ className, render, ...props }: useRender.ComponentProps<'a'>) {
+  return useRender({
+    defaultTagName: 'a',
+    props: mergeProps<'a'>(
+      { className: cn('hover:text-foreground transition-colors', className) },
+      props
+    ),
+    render,
+    state: { slot: 'breadcrumb-link' },
+  })
 }
 
 function BreadcrumbPage({ className, ...props }: React.ComponentProps<'span'>) {

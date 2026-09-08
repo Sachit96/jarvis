@@ -29,25 +29,41 @@ interface Point {
  */
 const chartConfig = {
   income: { label: "Income", color: "var(--chart-1)" },
-  expense: { label: "Expense", color: "var(--chart-2)" },
+  expense: { label: "Spending", color: "var(--chart-2)" },
 } satisfies ChartConfig;
 
-const compactMoney = (value: number) =>
-  Math.abs(value) >= 1000 ? `$${(value / 1000).toFixed(0)}k` : `$${value}`;
+// Intl's compact notation keeps one decimal where it's needed, so 1,800 and
+// 2,400 don't both collapse to "$2k" and print the same tick label twice.
+const compact = new Intl.NumberFormat(undefined, {
+  notation: "compact",
+  maximumFractionDigits: 1,
+});
+const compactMoney = (value: number) => `$${compact.format(value)}`;
 
 export function CashflowTrendChart({ points }: { points: Point[] }) {
   const hasActivity = points.some((p) => p.income !== 0 || p.expense !== 0);
 
-  const totals = points.reduce(
-    (acc, p) => ({ income: acc.income + p.income, expense: acc.expense + p.expense }),
-    { income: 0, expense: 0 },
-  );
+  // Plotted cumulatively rather than per-day. Income arrives in a few large
+  // lumps and spending trickles out daily, so on raw daily values the income
+  // spikes set the y-scale and flatten spending into a line along the axis —
+  // the exact comparison the card exists to show. Running totals put both on
+  // the same footing: two rising lines whose gap IS the month's net, and
+  // whose crossing point is the moment spending overtook earning.
+  let runningIncome = 0;
+  let runningExpense = 0;
+  const series = points.map((p) => {
+    runningIncome += p.income;
+    runningExpense += p.expense;
+    return { date: p.date, income: runningIncome, expense: runningExpense };
+  });
+
+  const totals = { income: runningIncome, expense: runningExpense };
 
   return (
     <Card padding="slotted" className="h-full">
       <CardHeader>
         <CardTitle>Cashflow</CardTitle>
-        <CardDescription>Income against spending, last 30 days</CardDescription>
+        <CardDescription>Running totals, last 30 days</CardDescription>
         <CardAction>
           <div className="tabular text-right">
             <p className="text-heading text-foreground">
@@ -64,7 +80,7 @@ export function CashflowTrendChart({ points }: { points: Point[] }) {
       <CardContent>
         {hasActivity ? (
           <ChartContainer config={chartConfig} className="aspect-auto h-56 w-full">
-            <LineChart data={points} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+            <LineChart data={series} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid vertical={false} strokeDasharray="3 3" />
               <XAxis
                 dataKey="date"

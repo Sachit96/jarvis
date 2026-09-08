@@ -1,11 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Search, FileText, Sparkles } from "lucide-react";
+import { FileText, Search, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from "@/components/ui/command";
 import { SIDEBAR_ITEMS } from "@/lib/nav-items";
 import {
   globalSearchAction,
@@ -22,23 +30,29 @@ const PAGES: SearchResult[] = SIDEBAR_ITEMS.filter((i) => i.href !== "/").map((i
   updatedAt: "",
 }));
 
-function pagesGroup(query: string): SearchGroup {
-  const q = query.trim().toLowerCase();
-  const items = q ? PAGES.filter((p) => p.title.toLowerCase().includes(q)) : PAGES;
-  return { key: "pages", label: "Pages", items: items.slice(0, 5), total: items.length };
-}
+const MIN_QUERY = 2;
+const SEARCH_DEBOUNCE_MS = 250;
 
+/**
+ * Rebuilt on cmdk. The previous implementation hand-rolled keyboard
+ * navigation, highlight state, a flattened index to map arrow keys onto
+ * grouped rendering, and scroll-into-view — all of which cmdk does, with
+ * correct ARIA combobox semantics the hand-rolled version never had.
+ *
+ * Server results arrive already filtered, so cmdk's own fuzzy filter is off
+ * (shouldFilter={false}); leaving it on would filter the results a second
+ * time against the same query and silently drop rows the server matched on
+ * a field the title doesn't contain.
+ */
 export function CommandPalette() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [groups, setGroups] = useState<SearchGroup[]>([]);
   const [recent, setRecent] = useState<SearchResult[]>([]);
-  const [highlighted, setHighlighted] = useState(0);
   const [isPending, startTransition] = useTransition();
   const [isCommandPending, startCommandTransition] = useTransition();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleKeydown(e: KeyboardEvent) {
@@ -47,7 +61,7 @@ export function CommandPalette() {
         setOpen((o) => !o);
         return;
       }
-      // Voice Mode — ⌘/Ctrl+J from anywhere in the app, same pattern as ⌘K above.
+      // Voice Mode — ⌘/Ctrl+J from anywhere in the app, same pattern as ⌘K.
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "j") {
         e.preventDefault();
         router.push("/voice");
@@ -61,25 +75,29 @@ export function CommandPalette() {
     if (!open) return;
     // Empty-query state needs the "recently modified" list — fetch once per open.
     startTransition(async () => {
-      const r = await getRecentSearchItemsAction();
-      setRecent(r);
+      setRecent(await getRecentSearchItemsAction());
     });
   }, [open]);
+
+  // Any pending debounce belongs to a query the user has moved on from, so
+  // it's cleared on unmount as well as on every keystroke — without this a
+  // late timer fires setState after the dialog is gone.
+  useEffect(() => () => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+  }, []);
 
   function handleOpenChange(next: boolean) {
     setOpen(next);
     if (!next) {
       setQuery("");
       setGroups([]);
-      setHighlighted(0);
     }
   }
 
   function handleQueryChange(value: string) {
     setQuery(value);
-    setHighlighted(0);
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (value.trim().length < 2) {
+    if (value.trim().length < MIN_QUERY) {
       setGroups([]);
       return;
     }
@@ -88,40 +106,36 @@ export function CommandPalette() {
         const r = await globalSearchAction(value);
         setGroups(r.groups);
       });
-    }, 250);
+    }, SEARCH_DEBOUNCE_MS);
   }
 
-  const showingRecent = query.trim().length < 2;
+  const showingRecent = query.trim().length < MIN_QUERY;
 
-  // Single flattened list drives both rendering order and keyboard nav — group headers
-  // are inserted for display but never receive a highlight index themselves.
-  const displayGroups: SearchGroup[] = useMemo(() => {
-    if (showingRecent) {
-      return [pagesGroup(""), { key: "recent", label: "Recently updated", items: recent, total: recent.length }];
-    }
-    const withPages = [pagesGroup(query), ...groups];
-    return withPages.filter((g) => g.items.length > 0);
-  }, [showingRecent, query, groups, recent]);
+  const pageMatches = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const items = q ? PAGES.filter((p) => p.title.toLowerCase().includes(q)) : PAGES;
+    return items.slice(0, 5);
+  }, [query]);
 
-  const flatItems = useMemo(() => displayGroups.flatMap((g) => g.items), [displayGroups]);
-  const totalKnown = displayGroups.reduce((sum, g) => sum + (g.total || g.items.length), 0);
+  const resultGroups = useMemo(
+    () => (showingRecent ? [] : groups.filter((g) => g.items.length > 0)),
+    [showingRecent, groups],
+  );
 
-  useEffect(() => {
-    const el = listRef.current?.querySelector(`[data-index="${highlighted}"]`);
-    el?.scrollIntoView({ block: "nearest" });
-  }, [highlighted]);
-
-  function navigateTo(item: SearchResult) {
-    setOpen(false);
-    router.push(item.href);
-  }
+  const navigateTo = useCallback(
+    (href: string) => {
+      setOpen(false);
+      router.push(href);
+    },
+    [router],
+  );
 
   /**
-   * UniOS command bar extension (Work Order 3) — opt-in, not automatic on
-   * every keystroke: this only runs when the user explicitly picks the
-   * "Ask JARVIS" row, both to avoid a Gemini call per debounced keystroke
-   * and because the palette's default job is search; natural-language
-   * actions are a deliberate escalation from that, never a silent guess.
+   * UniOS command bar extension — opt-in, not automatic on every keystroke:
+   * this only runs when the user explicitly picks the "Ask JARVIS" row, both
+   * to avoid a model call per debounced keystroke and because the palette's
+   * default job is search; natural-language actions are a deliberate
+   * escalation from that, never a silent guess.
    */
   function runCommand() {
     const text = query.trim();
@@ -138,21 +152,7 @@ export function CommandPalette() {
     });
   }
 
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setHighlighted((i) => Math.min(i + 1, flatItems.length - 1));
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setHighlighted((i) => Math.max(i - 1, 0));
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      const item = flatItems[highlighted];
-      if (item) navigateTo(item);
-    }
-  }
-
-  let runningIndex = -1;
+  const hasResults = pageMatches.length > 0 || resultGroups.length > 0 || (showingRecent && recent.length > 0);
 
   return (
     <>
@@ -161,7 +161,7 @@ export function CommandPalette() {
         aria-label="Search everything"
         className="relative hidden h-8 w-56 items-center gap-2 rounded-lg px-2.5 text-muted-foreground ring-1 ring-border transition-colors after:absolute after:-inset-y-2 hover:bg-white/[0.04] hover:text-foreground sm:flex lg:w-72"
       >
-        <Search className="h-3.5 w-3.5 shrink-0" />
+        <Search className="size-3.5 shrink-0" />
         <span className="flex-1 truncate text-left text-caption">Search anything...</span>
         <kbd className="shrink-0 rounded border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
           ⌘K
@@ -170,103 +170,101 @@ export function CommandPalette() {
       <button
         onClick={() => setOpen(true)}
         aria-label="Search everything"
-        className="relative flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground ring-1 ring-border transition-colors after:absolute after:-inset-1.5 hover:bg-white/[0.04] hover:text-foreground sm:hidden"
+        className="relative flex size-8 items-center justify-center rounded-lg text-muted-foreground ring-1 ring-border transition-colors after:absolute after:-inset-1.5 hover:bg-white/[0.04] hover:text-foreground sm:hidden"
       >
-        <Search className="h-[18px] w-[18px]" />
+        <Search className="size-[18px]" />
       </button>
-      <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="max-w-[560px] gap-0 p-0 sm:max-w-[560px]" showCloseButton={false}>
-          <div className="flex items-center gap-2.5 border-b border-border px-4 py-3">
-            <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
-            <Input
-              value={query}
-              onChange={(e) => handleQueryChange(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Search goals, tasks, notes, memory, finance…"
-              className="h-auto border-none bg-transparent p-0 shadow-none focus-visible:ring-0"
-              autoFocus
-            />
-            <kbd className="shrink-0 rounded border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
-              Esc
-            </kbd>
-          </div>
 
-          <div ref={listRef} className="max-h-[420px] space-y-3 overflow-y-auto p-2">
-            {!showingRecent && isPending && flatItems.length === 0 ? (
-              <p className="px-2 py-6 text-center text-sm text-muted-foreground">Searching…</p>
-            ) : !showingRecent && flatItems.length === 0 ? (
-              <div className="px-2 py-6 text-center">
-                <p className="text-sm text-foreground">No matches for &ldquo;{query}&rdquo;</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  ⌘K searches goals, tasks, habits, notes, memory, and finance.
-                </p>
-              </div>
-            ) : (
-              displayGroups.map((group) => (
-                <div key={group.key}>
-                  <p className="px-2 pb-1 text-xs uppercase tracking-wider text-muted-foreground">
-                    {group.label}
-                    {group.total > group.items.length ? (
-                      <span className="ml-1 normal-case text-muted-foreground/70">
-                        (showing {group.items.length} of {group.total})
-                      </span>
-                    ) : null}
+      <CommandDialog
+        open={open}
+        onOpenChange={handleOpenChange}
+        title="Search"
+        description="Search goals, tasks, notes, memory and finance"
+        commandProps={{ shouldFilter: false }}
+      >
+        <CommandInput
+          value={query}
+          onValueChange={handleQueryChange}
+          placeholder="Search goals, tasks, notes, memory, finance…"
+        />
+        <CommandList>
+          {!hasResults && !isPending ? (
+            <CommandEmpty>
+              {showingRecent ? (
+                "Start typing to search."
+              ) : (
+                <>
+                  <p>No matches for &ldquo;{query}&rdquo;</p>
+                  <p className="mt-1 text-caption text-muted-foreground">
+                    ⌘K searches goals, tasks, habits, notes, memory, and finance.
                   </p>
-                  <ul className="space-y-0.5">
-                    {group.items.map((item) => {
-                      runningIndex += 1;
-                      const index = runningIndex;
-                      const isHighlighted = index === highlighted;
-                      return (
-                        <li key={`${group.key}-${item.id}`} data-index={index}>
-                          <button
-                            onClick={() => navigateTo(item)}
-                            onMouseEnter={() => setHighlighted(index)}
-                            className={`flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-sm transition-colors ${
-                              isHighlighted ? "bg-brand/15 text-foreground" : "hover:bg-white/[0.04]"
-                            }`}
-                          >
-                            {group.key === "pages" ? (
-                              <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                            ) : null}
-                            <span className="min-w-0 flex-1">
-                              <span className="block truncate">{item.title}</span>
-                              {item.subtitle ? (
-                                <span className="block truncate text-xs text-muted-foreground">{item.subtitle}</span>
-                              ) : null}
-                            </span>
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              ))
-            )}
-          </div>
-
-          {query.trim().length >= 3 ? (
-            <div className="border-t border-border p-2">
-              <button
-                onClick={runCommand}
-                disabled={isCommandPending}
-                className="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-sm text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground"
-              >
-                <Sparkles className="h-3.5 w-3.5 shrink-0" />
-                <span className="min-w-0 flex-1 truncate">
-                  {isCommandPending ? "Asking JARVIS…" : <>Ask JARVIS: &ldquo;{query}&rdquo;</>}
-                </span>
-              </button>
-            </div>
+                </>
+              )}
+            </CommandEmpty>
           ) : null}
 
-          {!showingRecent && totalKnown > 20 ? (
-            <div className="border-t border-border px-4 py-2 text-center text-xs text-muted-foreground">
-              Showing top {Math.min(flatItems.length, 20)} of {totalKnown} matches
-            </div>
+          {pageMatches.length > 0 ? (
+            <CommandGroup heading="Pages">
+              {pageMatches.map((page) => (
+                <CommandItem
+                  key={page.href}
+                  value={`page-${page.href}`}
+                  onSelect={() => navigateTo(page.href)}
+                >
+                  <FileText />
+                  {page.title}
+                </CommandItem>
+              ))}
+            </CommandGroup>
           ) : null}
-        </DialogContent>
-      </Dialog>
+
+          {showingRecent && recent.length > 0 ? (
+            <CommandGroup heading="Recently updated">
+              {recent.map((item) => (
+                <CommandItem key={item.id} value={`recent-${item.id}`} onSelect={() => navigateTo(item.href)}>
+                  <FileText />
+                  {item.title}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          ) : null}
+
+          {resultGroups.map((group) => (
+            <CommandGroup
+              key={group.key}
+              heading={
+                group.total > group.items.length
+                  ? `${group.label} · showing ${group.items.length} of ${group.total}`
+                  : group.label
+              }
+            >
+              {group.items.map((item) => (
+                <CommandItem
+                  key={item.id}
+                  value={`${group.key}-${item.id}`}
+                  onSelect={() => navigateTo(item.href)}
+                >
+                  <FileText />
+                  {item.title}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          ))}
+
+          {!showingRecent ? (
+            <>
+              <CommandSeparator />
+              <CommandGroup heading="Actions">
+                <CommandItem value="ask-jarvis" onSelect={runCommand} disabled={isCommandPending}>
+                  <Sparkles />
+                  {isCommandPending ? "Asking JARVIS…" : `Ask JARVIS to “${query.trim()}”`}
+                  <CommandShortcut>↵</CommandShortcut>
+                </CommandItem>
+              </CommandGroup>
+            </>
+          ) : null}
+        </CommandList>
+      </CommandDialog>
     </>
   );
 }
