@@ -1,6 +1,7 @@
 import { CheckCircle2, XCircle } from "lucide-react";
 import { ExportBackupButton } from "@/components/settings/export-backup-button";
 import { createClient } from "@/lib/supabase/server";
+import { getIntegrationStatus, type IntegrationId } from "@/lib/integrations/status";
 import { getSavedLeadSearches } from "@/lib/db/queries/lead-research";
 import { getYtConnection } from "@/lib/db/queries/youtube";
 import { AiMentorStatusCard } from "@/components/settings/ai-mentor-status-card";
@@ -36,15 +37,17 @@ export default async function SettingsPage({
 }) {
   const { youtube_connected, youtube_error } = await searchParams;
   const supabase = await createClient();
-  const hasGeminiKey = Boolean(process.env.GEMINI_API_KEY);
+  // Derived from the shared status module rather than re-read here: the SMS
+  // four-variable rule in particular now lives in exactly one place, so this
+  // page and the board below it cannot disagree about what configured means.
+  const statusOf = (id: IntegrationId) => getIntegrationStatus(id).state;
+  const hasGeminiKey = statusOf("gemini") === "connected";
   const [savedSearches, ytConnection] = await Promise.all([
     getSavedLeadSearches(supabase),
     getYtConnection(supabase),
   ]);
 
-  const smsConfigured = Boolean(
-    process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER && process.env.OWNER_PHONE_NUMBER,
-  );
+  const smsConfigured = statusOf("sms") === "connected";
   // Degrades to 0 if migration 0024 hasn't run yet — see lib/db/missing-relation.ts.
   let smsRecentCount = 0;
   if (smsConfigured) {
@@ -56,9 +59,11 @@ export default async function SettingsPage({
     smsRecentCount = count ?? 0;
   }
 
-  const hasAnthropicKey = Boolean(process.env.ANTHROPIC_API_KEY);
+  const hasAnthropicKey = statusOf("anthropic") === "connected";
   const [anthropicCap, anthropicSpent] = await Promise.all([getAnthropicSpendCap(), getAnthropicSpendToDate()]);
-  const hasYoutubeKeys = Boolean(process.env.YOUTUBE_CLIENT_ID && process.env.YOUTUBE_CLIENT_SECRET);
+  // configuration_required is the one state meaning no app is registered;
+  // disconnected means registered but not yet authorised.
+  const hasYoutubeKeys = statusOf("youtube") !== "configuration_required";
 
   return (
     <div className="space-y-6">
