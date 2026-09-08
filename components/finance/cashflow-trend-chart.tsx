@@ -49,15 +49,21 @@ export function CashflowTrendChart({ points }: { points: Point[] }) {
   // the exact comparison the card exists to show. Running totals put both on
   // the same footing: two rising lines whose gap IS the month's net, and
   // whose crossing point is the moment spending overtook earning.
-  let runningIncome = 0;
-  let runningExpense = 0;
-  const series = points.map((p) => {
-    runningIncome += p.income;
-    runningExpense += p.expense;
-    return { date: p.date, income: runningIncome, expense: runningExpense };
-  });
+  // Accumulated off the previous element rather than a running counter
+  // outside the callback: closing over a mutable local during render is what
+  // the React Compiler flags, since a re-render re-enters the callback with
+  // the counter already advanced.
+  const series = points.reduce<{ date: string; income: number; expense: number }[]>((acc, p) => {
+    const prev = acc[acc.length - 1];
+    acc.push({
+      date: p.date,
+      income: (prev?.income ?? 0) + p.income,
+      expense: (prev?.expense ?? 0) + p.expense,
+    });
+    return acc;
+  }, []);
 
-  const totals = { income: runningIncome, expense: runningExpense };
+  const totals = series[series.length - 1] ?? { income: 0, expense: 0 };
 
   return (
     <Card padding="slotted" className="h-full">

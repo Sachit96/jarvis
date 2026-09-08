@@ -56,6 +56,14 @@ interface KpiCellProps {
    * claiming an identity that isn't there.
    */
   accentClassName?: string;
+  /**
+   * Tint for the figure itself — a red overdue count, say. Separate from
+   * `className` so it can't be applied by putting a text colour on the cell
+   * and relying on the label and hint to override it back; that works only
+   * because they happen to set their own colour, and breaks silently the
+   * moment one of them doesn't.
+   */
+  valueClassName?: string;
   className?: string;
 }
 
@@ -65,7 +73,7 @@ interface KpiCellProps {
  * block's outer edge — that way a cell never needs to know whether it is
  * last in its row, which changes with the breakpoint anyway.
  */
-export function KpiCell({ label, value, hint, action, accentClassName, className }: KpiCellProps) {
+export function KpiCell({ label, value, hint, action, accentClassName, valueClassName, className }: KpiCellProps) {
   return (
     <div className={cn("flex flex-col gap-3 border-border border-r border-b p-5", className)}>
       <div className="flex items-center gap-2">
@@ -77,7 +85,7 @@ export function KpiCell({ label, value, hint, action, accentClassName, className
 
       <div className="flex items-end justify-between gap-3">
         <div className="min-w-0 space-y-1.5">
-          <div className="tabular truncate text-metric">{value}</div>
+          <div className={cn("tabular truncate text-metric", valueClassName)}>{value}</div>
           {hint ? <p className="text-caption text-muted-foreground">{hint}</p> : null}
         </div>
         {action ? <div className="shrink-0 pb-0.5">{action}</div> : null}

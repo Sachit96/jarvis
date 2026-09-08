@@ -5,6 +5,7 @@ import { Send, Sparkles, TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { sendGeneralMentorMessageAction } from "@/actions/mentor-actions";
 import type { Database } from "@/lib/supabase/database.types";
 
@@ -56,13 +57,19 @@ export function MentorChatWidget({ initialMessages, hasKey }: { initialMessages:
       </div>
 
       {!hasKey ? (
-        <div className="mx-5 mt-3 flex items-start gap-2 rounded-xl bg-warn/10 p-3 text-label text-warn">
-          <TriangleAlert className="h-4 w-4 shrink-0" />
-          <span>GEMINI_API_KEY isn&apos;t configured yet, so the AI Mentor can&apos;t respond right now.</span>
-        </div>
+        <Alert className="mx-5 mt-3 w-auto border-warn/30 bg-warn/10 text-warn">
+          <TriangleAlert />
+          <AlertDescription className="text-warn/90">
+            GEMINI_API_KEY isn&apos;t configured yet, so the AI Mentor can&apos;t respond right now.
+          </AlertDescription>
+        </Alert>
       ) : null}
 
-      <div ref={scrollRef} className="max-h-80 min-h-32 space-y-3 overflow-y-auto p-5">
+      {/* Sized against the viewport, not a fixed 20rem. The widget sits in a
+          sticky column beside the brief now, so it should use the height the
+          column actually has; a fixed short box left most of that column
+          empty and made the transcript scroll after three exchanges. */}
+      <div ref={scrollRef} className="min-h-32 space-y-3 overflow-y-auto p-5 xl:max-h-[calc(100vh-19rem)]">
         {messages.length === 0 ? (
           <p className="text-body text-muted-foreground">
             Ask about your tasks, habits, finances, health, or pipeline — the Mentor sees your whole dashboard.
