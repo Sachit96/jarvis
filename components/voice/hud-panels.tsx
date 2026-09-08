@@ -4,7 +4,20 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { VoiceDashboardData } from "@/lib/db/queries/voice";
 
-export type VoiceStatusMode = "idle" | "listening" | "thinking" | "speaking";
+/**
+ * The HUD's state machine. Widened when Voice was connected to the operator:
+ * a turn that runs tools takes long enough that "thinking" alone leaves the
+ * user staring at an unchanging ring, and a turn awaiting spoken approval is
+ * a genuinely different state from one that is merely slow.
+ */
+export type VoiceStatusMode =
+  | "idle"
+  | "listening"
+  | "thinking"
+  | "executing"
+  | "waiting_for_confirmation"
+  | "speaking"
+  | "error";
 
 function money(n: number) {
   return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
@@ -108,7 +121,10 @@ const STATUS_LABEL: Record<VoiceStatusMode, string> = {
   idle: 'LISTENING FOR "HEY JARVIS"',
   listening: "LISTENING",
   thinking: "THINKING",
+  executing: "WORKING",
+  waiting_for_confirmation: "AWAITING YOUR CONFIRMATION",
   speaking: "SPEAKING",
+  error: "SOMETHING WENT WRONG",
 };
 
 export function StatusPill({ mode }: { mode: VoiceStatusMode }) {
@@ -120,6 +136,11 @@ export function StatusPill({ mode }: { mode: VoiceStatusMode }) {
         "rounded-full px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] transition-colors",
         mode === "listening" && "border-brand/50 text-brand",
         mode === "thinking" && "border-violet-400/50 text-violet-300",
+        mode === "executing" && "border-violet-400/50 text-violet-300",
+        // Amber, and the only state whose label is a full sentence: the user
+        // has to notice this one, because nothing proceeds until they answer.
+        mode === "waiting_for_confirmation" && "border-warn/60 text-warn",
+        mode === "error" && "border-danger/50 text-danger",
         mode === "speaking" && "border-brand/50 text-brand",
         mode === "idle" && "text-white/50",
       )}
@@ -187,6 +208,40 @@ export function StatusStrip({ micActive }: { micActive: boolean }) {
       <span className="text-[10px] tabular-nums text-white/40">
         {now ? now.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "--:--:--"}
       </span>
+    </div>
+  );
+}
+
+
+export interface VoiceTraceEntry {
+  name: string;
+  label: string;
+  ok: boolean;
+}
+
+/**
+ * What JARVIS just did, in the HUD's own idiom.
+ *
+ * Voice hides the reasoning that the chat transcript makes visible, so
+ * without this a spoken "done" is unverifiable — the user has no way to know
+ * whether anything was actually changed. Labels only; raw results and error
+ * detail stay out of the HUD.
+ */
+export function ActivityStrip({ entries }: { entries: VoiceTraceEntry[] }) {
+  if (entries.length === 0) return null;
+  return (
+    <div className={cn(PANEL_CLASS, "w-64")}>
+      <p className={LABEL_CLASS}>Activity</p>
+      <ul className="mt-3 space-y-1.5">
+        {entries.slice(-5).map((entry, i) => (
+          <li key={`${entry.name}-${i}`} className="flex items-start gap-1.5 text-xs">
+            <span className={cn("mt-0.5 shrink-0", entry.ok ? "text-success" : "text-warn")}>
+              {entry.ok ? "\u2713" : "!"}
+            </span>
+            <span className="text-white/70">{entry.label}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

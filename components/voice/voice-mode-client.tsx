@@ -8,6 +8,7 @@ import { useSpeechRecognition } from "@/lib/voice/use-speech-recognition";
 import { useMicAudioLevel } from "@/lib/voice/use-mic-audio-level";
 import { useSyntheticEnvelope } from "@/lib/voice/use-synthetic-envelope";
 import { browserTts } from "@/lib/voice/tts";
+import { interpretConfirmation, REPROMPT } from "@/lib/voice/confirmation";
 import { sendVoiceMessageAction } from "@/actions/voice-actions";
 import { NeuralMap, type RegionActivity } from "@/components/voice/neural-map";
 import {
@@ -17,7 +18,9 @@ import {
   StatusPill,
   Subtitle,
   StatusStrip,
+  ActivityStrip,
   type VoiceStatusMode,
+  type VoiceTraceEntry,
 } from "@/components/voice/hud-panels";
 import type { VoiceDashboardData } from "@/lib/db/queries/voice";
 
@@ -39,6 +42,11 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
   const [finalDisplay, setFinalDisplay] = useState("");
   const [replyText, setReplyText] = useState("");
   const [motorPulse, setMotorPulse] = useState(false);
+  const [trace, setTrace] = useState<VoiceTraceEntry[]>([]);
+  // Held while JARVIS waits for a spoken yes. The next utterance is read as
+  // an answer to this rather than as a new request.
+  const [pendingConfirmation, setPendingConfirmation] =
+    useState<{ toolName: string; summary: string; args: Record<string, unknown> } | null>(null);
   // Computed post-mount only, so server/first-client render always agree
   // (avoids a hydration mismatch on the "unsupported browser" banner).
   const [browserSupport, setBrowserSupport] = useState({ voice: false, tts: false });
@@ -48,6 +56,9 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
   const isPttHeldRef = useRef(false);
   const cooldownUntilRef = useRef(0);
   const modeRef = useRef<VoiceStatusMode>("idle");
+  // submitUtterance is a stable callback, so it cannot close over the
+  // pendingConfirmation state directly without going stale between turns.
+  const pendingConfirmationRef = useRef<typeof pendingConfirmation>(null);
   const motorPulseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // recognitionControlsRef breaks what would otherwise be a circular
   // dependency: the callbacks below need to pause/resume recognition, but
@@ -62,6 +73,10 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
   useEffect(() => {
     modeRef.current = mode;
   }, [mode]);
+
+  useEffect(() => {
+    pendingConfirmationRef.current = pendingConfirmation;
+  }, [pendingConfirmation]);
 
   useEffect(() => {
     // Deferred, not synchronous in the effect body, so server/first-client
@@ -111,27 +126,78 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
       if (isRequestInFlightRef.current) return; // gotcha 7: never fire a second call while one is in flight
       if (Date.now() < cooldownUntilRef.current) return;
 
+      const pending = pendingConfirmationRef.current;
+
+      // While a high-risk action awaits approval, this utterance is an
+      // answer to that question — not a new instruction. Parsing it as a
+      // fresh request is how "no, cancel" would get sent to the model as
+      // something to act on.
+      if (pending) {
+        const intent = interpretConfirmation(trimmed);
+        if (intent === "ambiguous") {
+          // Deliberately does NOT fall through to treating it as a new
+          // request: an unclear answer to "shall I delete this?" must
+          // re-ask, never proceed and never silently drop the pending call.
+          speakReply(REPROMPT);
+          return;
+        }
+        if (intent === "declined") {
+          setPendingConfirmation(null);
+          setTrace([]);
+          speakReply("Cancelled. Nothing was changed.");
+          return;
+        }
+        // Confirmed. The approved arguments are replayed from the pending
+        // record, not re-derived from this utterance.
+        isRequestInFlightRef.current = true;
+        setMode("executing");
+        recognitionControlsRef.current.pause();
+        setPendingConfirmation(null);
+
+        const approved = await sendVoiceMessageAction(pending.summary, {
+          toolName: pending.toolName,
+          args: pending.args,
+        });
+        isRequestInFlightRef.current = false;
+        if (approved.trace) setTrace(approved.trace);
+        if (approved.error) {
+          setMode("error");
+          speakReply("Sorry — that didn't go through.");
+        } else {
+          speakReply(approved.reply ?? "Done.");
+        }
+        return;
+      }
+
       isRequestInFlightRef.current = true;
-      setMode("thinking"); // PREFRONTAL fires for exactly this window — see regionActivity below
+      setMode("thinking");
       recognitionControlsRef.current.pause();
 
       const result = await sendVoiceMessageAction(trimmed);
       isRequestInFlightRef.current = false;
 
       if (!result.rateLimited && !result.error) {
-        // A real mentor_messages write just happened as part of that call
-        // (runGeneralMentorChat inserts both turns) — MOTOR CORTEX's pulse
-        // reflects that real event, timed to when we can confirm it occurred.
+        // A real mentor_messages write just happened as part of that call —
+        // MOTOR CORTEX's pulse reflects that real event, timed to when we
+        // can confirm it occurred.
         setMotorPulse(true);
         if (motorPulseTimeoutRef.current) clearTimeout(motorPulseTimeoutRef.current);
         motorPulseTimeoutRef.current = setTimeout(() => setMotorPulse(false), MOTOR_PULSE_MS);
       }
 
+      if (result.trace) setTrace(result.trace);
+
       if (result.rateLimited) {
         cooldownUntilRef.current = Date.now() + 15_000;
         speakReply("Rate limited. One moment.");
       } else if (result.error) {
+        setMode("error");
         speakReply("Sorry — something went wrong on my end.");
+      } else if (result.pendingConfirmation) {
+        // Spoken aloud so the user can answer without looking at the screen,
+        // which is the whole point of a voice interface.
+        setPendingConfirmation(result.pendingConfirmation);
+        speakReply(`${result.pendingConfirmation.summary}. Shall I go ahead?`);
       } else {
         speakReply(result.reply ?? "…");
       }
@@ -284,6 +350,12 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
           neural map's own labels. Desktop/tablet only. */}
       <div className="pointer-events-none absolute left-6 top-6 z-10 hidden 2xl:block">
         <TopLeftPanel data={data.last7Days} />
+      </div>
+      {/* Sits under the stats panel on the same rail. Only rendered once a
+          turn has actually run something, so the HUD stays clean until
+          there is something real to report. */}
+      <div className="pointer-events-none absolute left-6 top-56 z-10 hidden 2xl:block">
+        <ActivityStrip entries={trace} />
       </div>
       <div className="pointer-events-none absolute right-6 top-20 z-10 hidden 2xl:block">
         <TopRightPanel data={data.today} />
