@@ -4,7 +4,7 @@ import { getDailyRecommendation, getGeneralMentorMessages } from "@/lib/db/queri
 import { generateDailyBriefAction } from "@/actions/mentor-actions";
 import { BriefCard } from "@/components/mentor/brief-card";
 import { GenerateBriefButton } from "@/components/mentor/generate-brief-button";
-import { MentorChatWidget } from "@/components/mentor/mentor-chat-widget";
+import { OperatorChat } from "@/components/mentor/operator-chat";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { MENTOR_TABS } from "@/lib/nav-items";
@@ -63,7 +63,7 @@ export default async function MentorPage() {
             padding, so the chat pins just below the header rather than
             under it. */}
         <div className="xl:sticky xl:top-19 xl:col-span-5">
-          <MentorChatWidget initialMessages={messages} hasKey={hasGeminiKey} />
+          <OperatorChat initialMessages={messages} hasKey={hasGeminiKey} />
         </div>
       </div>
     </div>

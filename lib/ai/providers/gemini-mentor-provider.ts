@@ -1,6 +1,14 @@
 import "server-only";
 import { callGemini, stripMarkdownFence, type GeminiContent } from "@/lib/ai/providers/gemini-client";
-import type { MentorProvider, MentorChatMessage, MentorBriefResult, LoggedMealArgs } from "@/lib/ai/providers/types";
+import type {
+  MentorProvider,
+  MentorChatMessage,
+  MentorBriefResult,
+  LoggedMealArgs,
+  AgentChatOptions,
+  AgentChatResult,
+  AgentTraceEntry,
+} from "@/lib/ai/providers/types";
 
 // Tier routing (see gemini-client.ts for the full verified rationale): all
 // three methods here route to "high_volume" (gemma-4-31b-it) — none of them
@@ -128,5 +136,72 @@ export class GeminiMentorProvider implements MentorProvider {
       tools: [LOG_NUTRITION_TOOL],
     });
     return second.text ?? "Logged it.";
+  }
+
+  async agentChat({
+    systemPrompt,
+    history,
+    tools,
+    execute,
+    maxRounds = 5,
+  }: AgentChatOptions): Promise<AgentChatResult> {
+    // Same tier as nutritionChat: this needs function calling, which was
+    // verified working on Gemma in both directions, not structured JSON.
+    const contents = toGeminiContents(history);
+    const trace: AgentTraceEntry[] = [];
+
+    for (let round = 0; round < maxRounds; round++) {
+      const result = await callGemini({
+        tier: "high_volume",
+        systemInstruction: systemPrompt,
+        contents,
+        tools,
+      });
+
+      if (result.functionCalls.length === 0) {
+        return { text: result.text ?? "…", trace };
+      }
+
+      // A round can carry several calls (Gemini returns an array), so all of
+      // them are appended before the next request — replying to only the
+      // first would leave the rest unanswered and the history malformed.
+      contents.push({
+        role: "model",
+        parts: result.functionCalls.map((call) => ({ functionCall: call })),
+      });
+
+      const responseParts = [];
+      for (const call of result.functionCalls) {
+        const outcome = await execute({ name: call.name, args: call.args });
+        trace.push({ name: call.name, label: outcome.label, ok: outcome.ok });
+        responseParts.push({
+          functionResponse: { name: call.name, response: outcome.response },
+        });
+
+        if (outcome.halt) {
+          // Stop here rather than finishing the round: the model must not get
+          // a chance to narrate a high-risk action as done when it has only
+          // been proposed.
+          return {
+            text: `I need your confirmation first: ${outcome.halt.summary}.`,
+            trace,
+            pendingConfirmation: {
+              toolName: outcome.halt.toolName,
+              summary: outcome.halt.summary,
+              args: outcome.halt.args,
+            },
+          };
+        }
+      }
+
+      contents.push({ role: "user", parts: responseParts });
+    }
+
+    // Round budget spent with the model still asking for tools. Returning the
+    // trace unchanged means the UI still shows what was actually run.
+    return {
+      text: "I gathered what I could but ran out of steps before finishing. Ask me again, more specifically?",
+      trace,
+    };
   }
 }

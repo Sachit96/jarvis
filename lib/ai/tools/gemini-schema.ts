@@ -26,6 +26,10 @@ export interface GeminiFunctionDeclaration {
 }
 
 interface GeminiSchema {
+  // Gemini's schema dialect is an open JSON object, and the declaration is
+  // handed to callGemini as a Record<string, unknown>. The index signature
+  // states that openness rather than forcing a cast at the boundary.
+  [key: string]: unknown;
   type: string;
   description?: string;
   properties?: Record<string, GeminiSchema>;
