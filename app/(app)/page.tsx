@@ -1,4 +1,3 @@
-import { Wallet, TrendingUp, HeartPulse, Target, CircleCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getPriorityTasks, getGoals } from "@/lib/db/queries/life";
 import { getAccounts, getMonthTransactions, computeAssetLiabilityTotals, computeMonthlyPnl } from "@/lib/db/queries/finance";
@@ -20,7 +19,7 @@ import { getLifeScoreSnapshot, getLifeScoreTrend } from "@/lib/db/queries/life-s
 import { hasHevyKey } from "@/lib/providers/workout/hevy-client";
 import { getMemoryEntries } from "@/lib/db/queries/memory";
 import { formatLbs } from "@/lib/units";
-import { StatTile } from "@/components/shared/stat-tile";
+import { KpiCell, KpiGrid } from "@/components/shared/kpi-grid";
 import { PriorityTasksWidget } from "@/components/dashboard/priority-tasks-widget";
 import { TodayRoutineCard } from "@/components/dashboard/today-routine-card";
 import { MentorInsightCard } from "@/components/dashboard/mentor-insight-card";
@@ -130,121 +129,135 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="space-y-4">
       {hasHevyKey() ? <HevyAutoSync /> : null}
 
-      <h1 className="text-title">Today</h1>
-
-      <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-5">
-        <StatTile
-          label="Net Worth"
-          value={money(financeTotals.netWorth)}
-          icon={Wallet}
-          category="money"
-          compact
-          unmeasured={accounts.length === 0}
-          note={accounts.length === 0 ? "No accounts yet" : undefined}
-        />
-        <StatTile label="Business Revenue" value={money(mrr)} icon={TrendingUp} category="business" compact />
-        <StatTile
-          label="Health Score"
-          value={`${lifeScore.health}/100`}
-          icon={HeartPulse}
-          category="health"
-          compact
-          note={lifeScore.health === 0 && workouts.length > 0 ? "No workout/nutrition logged today" : undefined}
-        />
-        <StatTile label="Discipline Score" value={`${lifeScore.habits}/100`} icon={Target} category="goals" compact />
-        <StatTile label="Goal Completion" value={`${lifeScore.goals}%`} icon={CircleCheck} category="goals" compact />
+      <div className="space-y-1">
+        <p className="text-label uppercase tracking-wide text-muted-foreground">
+          {new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })}
+        </p>
+        <h1 className="text-title">Today</h1>
       </div>
 
-      {/* Main dashboard — 4 column stacks. items-stretch (the grid default) equalizes
-          every column to the tallest one; each column's flex-1 card absorbs the
-          leftover space instead of leaving a void beneath a shorter neighbor.
-          2xl:max-h caps the row itself — without it, a column whose *content*
-          (not just its filler card) grows unusually tall becomes the tallest
-          thing on the page and drags every other column up with it; each
-          column's own overflow-y-auto children absorb the rest by scrolling. */}
-      <div className="mt-4 grid grid-cols-1 items-stretch gap-4 md:grid-cols-2 2xl:grid-cols-4 2xl:max-h-[calc(100vh-220px)]">
-        {/* Column 1 */}
-        <div className="flex h-full min-h-0 flex-col gap-4">
-          <GoalsRailCard goals={goals} className="flex-1" />
+      {/* The five separate stat tiles are one fused block now. They were
+          always read as a set, and five outlines at the top of the page was
+          most of what made the dashboard look busy. Goal completion is the
+          one that dropped: LifeScoreCard and the goals rail below both
+          already carry it, where the other four have no second home. */}
+      <KpiGrid columns={4}>
+        <KpiCell
+          label="Net worth"
+          accentClassName="text-cat-money"
+          value={money(financeTotals.netWorth)}
+          hint={accounts.length === 0 ? "No accounts connected yet" : `Across ${accounts.length} account(s)`}
+        />
+        <KpiCell
+          label="Business revenue"
+          accentClassName="text-cat-business"
+          value={money(mrr)}
+          hint={`${pipelineSummary.openCount} open deal(s) · ${money(pipelineSummary.openValue)} pipeline`}
+        />
+        <KpiCell
+          label="Health score"
+          accentClassName="text-cat-health"
+          value={`${lifeScore.health}`}
+          hint={
+            lifeScore.health === 0 && workouts.length > 0
+              ? "Nothing logged today"
+              : trainedToday
+                ? "Trained today"
+                : "No training logged today"
+          }
+        />
+        <KpiCell
+          label="Discipline"
+          accentClassName="text-cat-goals"
+          value={`${lifeScore.habits}`}
+          hint={`${habitsDoneToday}/${routineItems.length} routine items done`}
+        />
+      </KpiGrid>
+
+      {/* A plain 12-column grid on natural heights, replacing four flex
+          columns that equalised against the tallest and needed a viewport
+          max-height plus filler cards stretched with flex-1 to avoid voids.
+          That arrangement made any one card growing drag every other column
+          with it; here a tall card affects only its own row. */}
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+        <div className="xl:col-span-8">
+          <OverallProgressChart points={lifeScoreTrend} narrative={progressNarrative} compact />
+        </div>
+        <div className="xl:col-span-4">
+          <LifeScoreCard score={lifeScore} compact />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <PriorityTasksWidget tasks={priorityTasks} compact />
+        <TodayRoutineCard items={routineItems} compact />
+        <MentorInsightCard
+          markdownBody={dailyBrief?.markdown_body ?? null}
+          focusAreas={dailyBrief?.focus_areas ?? []}
+          compact
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <UpcomingCard items={upcoming} compact />
+        <GoalsRailCard goals={goals} />
+        <RecentActivityCard items={recentActivity} compact />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <DetailStatsCard
+          title="Finance"
+          compact
+          footnote={accounts.length === 0 ? "No accounts connected yet" : undefined}
+          rows={[
+            { label: "Assets", value: money(financeTotals.assets) },
+            { label: "Liabilities", value: money(financeTotals.liabilities), tone: financeTotals.liabilities > 0 ? "danger" : "neutral" },
+            { label: "Income (mo)", value: money(pnl.income), tone: "success" },
+            { label: "Expenses (mo)", value: money(pnl.expense), tone: "danger" },
+          ]}
+          footerLabel="Finance Overview"
+          footerHref="/finance/overview"
+        />
+        <DetailStatsCard
+          title="Business"
+          compact
+          footnote={
+            pipelineSummary.openValue === 0 && pipelineSummary.openCount > 0
+              ? `${pipelineSummary.openCount} deal(s), values not set yet`
+              : undefined
+          }
+          rows={[
+            { label: "Open Pipeline", value: `${money(pipelineSummary.openValue)} (${pipelineSummary.openCount})` },
+            { label: "Win Rate", value: `${pipelineSummary.winRate}%` },
+          ]}
+          footerLabel="Business Dashboard"
+          footerHref="/business/dashboard"
+        />
+        <DetailStatsCard
+          title="Health"
+          compact
+          rows={[
+            { label: "Trained Today", value: trainedToday ? "Yes" : "No", tone: trainedToday ? "success" : "neutral" },
+            { label: "Workouts", value: String(workouts.length) },
+            { label: "Volume (7d)", value: `${formatLbs(volume7d)} lbs` },
+            { label: "Calories Today", value: `${macroTotals.calories.toLocaleString()} / ${calorieTarget.toLocaleString()}` },
+          ]}
+          footerLabel="Health"
+          footerHref="/health/workouts"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+        <div className="xl:col-span-4">
           <NotesRailCard entries={memoryEntries} />
         </div>
-
-        {/* Column 2 */}
-        <div className="flex h-full min-h-0 flex-col gap-4">
-          <OverallProgressChart points={lifeScoreTrend} narrative={progressNarrative} compact />
-          <TodayRoutineCard items={routineItems} compact className="flex-1" />
-          <DetailStatsCard
-            title="Finance"
-            compact
-            className="min-h-[190px]"
-            footnote={accounts.length === 0 ? "No accounts connected yet" : undefined}
-            rows={[
-              { label: "Assets", value: money(financeTotals.assets) },
-              { label: "Liabilities", value: money(financeTotals.liabilities), tone: financeTotals.liabilities > 0 ? "danger" : "neutral" },
-              { label: "Income (mo)", value: money(pnl.income), tone: "success" },
-              { label: "Expenses (mo)", value: money(pnl.expense), tone: "danger" },
-            ]}
-            footerLabel="Finance Overview"
-            footerHref="/finance/overview"
-          />
-        </div>
-
-        {/* Column 3 */}
-        <div className="flex h-full min-h-0 flex-col gap-4">
-          <LifeScoreCard score={lifeScore} compact />
-          <MentorInsightCard
-            markdownBody={dailyBrief?.markdown_body ?? null}
-            focusAreas={dailyBrief?.focus_areas ?? []}
-            compact
-            fill
-            className="flex-1"
-          />
-          <DetailStatsCard
-            title="Business"
-            compact
-            className="min-h-[140px]"
-            footnote={
-              pipelineSummary.openValue === 0 && pipelineSummary.openCount > 0
-                ? `${pipelineSummary.openCount} deal(s), values not set yet`
-                : undefined
-            }
-            rows={[
-              { label: "Open Pipeline", value: `${money(pipelineSummary.openValue)} (${pipelineSummary.openCount})` },
-              { label: "Win Rate", value: `${pipelineSummary.winRate}%` },
-            ]}
-            footerLabel="Business Dashboard"
-            footerHref="/business/dashboard"
-          />
-          <DetailStatsCard
-            title="Health"
-            compact
-            className="min-h-[190px]"
-            rows={[
-              { label: "Trained Today", value: trainedToday ? "Yes" : "No", tone: trainedToday ? "success" : "neutral" },
-              { label: "Workouts", value: String(workouts.length) },
-              { label: "Volume (7d)", value: `${formatLbs(volume7d)} lbs` },
-              { label: "Calories Today", value: `${macroTotals.calories.toLocaleString()} / ${calorieTarget.toLocaleString()}` },
-            ]}
-            footerLabel="Health"
-            footerHref="/health/workouts"
-          />
-        </div>
-
-        {/* Column 4 */}
-        <div className="flex h-full min-h-0 flex-col gap-4">
-          <PriorityTasksWidget tasks={priorityTasks} compact />
-          <UpcomingCard items={upcoming} compact />
-          <RecentActivityCard items={recentActivity} compact className="flex-1" />
+        <div className="xl:col-span-8">
+          <HabitHeatmapCard habits={habits} datesByHabit={datesByHabit} />
         </div>
       </div>
-
-      {/* Habit history — full width, below the 4-column grid, per the
-          dashboard spec. HabitHeatmapCard was fully built to this spec but
-          never wired in until now (Cleanup work order follow-up). */}
-      <HabitHeatmapCard habits={habits} datesByHabit={datesByHabit} className="mt-4" />
     </div>
   );
 }
