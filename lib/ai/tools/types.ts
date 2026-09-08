@@ -2,6 +2,7 @@ import "server-only";
 import type { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
+import type { IntegrationState } from "@/lib/integrations/status";
 
 export type Client = SupabaseClient<Database>;
 
@@ -33,17 +34,12 @@ export type ToolDomain =
   | "memory";
 
 /**
- * Why a tool could not produce data, when the reason is an integration
- * rather than a bug. Mirrors the states the audit fixed on for Settings, so
- * the model can say "Brightspace isn't connected" instead of inventing
- * grades.
+ * Re-exported rather than redeclared. A second copy of this union drifted
+ * from the canonical one immediately — it was missing "syncing" — and the
+ * whole point of the status system is that Settings, Home, Voice and the
+ * model describe an integration the same way.
  */
-export type IntegrationState =
-  | "connected"
-  | "disconnected"
-  | "configuration_required"
-  | "unavailable"
-  | "error";
+export type { IntegrationState } from "@/lib/integrations/status";
 
 export type ToolResult =
   | { status: "ok"; data: unknown }

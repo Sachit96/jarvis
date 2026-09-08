@@ -4,6 +4,7 @@ import { z } from "zod";
 import { toGeminiDeclaration } from "../lib/ai/tools/gemini-schema.ts";
 import { getToolDeclarations, listTools, toolNamesByRisk } from "../lib/ai/tools/registry.ts";
 import { executeTool, toolResultForModel } from "../lib/ai/tools/executor.ts";
+import { runToolRound } from "../lib/ai/providers/tool-round.ts";
 import type { Client, ToolContext } from "../lib/ai/tools/types.ts";
 
 /**
@@ -240,5 +241,92 @@ describe("toolResultForModel", () => {
     });
     assert.equal(payload.error, "invalid_arguments");
     assert.deepEqual(payload.issues, ["title: Required"]);
+  });
+});
+
+describe("tool round scheduling", () => {
+  /** Records overlap so a claim of concurrency is measured, not assumed. */
+  function tracker() {
+    let active = 0;
+    let maxActive = 0;
+    const order: string[] = [];
+    return {
+      order,
+      maxActive: () => maxActive,
+      async execute(call: { name: string; args: Record<string, unknown> }) {
+        active++;
+        maxActive = Math.max(maxActive, active);
+        order.push(call.name);
+        await new Promise((r) => setTimeout(r, 5));
+        active--;
+        return { response: { ok: true }, label: `ran ${call.name}`, ok: true };
+      },
+    };
+  }
+
+  const call = (name: string) => ({ name, args: {} });
+
+  test("independent reads run concurrently", async () => {
+    const t = tracker();
+    const outcomes = await runToolRound(
+      [call("get_tasks"), call("get_goals"), call("get_accounts")],
+      t.execute,
+      () => true,
+    );
+    assert.equal(outcomes.length, 3);
+    assert.equal(t.maxActive(), 3, "all three should have been in flight together");
+  });
+
+  test("writes run one at a time, in the order the model asked", async () => {
+    const t = tracker();
+    await runToolRound([call("create_task"), call("complete_task")], t.execute, () => false);
+    assert.equal(t.maxActive(), 1, "writes must not overlap");
+    assert.deepEqual(t.order, ["create_task", "complete_task"]);
+  });
+
+  test("a mixed round falls back to sequential", async () => {
+    // One unsafe call makes the whole round unsafe: the write may depend on
+    // the read, and ordering is the only safe assumption.
+    const t = tracker();
+    await runToolRound(
+      [call("get_tasks"), call("create_task")],
+      t.execute,
+      (name) => name.startsWith("get_"),
+    );
+    assert.equal(t.maxActive(), 1);
+  });
+
+  test("defaults to sequential when no predicate is supplied", async () => {
+    const t = tracker();
+    await runToolRound([call("a"), call("b")], t.execute);
+    assert.equal(t.maxActive(), 1);
+  });
+
+  test("a halt stops the rest of the round from running", async () => {
+    const ran: string[] = [];
+    const outcomes = await runToolRound(
+      [call("delete_task"), call("create_task")],
+      async (c) => {
+        ran.push(c.name);
+        return c.name === "delete_task"
+          ? {
+              response: {},
+              label: "needs approval",
+              ok: false,
+              halt: {
+                reason: "confirmation_required" as const,
+                toolName: "delete_task",
+                summary: "Delete it",
+                args: {},
+              },
+            }
+          : { response: {}, label: "ran", ok: true };
+      },
+      () => false,
+    );
+    assert.equal(outcomes.length, 1);
+    // The second call must never have executed — it is work the user is
+    // still being asked about.
+    assert.deepEqual(ran, ["delete_task"]);
   });
 });

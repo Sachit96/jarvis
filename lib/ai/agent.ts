@@ -109,6 +109,10 @@ export async function runAgentTurn(
     history,
     tools: getToolDeclarations(),
     execute,
+    // Only reads. A read cannot change what a sibling call would see, so
+    // fanning them out is free; anything that writes stays ordered, since
+    // two writes in one round may well depend on each other.
+    parallelSafe: (name) => getTool(name)?.risk === "safe",
   });
 }
 

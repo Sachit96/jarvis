@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getExercises, getWorkouts, getWorkoutSets } from "@/lib/db/queries/health";
 import { ensureDefaultExercisesAction } from "@/actions/health-actions";
-import { hasHevyKey } from "@/lib/providers/workout/hevy-client";
+import { hasHevyKey } from "@/lib/integrations/hevy/client";
 import { WorkoutForm } from "@/components/health/workout-form";
 import { ExerciseForm } from "@/components/health/exercise-form";
 import { WorkoutsList } from "@/components/health/workouts-list";

@@ -16,7 +16,7 @@ import { getTodayRoutineItems } from "@/lib/db/queries/routine";
 import { getHabits, getHabitLogsForHeatmap } from "@/lib/db/queries/life";
 import { getUpcoming, getRecentActivity } from "@/lib/db/queries/command-center";
 import { getLifeScoreSnapshot, getLifeScoreTrend } from "@/lib/db/queries/life-score";
-import { hasHevyKey } from "@/lib/providers/workout/hevy-client";
+import { hasHevyKey } from "@/lib/integrations/hevy/client";
 import { getMemoryEntries } from "@/lib/db/queries/memory";
 import { formatLbs } from "@/lib/units";
 import { KpiCell, KpiGrid } from "@/components/shared/kpi-grid";

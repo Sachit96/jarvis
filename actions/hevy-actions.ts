@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { syncHevyWorkouts } from "@/lib/providers/workout/hevy-sync";
+import { syncHevyWorkouts } from "@/lib/integrations/hevy/sync";
 
 /**
  * Both browser call sites (HevyAutoSync, HevySyncButton) call this
