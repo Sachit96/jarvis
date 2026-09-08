@@ -1,4 +1,3 @@
-import { Wallet } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import {
   getAccounts,
@@ -9,73 +8,81 @@ import {
   computeSpendByCategory,
   computeDailyCashflow,
 } from "@/lib/db/queries/finance";
-import { NetWorthWidget } from "@/components/finance/net-worth-widget";
-import { MonthlyPnlCard } from "@/components/finance/monthly-pnl-card";
+import { FinanceKpis } from "@/components/finance/finance-kpis";
 import { CashflowTrendChart } from "@/components/finance/cashflow-trend-chart";
 import { SpendByCategoryChart } from "@/components/finance/spend-by-category-chart";
-import { CashflowSparklineCard } from "@/components/finance/cashflow-sparkline-card";
-import { LatestTransactionCard } from "@/components/finance/latest-transaction-card";
-import { AccountCard } from "@/components/finance/account-card";
-import { AccountForm } from "@/components/finance/account-form";
-import { EmptyState } from "@/components/shared/empty-state";
+import { RecentTransactionsCard } from "@/components/finance/recent-transactions-card";
+import { AccountsSummaryCard } from "@/components/finance/accounts-summary-card";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { FINANCE_TABS } from "@/lib/nav-items";
 
+/** Liquid accounts — what could actually be spent today, so investments are out. */
+const CASH_TYPES = new Set(["cash", "savings"]);
+
+function lastMonth(reference = new Date()) {
+  return new Date(reference.getFullYear(), reference.getMonth() - 1, 1);
+}
+
 export default async function FinanceOverviewPage() {
   const supabase = await createClient();
-  const [accounts, monthTransactions, recentTransactions] = await Promise.all([
+  const [accounts, monthTransactions, prevMonthTransactions, recentTransactions] = await Promise.all([
     getAccounts(supabase),
     getMonthTransactions(supabase),
+    // Drives the KPI deltas. Without it the badges would have nothing real
+    // to compare against, and a KPI with an invented delta is worse than one
+    // with no delta at all.
+    getMonthTransactions(supabase, lastMonth()),
     getRecentTransactions(supabase),
   ]);
 
   const totals = computeAssetLiabilityTotals(accounts);
   const pnl = computeMonthlyPnl(monthTransactions);
+  const prevPnl = computeMonthlyPnl(prevMonthTransactions);
   const spendByCategory = computeSpendByCategory(monthTransactions);
   const cashflowPoints = computeDailyCashflow(recentTransactions);
-  const latestTransaction = recentTransactions.length > 0 ? recentTransactions[recentTransactions.length - 1] : null;
+
+  const availableCash = accounts
+    .filter((a) => !a.is_liability && CASH_TYPES.has(a.account_type))
+    .reduce((sum, a) => sum + Number(a.current_balance), 0);
+
+  const monthLabel = new Date().toLocaleDateString(undefined, { month: "long", year: "numeric" });
 
   return (
-    <div className="space-y-8">
-      <div>
+    <div className="space-y-6">
+      <div className="space-y-1">
         <p className="text-label uppercase tracking-wide text-muted-foreground">Finance</p>
         <h1 className="text-title">Overview</h1>
+        <p className="text-body text-muted-foreground">{monthLabel}</p>
       </div>
 
       <ModuleTabs tabs={FINANCE_TABS} />
 
-      <NetWorthWidget {...totals} accountCount={accounts.length} />
-      <MonthlyPnlCard {...pnl} />
+      <FinanceKpis
+        netWorth={totals.netWorth}
+        availableCash={availableCash}
+        monthSpend={pnl.expense}
+        monthIncome={pnl.income}
+        previous={{ spend: prevPnl.expense, income: prevPnl.income }}
+      />
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-        <div className="min-w-0 space-y-6">
+      {/* 12-column grid rather than fixed pixel columns so the split holds
+          at every width — the chart needs the majority share, and the two
+          list cards below are equal-weight. */}
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+        <div className="xl:col-span-7">
           <CashflowTrendChart points={cashflowPoints} />
-
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-heading text-muted-foreground">Accounts</h2>
-              <AccountForm />
-            </div>
-            {accounts.length === 0 ? (
-              <EmptyState
-                icon={Wallet}
-                title="No accounts yet"
-                description="Add a cash, savings, credit, or investment account to start tracking your net worth."
-              />
-            ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
-                {accounts.map((account) => (
-                  <AccountCard key={account.id} account={account} />
-                ))}
-              </div>
-            )}
-          </div>
         </div>
-
-        <div className="space-y-6">
+        <div className="xl:col-span-5">
           <SpendByCategoryChart spendByCategory={spendByCategory} />
-          <CashflowSparklineCard points={cashflowPoints} />
-          <LatestTransactionCard transaction={latestTransaction} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+        <div className="xl:col-span-7">
+          <RecentTransactionsCard transactions={recentTransactions} />
+        </div>
+        <div className="xl:col-span-5">
+          <AccountsSummaryCard accounts={accounts} />
         </div>
       </div>
     </div>

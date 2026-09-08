@@ -24,12 +24,12 @@ export const CATEGORY_BADGE_CLASS: Record<Category, string> = {
 
 /** Raw CSS color value per category, for contexts that need an actual color (SVG/recharts stroke/fill), not a Tailwind class. */
 export const CATEGORY_HEX: Record<Category, string> = {
-  money: "#22c55e",
-  business: "#8b5cf6",
-  health: "#ef4444",
-  goals: "#3b82f6",
-  finance: "#f97316",
-  habits: "#ec4899",
+  money: "#16a34a",
+  business: "#9333ea",
+  health: "#dc2626",
+  goals: "#2563eb",
+  finance: "#c08205",
+  habits: "#0d9488",
 };
 
 /** Plain text-color class per category, for icons/labels that just need a tint (no badge background). */

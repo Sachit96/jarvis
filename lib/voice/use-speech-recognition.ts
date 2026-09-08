@@ -1,5 +1,21 @@
 "use client";
 
+/**
+ * UPGRADE SEAM — swapping in a server-side recogniser.
+ *
+ * This hook is the only place the app touches the browser's SpeechRecognition
+ * API, and every consumer reads it through the return value below
+ * (transcript / interimTranscript / listening / error / start / stop). A
+ * self-hosted recogniser — e.g. local Whisper behind a WebSocket, as in
+ * forks-ai/jarvis — replaces this file alone: stream mic audio instead of
+ * calling SpeechRecognition, push partials into interimTranscript and final
+ * segments into transcript, and no HUD component has to change.
+ *
+ * Two things to keep if you do: `error` is rendered verbatim to the user, so
+ * it must stay human-readable, and `listening` has to go false when the
+ * transport drops, or push-to-talk latches on with no way to release it.
+ */
+
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseSpeechRecognitionOptions {

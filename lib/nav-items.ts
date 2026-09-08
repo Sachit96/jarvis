@@ -42,6 +42,57 @@ export const SIDEBAR_ITEMS: NavItem[] = [
   { href: "/settings", label: "Settings", icon: SettingsIcon },
 ];
 
+export interface NavGroup {
+  /** Omitted for the first group — a lone "Home" doesn't need a heading over it. */
+  label?: string;
+  items: NavItem[];
+}
+
+/**
+ * The same twelve destinations as SIDEBAR_ITEMS, in groups.
+ *
+ * Twelve flat rows is past the point where the eye scans and into where it
+ * reads, and the order was carrying meaning ("priority") that nothing in the
+ * UI expressed. Grouping by what part of life the section is about means the
+ * user navigates by picking a domain first, which is how they think about it
+ * anyway — and it puts the three assistant surfaces together, where their
+ * relationship is obvious.
+ *
+ * SIDEBAR_ITEMS is still the flat source of truth for anything that wants
+ * every destination without caring about grouping (the command palette).
+ */
+export const SIDEBAR_GROUPS: NavGroup[] = [
+  { items: [{ href: "/", label: "Home", icon: LayoutDashboard }] },
+  {
+    label: "Money",
+    items: [
+      { href: "/business/dashboard", label: "Business", icon: Briefcase },
+      { href: "/finance/overview", label: "Finance", icon: Wallet },
+    ],
+  },
+  {
+    label: "Self",
+    items: [
+      { href: "/health/workouts", label: "Health", icon: HeartPulse },
+      { href: "/life/goals", label: "Goals", icon: Target },
+      { href: "/life/tasks", label: "Tasks & Routine", icon: ListChecks },
+      { href: "/uni", label: "University", icon: GraduationCap },
+    ],
+  },
+  {
+    label: "Assistant",
+    items: [
+      { href: "/mentor", label: "AI Mentor", icon: Sparkles },
+      { href: "/voice", label: "Voice Mode", icon: Mic },
+      { href: "/memory", label: "Memory", icon: BrainCircuit },
+    ],
+  },
+  {
+    label: "Create",
+    items: [{ href: "/youtube", label: "YouTube", icon: Clapperboard }],
+  },
+];
+
 /**
  * Curated subset for the mobile bottom bar — five is the most a thumb can
  * reach comfortably, so a 6th domain (University) means swapping one out

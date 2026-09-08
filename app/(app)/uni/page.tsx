@@ -1,18 +1,17 @@
 import Link from "next/link";
-import { AlertTriangle, GraduationCap } from "lucide-react";
+import { AlertTriangle, CalendarClock, GraduationCap } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCourses, getAssessments, getAssessmentGroups, getScheduleBlocks, getDeadlines } from "@/lib/db/queries/uni";
 import { courseGrade, semesterAverage, riskScore } from "@/lib/uni/grades";
-import { StatTile } from "@/components/shared/stat-tile";
+import { KpiCell, KpiGrid } from "@/components/shared/kpi-grid";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { RiskChip } from "@/components/uni/risk-chip";
 import { PlanTonight } from "@/components/uni/plan-tonight";
-import { Card } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { UNI_TABS } from "@/lib/nav-items";
 import { cn } from "@/lib/utils";
-
-const DAY_LABEL = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default async function UniDashboardPage() {
   const supabase = await createClient();
@@ -71,9 +70,9 @@ export default async function UniDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">University</p>
-        <h1 className="text-xl font-semibold">Dashboard</h1>
+      <div className="space-y-1">
+        <p className="text-label uppercase tracking-wide text-muted-foreground">University</p>
+        <h1 className="text-title">Dashboard</h1>
       </div>
 
       <ModuleTabs tabs={UNI_TABS} />
@@ -84,119 +83,172 @@ export default async function UniDashboardPage() {
           description="Add your courses to start tracking grades, deadlines, and schedule."
           icon={GraduationCap}
           action={
-            <Link href="/uni/courses" className="text-sm font-medium text-brand hover:underline">
+            <Link href="/uni/courses" className="text-body font-medium text-brand hover:underline">
               Add a course →
             </Link>
           }
         />
       ) : (
         <>
+          {/* The single most urgent thing, given its own band above the
+              grid. An overdue assessment is a different kind of fact from
+              the counts below it, so it gets the destructive treatment; the
+              nearest upcoming item gets a neutral one, because "your next
+              deadline" is information, not an alarm. */}
           {mostImportant && mostImportantCourse ? (
-            <Card className="border-danger/30 bg-danger/5">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-danger" />
-                <div>
-                  <p className="text-caption uppercase tracking-wide text-danger">Most important thing right now</p>
-                  <p className="mt-1 text-sm font-medium text-foreground">
-                    {mostImportantCourse.code} — {mostImportant.title} is overdue
-                  </p>
-                </div>
-              </div>
-            </Card>
+            <Alert variant="destructive">
+              <AlertTriangle />
+              <AlertTitle>Overdue — deal with this first</AlertTitle>
+              <AlertDescription>
+                {mostImportantCourse.code} — {mostImportant.title}
+              </AlertDescription>
+            </Alert>
           ) : nextThing ? (
-            <Card>
-              <p className="text-caption uppercase tracking-wide text-muted-foreground">Most important thing right now</p>
-              <p className="mt-1 text-sm font-medium text-foreground">
+            <Alert>
+              <CalendarClock />
+              <AlertTitle>Next up</AlertTitle>
+              <AlertDescription>
                 {nextThing.courseCode ? `${nextThing.courseCode} — ` : ""}
-                {nextThing.title} · due {new Date(nextThing.due_at).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
-              </p>
-            </Card>
+                {nextThing.title} · due{" "}
+                {new Date(nextThing.due_at).toLocaleDateString(undefined, {
+                  weekday: "short",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </AlertDescription>
+            </Alert>
           ) : null}
 
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            <StatTile
-              label="Semester Average"
+          <KpiGrid columns={4}>
+            <KpiCell
+              label="Semester average"
+              accentClassName="text-cat-goals"
               value={average != null ? `${average.toFixed(1)}%` : "—"}
-              unmeasured={average == null}
-              note={
-                coursesWithData < courses.length
-                  ? `Based on ${coursesWithData} of ${courses.length} courses — ${coursesWithoutData.join(", ")} ${coursesWithoutData.length > 1 ? "have" : "has"} no assessments recorded`
-                  : undefined
+              hint={
+                average == null
+                  ? "No graded assessments yet"
+                  : coursesWithData < courses.length
+                    ? `${coursesWithData} of ${courses.length} courses — ${coursesWithoutData.join(", ")} not recorded`
+                    : `Across all ${courses.length} courses`
               }
-              icon={GraduationCap}
-              category="goals"
             />
-            <StatTile label="Courses" value={String(courses.length)} />
-            <StatTile label="Overdue" value={String(overdue.length)} tone={overdue.length > 0 ? "danger" : "neutral"} />
-            <StatTile label="Due in 7 Days" value={String(next7Days.length)} />
-          </div>
+            <KpiCell label="Courses" value={String(courses.length)} hint="This semester" />
+            <KpiCell
+              label="Overdue"
+              value={String(overdue.length)}
+              hint={overdue.length === 0 ? "Nothing past due" : "Needs attention now"}
+              valueClassName={overdue.length > 0 ? "text-danger" : undefined}
+            />
+            <KpiCell
+              label="Due in 7 days"
+              value={String(next7Days.length)}
+              hint={next7Days.length === 0 ? "Clear week ahead" : "Assessments and deadlines"}
+            />
+          </KpiGrid>
 
-          <div className="grid gap-4 lg:grid-cols-2">
-            <Card>
-              <p className="text-caption uppercase tracking-wide text-muted-foreground">Today&apos;s classes</p>
-              {todaysClasses.length === 0 ? (
-                <p className="mt-3 text-sm text-muted-foreground/50">No classes today</p>
-              ) : (
-                <ul className="mt-3 space-y-2">
-                  {todaysClasses.map((b) => {
-                    const course = courses.find((c) => c.id === b.course_id);
-                    return (
-                      <li key={b.id} className="flex items-center gap-2.5 text-sm">
-                        <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: course?.color ?? "#8b5cf6" }} />
-                        <span className="font-mono text-caption text-muted-foreground">{b.start_time.slice(0, 5)}</span>
-                        <span className="text-foreground">{course?.code}</span>
-                        <span className="text-caption text-muted-foreground capitalize">{b.type.replace("_", " ")}</span>
-                        {b.room ? <span className="text-caption text-muted-foreground">· {b.room}</span> : null}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <Card padding="slotted">
+              <CardHeader>
+                <CardTitle>Today&apos;s classes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {todaysClasses.length === 0 ? (
+                  <p className="py-6 text-center text-body text-muted-foreground">No classes today.</p>
+                ) : (
+                  <ul className="-my-1 divide-y divide-border">
+                    {todaysClasses.map((b) => {
+                      const course = courses.find((c) => c.id === b.course_id);
+                      return (
+                        <li key={b.id} className="flex items-center gap-2.5 py-2.5 text-body">
+                          <span
+                            className="size-2 shrink-0 rounded-full"
+                            style={{ backgroundColor: course?.color ?? "var(--cat-business)" }}
+                          />
+                          <span className="tabular shrink-0 text-caption text-muted-foreground">
+                            {b.start_time.slice(0, 5)}
+                          </span>
+                          <span className="font-medium">{course?.code}</span>
+                          <span className="text-caption text-muted-foreground capitalize">
+                            {b.type.replace("_", " ")}
+                          </span>
+                          {b.room ? <span className="text-caption text-muted-foreground">· {b.room}</span> : null}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </CardContent>
             </Card>
 
-            <Card>
-              <p className="text-caption uppercase tracking-wide text-muted-foreground">Next 7 days</p>
-              {next7Days.length === 0 ? (
-                <p className="mt-3 text-sm text-muted-foreground/50">Nothing due</p>
-              ) : (
-                <ul className="mt-3 space-y-2">
-                  {next7Days.slice(0, 8).map((item) => (
-                    <li key={item.id} className="flex items-center justify-between text-sm">
-                      <span className="text-foreground">
-                        {item.courseCode ? <span className="text-muted-foreground">{item.courseCode} · </span> : null}
-                        {item.title}
-                      </span>
-                      <span className="text-caption text-muted-foreground">
-                        {new Date(item.due_at).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
+            <Card padding="slotted">
+              <CardHeader>
+                <CardTitle>Next 7 days</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {next7Days.length === 0 ? (
+                  <p className="py-6 text-center text-body text-muted-foreground">Nothing due.</p>
+                ) : (
+                  <ul className="-my-1 divide-y divide-border">
+                    {next7Days.slice(0, 8).map((item) => (
+                      <li key={item.id} className="flex items-center justify-between gap-3 py-2.5 text-body">
+                        <span className="min-w-0 truncate">
+                          {item.courseCode ? (
+                            <span className="text-muted-foreground">{item.courseCode} · </span>
+                          ) : null}
+                          {item.title}
+                        </span>
+                        <span className="shrink-0 text-caption text-muted-foreground">
+                          {new Date(item.due_at).toLocaleDateString(undefined, {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </CardContent>
             </Card>
           </div>
 
           <PlanTonight assessmentCourseIds={Object.fromEntries(assessments.map((a) => [a.id, a.course_id]))} />
 
-          <div>
-            <p className="mb-3 text-caption uppercase tracking-wide text-muted-foreground">Courses</p>
+          <div className="space-y-3">
+            <h2 className="text-heading text-muted-foreground">Courses</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {coursesWithGrades.map((c) => (
-                <Link key={c.id} href={`/uni/courses/${c.id}`} className="block outline-none focus-visible:ring-3 focus-visible:ring-ring/50 rounded-2xl">
+                <Link
+                  key={c.id}
+                  href={`/uni/courses/${c.id}`}
+                  className="block rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
                   <Card interactive padding="compact">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: c.color ?? "#8b5cf6" }} />
-                        <span className="text-sm font-medium text-foreground">{c.code}</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span
+                          className="size-2 shrink-0 rounded-full"
+                          style={{ backgroundColor: c.color ?? "var(--cat-business)" }}
+                        />
+                        <span className="truncate text-body font-medium">{c.code}</span>
                       </div>
                       <RiskChip score={c.risk} />
                     </div>
-                    <p className={cn("mt-2 font-mono text-lg tabular-nums", c.assessmentCount === 0 ? "text-caption text-muted-foreground/50" : "text-foreground")}>
-                      {c.assessmentCount === 0 ? "No assessments" : c.grade != null ? `${c.grade.toFixed(1)}%` : "—"}
+                    <p
+                      className={cn(
+                        "tabular mt-2 text-metric",
+                        c.assessmentCount === 0 && "text-body font-normal text-muted-foreground",
+                      )}
+                    >
+                      {c.assessmentCount === 0
+                        ? "No assessments"
+                        : c.grade != null
+                          ? `${c.grade.toFixed(1)}%`
+                          : "—"}
                     </p>
                     {c.needsVerificationCount > 0 ? (
-                      <p className="mt-1 flex items-center gap-1 text-caption text-warn">
-                        <AlertTriangle className="h-3 w-3" strokeWidth={2.5} />
+                      <p className="mt-1.5 flex items-center gap-1 text-caption text-warn">
+                        <AlertTriangle className="size-3" strokeWidth={2.5} />
                         {c.needsVerificationCount} need{c.needsVerificationCount === 1 ? "s" : ""} verification
                       </p>
                     ) : null}

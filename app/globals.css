@@ -18,6 +18,8 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
+  --color-chart-primary: var(--chart-primary);
+  --color-chart-6: var(--chart-6);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
@@ -74,6 +76,15 @@
   --text-display: 2.25rem;
   --text-display--line-height: 2.5rem;
   --text-display--font-weight: 600;
+  /* text-metric: the number in a KPI cell. Distinct from text-display
+     because a KPI grid shows four to six of these at once, so they can't
+     each be "the one large moment" — they sit a step down, set solid
+     (line-height 1) and slightly tightened so a row of them reads as one
+     band rather than four separate headlines. */
+  --text-metric: 1.75rem;
+  --text-metric--line-height: 1;
+  --text-metric--font-weight: 600;
+  --text-metric--letter-spacing: -0.02em;
   --text-title: 1.375rem;
   --text-title--line-height: 1.75rem;
   --text-title--font-weight: 600;
@@ -131,11 +142,22 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.82 0.15 200);
-  --chart-1: oklch(0.82 0.15 200);
-  --chart-2: oklch(0.72 0.08 165);
-  --chart-3: oklch(0.74 0.09 70);
-  --chart-4: oklch(0.65 0.03 300);
-  --chart-5: oklch(0.55 0.02 235);
+  /* Chart slots ARE the category palette, in the one order whose every
+     adjacent pair passes the colorblind and normal-vision checks — so a
+     chart that fills slots 1..n in order is safe by construction and needs
+     no per-chart color thinking. Slots 4 and 5 used to be near-achromatic
+     (chroma 0.03 and 0.02, i.e. two greys), which is why multi-series
+     charts read as flat. Assign in order; never cycle back to slot 1 for a
+     7th series. */
+  --chart-1: var(--cat-money);
+  --chart-2: var(--cat-goals);
+  --chart-3: var(--cat-health);
+  --chart-4: var(--cat-business);
+  --chart-5: var(--cat-finance);
+  --chart-6: var(--cat-habits);
+  /* Single-series charts have no identity to encode, so they wear the brand
+     accent rather than borrowing a category's color and implying one. */
+  --chart-primary: var(--brand);
   --radius: 0.75rem;
   /* Sidebar reads as the same surface as the page, not a separate panel —
      no lightness/hue shift from --background. */
@@ -160,12 +182,28 @@
   /* Category accents — one fixed color per domain, reused everywhere
      (stat-tile badges, chart legends/lines, activity-feed badges) so the
      same category always reads the same color across the whole app. */
-  --cat-money: #22c55e;
-  --cat-business: #8b5cf6;
-  --cat-health: #ef4444;
-  --cat-goals: #3b82f6;
-  --cat-finance: #f97316;
-  --cat-habits: #ec4899;
+  /* These six are a validated categorical palette, not hand-picked hues.
+     They were re-stepped against the actual card surface (#1c1c1c — the 9%
+     white --card fill over --background) and checked for OKLCH lightness
+     band, chroma floor, colorblind separation, normal-vision separation and
+     WCAG contrast. The previous set failed twice over: finance-orange vs
+     health-red sat 5.8 ΔE apart (below the 15 floor — indistinguishable
+     even with full color vision), and habits-pink vs health-red 10.1.
+     Re-spacing the hues fixed both.
+
+     TWO PAIRS REMAIN IRREDUCIBLE and constrain how charts may be built:
+     goals-blue vs business-violet (1.3 ΔE under deuteranopia) and
+     money-green vs habits-teal (10.8 ΔE normal vision). Six saturated
+     categorical hues simply cannot all be mutually distinct — so the rule
+     is: at most four categories per chart, always with a legend, and with
+     direct labels whenever one of those two pairs appears together.
+     Beyond four, fold the tail into "Other" or use small multiples. */
+  --cat-money: #16a34a;
+  --cat-business: #9333ea;
+  --cat-health: #dc2626;
+  --cat-goals: #2563eb;
+  --cat-finance: #c08205;
+  --cat-habits: #0d9488;
 
   /* Primary brand gradient (logo mark, avatar, progress rings) — teal to
      blue to violet, distinct from the flat --brand cyan used for smaller
@@ -194,6 +232,14 @@
     background-image: var(--gradient-brand);
     background-clip: text;
     color: transparent;
+  }
+
+  /* Any figure that changes in place — a KPI, a table column, a running
+     total, a countdown. Proportional digits have different widths, so an
+     updating number visibly shifts its neighbours; tabular ones lock to a
+     common advance width and the row stays still. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
   }
 
   /* Reserved for genuinely interactive/important elements only — not every card. */

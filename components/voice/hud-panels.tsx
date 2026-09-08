@@ -10,7 +10,13 @@ function money(n: number) {
   return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 }
 
-const PANEL_CLASS = "pointer-events-none rounded-lg border border-white/10 bg-black/40 p-4 font-mono backdrop-blur-sm";
+// Deliberately NOT the app's Card. This is a heads-up overlay on a live
+// animated background, so it needs to stay legible over whatever is moving
+// underneath without becoming an opaque box that hides it: a heavier blur
+// carries the legibility, a brand-tinted hairline plus a top inset highlight
+// give the glass an edge, and the fill stays dark and translucent.
+const PANEL_CLASS =
+  "pointer-events-none rounded-xl border border-brand/15 bg-black/50 p-4 font-mono shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] backdrop-blur-md";
 const LABEL_CLASS = "text-[10px] uppercase tracking-[0.15em] text-brand/80";
 
 function Row({ label, value }: { label: string; value: string }) {

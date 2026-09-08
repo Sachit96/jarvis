@@ -1,79 +1,84 @@
-"use client";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import { Card } from "@/components/ui/card";
-
-const SLICE_COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
-
-interface Slice {
-  category: string;
-  amount: number;
-}
-
-function CategoryTooltip({ active, payload }: { active?: boolean; payload?: { name: string; value: number }[] }) {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="rounded-xl bg-popover px-3 py-2 text-caption ring-1 ring-white/[0.08]">
-      <p className="text-muted-foreground">{payload[0].name}</p>
-      <p className="mt-0.5 font-mono font-medium text-foreground">${payload[0].value.toLocaleString()}</p>
-    </div>
-  );
-}
+/**
+ * Spending by category is a ranked-magnitude comparison, which is a bar's
+ * job, not a donut's — a donut asks the reader to compare arc lengths, and
+ * the two or three categories that actually matter are usually close enough
+ * that arcs can't separate them.
+ *
+ * Bars also make the color question disappear. Every bar measures the same
+ * thing, so one hue carries it; the previous donut needed five categorical
+ * colors purely because slices touch, and cycled them once the list grew
+ * past five, which silently gave two different categories the same color.
+ *
+ * Rendered as plain elements rather than Recharts: at this size a bar list
+ * is a flex row with a percentage width, and doing it directly keeps the
+ * card a server component, keeps the labels real selectable text, and
+ * avoids shipping a chart runtime for five rows.
+ */
+const MAX_ROWS = 6;
 
 export function SpendByCategoryChart({ spendByCategory }: { spendByCategory: Map<string, number> }) {
-  const slices: Slice[] = [...spendByCategory.entries()]
+  const all = [...spendByCategory.entries()]
     .map(([category, amount]) => ({ category, amount }))
-    .sort((a, b) => b.amount - a.amount)
-    .slice(0, 5);
-  const total = slices.reduce((sum, s) => sum + s.amount, 0);
+    .sort((a, b) => b.amount - a.amount);
+
+  // Everything past the cut folds into one "Other" row rather than being
+  // dropped — otherwise the rows don't sum to the total shown above them.
+  const head = all.slice(0, MAX_ROWS);
+  const tail = all.slice(MAX_ROWS);
+  const rows =
+    tail.length > 0
+      ? [...head, { category: `Other (${tail.length})`, amount: tail.reduce((s, r) => s + r.amount, 0) }]
+      : head;
+
+  const total = all.reduce((sum, r) => sum + r.amount, 0);
+  // Bars are scaled against the largest row, not the total: against the
+  // total, a realistic spread leaves every bar a short stub and the ranking
+  // becomes hard to read.
+  const max = rows.length > 0 ? Math.max(...rows.map((r) => r.amount)) : 0;
 
   return (
-    <Card>
-      <p className="text-heading">Spending by category</p>
-      <p className="mt-0.5 text-caption text-muted-foreground">This month&apos;s expenses, top 5 categories.</p>
+    <Card padding="slotted" className="h-full">
+      <CardHeader>
+        <CardTitle>Spending by category</CardTitle>
+        <CardDescription>
+          {total > 0
+            ? `$${total.toLocaleString(undefined, { maximumFractionDigits: 0 })} this month`
+            : "This month"}
+        </CardDescription>
+      </CardHeader>
 
-      {slices.length === 0 ? (
-        <div className="flex h-48 items-center justify-center text-body text-muted-foreground">
-          No expenses logged this month yet.
-        </div>
-      ) : (
-        <>
-          <div className="relative mt-2 h-48">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={slices}
-                  dataKey="amount"
-                  nameKey="category"
-                  innerRadius="62%"
-                  outerRadius="90%"
-                  paddingAngle={2}
-                  animationDuration={600}
-                  stroke="var(--card)"
-                  strokeWidth={2}
-                >
-                  {slices.map((s, i) => (
-                    <Cell key={s.category} fill={SLICE_COLORS[i % SLICE_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CategoryTooltip />} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-              <p className="font-mono text-heading text-foreground">${total.toLocaleString()}</p>
-              <p className="text-caption text-muted-foreground">total</p>
-            </div>
+      <CardContent>
+        {rows.length === 0 ? (
+          <div className="flex h-40 items-center justify-center text-body text-muted-foreground">
+            No expenses logged this month yet.
           </div>
-          <ul className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1.5">
-            {slices.map((s, i) => (
-              <li key={s.category} className="flex items-center gap-1.5 text-caption text-muted-foreground">
-                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: SLICE_COLORS[i % SLICE_COLORS.length] }} />
-                {s.category}
-              </li>
-            ))}
+        ) : (
+          <ul className="space-y-3.5">
+            {rows.map((row) => {
+              const share = total > 0 ? (row.amount / total) * 100 : 0;
+              return (
+                <li key={row.category} className="space-y-1.5">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="truncate text-body">{row.category}</span>
+                    <span className="tabular shrink-0 text-body text-muted-foreground">
+                      ${row.amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      <span className="ml-1.5 text-caption">{share.toFixed(0)}%</span>
+                    </span>
+                  </div>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+                    <div
+                      className="h-full rounded-full bg-cat-finance"
+                      style={{ width: `${max > 0 ? Math.max((row.amount / max) * 100, 2) : 0}%` }}
+                    />
+                  </div>
+                </li>
+              );
+            })}
           </ul>
-        </>
-      )}
+        )}
+      </CardContent>
     </Card>
   );
 }
