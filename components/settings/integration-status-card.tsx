@@ -1,14 +1,17 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { getIntegrationStatuses, type IntegrationState } from "@/lib/integrations/status";
+import { type IntegrationState } from "@/lib/integrations/status";
+import { getIntegrationStatusesWithGrants } from "@/lib/integrations/grants";
 
 /**
  * One board showing every external service and whether it can actually do
  * anything, replacing per-integration cards that each decided for themselves
  * what "connected" meant.
  *
- * Reads the same function the AI tools read, so what this page claims and
- * what JARVIS tells you in chat cannot diverge.
+ * Built on the same status vocabulary the AI tools read, so what this page
+ * claims and what JARVIS tells you in chat cannot diverge. This surface adds
+ * one thing the tools do not need: whether an OAuth grant actually exists,
+ * rather than just an app registration.
  */
 
 const STATE_LABEL: Record<IntegrationState, string> = {
@@ -34,8 +37,10 @@ const STATE_DOT: Record<IntegrationState, string> = {
   unavailable: "bg-muted-foreground/50",
 };
 
-export function IntegrationStatusCard() {
-  const statuses = getIntegrationStatuses();
+// Async so the two OAuth integrations report an actual grant rather than a
+// mere app registration — see lib/integrations/grants.ts.
+export async function IntegrationStatusCard() {
+  const statuses = await getIntegrationStatusesWithGrants();
 
   return (
     <Card padding="slotted">

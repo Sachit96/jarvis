@@ -1,0 +1,237 @@
+# JARVIS — setup and operations
+
+Everything needed to take this repository from a clone to a running,
+connected system. No secret values appear here or should ever be added.
+
+Two commands answer "is it set up?" at any point:
+
+```bash
+npm run check-config      # what this environment can actually do, right now
+npm run operator:live     # whether the model really drives the 39 tools
+```
+
+---
+
+## 1. Environment variables
+
+`.env.local.example` is the authoritative list and explains where each value
+comes from. `npm run check-config` reports every one as **configured** or
+**missing** — it never prints a value, so its output is safe to paste into an
+issue.
+
+### Core — the app does not work without these
+
+| Variable | Why |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL. |
+| `SUPABASE_SERVICE_ROLE_KEY` | The only key this app uses. There is no authentication and no RLS — see §9. |
+| `SITE_PASSWORD` | HTTP Basic gate over the whole deployment (`proxy.ts`). **Unset means the site is public**, and it holds real finance and health data. |
+
+### AI
+
+| Variable | Why |
+| --- | --- |
+| `GEMINI_API_KEY` | The AI Mentor, Voice Mode, the operator, and Lead Research qualification. Without it those surfaces render as "not configured" rather than failing. |
+| `ANTHROPIC_API_KEY` | Optional. Only an alternate lead qualifier, used while lifetime spend is under the cap set in Settings. |
+
+### Integrations
+
+| Variable | Why |
+| --- | --- |
+| `HEVY_API_KEY` | Workout sync. Requires Hevy Pro. |
+| `BRIGHTSPACE_HOST`, `BRIGHTSPACE_CLIENT_ID`, `BRIGHTSPACE_CLIENT_SECRET` | University sync — see §5. |
+| `YOUTUBE_CLIENT_ID`, `YOUTUBE_CLIENT_SECRET` | YouTube uploads. These register the app; a user still has to authorise it. |
+| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`, `OWNER_PHONE_NUMBER` | Inbound SMS logging. **All four or nothing** — the webhook silently no-ops until every one is set. |
+| `GOOGLE_PLACES_API_KEY`, `PAGESPEED_API_KEY` | Lead Research discovery and audit. |
+| `CRON_SECRET` | Bearer token the scheduler sends to `POST /api/mentor/run`. |
+
+### Voice
+
+Voice Mode needs **no credentials**. It uses the browser's built-in Web Speech
+API for both recognition and synthesis, so it works offline of any vendor —
+but only in browsers that implement it (Chrome and Edge; Safari partially).
+The speech layer is deliberately isolated in `lib/voice/` so a hosted STT/TTS
+provider can replace it later without touching the operator.
+
+---
+
+## 2. Database migrations
+
+Migrations live in `supabase/migrations/` and are applied **in filename
+order**. They are plain SQL, so any of these work:
+
+```bash
+supabase db push                                   # Supabase CLI, linked project
+psql "$DATABASE_URL" -f supabase/migrations/0036_routine_cadence.sql
+```
+
+Then regenerate the types, which are checked in:
+
+```bash
+supabase gen types typescript --linked > lib/supabase/database.types.ts
+```
+
+### One migration is deliberately opt-in
+
+`0029_drop_prayers.sql` is **destructive and not part of the standard
+sequence**. It drops `prayers` and `prayer_logs`, which have had no UI since
+migration 0011. Take the JSON backup from Settings first if you still want
+that data. The rest of the app is unaffected either way: the export tolerates
+both tables being absent, and nothing else reads them.
+
+### Verifying before you apply
+
+The whole chain has been verified by applying `0001`–`0037` to a scratch
+Postgres 16 cluster and probing the resulting constraints. To repeat that:
+
+```bash
+initdb -D /tmp/qa && pg_ctl -D /tmp/qa -o "-p 55432" start
+# create the `extensions` and `auth` schemas Supabase provides, then:
+for f in supabase/migrations/*.sql; do psql -p 55432 -v ON_ERROR_STOP=1 -f "$f"; done
+```
+
+---
+
+## 3. Gemini
+
+1. Get a key at <https://aistudio.google.com/apikey>.
+2. Set `GEMINI_API_KEY`.
+3. Confirm: `npm run check-config` shows Gemini **connected**.
+4. Prove it end to end: `npm run operator:live`.
+
+Two model tiers are used, tracked and budgeted separately, and a call is never
+silently re-routed between them — see `lib/ai/providers/gemini-client.ts`.
+Exceeding a tier's daily budget surfaces to the user as "I've used up today's
+AI quota", not as an error.
+
+---
+
+## 4. Hevy
+
+1. Hevy Pro → <https://hevy.com/settings?developer> → copy the API key.
+2. Set `HEVY_API_KEY`. It is read server-side only and never reaches the
+   browser.
+3. Sync runs from the Health pages and on the dashboard.
+
+Unset is a supported state, not a broken one: workouts you log by hand are the
+source of truth regardless, and every health tool reports the sync state
+alongside its data so JARVIS can say "this is only what you logged manually"
+instead of concluding you stopped training.
+
+---
+
+## 5. Brightspace
+
+Brightspace uses OAuth2 authorization-code. **No password is ever requested or
+stored**, and there is no code path that accepts one.
+
+1. Register an OAuth application with your institution's D2L administrator.
+   Redirect URI, exactly:
+   `https://<your-domain>/api/brightspace/oauth/callback`
+   (and `http://localhost:3000/...` for local testing).
+2. Set `BRIGHTSPACE_HOST`, `BRIGHTSPACE_CLIENT_ID`, `BRIGHTSPACE_CLIENT_SECRET`.
+3. Apply migration `0037`, which creates the token table.
+4. Settings → **Connect Brightspace** → authorise.
+
+Requested scopes are read-only (`core`, `grades:read`, `enrollment:read`,
+`content:read`). JARVIS reads coursework; it never submits on your behalf.
+
+**Many institutions do not offer student OAuth registration.** If yours does
+not, this stays at `configuration_required` and the Settings card says so.
+University then runs on manually-entered data, which is fully supported — and
+JARVIS will tell you Brightspace is unavailable rather than inventing
+assignments.
+
+---
+
+## 6. YouTube
+
+1. Google Cloud Console → Credentials → OAuth client ID → Web application.
+2. Authorized redirect URI, exactly:
+   `https://<your-domain>/api/youtube/oauth/callback`
+3. Set `YOUTUBE_CLIENT_ID` and `YOUTUBE_CLIENT_SECRET`.
+4. Settings → **Connect YouTube**.
+
+While the consent screen is in "Testing", Google expires refresh tokens after
+7 days regardless of use. The Settings card warns before that happens.
+
+---
+
+## 7. Local development
+
+```bash
+npm install
+cp .env.local.example .env.local     # then fill it in
+npm run dev
+```
+
+| Command | What it does |
+| --- | --- |
+| `npm test` | Full suite. Needs no credentials. |
+| `npx tsc --noEmit` | Typecheck. |
+| `npm run lint` | ESLint. |
+| `npm run build` | Production build. |
+| `npm run check-config` | Environment readiness. |
+| `npm run operator:live` | Live model + database QA. Needs credentials. |
+
+`npm run operator:live` is read-only by default. `-- --with-writes` adds the
+create/confirm/delete journey; it creates its own records and deletes them,
+and never touches anything it did not create.
+
+---
+
+## 8. Production deployment
+
+Deployed on Netlify. `scripts/check-env.mjs` diffs `.env.local` against
+Netlify's environment (fingerprints only — secret-scoped variables are
+unreadable by design, so those are checked for presence and context coverage
+only).
+
+Five scheduled functions run in `netlify/functions/`. They call the site's own
+API and need `CRON_SECRET` to match.
+
+Before a deploy:
+
+```bash
+npm test && npx tsc --noEmit && npm run lint && npm run build
+```
+
+Set `SITE_PASSWORD` before the first public deploy. This app has no user
+authentication at all.
+
+---
+
+## 9. Integration status meanings
+
+One vocabulary, defined in `lib/integrations/status.ts` and used identically by
+Settings, Home, Voice and the AI tools — so what the page claims and what
+JARVIS says in conversation cannot diverge.
+
+| State | Meaning | Who acts |
+| --- | --- | --- |
+| **connected** | Credentials present *and*, for OAuth integrations, a grant actually exists. | Nobody. |
+| **disconnected** | The app is registered but nobody has authorised it. | You, one click. |
+| **configuration_required** | Credentials, an OAuth app, or a registration are missing. | You, or an administrator. |
+| **syncing** | A sync is in flight. | Wait. |
+| **error** | Configured, but the last interaction failed. | Investigate. |
+| **unavailable** | Cannot work here at all. | Nothing to do. |
+
+Two rules this system exists to enforce:
+
+- **No integration reports `connected` merely because its adapter exists.**
+  Client credentials are an app *registration*, not a *connection*; only a
+  stored grant earns `connected`.
+- **An unusable integration never produces substitute data.** Tools return an
+  explicit `integration_unavailable` with the state and a message, which is
+  what stops the model from narrating an empty result as though the data were
+  real.
+
+### A note on security posture
+
+JARVIS has **no authentication and no RLS** — migration 0012 removed it. One
+fixed dataset, one owner. Everything is gated by `SITE_PASSWORD` at the edge
+and by the service-role key staying server-side. `tests/security-guards.test.ts`
+enforces the latter on every commit: no client component may read a non-public
+environment variable, no secret value may reach a log line, no `eval`, no
+dynamically-built table name in the tool layer, and no password path in the
+Brightspace integration.

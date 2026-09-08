@@ -378,3 +378,54 @@ describe("operator coverage across modules", () => {
     }
   });
 });
+
+describe("tool descriptions are distinguishable", () => {
+  /**
+   * Step 17: when the model picks the wrong tool, the first thing to improve
+   * is the description — never the validation. These are the properties that
+   * can be checked without a model: descriptions must not contradict each
+   * other, because a model reading two tools that claim the same trigger has
+   * been given no basis to choose.
+   */
+  test("no two tools share a quoted trigger phrase", () => {
+    // Quoted phrases are the strongest selection signal in a description.
+    // Three task tools once all claimed the duplicate-check job, and two
+    // claimed day planning.
+    // A quoted span is one whose opening quote follows whitespace and whose
+    // closing quote precedes punctuation or a space. An apostrophe inside a
+    // word ("what's") is allowed through the middle but cannot delimit —
+    // otherwise every contraction reads as the start of a quotation.
+    const QUOTED = /(?<=^|[\s—(])'((?:[^']|'(?=[a-z])){4,}?)'(?=[\s.,;:)—]|$)/g;
+    const claims = new Map<string, string[]>();
+    for (const tool of listTools()) {
+      for (const m of tool.description.matchAll(QUOTED)) {
+        const phrase = m[1].toLowerCase();
+        claims.set(phrase, [...(claims.get(phrase) ?? []), tool.name]);
+      }
+    }
+    const collisions = [...claims.entries()].filter(([, tools]) => tools.length > 1);
+    assert.deepEqual(collisions, [], `phrases claimed by more than one tool: ${JSON.stringify(collisions)}`);
+  });
+
+  test("every description is unique", () => {
+    const seen = new Map<string, string>();
+    for (const tool of listTools()) {
+      const previous = seen.get(tool.description);
+      assert.equal(previous, undefined, `${tool.name} and ${previous} have identical descriptions`);
+      seen.set(tool.description, tool.name);
+    }
+  });
+
+  test("tools that overlap point at each other", () => {
+    // Where two tools genuinely cover adjacent ground, the cheaper/narrower
+    // one has to say when the other is the right choice — otherwise the
+    // model has to guess, and guesses are what cost a round trip.
+    const overlapping = ["get_tasks", "get_today_tasks", "get_overdue_tasks", "get_upcoming_tasks"];
+    for (const name of overlapping) {
+      const tool = listTools().find((t) => t.name === name);
+      assert.ok(tool, `${name} should exist`);
+      const mentionsSibling = overlapping.some((other) => other !== name && tool!.description.includes(other));
+      assert.ok(mentionsSibling, `${name} must say which sibling to prefer and when`);
+    }
+  });
+});

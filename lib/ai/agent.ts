@@ -6,6 +6,7 @@ import type { AgentChatResult, AgentToolOutcome, MentorChatMessage } from "@/lib
 import { getToolDeclarations, getTool } from "@/lib/ai/tools/registry";
 import { executeTool, toolResultForModel } from "@/lib/ai/tools/executor";
 import { buildPersonaPrefix } from "@/lib/ai/persona";
+import { applyApproval, type ApprovedCall } from "@/lib/ai/approval";
 import { todayStr } from "@/lib/date";
 
 type Client = SupabaseClient<Database>;
@@ -48,7 +49,7 @@ export interface RunAgentOptions {
    * the model re-proposes — otherwise approving one action could execute a
    * different one.
    */
-  confirmedCall?: { toolName: string; args: Record<string, unknown> };
+  confirmedCall?: ApprovedCall;
 }
 
 /**
@@ -72,17 +73,15 @@ export async function runAgentTurn(
     name: string;
     args: Record<string, unknown>;
   }): Promise<AgentToolOutcome> {
-    const approved =
-      pendingApproval?.toolName === call.name ? { ...pendingApproval } : undefined;
-    if (approved) pendingApproval = undefined;
+    // See lib/ai/approval.ts: this both picks the arguments the user actually
+    // saw and spends the approval, so it cannot authorise a second call.
+    const decision = applyApproval(pendingApproval, call);
+    pendingApproval = decision.remaining;
 
-    const result = await executeTool(
-      call.name,
-      // The approved arguments win over whatever the model just emitted, so
-      // what runs is what the user actually saw and agreed to.
-      approved ? approved.args : call.args,
-      { supabase, confirmed: Boolean(approved) },
-    );
+    const result = await executeTool(call.name, decision.args, {
+      supabase,
+      confirmed: decision.confirmed,
+    });
 
     const tool = getTool(call.name);
     const label = describeCall(call.name, tool?.domain, result.status);

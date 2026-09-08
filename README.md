@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# JARVIS
 
-## Getting Started
+A personal command centre — tasks, goals, finance, business, university,
+health and memory in one place, with an AI operator that can actually read and
+change the data rather than just talk about it.
 
-First, run the development server:
+Built on Next.js 16, React 19, Tailwind 4 and Supabase.
+
+## Getting started
 
 ```bash
+npm install
+cp .env.local.example .env.local     # then fill it in
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open <http://localhost:3000>.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**[docs/SETUP.md](docs/SETUP.md)** is the full guide: environment variables,
+migrations, each integration, deployment, and what the integration states
+mean.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## The operator
 
-## Learn More
+JARVIS exposes 39 tools to the model through a static whitelist
+(`lib/ai/tools/registry.ts`). Every model-initiated call passes one gate:
 
-To learn more about Next.js, take a look at the following resources:
+```
+MODEL → SELECTION → VALIDATION → RISK GATE → HANDLER → RESULT
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Nothing in that path trusts the model. Names resolve through a registry, so an
+invented one reaches no code. Arguments are parsed by the tool's own Zod
+schema, so nothing malformed reaches a query. High-risk tools stop until the
+*caller* — never the model — marks a call confirmed, and one approval
+authorises exactly one execution with the arguments the user actually saw.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+There is no raw SQL, no arbitrary query, and no dynamic table name anywhere in
+the tool layer, and `tests/security-guards.test.ts` fails the build if that
+changes.
 
-## Deploy on Vercel
+## Checks
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm test                  # full suite, no credentials needed
+npx tsc --noEmit
+npm run lint
+npm run build
+npm run check-config      # what this environment can actually do
+npm run operator:live     # live model + database QA (needs credentials)
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The first four run anywhere. The last two are the difference between "the
+gates hold" and "the system works" — see `docs/SETUP.md`.

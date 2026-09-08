@@ -26,7 +26,7 @@ const empty = z.object({});
 export const getTasksTool: ToolDefinition = {
   name: "get_tasks",
   description:
-    "List the user's open tasks. Use for 'what do I need to do', backlog questions, or before creating a task to avoid duplicates.",
+    "Every open task, as a flat list. Use for the whole backlog — 'everything on my list', 'what am I carrying' — and as the duplicate check before create_task. For anything organised by when it is due, use get_upcoming_tasks instead.",
   domain: "tasks",
   risk: "safe",
   schema: z.object({
@@ -54,7 +54,7 @@ export const getTasksTool: ToolDefinition = {
 export const getTodayTasksTool: ToolDefinition = {
   name: "get_today_tasks",
   description:
-    "The user's highest-priority open tasks right now, plus today's routine checklist. Use this for 'what should I do today'.",
+    "A short shortlist of the highest-priority open tasks, plus today's routine checklist. Use for 'what should I do right now' and 'what's on today'. This is the narrow answer; use get_upcoming_tasks when the question spans more than today.",
   domain: "tasks",
   risk: "safe",
   schema: empty,
@@ -78,7 +78,7 @@ export const getTodayTasksTool: ToolDefinition = {
 
 export const getOverdueTasksTool: ToolDefinition = {
   name: "get_overdue_tasks",
-  description: "Open tasks whose due date has already passed.",
+  description: "Only the tasks whose due date has already passed. Use when the user asks specifically about what is late or overdue — it is cheaper than get_upcoming_tasks, which also returns them grouped with everything else.",
   domain: "tasks",
   risk: "safe",
   schema: empty,

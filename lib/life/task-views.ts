@@ -111,3 +111,30 @@ export function filterTasks(tasks: TaskLike[], filter: TaskFilter): TaskLike[] {
 export function collectTags(tasks: TaskLike[]): string[] {
   return [...new Set(tasks.flatMap((t) => t.tags))].sort();
 }
+
+/**
+ * The "what should I look at" shortlist, as a pure function over tasks
+ * already in hand.
+ *
+ * Extracted because Home fetched the whole tasks table twice per render:
+ * once through getPriorityTasks (which selects every unfinished task and
+ * then slices in memory anyway) and once through getTasks for the buckets
+ * and the priority line. One list can answer both.
+ *
+ * Ordering matches what getPriorityTasks always did — priority first, due
+ * date within it — and relies on a stable sort, which every runtime this
+ * targets guarantees.
+ */
+export function selectPriorityTasks<T extends TaskLike>(tasks: T[], limit = 5): T[] {
+  return [...tasks]
+    .filter((t) => t.status !== "done")
+    .sort((a, b) => {
+      if (a.due_date && b.due_date) return a.due_date.localeCompare(b.due_date);
+      // Undated tasks sort last: a date is a commitment, no date is a wish.
+      if (a.due_date) return -1;
+      if (b.due_date) return 1;
+      return 0;
+    })
+    .sort((a, b) => (PRIORITY_RANK[a.priority] ?? 99) - (PRIORITY_RANK[b.priority] ?? 99))
+    .slice(0, limit);
+}

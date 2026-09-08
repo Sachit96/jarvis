@@ -92,7 +92,7 @@ export const completeRoutineTool: ToolDefinition = {
 export const getUpcomingTasksTool: ToolDefinition = {
   name: "get_upcoming_tasks",
   description:
-    "Open tasks grouped into overdue, due today, and upcoming. Use this for 'what's on', planning a day, or before creating tasks so you don't duplicate one.",
+    "Open tasks bucketed by when they are due — overdue, due today, and upcoming. Use whenever the question spans more than today: 'what does this week look like', 'what's coming up', planning tomorrow. For today alone use get_today_tasks; for overdue alone use get_overdue_tasks.",
   domain: "tasks",
   risk: "safe",
   schema: z.object({
