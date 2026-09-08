@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
-import { getHabits, getHabitLogsForHeatmap, getTasks, getJournalEntries, computeStreak } from "@/lib/db/queries/life";
+import { getHabits, getHabitLogsForHeatmap, getTasks, getJournalEntries } from "@/lib/db/queries/life";
+import { cadenceStreak, describeCadence, isDueOn } from "@/lib/life/routine-cadence";
 import { getWorkouts, getNutritionTargets, getNutritionLogsForDate, computeMacroTotals } from "@/lib/db/queries/health";
 import { getDailyRecommendation } from "@/lib/db/queries/mentor";
 import { todayStr } from "@/lib/date";
@@ -13,7 +14,10 @@ export interface RoutineItem {
   completed: boolean;
   /** Manual items are habit rows the user toggles themselves; auto items are read-only, derived from data tracked elsewhere. */
   kind: "manual" | "auto";
-  streak?: { current: number; best: number };
+  /** Consecutive DUE days completed — see cadenceStreak. Absent for auto items. */
+  streak?: number;
+  /** "Daily", or the weekdays a weekly routine runs on. Absent for auto items. */
+  cadence?: string;
 }
 
 /**
@@ -49,13 +53,20 @@ export async function getTodayRoutineItems(supabase: Client): Promise<RoutineIte
     completedDatesByHabit.set(log.habit_id, set);
   }
 
-  const manualItems: RoutineItem[] = habits.map((h) => ({
-    id: h.id,
-    label: h.name,
-    completed: todayLogByHabit.get(h.id)?.completed ?? false,
-    kind: "manual",
-    streak: computeStreak(completedDatesByHabit.get(h.id) ?? new Set()),
-  }));
+  // Only routines actually due today. A weekly routine shown every day is
+  // indistinguishable from a daily one and reads as perpetually missed.
+  const manualItems: RoutineItem[] = habits
+    .filter((h) => isDueOn(h, today))
+    .map((h) => ({
+      id: h.id,
+      label: h.name,
+      completed: todayLogByHabit.get(h.id)?.completed ?? false,
+      kind: "manual" as const,
+      // Counts consecutive DUE days rather than calendar days, so a weekly
+      // routine does not lose its streak on the six days it never ran.
+      streak: cadenceStreak(h, completedDatesByHabit.get(h.id) ?? new Set(), today),
+      cadence: describeCadence(h),
+    }));
 
   const trainedToday = workouts.some((w) => w.started_at.slice(0, 10) === today);
   const macros = computeMacroTotals(todayNutritionLogs);

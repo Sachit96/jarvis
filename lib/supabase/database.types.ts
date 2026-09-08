@@ -678,6 +678,8 @@ export type Database = {
           metric_type: string
           name: string
           pinned: boolean
+          cadence: string
+          days_of_week: number[]
           sort_order: number
           target_count: number | null
           updated_at: string
@@ -691,6 +693,8 @@ export type Database = {
           metric_type?: string
           name: string
           pinned?: boolean
+          cadence?: string
+          days_of_week?: number[]
           sort_order?: number
           target_count?: number | null
           updated_at?: string
@@ -704,6 +708,8 @@ export type Database = {
           metric_type?: string
           name?: string
           pinned?: boolean
+          cadence?: string
+          days_of_week?: number[]
           sort_order?: number
           target_count?: number | null
           updated_at?: string

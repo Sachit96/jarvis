@@ -1,6 +1,7 @@
 import "server-only";
 import { personalReadTools } from "@/lib/ai/tools/read/personal";
 import { moduleReadTools } from "@/lib/ai/tools/read/modules";
+import { routineTools } from "@/lib/ai/tools/read/routines";
 import { personalWriteTools } from "@/lib/ai/tools/write/personal";
 import { businessWriteTools } from "@/lib/ai/tools/write/business";
 import { toGeminiDeclaration, type GeminiFunctionDeclaration } from "@/lib/ai/tools/gemini-schema";
@@ -18,6 +19,7 @@ import type { RiskLevel, ToolDefinition } from "@/lib/ai/tools/types";
 const ALL_TOOLS: ToolDefinition[] = [
   ...personalReadTools,
   ...moduleReadTools,
+  ...routineTools,
   ...personalWriteTools,
   ...businessWriteTools,
 ];
