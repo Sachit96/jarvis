@@ -1,7 +1,15 @@
 "use client";
 
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { Card } from "@/components/ui/card";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 interface Point {
   date: string;
@@ -10,66 +18,98 @@ interface Point {
   net: number;
 }
 
-function CashflowTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="rounded-xl bg-popover px-3 py-2 text-caption ring-1 ring-white/[0.08]">
-      <p className="text-muted-foreground">{label}</p>
-      <p className="mt-0.5 font-mono font-medium text-foreground">
-        {payload[0].value >= 0 ? "+" : "-"}${Math.abs(payload[0].value).toLocaleString()}
-      </p>
-    </div>
-  );
-}
+/**
+ * Income and expense are two series to tell apart, so they get categorical
+ * colors — but NOT the obvious green/red pair. Green #16a34a against red
+ * #dc2626 measures 5.0 OKLab ΔE under deuteranopia, i.e. the single most
+ * common form of colorblindness renders the two lines the same. Blue is the
+ * nearest choice that survives simulation (30.3 ΔE) while keeping income on
+ * the app's money-green. The legend below carries the names either way, so
+ * identity never rests on hue alone.
+ */
+const chartConfig = {
+  income: { label: "Income", color: "var(--chart-1)" },
+  expense: { label: "Expense", color: "var(--chart-2)" },
+} satisfies ChartConfig;
+
+const compactMoney = (value: number) =>
+  Math.abs(value) >= 1000 ? `$${(value / 1000).toFixed(0)}k` : `$${value}`;
 
 export function CashflowTrendChart({ points }: { points: Point[] }) {
   const hasActivity = points.some((p) => p.income !== 0 || p.expense !== 0);
 
+  const totals = points.reduce(
+    (acc, p) => ({ income: acc.income + p.income, expense: acc.expense + p.expense }),
+    { income: 0, expense: 0 },
+  );
+
   return (
-    <Card>
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-heading">Cashflow trend</p>
-          <p className="mt-0.5 text-caption text-muted-foreground">Net income minus expenses per day, last 30 days.</p>
-        </div>
-      </div>
-      <div className="mt-4 h-56">
+    <Card padding="slotted" className="h-full">
+      <CardHeader>
+        <CardTitle>Cashflow</CardTitle>
+        <CardDescription>Income against spending, last 30 days</CardDescription>
+        <CardAction>
+          <div className="tabular text-right">
+            <p className="text-heading text-foreground">
+              {totals.income - totals.expense >= 0 ? "+" : "−"}$
+              {Math.abs(totals.income - totals.expense).toLocaleString(undefined, {
+                maximumFractionDigits: 0,
+              })}
+            </p>
+            <p className="text-caption text-muted-foreground">net, 30 days</p>
+          </div>
+        </CardAction>
+      </CardHeader>
+
+      <CardContent>
         {hasActivity ? (
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={points} margin={{ top: 8, right: 4, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="cashflowFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="var(--brand)" stopOpacity={0.35} />
-                  <stop offset="100%" stopColor="var(--brand)" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid vertical={false} stroke="var(--muted-foreground)" strokeOpacity={0.15} strokeDasharray="3 3" />
+          <ChartContainer config={chartConfig} className="aspect-auto h-56 w-full">
+            <LineChart data={points} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+              <CartesianGrid vertical={false} strokeDasharray="3 3" />
               <XAxis
                 dataKey="date"
-                tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
+                tickMargin={10}
                 interval="preserveStartEnd"
-                minTickGap={32}
+                minTickGap={40}
+                tick={{ fontSize: 11 }}
               />
-              <YAxis tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} axisLine={false} tickLine={false} width={48} />
-              <Tooltip content={<CashflowTooltip />} cursor={{ stroke: "var(--border)" }} />
-              <Area
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                width={44}
+                tickFormatter={compactMoney}
+                tick={{ fontSize: 11 }}
+              />
+              <ChartTooltip cursor={{ stroke: "var(--border)" }} content={<ChartTooltipContent indicator="line" />} />
+              <ChartLegend content={<ChartLegendContent />} />
+              {/* dot={false} keeps 30 points readable as a shape; activeDot
+                  gives the hover a target big enough to hit on touch. */}
+              <Line
+                dataKey="income"
                 type="monotone"
-                dataKey="net"
-                stroke="var(--brand)"
+                stroke="var(--color-income)"
                 strokeWidth={2}
-                fill="url(#cashflowFill)"
-                animationDuration={600}
+                dot={false}
+                activeDot={{ r: 4 }}
               />
-            </AreaChart>
-          </ResponsiveContainer>
+              <Line
+                dataKey="expense"
+                type="monotone"
+                stroke="var(--color-expense)"
+                strokeWidth={2}
+                dot={false}
+                activeDot={{ r: 4 }}
+              />
+            </LineChart>
+          </ChartContainer>
         ) : (
-          <div className="flex h-full items-center justify-center text-body text-muted-foreground">
+          <div className="flex h-56 items-center justify-center text-body text-muted-foreground">
             No transactions in the last 30 days yet.
           </div>
         )}
-      </div>
+      </CardContent>
     </Card>
   );
 }
