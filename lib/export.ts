@@ -10,6 +10,9 @@ export const EXPORT_TABLES = [
   "habits",
   "habit_logs",
   "journal_entries",
+  // Dropped by the opt-in migration 0029. Kept here because 0029 tells you to
+  // take this backup BEFORE running it; buildExportPayload skips them once
+  // they are gone.
   "prayers",
   "prayer_logs",
   "accounts",
@@ -36,18 +39,45 @@ export const EXPORT_TABLES = [
   "weekly_reviews",
 ] as const;
 
-/** Shared between the bearer-protected GET route (external/scripted access) and exportJsonBackupAction (the Settings page's download button) — one place building the actual payload, not two slightly-different copies. */
+/**
+ * Missing-relation codes. PostgREST reports an unknown table as PGRST205 (or
+ * PGRST202 on older versions) and Postgres itself as 42P01.
+ */
+const MISSING_TABLE_CODES = new Set(["PGRST202", "PGRST205", "42P01"]);
+
+/**
+ * Shared between the bearer-protected GET route (external/scripted access) and
+ * exportJsonBackupAction (the Settings page's download button) — one place
+ * building the actual payload, not two slightly-different copies.
+ *
+ * A table listed here may legitimately not exist: migration 0029 (drop
+ * prayers) is deliberately opt-in, so this list has to span both sides of it.
+ * A missing table is therefore skipped and named in `skipped`, not thrown —
+ * the previous behaviour failed the whole backup on the first absent table,
+ * which took out the one escape hatch 0029 tells you to use before running it.
+ * Any other error still throws: a permissions or connection failure must not
+ * quietly produce a backup with holes in it.
+ */
 export async function buildExportPayload(supabase: Client) {
   const results = await Promise.all(
     EXPORT_TABLES.map(async (table) => {
       const { data, error } = await supabase.from(table).select("*");
-      if (error) throw new Error(`${table}: ${error.message}`);
+      if (error) {
+        if (MISSING_TABLE_CODES.has(error.code)) return [table, null] as const;
+        throw new Error(`${table}: ${error.message}`);
+      }
       return [table, data] as const;
     }),
   );
 
+  const present = results.filter(([, rows]) => rows !== null);
+  const skipped = results.filter(([, rows]) => rows === null).map(([table]) => table);
+
   return {
     exportedAt: new Date().toISOString(),
-    data: Object.fromEntries(results),
+    // Named explicitly so a restore can tell "this table was empty" from
+    // "this table no longer exists", which are very different facts.
+    skipped,
+    data: Object.fromEntries(present),
   };
 }

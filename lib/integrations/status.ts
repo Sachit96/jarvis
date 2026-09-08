@@ -61,6 +61,13 @@ function configured(...names: string[]): boolean {
   return names.every((n) => Boolean(process.env[n]));
 }
 
+const SMS_VARS = [
+  "TWILIO_ACCOUNT_SID",
+  "TWILIO_AUTH_TOKEN",
+  "TWILIO_PHONE_NUMBER",
+  "OWNER_PHONE_NUMBER",
+] as const;
+
 /**
  * Credential-derived status for every integration.
  *
@@ -104,14 +111,19 @@ export function getIntegrationStatuses(): IntegrationStatus[] {
     {
       id: "youtube",
       label: "YouTube",
+      // Client ID/secret are an app REGISTRATION, not a grant — exactly the
+      // same distinction as Brightspace. Reporting "connected" from these
+      // alone claimed uploads would work when no account had ever authorised
+      // JARVIS. Only a stored token in yt_connections earns "connected", and
+      // only getIntegrationStatusesWithGrants can see that.
       state: configured("YOUTUBE_CLIENT_ID", "YOUTUBE_CLIENT_SECRET")
-        ? "connected"
+        ? "disconnected"
         : "configuration_required",
       message: configured("YOUTUBE_CLIENT_ID", "YOUTUBE_CLIENT_SECRET")
-        ? "YouTube upload is configured."
+        ? "YouTube is configured but no account has been authorised yet."
         : "YouTube upload is not configured.",
       actionHint: configured("YOUTUBE_CLIENT_ID", "YOUTUBE_CLIENT_SECRET")
-        ? undefined
+        ? "Connect YouTube from Settings to authorise uploads."
         : "Set YOUTUBE_CLIENT_ID and YOUTUBE_CLIENT_SECRET to enable uploads.",
       requires: ["YOUTUBE_CLIENT_ID", "YOUTUBE_CLIENT_SECRET"],
     },
@@ -137,12 +149,18 @@ export function getIntegrationStatuses(): IntegrationStatus[] {
     {
       id: "sms",
       label: "SMS",
-      state: configured("TWILIO_AUTH_TOKEN") ? "connected" : "configuration_required",
-      message: configured("TWILIO_AUTH_TOKEN")
+      // All four or nothing: the webhook no-ops (empty TwiML) unless every
+      // one is set, and OWNER_PHONE_NUMBER is what gates who may text in.
+      // Checking only the auth token reported "connected" for a webhook that
+      // silently ignored every message.
+      state: configured(...SMS_VARS) ? "connected" : "configuration_required",
+      message: configured(...SMS_VARS)
         ? "Inbound SMS logging is configured."
         : "SMS logging is not configured.",
-      actionHint: configured("TWILIO_AUTH_TOKEN") ? undefined : "Set TWILIO_AUTH_TOKEN.",
-      requires: ["TWILIO_AUTH_TOKEN"],
+      actionHint: configured(...SMS_VARS)
+        ? undefined
+        : "Set all four Twilio variables — the webhook ignores every message until then.",
+      requires: [...SMS_VARS],
     },
   ];
 }

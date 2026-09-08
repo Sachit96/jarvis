@@ -525,66 +525,6 @@ export type Database = {
         }
         Relationships: []
       }
-      ghl_connections: {
-        Row: {
-          created_at: string
-          id: string
-          is_active: boolean
-          last_synced_at: string | null
-          location_id: string
-          private_token: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          last_synced_at?: string | null
-          location_id: string
-          private_token: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          last_synced_at?: string | null
-          location_id?: string
-          private_token?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ghl_sync_logs: {
-        Row: {
-          created_at: string
-          direction: string
-          event_type: string
-          id: string
-          message: string | null
-          payload: Json | null
-          status: string
-        }
-        Insert: {
-          created_at?: string
-          direction: string
-          event_type: string
-          id?: string
-          message?: string | null
-          payload?: Json | null
-          status: string
-        }
-        Update: {
-          created_at?: string
-          direction?: string
-          event_type?: string
-          id?: string
-          message?: string | null
-          payload?: Json | null
-          status?: string
-        }
-        Relationships: []
-      }
       goals: {
         Row: {
           category: string | null
@@ -1114,6 +1054,7 @@ export type Database = {
         }
         Relationships: []
       }
+      // See prayers, above — retained for the pre-0029 backup path only.
       prayer_logs: {
         Row: {
           completed: boolean
@@ -1152,6 +1093,8 @@ export type Database = {
           },
         ]
       }
+      // Dropped by the opt-in migration 0029; retained only so the
+      // pre-0029 JSON backup in lib/export.ts stays type-checked.
       prayers: {
         Row: {
           created_at: string
@@ -2266,44 +2209,6 @@ export type Database = {
           youtube_privacy_status?: string | null
         }
         Relationships: []
-      }
-      yt_thumbnails: {
-        Row: {
-          created_at: string
-          id: string
-          image_base64: string | null
-          mime_type: string
-          prompt: string
-          script_id: string
-          selected: boolean
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          image_base64?: string | null
-          mime_type?: string
-          prompt: string
-          script_id: string
-          selected?: boolean
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          image_base64?: string | null
-          mime_type?: string
-          prompt?: string
-          script_id?: string
-          selected?: boolean
-        }
-        Relationships: [
-          {
-            foreignKeyName: "yt_thumbnails_script_id_fkey"
-            columns: ["script_id"]
-            isOneToOne: false
-            referencedRelation: "yt_scripts"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Views: {

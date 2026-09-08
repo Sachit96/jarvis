@@ -139,23 +139,3 @@ export async function getJournalEntries(supabase: Client) {
   return data;
 }
 
-export async function getPrayers(supabase: Client) {
-  const { data, error } = await supabase
-    .from("prayers")
-    .select("*")
-    .eq("is_active", true)
-    .order("sort_order", { ascending: true });
-  if (error) throw error;
-  return data;
-}
-
-export async function getPrayerLogsForDate(supabase: Client, date: string) {
-  const { data, error } = await supabase
-    .from("prayer_logs")
-    .select("*")
-    .eq("log_date", date);
-  if (error) throw error;
-  return data;
-}
-
-export const DEFAULT_PRAYERS = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
