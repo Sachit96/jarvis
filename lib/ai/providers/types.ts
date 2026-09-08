@@ -42,6 +42,56 @@ export interface LoggedMealArgs {
   fat_g: number;
 }
 
+
+// ============================================================= Agent loop
+
+/** One tool call the model asked for. */
+export interface AgentToolCall {
+  name: string;
+  args: Record<string, unknown>;
+}
+
+/** What the caller did with a tool call, and what should happen next. */
+export interface AgentToolOutcome {
+  /** Sent back to the model as the function response. */
+  response: Record<string, unknown>;
+  /** Human-readable line for the UI trace, e.g. "Checked your tasks". */
+  label: string;
+  /** True when the call succeeded — drives the trace's tick/cross only. */
+  ok: boolean;
+  /**
+   * Set to stop the loop immediately and hand control back to the user.
+   * Used for confirmation: the model must not keep reasoning as though a
+   * high-risk action had already run.
+   */
+  halt?: { reason: "confirmation_required"; toolName: string; summary: string; args: Record<string, unknown> };
+}
+
+export interface AgentTraceEntry {
+  name: string;
+  label: string;
+  ok: boolean;
+}
+
+export interface AgentChatResult {
+  text: string;
+  /** Every tool the model ran this turn, in order. */
+  trace: AgentTraceEntry[];
+  pendingConfirmation?: { toolName: string; summary: string; args: Record<string, unknown> };
+}
+
+export interface AgentChatOptions {
+  systemPrompt: string;
+  history: MentorChatMessage[];
+  tools: { name: string; description: string; parameters: Record<string, unknown> }[];
+  execute: (call: AgentToolCall) => Promise<AgentToolOutcome>;
+  /**
+   * Ceiling on model round trips. Bounds both cost and latency, and stops a
+   * model that keeps re-calling the same tool from looping forever.
+   */
+  maxRounds?: number;
+}
+
 /**
  * The Mentor's three call sites (daily/weekly brief, general chat, the
  * nutrition chatbot's one tool) behind a single provider, same reasoning as
@@ -65,4 +115,15 @@ export interface MentorProvider {
     history: MentorChatMessage[],
     executeTool: (args: LoggedMealArgs) => Promise<string>,
   ): Promise<string>;
+  /**
+   * The general operator loop: many tools, several rounds, and the
+   * execution decision delegated entirely to the caller.
+   *
+   * Generalises nutritionChat, which hardcodes one tool and exactly one
+   * round trip. Same principle as that method — the provider drives the
+   * wire protocol and never touches the database — but the caller now
+   * supplies the tool list and an execute callback that can also halt the
+   * loop (for a confirmation prompt) rather than only returning a string.
+   */
+  agentChat(options: AgentChatOptions): Promise<AgentChatResult>;
 }
