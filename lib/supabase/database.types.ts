@@ -2138,6 +2138,45 @@ export type Database = {
         }
         Relationships: []
       }
+      brightspace_connections: {
+        Row: {
+          access_token: string
+          connected_at: string
+          display_name: string | null
+          host: string
+          id: boolean
+          last_synced_at: string | null
+          refresh_token: string
+          scope: string
+          token_expires_at: string
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          connected_at?: string
+          display_name?: string | null
+          host: string
+          id?: boolean
+          last_synced_at?: string | null
+          refresh_token: string
+          scope: string
+          token_expires_at: string
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          connected_at?: string
+          display_name?: string | null
+          host?: string
+          id?: boolean
+          last_synced_at?: string | null
+          refresh_token?: string
+          scope?: string
+          token_expires_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       yt_connections: {
         Row: {
           access_token: string

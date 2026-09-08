@@ -5,6 +5,7 @@ import { getSavedLeadSearches } from "@/lib/db/queries/lead-research";
 import { getYtConnection } from "@/lib/db/queries/youtube";
 import { AiMentorStatusCard } from "@/components/settings/ai-mentor-status-card";
 import { IntegrationStatusCard } from "@/components/settings/integration-status-card";
+import { BrightspaceConnectionCard } from "@/components/settings/brightspace-connection-card";
 import { SavedLeadSearchesCard } from "@/components/settings/saved-lead-searches-card";
 import { SmsStatusCard } from "@/components/settings/sms-status-card";
 import { AnthropicStatusCard } from "@/components/settings/anthropic-status-card";
@@ -80,6 +81,8 @@ export default async function SettingsPage({
           each does something this one does not (spend caps, OAuth connect,
           saved searches) rather than just reporting a state. */}
       <IntegrationStatusCard />
+
+      <BrightspaceConnectionCard />
 
       <AiMentorStatusCard
         hasKey={hasGeminiKey}

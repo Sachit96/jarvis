@@ -7,6 +7,7 @@ import {
   describeUnusable,
 } from "../lib/integrations/status.ts";
 import { getBrightspaceStatus, getAuthorizationUrl } from "../lib/integrations/brightspace/index.ts";
+import { buildAuthUrl, isConfigured, SCOPES } from "../lib/integrations/brightspace/oauth.ts";
 
 /**
  * Status is read from process.env at call time rather than captured at
@@ -120,5 +121,53 @@ describe("brightspace adapter", () => {
 
   test("brightspace is not usable, so callers must not treat it as a data source", () => {
     assert.equal(isUsable(getBrightspaceStatus().state), false);
+  });
+});
+
+describe("brightspace oauth flow", () => {
+  test("offers no authorize URL until an app is registered", () => {
+    // A half-formed URL would send the user to a page that looks like an
+    // institution outage rather than missing configuration.
+    assert.equal(isConfigured(), false);
+    assert.equal(buildAuthUrl("https://jarvis.example.com/cb", "state123"), null);
+  });
+
+  test("builds a standard authorization-code URL once configured", () => {
+    process.env.BRIGHTSPACE_HOST = "https://lms.example.edu";
+    process.env.BRIGHTSPACE_CLIENT_ID = "client-abc";
+    process.env.BRIGHTSPACE_CLIENT_SECRET = "secret-xyz";
+
+    const url = buildAuthUrl("https://jarvis.example.com/cb", "state123");
+    assert.ok(url);
+    const parsed = new URL(url);
+    assert.equal(parsed.searchParams.get("response_type"), "code");
+    assert.equal(parsed.searchParams.get("client_id"), "client-abc");
+    assert.equal(parsed.searchParams.get("redirect_uri"), "https://jarvis.example.com/cb");
+    assert.equal(parsed.searchParams.get("state"), "state123");
+  });
+
+  test("the client secret never rides in the front-channel redirect", () => {
+    process.env.BRIGHTSPACE_HOST = "https://lms.example.edu";
+    process.env.BRIGHTSPACE_CLIENT_ID = "client-abc";
+    process.env.BRIGHTSPACE_CLIENT_SECRET = "secret-xyz";
+    // It goes in the token endpoint's Authorization header instead, so it
+    // cannot end up in browser history or a referrer.
+    assert.doesNotMatch(buildAuthUrl("https://jarvis.example.com/cb", "s")!, /secret-xyz/);
+  });
+
+  test("no OAuth parameter ever carries a password", () => {
+    process.env.BRIGHTSPACE_HOST = "https://lms.example.edu";
+    process.env.BRIGHTSPACE_CLIENT_ID = "client-abc";
+    process.env.BRIGHTSPACE_CLIENT_SECRET = "secret-xyz";
+    const parsed = new URL(buildAuthUrl("https://jarvis.example.com/cb", "s")!);
+    for (const key of ["password", "pass", "pwd", "username", "user"]) {
+      assert.equal(parsed.searchParams.get(key), null, `${key} must not appear in the auth URL`);
+    }
+  });
+
+  test("requests read-only scopes", () => {
+    // This integration reads coursework; it never submits on the user's behalf.
+    assert.match(SCOPES, /read/);
+    assert.doesNotMatch(SCOPES, /write|submit|delete/);
   });
 });

@@ -1,5 +1,6 @@
 import "server-only";
 import { getIntegrationStatus, isUsable, type IntegrationStatus } from "@/lib/integrations/status";
+import { getConnection, getAccessToken } from "@/lib/integrations/brightspace/connection";
 
 /**
  * Brightspace (D2L Valence) adapter.
@@ -61,6 +62,35 @@ export function getBrightspaceStatus(): IntegrationStatus {
 }
 
 /**
+ * Status including whether a token is actually stored.
+ *
+ * The synchronous getBrightspaceStatus answers "could this work" from env
+ * alone, which is what a page render needs. This one hits the database, so
+ * it is only for surfaces that genuinely need to know whether the user has
+ * authorised — the Settings card, and the sync job.
+ */
+export async function getBrightspaceConnectionStatus(): Promise<IntegrationStatus> {
+  const base = getIntegrationStatus("brightspace");
+  // No registered app means there is nothing to connect to; a stored token
+  // cannot exist and checking for one would be misleading.
+  if (base.state === "configuration_required") return base;
+
+  const connection = await getConnection();
+  if (!connection) return base;
+
+  return {
+    ...base,
+    state: "connected",
+    message: connection.display_name
+      ? `Connected as ${connection.display_name}.`
+      : "Connected.",
+    actionHint: connection.last_synced_at
+      ? undefined
+      : "Connected, but nothing has been synced yet.",
+  };
+}
+
+/**
  * Where the OAuth redirect would be built.
  *
  * Returns null rather than a half-formed URL when the app is not registered,
@@ -87,28 +117,44 @@ export function getAuthorizationUrl(redirectUri: string): string | null {
  * Written once so a new resource function cannot forget the check and
  * silently return an empty list that reads as "you have no assignments".
  */
-function unusable<T>(): BrightspaceResult<T> | null {
-  const status = getBrightspaceStatus();
-  return isUsable(status.state) ? null : { status };
+async function requireToken<T>(): Promise<{ token: string } | BrightspaceResult<T>> {
+  const status = await getBrightspaceConnectionStatus();
+  if (!isUsable(status.state)) return { status };
+
+  const token = await getAccessToken();
+  if (!token) {
+    // Configured and previously connected, but the grant no longer works —
+    // a distinct state from never having connected, and it needs a
+    // different instruction.
+    return {
+      status: {
+        ...status,
+        state: "error",
+        message: "Brightspace access has expired or been revoked.",
+        actionHint: "Reconnect from Settings.",
+      },
+    };
+  }
+  return { token };
 }
 
 export async function fetchCourses(): Promise<BrightspaceResult<BrightspaceCourse[]>> {
-  const blocked = unusable<BrightspaceCourse[]>();
-  if (blocked) return blocked;
-  // Unreachable until the package and an OAuth grant exist. Throwing rather
-  // than returning [] means a mistake here surfaces as an error, not as a
-  // student being told they have no courses.
-  throw new Error("Brightspace client not installed — see lib/integrations/brightspace/index.ts");
+  const gate = await requireToken<BrightspaceCourse[]>();
+  if ("status" in gate) return gate;
+  // Reached only with a valid token. Throwing rather than returning []
+  // means the missing resource layer surfaces as an error, not as a student
+  // being told they have no courses.
+  throw new Error("Brightspace resource client not installed — see lib/integrations/brightspace/index.ts");
 }
 
 export async function fetchAssignments(): Promise<BrightspaceResult<BrightspaceAssignment[]>> {
-  const blocked = unusable<BrightspaceAssignment[]>();
-  if (blocked) return blocked;
-  throw new Error("Brightspace client not installed — see lib/integrations/brightspace/index.ts");
+  const gate = await requireToken<BrightspaceAssignment[]>();
+  if ("status" in gate) return gate;
+  throw new Error("Brightspace resource client not installed — see lib/integrations/brightspace/index.ts");
 }
 
 export async function fetchGrades(): Promise<BrightspaceResult<BrightspaceGrade[]>> {
-  const blocked = unusable<BrightspaceGrade[]>();
-  if (blocked) return blocked;
-  throw new Error("Brightspace client not installed — see lib/integrations/brightspace/index.ts");
+  const gate = await requireToken<BrightspaceGrade[]>();
+  if ("status" in gate) return gate;
+  throw new Error("Brightspace resource client not installed — see lib/integrations/brightspace/index.ts");
 }
