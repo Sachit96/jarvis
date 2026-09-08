@@ -330,3 +330,51 @@ describe("tool round scheduling", () => {
     assert.deepEqual(ran, ["delete_task"]);
   });
 });
+
+describe("operator coverage across modules", () => {
+  test("every domain the operator claims to cover has at least one tool", () => {
+    // The point of a single operator is that no module is a blind spot. A
+    // domain with no tool means JARVIS must guess or refuse when asked
+    // about it.
+    const domains = new Set(listTools().map((t) => t.domain));
+    for (const expected of [
+      "tasks",
+      "goals",
+      "business",
+      "finance",
+      "university",
+      "health",
+      "calendar",
+      "memory",
+    ] as const) {
+      assert.ok(domains.has(expected), `no tool covers the "${expected}" domain`);
+    }
+  });
+
+  test("no tool exposes a field the schema does not have", () => {
+    // deals has no probability column. A tool describing one would have the
+    // model quoting a number with nothing behind it — the exact failure the
+    // integration-status work exists to prevent, in a different guise.
+    for (const tool of listTools()) {
+      assert.doesNotMatch(
+        tool.description.toLowerCase(),
+        /probability/,
+        `${tool.name} promises a probability field that does not exist`,
+      );
+    }
+  });
+
+  test("write tools that touch a record require an id", () => {
+    // A write with no identifier either creates something or edits an
+    // arbitrary row; update/complete/delete must always name their target.
+    for (const tool of listTools()) {
+      if (!/^(update|complete|delete|move)_/.test(tool.name)) continue;
+      const declared = getToolDeclarations().find((d) => d.name === tool.name);
+      const required = declared?.parameters.required ?? [];
+      assert.ok(
+        required.some((f) => f.endsWith("_id")),
+        `${tool.name} must require an id`,
+      );
+    }
+  });
+});
