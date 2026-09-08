@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { runAgentTurn } from "@/lib/ai/agent";
+import { toClientTrace } from "@/lib/ai/providers/types";
 import { toUserFacingError } from "@/lib/ai/user-error";
 import { getGeneralMentorMessages } from "@/lib/db/queries/mentor";
 import { createClient } from "@/lib/supabase/server";
@@ -106,7 +107,10 @@ export async function sendOperatorMessageAction(
     revalidatePath("/mentor");
     return {
       reply: result.text,
-      trace: result.trace,
+      // Mapped, not passed through: the trace carries the arguments each tool
+      // was called with, and Next serializes an action's return value straight
+      // to the browser. The UI only renders name/label/ok.
+      trace: toClientTrace(result.trace),
       pendingConfirmation: result.pendingConfirmation,
     };
   } catch (err) {

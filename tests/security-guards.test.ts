@@ -172,3 +172,31 @@ describe("no password path exists for Brightspace", () => {
     }
   });
 });
+
+describe("the trace does not leak arguments to the browser", () => {
+  /**
+   * AgentTraceEntry carries the arguments each tool was called with, so a live
+   * QA run can report what was called WITH rather than merely what was called.
+   * Next serializes a Server Action's return value straight to the client, and
+   * TypeScript will NOT catch the leak — an object with extra properties still
+   * assigns to a narrower declared type. So this is checked here instead.
+   */
+  test("toClientTrace drops everything but name, label and ok", async () => {
+    const { toClientTrace } = await import("../lib/ai/providers/types.ts");
+    const stripped = toClientTrace([
+      { name: "delete_task", label: "Deleted tasks", ok: true, args: { task_id: "secret-id" } },
+    ]);
+    assert.deepEqual(stripped, [{ name: "delete_task", label: "Deleted tasks", ok: true }]);
+    assert.equal("args" in stripped[0], false);
+  });
+
+  test("no operator action returns a raw agent trace", () => {
+    // The two surfaces that call runAgentTurn must both map the trace. A
+    // regression here is silent: it typechecks and the UI looks identical.
+    for (const f of ["actions/mentor-actions.ts", "actions/voice-actions.ts"]) {
+      const src = read(f);
+      assert.doesNotMatch(src, /trace:\s*result\.trace/, `${f} must map the trace, not pass it through`);
+      assert.match(src, /toClientTrace\(result\.trace\)/, `${f} should use toClientTrace`);
+    }
+  });
+});

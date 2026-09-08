@@ -3,12 +3,36 @@
 Everything needed to take this repository from a clone to a running,
 connected system. No secret values appear here or should ever be added.
 
-Two commands answer "is it set up?" at any point:
+Three commands answer "is it set up?" at any point, in increasing order of
+what they need:
 
 ```bash
-npm run check-config      # what this environment can actually do, right now
-npm run operator:live     # whether the model really drives the 39 tools
+npm run check-config       # which variables are set — no network, no credentials needed
+npm run integration:check  # read-only: does each configured integration actually work?
+npm run operator:live      # does the real model really drive the 39 tools?
 ```
+
+`integration:check` needs only the credentials for whatever you want tested —
+it reports every integration as PRESENT / MISSING / INVALID / NOT APPLICABLE,
+never prints a value, and mutates nothing. **INVALID is the one to care
+about**: it means a credential exists but the integration could not be used.
+
+`operator:live` additionally needs `GEMINI_API_KEY`, because it is the only
+part of the suite that proves the model itself selects and executes tools.
+Read-only by default; `-- --with-writes` adds the create/update/complete
+journey and the confirmation gate, both of which operate solely on records
+tagged with that run's own id.
+
+### What must never be confused
+
+| Claim | What establishes it |
+| --- | --- |
+| the code supports it | `npm test` |
+| tested against a real database | `npm run integration:check` |
+| the real model invoked it | `npm run operator:live` |
+| the real integration worked | `integration:check` returning PRESENT for that integration's authenticated read |
+
+Passing tests do not make any of the last three true.
 
 ---
 
@@ -171,8 +195,9 @@ npm run dev
 | `npx tsc --noEmit` | Typecheck. |
 | `npm run lint` | ESLint. |
 | `npm run build` | Production build. |
-| `npm run check-config` | Environment readiness. |
-| `npm run operator:live` | Live model + database QA. Needs credentials. |
+| `npm run check-config` | Environment readiness. No credentials needed. |
+| `npm run integration:check` | Read-only connectivity per integration. |
+| `npm run operator:live` | Live model + database QA. Needs a Gemini key. |
 
 `npm run operator:live` is read-only by default. `-- --with-writes` adds the
 create/confirm/delete journey; it creates its own records and deletes them,

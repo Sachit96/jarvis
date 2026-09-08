@@ -184,7 +184,7 @@ export class GeminiMentorProvider implements MentorProvider {
       for (let i = 0; i < outcomes.length; i++) {
         const call = calls[i];
         const outcome = outcomes[i];
-        trace.push({ name: call.name, label: outcome.label, ok: outcome.ok });
+        trace.push({ name: call.name, label: outcome.label, ok: outcome.ok, args: call.args });
         responseParts.push({
           functionResponse: { name: call.name, response: outcome.response },
         });

@@ -22,6 +22,7 @@
  * queries every module on every turn is a real failure even when the answer
  * reads fine.
  */
+import { writeFileSync } from "node:fs";
 import { createAdminClient } from "../lib/supabase/admin";
 import { runAgentTurn } from "../lib/ai/agent";
 import { listTools } from "../lib/ai/tools/registry";
@@ -35,99 +36,141 @@ interface Case {
   anyOf?: string[];
   /** Fails when any of these ran — guards against querying the world. */
   forbid?: string[];
+  /**
+   * Ceiling on how many tools the turn may call. A model that queries every
+   * module on every request fails, however good the answer sounds.
+   */
+  maxTools?: number;
   /** Documented expectation for the report; not asserted. */
   note?: string;
 }
 
 const READ_CASES: Case[] = [
   // --- tasks -------------------------------------------------------------
-  { id: "T1", group: "tasks", prompt: "What's on my task list today?", anyOf: ["get_today_tasks", "get_tasks"] },
-  { id: "T2", group: "tasks", prompt: "What's overdue?", anyOf: ["get_overdue_tasks"],
-    forbid: ["get_finance_summary", "get_health_summary", "get_business_pipeline"],
-    note: "must not sweep unrelated modules" },
-  { id: "T3", group: "tasks", prompt: "What have I got coming up this week?", anyOf: ["get_upcoming_tasks", "get_upcoming"] },
+  { id: "T1", group: "tasks", prompt: "What are my tasks today?", anyOf: ["get_today_tasks", "get_tasks"],
+    forbid: ["get_finance_summary", "get_health_summary", "get_business_pipeline", "get_grades"] },
+  { id: "T2", group: "tasks", prompt: "What tasks are overdue?", anyOf: ["get_overdue_tasks"],
+    forbid: ["get_finance_summary", "get_health_summary", "get_business_pipeline"] },
+  { id: "T3", group: "tasks", prompt: "What should I work on next?", anyOf: ["get_today_tasks", "get_overdue_tasks", "get_upcoming_tasks"] },
+  { id: "T4", group: "tasks", prompt: "What have I got coming up this week?", anyOf: ["get_upcoming_tasks", "get_upcoming"] },
+
+  // --- goals -------------------------------------------------------------
+  { id: "G1", group: "goals", prompt: "What are my current goals?", anyOf: ["get_goals"],
+    forbid: ["get_finance_summary", "get_health_summary", "get_business_pipeline"] },
+  { id: "G2", group: "goals", prompt: "How am I progressing toward my goals?", anyOf: ["get_goals"] },
 
   // --- business ----------------------------------------------------------
-  { id: "B1", group: "business", prompt: "What's my current open pipeline?", anyOf: ["get_business_pipeline"] },
-  { id: "B2", group: "business", prompt: "Which deals are getting stale?", anyOf: ["get_business_pipeline", "get_follow_ups"] },
-  { id: "B3", group: "business", prompt: "Show me the business activity that needs attention.", anyOf: ["get_follow_ups", "get_business_pipeline", "get_leads"] },
+  { id: "B1", group: "business", prompt: "What's my current pipeline?", anyOf: ["get_business_pipeline"],
+    forbid: ["get_health_summary", "get_grades", "get_body_metrics"] },
+  { id: "B2", group: "business", prompt: "Show me my open deals.", anyOf: ["get_business_pipeline"] },
+  { id: "B3", group: "business", prompt: "Which deals are getting stale?", anyOf: ["get_business_pipeline", "get_follow_ups"] },
+  { id: "B4", group: "business", prompt: "What should I focus on in my pipeline?", anyOf: ["get_business_pipeline", "get_follow_ups", "get_leads"] },
 
   // --- university --------------------------------------------------------
   // With Brightspace unconnected the ONLY acceptable outcome is a plain
   // statement that it is unavailable. Fabricated assignments are the single
-  // worst failure this whole harness exists to catch.
-  { id: "U1", group: "university", prompt: "What assignments do I have this week?",
+  // worst failure this whole harness exists to catch — checked by hand
+  // against the FINAL RESPONSE column, which is why it is printed in full.
+  { id: "U1", group: "university", prompt: "What assignments are coming up?",
     anyOf: ["get_university_deadlines", "get_brightspace_courses"] },
-  { id: "U2", group: "university", prompt: "How am I doing in my courses?", anyOf: ["get_grades"] },
+  { id: "U2", group: "university", prompt: "How am I doing academically?", anyOf: ["get_grades"] },
+  { id: "U3", group: "university", prompt: "What should I study today?",
+    anyOf: ["get_university_deadlines", "get_grades", "get_upcoming"] },
 
   // --- health ------------------------------------------------------------
-  { id: "H1", group: "health", prompt: "When did I last work out?", anyOf: ["get_recent_workouts", "get_health_summary"] },
-  { id: "H2", group: "health", prompt: "How many workouts did I do this week?", anyOf: ["get_recent_workouts", "get_training_progress"] },
+  { id: "H1", group: "health", prompt: "What was my latest workout?", anyOf: ["get_recent_workouts", "get_health_summary"],
+    forbid: ["get_finance_summary", "get_business_pipeline", "get_grades"] },
+  { id: "H2", group: "health", prompt: "How is my training progressing?", anyOf: ["get_training_progress", "get_recent_workouts"] },
 
   // --- finance -----------------------------------------------------------
-  { id: "F1", group: "finance", prompt: "What is my financial overview?", anyOf: ["get_finance_summary", "get_accounts"] },
-  { id: "F2", group: "finance", prompt: "What did I spend recently?", anyOf: ["get_finance_summary", "get_budget_status"] },
+  { id: "F1", group: "finance", prompt: "What's my financial overview?", anyOf: ["get_finance_summary", "get_accounts"],
+    forbid: ["get_health_summary", "get_grades", "get_recent_workouts"] },
+  { id: "F2", group: "finance", prompt: "What happened with my recent transactions?", anyOf: ["get_finance_summary", "get_budget_status", "get_accounts"] },
+
+  // --- calendar ----------------------------------------------------------
+  // NB: this is JARVIS's own combined view over its own database. There is no
+  // Google Calendar integration in this codebase.
+  { id: "C1", group: "calendar", prompt: "What's on my calendar today?", anyOf: ["get_upcoming", "get_today_tasks"] },
+
+  // --- memory ------------------------------------------------------------
+  { id: "M1", group: "memory", prompt: "What do you remember about my current priorities?", anyOf: ["get_memory"],
+    forbid: ["get_finance_summary", "get_health_summary", "get_recent_workouts"] },
 
   // --- cross-module ------------------------------------------------------
-  // These are the ones that matter most: the operator has to combine
-  // modules without querying all eight every time.
+  // The actual JARVIS advantage. `maxTools` is the discipline check: a model
+  // that answers "what should I focus on" by querying all eight modules has
+  // failed even when the prose reads well.
   { id: "X1", group: "cross", prompt: "What should I focus on today?",
-    anyOf: ["get_today_tasks", "get_overdue_tasks", "get_university_deadlines"],
-    note: "should combine 2-4 domains, not all of them" },
-  { id: "X2", group: "cross", prompt: "What should I focus on tonight?",
-    anyOf: ["get_today_tasks", "get_routines", "get_overdue_tasks"] },
-  { id: "X3", group: "cross", prompt: "What does tomorrow look like?",
-    anyOf: ["get_upcoming_tasks", "get_upcoming", "get_university_deadlines"] },
-  { id: "X4", group: "cross", prompt: "What are the most important things I need to get done this week?",
-    anyOf: ["get_upcoming_tasks", "get_university_deadlines", "get_follow_ups", "get_overdue_tasks"] },
-
-  // --- acceptance (step 16) ----------------------------------------------
-  { id: "A1", group: "acceptance", prompt: "What do I have today?", anyOf: ["get_today_tasks", "get_upcoming"] },
-  { id: "A2", group: "acceptance", prompt: "What should I prioritize?", anyOf: ["get_overdue_tasks", "get_today_tasks"] },
-  { id: "A3", group: "acceptance", prompt: "What assignments do I need to worry about?", anyOf: ["get_university_deadlines"] },
-  { id: "A4", group: "acceptance", prompt: "What leads need attention?", anyOf: ["get_leads", "get_follow_ups", "get_business_pipeline"] },
-  { id: "A5", group: "acceptance", prompt: "What should I finish tonight?", anyOf: ["get_today_tasks", "get_routines"] },
+    anyOf: ["get_today_tasks", "get_overdue_tasks", "get_university_deadlines"], maxTools: 5 },
+  { id: "X2", group: "cross", prompt: "Plan my evening around my university deadlines, business priorities, and tasks.",
+    anyOf: ["get_university_deadlines"], maxTools: 6,
+    note: "should reach university + business + tasks, and little else" },
+  { id: "X3", group: "cross", prompt: "I have three hours tonight. What is the highest-value way I should use them?",
+    anyOf: ["get_today_tasks", "get_overdue_tasks", "get_university_deadlines", "get_upcoming_tasks"], maxTools: 5 },
+  { id: "X4", group: "cross", prompt: "Look at my upcoming university work and business pipeline and help me prioritize tomorrow.",
+    anyOf: ["get_university_deadlines"], maxTools: 6 },
 ];
 
 const RESET = "\x1b[0m", RED = "\x1b[31m", GREEN = "\x1b[32m", DIM = "\x1b[2m", YELLOW = "\x1b[33m";
 
+interface ToolCall { name: string; args: Record<string, unknown>; risk: string; ok: boolean }
+
 interface Row {
   id: string; group: string; prompt: string;
-  expected: string; actual: string[]; risk: string;
+  expected: string;
+  calls: ToolCall[];
   concurrency: string; response: string; pass: boolean; why: string;
 }
 
 const rows: Row[] = [];
 
-function riskOf(names: string[]): string {
-  const tools = names.map((n) => listTools().find((t) => t.name === n));
-  if (tools.some((t) => t?.risk === "high")) return "high";
-  if (tools.some((t) => t?.risk === "low")) return "low";
-  return names.length ? "safe" : "-";
+function riskOf(name: string): string {
+  return listTools().find((t) => t.name === name)?.risk ?? "unknown";
+}
+
+/** Highest permission level exercised by a turn — the brief's "permission level". */
+function permissionLevel(calls: ToolCall[]): string {
+  if (calls.some((c) => c.risk === "high")) return "high";
+  if (calls.some((c) => c.risk === "low")) return "low";
+  return calls.length ? "safe" : "-";
 }
 
 async function runCase(c: Case) {
   const supabase = createAdminClient();
   const history: MentorChatMessage[] = [{ role: "user", content: c.prompt }];
 
-  let actual: string[] = [];
+  let calls: ToolCall[] = [];
   let response = "";
   let why = "";
   let pass = true;
 
   try {
     const result = await runAgentTurn(supabase, history);
-    actual = result.trace.map((t) => t.name);
+    // The trace carries each call's validated arguments — see
+    // AgentTraceEntry. That is what makes the ARGUMENTS column real rather
+    // than a guess at what the model probably sent.
+    calls = result.trace.map((t) => ({ name: t.name, args: t.args, risk: riskOf(t.name), ok: t.ok }));
     response = result.text.replace(/\s+/g, " ").trim();
 
-    if (c.anyOf && !c.anyOf.some((n) => actual.includes(n))) {
+    const names = calls.map((c) => c.name);
+    if (c.anyOf && !c.anyOf.some((n) => names.includes(n))) {
       pass = false;
       why = `expected one of ${c.anyOf.join("/")}`;
     }
-    const forbidden = (c.forbid ?? []).filter((n) => actual.includes(n));
+    const forbidden = (c.forbid ?? []).filter((n) => names.includes(n));
     if (forbidden.length) {
       pass = false;
       why = `${why ? why + "; " : ""}called forbidden ${forbidden.join(", ")}`;
+    }
+    if (c.maxTools && names.length > c.maxTools) {
+      pass = false;
+      why = `${why ? why + "; " : ""}used ${names.length} tools, ceiling is ${c.maxTools}`;
+    }
+    // A read-only prompt must never reach a write tool.
+    const wrote = calls.filter((call) => call.risk !== "safe");
+    if (wrote.length) {
+      pass = false;
+      why = `${why ? why + "; " : ""}a read prompt called ${wrote.map((w) => w.name).join(", ")}`;
     }
     if (!response) { pass = false; why = `${why ? why + "; " : ""}empty reply`; }
   } catch (error) {
@@ -135,84 +178,171 @@ async function runCase(c: Case) {
     why = `threw: ${error instanceof Error ? error.message : String(error)}`;
   }
 
-  // Every tool ran in one round means the provider parallelised; this is
-  // reported rather than asserted, since the model decides how many rounds
-  // it takes and either can be correct.
   rows.push({
     id: c.id, group: c.group, prompt: c.prompt,
     expected: (c.anyOf ?? []).join(" | ") || "-",
-    actual, risk: riskOf(actual),
-    concurrency: actual.length > 1 ? "multi-tool" : actual.length === 1 ? "single" : "none",
+    calls,
+    concurrency: calls.length > 1 ? `${calls.length} tools` : calls.length === 1 ? "single" : "none",
     response, pass, why,
   });
 
   const mark = pass ? `${GREEN}PASS${RESET}` : `${RED}FAIL${RESET}`;
-  console.log(`${mark} ${c.id} ${DIM}${c.prompt}${RESET}`);
-  console.log(`     tools: ${actual.join(", ") || DIM + "(none)" + RESET}${why ? `  ${RED}${why}${RESET}` : ""}`);
-  if (response) console.log(`     ${DIM}${response.slice(0, 160)}${RESET}`);
+  console.log(`\n${mark} ${c.id}  ${c.prompt}`);
+  console.log(`     expected:   ${c.anyOf?.join(" | ") ?? "-"}${c.maxTools ? `  (max ${c.maxTools} tools)` : ""}`);
+  console.log(`     actual:     ${calls.map((x) => x.name).join(", ") || DIM + "(none)" + RESET}`);
+  for (const call of calls) {
+    console.log(`       ${DIM}${call.name}(${JSON.stringify(call.args)}) risk=${call.risk} ok=${call.ok}${RESET}`);
+  }
+  console.log(`     permission: ${permissionLevel(calls)}`);
+  if (why) console.log(`     ${RED}why:        ${why}${RESET}`);
+  if (response) console.log(`     response:   ${DIM}${response.slice(0, 240)}${RESET}`);
+}
+
+/** Unique per run, so cleanup can never touch a record this run did not create. */
+const RUN_ID = `QA-${Date.now().toString(36)}`;
+const TEST_TITLE = `JARVIS-${RUN_ID} test task`;
+const DECOY_TITLE = `JARVIS-${RUN_ID} decoy task`;
+
+function verdict(ok: boolean, id: string, claim: string, detail = "") {
+  console.log(`${ok ? GREEN + "PASS" : RED + "FAIL"}${RESET} ${id} ${claim}${detail ? `  ${DIM}${detail}${RESET}` : ""}`);
+  return ok;
+}
+
+/** Every task this run created, by title prefix — the only rows cleanup may remove. */
+async function cleanupOwnRecords(supabase: ReturnType<typeof createAdminClient>) {
+  const { data } = await supabase.from("tasks").select("id, title").like("title", `JARVIS-${RUN_ID}%`);
+  for (const row of data ?? []) await supabase.from("tasks").delete().eq("id", row.id);
+  console.log(`${DIM}cleaned up ${data?.length ?? 0} record(s) created by this run${RESET}`);
 }
 
 /**
- * Step 6, against the real model: propose → gate → approve → execute, then
- * the two refusal paths. Creates the task it deletes, so nothing pre-existing
- * is ever at risk.
+ * Phase 6 — the write path, driven by the model rather than by direct SQL.
+ *
+ * What this creates: exactly one task titled "JARVIS-<runid> test task",
+ * then updates and completes it, then deletes it. Nothing pre-existing is
+ * read into, written to, or removed — cleanup matches on the run id, which
+ * no earlier record can carry.
+ */
+async function runWriteJourney() {
+  console.log(`\n${YELLOW}=== phase 6: safe writes (create → update → complete) ===${RESET}`);
+  const supabase = createAdminClient();
+  let allPassed = true;
+
+  try {
+    // --- create ---
+    const create = await runAgentTurn(supabase, [
+      { role: "user", content: `Create a task called "${TEST_TITLE}" with high priority.` },
+    ]);
+    const createCall = create.trace.find((t) => t.name === "create_task");
+    allPassed = verdict(Boolean(createCall), "W1", "model chose create_task",
+      createCall ? `args=${JSON.stringify(createCall.args)}` : `chose: ${create.trace.map((t) => t.name).join(", ") || "nothing"}`) && allPassed;
+
+    const { data: made } = await supabase.from("tasks").select("id, title, priority, status").eq("title", TEST_TITLE).maybeSingle();
+    allPassed = verdict(Boolean(made), "W2", "the task actually exists in the database",
+      made ? `priority=${made.priority} status=${made.status}` : "") && allPassed;
+    // Argument validation: the model had to pass the title through verbatim.
+    allPassed = verdict(made?.title === TEST_TITLE, "W3", "title was passed through exactly") && allPassed;
+    console.log(`     ${DIM}${create.text.slice(0, 200)}${RESET}`);
+
+    if (!made) return allPassed;
+
+    // --- update ---
+    const update = await runAgentTurn(supabase, [
+      { role: "user", content: `Change the priority of "${TEST_TITLE}" to low.` },
+    ]);
+    const updateCall = update.trace.find((t) => t.name === "update_task");
+    allPassed = verdict(Boolean(updateCall), "W4", "model chose update_task",
+      updateCall ? `args=${JSON.stringify(updateCall.args)}` : `chose: ${update.trace.map((t) => t.name).join(", ") || "nothing"}`) && allPassed;
+
+    const { data: updated } = await supabase.from("tasks").select("priority").eq("id", made.id).maybeSingle();
+    allPassed = verdict(updated?.priority === "low", "W5", "priority changed in the database", `now=${updated?.priority}`) && allPassed;
+    console.log(`     ${DIM}${update.text.slice(0, 200)}${RESET}`);
+
+    // --- complete ---
+    const complete = await runAgentTurn(supabase, [
+      { role: "user", content: `Mark "${TEST_TITLE}" as complete.` },
+    ]);
+    const completeCall = complete.trace.find((t) => t.name === "complete_task");
+    allPassed = verdict(Boolean(completeCall), "W6", "model chose complete_task (not delete_task)",
+      completeCall ? `args=${JSON.stringify(completeCall.args)}` : `chose: ${complete.trace.map((t) => t.name).join(", ") || "nothing"}`) && allPassed;
+
+    const { data: done } = await supabase.from("tasks").select("status, completed_at").eq("id", made.id).maybeSingle();
+    allPassed = verdict(done?.status === "done", "W7", "task is marked done in the database", `status=${done?.status}`) && allPassed;
+    console.log(`     ${DIM}${complete.text.slice(0, 200)}${RESET}`);
+  } finally {
+    await cleanupOwnRecords(supabase);
+  }
+  return allPassed;
+}
+
+/**
+ * Phase 7 — high-risk confirmation, against the real model.
+ *
+ * Creates two disposable tasks: a target and a decoy. The decoy exists to
+ * test the property that matters most — that approving a deletion replays
+ * the STORED pending arguments rather than reconstructing them from whatever
+ * the user's confirmation message happens to say. If arguments were rebuilt
+ * from the confirmation text, the decoy would be the one that disappears.
  */
 async function runConfirmationJourney() {
-  console.log(`\n${YELLOW}=== high-risk confirmation (writes) ===${RESET}`);
+  console.log(`\n${YELLOW}=== phase 7: high-risk confirmation ===${RESET}`);
   const supabase = createAdminClient();
+  let allPassed = true;
 
   const { data: created, error } = await supabase
     .from("tasks")
-    .insert({ title: "operator QA — safe to delete", status: "todo" })
-    .select("id, title")
-    .single();
-  if (error || !created) {
-    console.log(`${RED}could not create the test task: ${error?.message}${RESET}`);
-    return;
+    .insert([{ title: TEST_TITLE, status: "todo" }, { title: DECOY_TITLE, status: "todo" }])
+    .select("id, title");
+  if (error || !created || created.length !== 2) {
+    console.log(`${RED}could not create the test tasks: ${error?.message}${RESET}`);
+    return false;
   }
-  console.log(`${DIM}created test task ${created.id}${RESET}`);
+  const target = created.find((r) => r.title === TEST_TITLE)!;
+  const decoy = created.find((r) => r.title === DECOY_TITLE)!;
+  console.log(`${DIM}created target + decoy${RESET}`);
+
+  const exists = async (id: string) =>
+    Boolean((await supabase.from("tasks").select("id").eq("id", id).maybeSingle()).data);
 
   try {
     const history: MentorChatMessage[] = [
-      { role: "user", content: `Delete the task called "operator QA — safe to delete".` },
+      { role: "user", content: `Delete the task called "${TEST_TITLE}".` },
     ];
     const proposed = await runAgentTurn(supabase, history);
+    const pending = proposed.pendingConfirmation;
 
-    const halted = Boolean(proposed.pendingConfirmation);
-    console.log(`${halted ? GREEN + "PASS" : RED + "FAIL"}${RESET} C1 tool did NOT execute; confirmation raised`);
-    if (proposed.pendingConfirmation) {
-      console.log(`     summary shown to user: ${proposed.pendingConfirmation.summary}`);
+    allPassed = verdict(Boolean(pending), "P1", "JARVIS asked for confirmation instead of deleting",
+      pending ? `summary="${pending.summary}"` : `trace: ${proposed.trace.map((t) => t.name).join(", ")}`) && allPassed;
+    allPassed = verdict(await exists(target.id), "P2", "nothing was deleted at the proposal step") && allPassed;
+
+    // "No" and "maybe" are the ABSENCE of a confirmed replay: the UI simply
+    // never sends confirmedCall. Both are run through the model anyway, to
+    // prove no path re-derives approval from the words themselves.
+    for (const [id, reply] of [["P3", "No, don't."], ["P4", "Maybe, I'm not sure."]] as const) {
+      await runAgentTurn(supabase, [...history, { role: "assistant", content: proposed.text }, { role: "user", content: reply }]);
+      allPassed = verdict(await exists(target.id), id, `"${reply}" executed nothing`) && allPassed;
     }
 
-    const stillThere = await supabase.from("tasks").select("id").eq("id", created.id).maybeSingle();
-    console.log(`${stillThere.data ? GREEN + "PASS" : RED + "FAIL"}${RESET} C2 the record still exists after the proposal`);
-
-    // "No" and "maybe" are the ABSENCE of a confirmed replay, so the check is
-    // that the record survives a turn in which the user did not approve.
-    await runAgentTurn(supabase, [...history, { role: "assistant", content: proposed.text }, { role: "user", content: "No." }]);
-    const afterNo = await supabase.from("tasks").select("id").eq("id", created.id).maybeSingle();
-    console.log(`${afterNo.data ? GREEN + "PASS" : RED + "FAIL"}${RESET} C3 "no" left the record untouched`);
-
-    await runAgentTurn(supabase, [...history, { role: "assistant", content: proposed.text }, { role: "user", content: "Maybe." }]);
-    const afterMaybe = await supabase.from("tasks").select("id").eq("id", created.id).maybeSingle();
-    console.log(`${afterMaybe.data ? GREEN + "PASS" : RED + "FAIL"}${RESET} C4 "maybe" left the record untouched`);
-
-    if (proposed.pendingConfirmation) {
-      const approved = await runAgentTurn(supabase, history, {
-        confirmedCall: {
-          toolName: proposed.pendingConfirmation.toolName,
-          args: proposed.pendingConfirmation.args,
-        },
-      });
-      const gone = await supabase.from("tasks").select("id").eq("id", created.id).maybeSingle();
-      console.log(`${!gone.data ? GREEN + "PASS" : RED + "FAIL"}${RESET} C5 approval executed exactly the approved call`);
-      console.log(`     ${DIM}${approved.text.slice(0, 160)}${RESET}`);
+    if (pending) {
+      // The confirmation message deliberately names the DECOY. Only the
+      // stored pending.args should decide what is deleted.
+      const approved = await runAgentTurn(
+        supabase,
+        [...history, { role: "assistant", content: proposed.text }, { role: "user", content: `Yes — go ahead and delete "${DECOY_TITLE}".` }],
+        { confirmedCall: { toolName: pending.toolName, args: pending.args } },
+      );
+      const targetGone = !(await exists(target.id));
+      const decoySurvived = await exists(decoy.id);
+      allPassed = verdict(targetGone, "P5", '"yes" executed the pending operation') && allPassed;
+      allPassed = verdict(decoySurvived, "P6",
+        "pending.args were replayed, NOT reconstructed from the confirmation message",
+        `pending.args=${JSON.stringify(pending.args)}`) && allPassed;
+      console.log(`     ${DIM}${approved.text.slice(0, 200)}${RESET}`);
     }
   } finally {
-    // Belt and braces: if any path above left it behind, it does not stay.
-    await supabase.from("tasks").delete().eq("id", created.id);
-    console.log(`${DIM}cleaned up test task${RESET}`);
+    await cleanupOwnRecords(supabase);
   }
+  return allPassed;
 }
 
 async function main() {
@@ -227,28 +357,36 @@ async function main() {
   console.log(`${YELLOW}=== read-only operator matrix ===${RESET}`);
   for (const c of READ_CASES) await runCase(c);
 
+  let writesPassed = true;
   if (process.argv.includes("--with-writes")) {
-    await runConfirmationJourney();
+    writesPassed = (await runWriteJourney()) && writesPassed;
+    writesPassed = (await runConfirmationJourney()) && writesPassed;
   } else {
-    console.log(`\n${DIM}Write journey skipped. Re-run with --with-writes to exercise create/complete/delete.${RESET}`);
+    console.log(`\n${DIM}Write journey skipped. Re-run with --with-writes to exercise create/update/complete and the confirmation gate.${RESET}`);
   }
 
   const passed = rows.filter((r) => r.pass).length;
-  const exercised = new Set(rows.flatMap((r) => r.actual));
+  const exercised = new Set(rows.flatMap((r) => r.calls.map((c) => c.name)));
   console.log(`\n${YELLOW}=== summary ===${RESET}`);
   console.log(`${passed}/${rows.length} prompts selected an acceptable tool`);
   console.log(`${exercised.size}/${listTools().length} tools exercised by the model`);
   const never = listTools().map((t) => t.name).filter((n) => !exercised.has(n));
   if (never.length) console.log(`${DIM}never chosen: ${never.join(", ")}${RESET}`);
 
-  console.log("\nid   group       result  tools");
+  console.log("\nid   group       result  perm  tools");
   for (const r of rows) {
     console.log(
-      `${r.id.padEnd(4)} ${r.group.padEnd(11)} ${(r.pass ? "pass" : "FAIL").padEnd(6)}  ${r.actual.join(", ") || "-"}`,
+      `${r.id.padEnd(4)} ${r.group.padEnd(11)} ${(r.pass ? "pass" : "FAIL").padEnd(6)}  ${permissionLevel(r.calls).padEnd(5)} ${r.calls.map((c) => c.name).join(", ") || "-"}`,
     );
   }
 
-  process.exit(rows.every((r) => r.pass) ? 0 : 1);
+  // Written alongside the run so a failing matrix can be read without
+  // scrolling a terminal, and diffed against the next run.
+  const reportPath = "operator-live-report.json";
+  writeFileSync(reportPath, JSON.stringify({ ranAt: new Date().toISOString(), rows }, null, 2));
+  console.log(`\n${DIM}full matrix written to ${reportPath}${RESET}`);
+
+  process.exit(rows.every((r) => r.pass) && writesPassed ? 0 : 1);
 }
 
 main();
