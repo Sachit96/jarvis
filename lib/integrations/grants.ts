@@ -26,9 +26,10 @@ export async function getIntegrationStatusesWithGrants(): Promise<IntegrationSta
   const needsYouTube = base.find((s) => s.id === "youtube")?.state === "disconnected";
   const needsBrightspace = base.find((s) => s.id === "brightspace")?.state === "disconnected";
 
-  const supabase = createAdminClient();
+  // The client is built only when a lookup is actually going to happen, so a
+  // page with no OAuth app registered pays nothing for this.
   const [youtube, brightspace] = await Promise.all([
-    needsYouTube ? getYtConnection(supabase).catch(() => null) : Promise.resolve(null),
+    needsYouTube ? getYtConnection(createAdminClient()).catch(() => null) : Promise.resolve(null),
     needsBrightspace ? getBrightspaceConnection().catch(() => null) : Promise.resolve(null),
   ]);
 
