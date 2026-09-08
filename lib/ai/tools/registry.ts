@@ -3,6 +3,7 @@ import { personalReadTools } from "@/lib/ai/tools/read/personal";
 import { moduleReadTools } from "@/lib/ai/tools/read/modules";
 import { routineTools } from "@/lib/ai/tools/read/routines";
 import { businessOpsTools } from "@/lib/ai/tools/read/business-ops";
+import { healthOpsTools } from "@/lib/ai/tools/read/health-ops";
 import { personalWriteTools } from "@/lib/ai/tools/write/personal";
 import { businessWriteTools } from "@/lib/ai/tools/write/business";
 import { toGeminiDeclaration, type GeminiFunctionDeclaration } from "@/lib/ai/tools/gemini-schema";
@@ -22,6 +23,7 @@ const ALL_TOOLS: ToolDefinition[] = [
   ...moduleReadTools,
   ...routineTools,
   ...businessOpsTools,
+  ...healthOpsTools,
   ...personalWriteTools,
   ...businessWriteTools,
 ];
