@@ -162,7 +162,7 @@ export async function buildMentorContext(supabase: Client) {
       dailyRoutineToday: routineItems.map((item) => ({
         item: item.label,
         completedToday: item.completed,
-        currentStreak: item.streak?.current,
+        currentStreak: item.streak,
       })),
       recentMoods: journalEntries
         .slice(0, 7)
