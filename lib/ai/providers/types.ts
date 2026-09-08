@@ -86,6 +86,13 @@ export interface AgentChatOptions {
   tools: { name: string; description: string; parameters: Record<string, unknown> }[];
   execute: (call: AgentToolCall) => Promise<AgentToolOutcome>;
   /**
+   * Whether a tool is safe to run concurrently with its siblings in the same
+   * round. The provider cannot answer this — risk lives in the registry — so
+   * the caller supplies the predicate. Defaults to false, i.e. sequential,
+   * because that is the behaviour that is always correct.
+   */
+  parallelSafe?: (name: string) => boolean;
+  /**
    * Ceiling on model round trips. Bounds both cost and latency, and stops a
    * model that keeps re-calling the same tool from looping forever.
    */

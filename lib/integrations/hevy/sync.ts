@@ -1,7 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
-import { listRecentHevyWorkouts, hasHevyKey } from "@/lib/providers/workout/hevy-client";
+import { listRecentHevyWorkouts, hasHevyKey } from "@/lib/integrations/hevy/client";
 
 type Client = SupabaseClient<Database>;
 type WorkoutSetInsert = Database["public"]["Tables"]["workout_sets"]["Insert"];

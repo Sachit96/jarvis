@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { syncHevyWorkouts } from "@/lib/providers/workout/hevy-sync";
-import { hasHevyKey } from "@/lib/providers/workout/hevy-client";
+import { syncHevyWorkouts } from "@/lib/integrations/hevy/sync";
+import { hasHevyKey } from "@/lib/integrations/hevy/client";
 import { isRateLimited, recordRateLimitEvent } from "@/lib/rate-limit";
 
 const ROUTE = "hevy";

@@ -1,5 +1,6 @@
 import "server-only";
 import { callGemini, stripMarkdownFence, type GeminiContent } from "@/lib/ai/providers/gemini-client";
+import { runToolRound } from "@/lib/ai/providers/tool-round";
 import type {
   MentorProvider,
   MentorChatMessage,
@@ -58,6 +59,7 @@ function toGeminiContents(history: MentorChatMessage[]): GeminiContent[] {
     parts: [{ text: m.content }],
   }));
 }
+
 
 export class GeminiMentorProvider implements MentorProvider {
   async generateBrief(systemPrompt: string, _effort: "fast" | "deep"): Promise<MentorBriefResult> {
@@ -143,6 +145,7 @@ export class GeminiMentorProvider implements MentorProvider {
     history,
     tools,
     execute,
+    parallelSafe = () => false,
     maxRounds = 5,
   }: AgentChatOptions): Promise<AgentChatResult> {
     // Same tier as nutritionChat: this needs function calling, which was
@@ -170,9 +173,17 @@ export class GeminiMentorProvider implements MentorProvider {
         parts: result.functionCalls.map((call) => ({ functionCall: call })),
       });
 
+      // Scheduling rule (parallel reads, ordered writes) lives in
+      // runToolRound, where it is testable without a model round trip.
+      const calls = result.functionCalls;
+      const outcomes = await runToolRound(calls, execute, parallelSafe);
+
       const responseParts = [];
-      for (const call of result.functionCalls) {
-        const outcome = await execute({ name: call.name, args: call.args });
+      // Iterates outcomes, not calls: a halt short-circuits the round, so
+      // there can be fewer outcomes than the model asked for.
+      for (let i = 0; i < outcomes.length; i++) {
+        const call = calls[i];
+        const outcome = outcomes[i];
         trace.push({ name: call.name, label: outcome.label, ok: outcome.ok });
         responseParts.push({
           functionResponse: { name: call.name, response: outcome.response },

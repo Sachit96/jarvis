@@ -26,7 +26,9 @@ import {
   computeMacroTotals,
   computeWorkoutVolume,
 } from "@/lib/db/queries/health";
-import { hasHevyKey } from "@/lib/providers/workout/hevy-client";
+import { getHevyStatus } from "@/lib/integrations/hevy";
+import { getBrightspaceStatus } from "@/lib/integrations/brightspace";
+import { describeUnusable, isUsable } from "@/lib/integrations/status";
 import { todayStr } from "@/lib/date";
 import { ok, unavailable, type ToolDefinition } from "@/lib/ai/tools/types";
 
@@ -280,8 +282,9 @@ export const getHealthSummaryTool: ToolDefinition = {
         : null,
       // Manual logging always works; this says whether automatic sync is on,
       // so the model can explain a thin history instead of assuming the user
-      // did not train.
-      hevy_sync: hasHevyKey() ? "connected" : "configuration_required",
+      // did not train. Read from the shared status system so Settings, Home
+      // and the model cannot disagree about whether Hevy is connected.
+      hevy_sync: getHevyStatus().state,
     });
   },
 };
@@ -303,11 +306,19 @@ export const getBrightspaceCoursesTool: ToolDefinition = {
   risk: "safe",
   schema: empty,
   async handler() {
-    return unavailable(
-      "brightspace",
-      "configuration_required",
-      "Brightspace is not connected yet. The user's manually-entered courses are available through get_grades and get_university_deadlines.",
-    );
+    const status = getBrightspaceStatus();
+    if (!isUsable(status.state)) {
+      return unavailable(
+        "brightspace",
+        status.state,
+        `${describeUnusable(status)} The user's manually-entered courses are still available through get_grades and get_university_deadlines.`,
+      );
+    }
+    // Reached only once an OAuth grant exists; the adapter throws until its
+    // client is installed, which the executor converts to a structured error.
+    const { fetchCourses } = await import("@/lib/integrations/brightspace");
+    const result = await fetchCourses();
+    return ok(result.data ?? []);
   },
 };
 
