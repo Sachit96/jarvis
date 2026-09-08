@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getPriorityTasks, getGoals } from "@/lib/db/queries/life";
+import { getPriorityTasks, getGoals, getTasks } from "@/lib/db/queries/life";
 import { getAccounts, getMonthTransactions, computeAssetLiabilityTotals, computeMonthlyPnl } from "@/lib/db/queries/finance";
 import { todayStr } from "@/lib/date";
 import {
@@ -15,6 +15,11 @@ import { getPipelineStages, getDeals, getContracts, computeMrr, computePipelineS
 import { getTodayRoutineItems } from "@/lib/db/queries/routine";
 import { getHabits, getHabitLogsForHeatmap } from "@/lib/db/queries/life";
 import { getUpcoming, getRecentActivity } from "@/lib/db/queries/command-center";
+import { getCourses, getAssessments, getDeadlines } from "@/lib/db/queries/uni";
+import { computeStaleDeals, getContacts } from "@/lib/db/queries/business";
+import { groupTasks, type TaskLike } from "@/lib/life/task-views";
+import { topPriority, rankPriorities } from "@/lib/life/priority";
+import { JarvisPriorityCard } from "@/components/dashboard/jarvis-priority-card";
 import { getLifeScoreSnapshot, getLifeScoreTrend } from "@/lib/db/queries/life-score";
 import { hasHevyKey } from "@/lib/integrations/hevy/client";
 import { getMemoryEntries } from "@/lib/db/queries/memory";
@@ -120,6 +125,40 @@ export default async function DashboardPage() {
     habits.map((h) => h.id),
     84,
   );
+  // Cross-module inputs for the JARVIS priority line. Fetched together —
+  // none depends on another — and reusing the same helpers the University
+  // and Business pages use, so the headline cannot disagree with them.
+  const [uniCourses, uniDeadlines, allTasks, contacts] = await Promise.all([
+    getCourses(supabase),
+    getDeadlines(supabase),
+    getTasks(supabase),
+    getContacts(supabase),
+  ]);
+  const uniAssessments = await getAssessments(supabase, uniCourses.map((c) => c.id));
+  const courseCode = new Map(uniCourses.map((c) => [c.id, c.code]));
+
+  const groupedTasks = groupTasks(allTasks as TaskLike[], today);
+  const staleDeals = computeStaleDeals(deals, stages, contacts);
+
+  const priorityInput = {
+    today,
+    overdueTasks: groupedTasks.overdue.map((t) => ({ id: t.id, title: t.title, due_date: t.due_date })),
+    tasksDueToday: groupedTasks.today.map((t) => ({ id: t.id, title: t.title })),
+    universityDue: [
+      ...uniAssessments
+        .filter((a) => a.due_at && a.status !== "graded" && a.status !== "submitted")
+        .map((a) => ({ id: a.id, title: a.title, due_at: a.due_at!, course: courseCode.get(a.course_id) })),
+      ...uniDeadlines.map((d) => ({ id: d.id, title: d.title, due_at: d.due_at, course: null })),
+    ],
+    staleDeals,
+    routine: {
+      completed: routineItems.filter((i) => i.completed).length,
+      total: routineItems.length,
+    },
+  };
+  const ranked = rankPriorities(priorityInput);
+  const priority = topPriority(priorityInput);
+
   const datesByHabit = new Map<string, Set<string>>();
   for (const log of habitLogs) {
     if (!log.completed) continue;
@@ -144,6 +183,8 @@ export default async function DashboardPage() {
           most of what made the dashboard look busy. Goal completion is the
           one that dropped: LifeScoreCard and the goals rail below both
           already carry it, where the other four have no second home. */}
+      <JarvisPriorityCard priority={priority} runnersUp={ranked.slice(1, 3)} />
+
       <KpiGrid columns={4}>
         <KpiCell
           label="Net worth"
