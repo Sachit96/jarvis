@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
+import { isMissingRelation } from "@/lib/db/missing-relation";
 
 type Client = SupabaseClient<Database>;
 
@@ -40,12 +41,6 @@ export const EXPORT_TABLES = [
 ] as const;
 
 /**
- * Missing-relation codes. PostgREST reports an unknown table as PGRST205 (or
- * PGRST202 on older versions) and Postgres itself as 42P01.
- */
-const MISSING_TABLE_CODES = new Set(["PGRST202", "PGRST205", "42P01"]);
-
-/**
  * Shared between the bearer-protected GET route (external/scripted access) and
  * exportJsonBackupAction (the Settings page's download button) — one place
  * building the actual payload, not two slightly-different copies.
@@ -63,7 +58,7 @@ export async function buildExportPayload(supabase: Client) {
     EXPORT_TABLES.map(async (table) => {
       const { data, error } = await supabase.from(table).select("*");
       if (error) {
-        if (MISSING_TABLE_CODES.has(error.code)) return [table, null] as const;
+        if (isMissingRelation(error)) return [table, null] as const;
         throw new Error(`${table}: ${error.message}`);
       }
       return [table, data] as const;

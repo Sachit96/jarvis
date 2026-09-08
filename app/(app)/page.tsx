@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getPriorityTasks, getGoals, getTasks } from "@/lib/db/queries/life";
+import { getGoals, getTasks } from "@/lib/db/queries/life";
 import { getAccounts, getMonthTransactions, computeAssetLiabilityTotals, computeMonthlyPnl } from "@/lib/db/queries/finance";
 import { todayStr } from "@/lib/date";
 import {
@@ -17,7 +17,7 @@ import { getHabits, getHabitLogsForHeatmap } from "@/lib/db/queries/life";
 import { getUpcoming, getRecentActivity } from "@/lib/db/queries/command-center";
 import { getCourses, getAssessments, getDeadlines } from "@/lib/db/queries/uni";
 import { computeStaleDeals, getContacts } from "@/lib/db/queries/business";
-import { groupTasks, type TaskLike } from "@/lib/life/task-views";
+import { groupTasks, selectPriorityTasks, type TaskLike } from "@/lib/life/task-views";
 import { topPriority, rankPriorities } from "@/lib/life/priority";
 import { JarvisPriorityCard } from "@/components/dashboard/jarvis-priority-card";
 import { getLifeScoreSnapshot, getLifeScoreTrend } from "@/lib/db/queries/life-score";
@@ -46,8 +46,13 @@ export default async function DashboardPage() {
   const supabase = await createClient();
   const today = todayStr();
 
+  // Two waves, not five. Everything independent goes in the first; the
+  // second holds only what genuinely needs an id from the first (workout
+  // sets, habit logs, assessments), so those three overlap rather than
+  // queueing behind one another. getTasks also replaces the separate
+  // getPriorityTasks call — both read the whole tasks table, and one list
+  // answers both questions.
   const [
-    priorityTasks,
     accounts,
     monthTransactions,
     workouts,
@@ -65,8 +70,11 @@ export default async function DashboardPage() {
     goals,
     memoryEntries,
     habits,
+    uniCourses,
+    uniDeadlines,
+    allTasks,
+    contacts,
   ] = await Promise.all([
-    getPriorityTasks(supabase, 4),
     getAccounts(supabase),
     getMonthTransactions(supabase),
     getWorkouts(supabase),
@@ -84,7 +92,13 @@ export default async function DashboardPage() {
     getGoals(supabase),
     getMemoryEntries(supabase),
     getHabits(supabase),
+    getCourses(supabase),
+    getDeadlines(supabase),
+    getTasks(supabase),
+    getContacts(supabase),
   ]);
+
+  const priorityTasks = selectPriorityTasks(allTasks, 4);
 
   const financeTotals = computeAssetLiabilityTotals(accounts);
   const pnl = computeMonthlyPnl(monthTransactions);
@@ -97,7 +111,18 @@ export default async function DashboardPage() {
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
   const recentWorkoutIds = workouts.filter((w) => new Date(w.started_at) >= sevenDaysAgo).map((w) => w.id);
-  const recentSets = await getWorkoutSets(supabase, recentWorkoutIds);
+
+  // The only three reads that genuinely depend on the batch above, so they
+  // run together rather than in three separate waves.
+  //
+  // 84 days = the 12 weeks HabitHeatmapCard actually renders — the Routine
+  // page's own getHabitLogsForHeatmap call asks for 35 (its own narrower
+  // view), so this needs its own wider window, not the default.
+  const [recentSets, habitLogs, uniAssessments] = await Promise.all([
+    getWorkoutSets(supabase, recentWorkoutIds),
+    getHabitLogsForHeatmap(supabase, habits.map((h) => h.id), 84),
+    getAssessments(supabase, uniCourses.map((c) => c.id)),
+  ]);
   const volume7d = computeWorkoutVolume(recentSets);
 
   // Real per-category counts for the last 7 days — a short narrative line
@@ -117,24 +142,9 @@ export default async function DashboardPage() {
     `Habits: ${habitsDoneToday}/${routineItems.length} done today`,
   ];
 
-  // 84 days = the 12 weeks HabitHeatmapCard actually renders — the Routine
-  // page's own getHabitLogsForHeatmap call only asks for 35 (its own
-  // narrower view), so this needs its own wider window, not the default.
-  const habitLogs = await getHabitLogsForHeatmap(
-    supabase,
-    habits.map((h) => h.id),
-    84,
-  );
-  // Cross-module inputs for the JARVIS priority line. Fetched together —
-  // none depends on another — and reusing the same helpers the University
-  // and Business pages use, so the headline cannot disagree with them.
-  const [uniCourses, uniDeadlines, allTasks, contacts] = await Promise.all([
-    getCourses(supabase),
-    getDeadlines(supabase),
-    getTasks(supabase),
-    getContacts(supabase),
-  ]);
-  const uniAssessments = await getAssessments(supabase, uniCourses.map((c) => c.id));
+  // Cross-module inputs for the JARVIS priority line reuse the same helpers
+  // the University and Business pages use, so the headline cannot disagree
+  // with them.
   const courseCode = new Map(uniCourses.map((c) => [c.id, c.code]));
 
   const groupedTasks = groupTasks(allTasks as TaskLike[], today);

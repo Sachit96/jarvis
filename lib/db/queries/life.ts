@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
+import { selectPriorityTasks } from "@/lib/life/task-views";
 
 type Client = SupabaseClient<Database>;
 
@@ -14,8 +15,6 @@ export async function getTasks(supabase: Client) {
   return data;
 }
 
-const PRIORITY_RANK: Record<string, number> = { high: 0, medium: 1, low: 2 };
-
 /** Top incomplete tasks for the Command Center HUD — high priority first, then soonest due. */
 export async function getPriorityTasks(supabase: Client, limit = 5) {
   const { data, error } = await supabase
@@ -24,8 +23,10 @@ export async function getPriorityTasks(supabase: Client, limit = 5) {
     .neq("status", "done")
     .order("due_date", { ascending: true, nullsFirst: false });
   if (error) throw error;
-  // Sorted client-side since "high"/"medium"/"low" doesn't order alphabetically the way we need.
-  return [...data].sort((a, b) => PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority]).slice(0, limit);
+  // The ranking itself lives in lib/life/task-views.ts, so a caller that
+  // already holds the tasks (Home does) can produce the same shortlist
+  // without a second trip to the same table.
+  return selectPriorityTasks(data, limit);
 }
 
 export async function getGoals(supabase: Client) {

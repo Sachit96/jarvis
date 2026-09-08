@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { runAgentTurn } from "@/lib/ai/agent";
+import { toUserFacingError } from "@/lib/ai/user-error";
 import { getGeneralMentorMessages } from "@/lib/db/queries/mentor";
 import { createClient } from "@/lib/supabase/server";
 import { generateDailyBrief, generateWeeklyReview, runGeneralMentorChat } from "@/lib/ai/mentor-brief";
@@ -109,6 +110,8 @@ export async function sendOperatorMessageAction(
       pendingConfirmation: result.pendingConfirmation,
     };
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Mentor chat failed" };
+    // The chat renders this string as an assistant bubble, so it must read
+    // like JARVIS — never a raw Supabase or vendor message.
+    return { error: toUserFacingError(err, "operator-chat").message };
   }
 }

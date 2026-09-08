@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { runAgentTurn } from "@/lib/ai/agent";
+import { toUserFacingError } from "@/lib/ai/user-error";
 import { getGeneralMentorMessages } from "@/lib/db/queries/mentor";
 
 export interface VoiceReplyResult {
@@ -68,7 +69,8 @@ export async function sendVoiceMessageAction(
       pendingConfirmation: result.pendingConfirmation,
     };
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return { error: message, rateLimited: message.includes("429") };
+    // Spoken aloud, so this has to be a sentence rather than an error string.
+    const { message, rateLimited } = toUserFacingError(err, "voice");
+    return { error: message, rateLimited };
   }
 }
