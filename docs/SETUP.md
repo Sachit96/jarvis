@@ -34,6 +34,31 @@ tagged with that run's own id.
 
 Passing tests do not make any of the last three true.
 
+### Verified live, 2026-09-09
+
+The first end-to-end run against the real model and the real database:
+
+| | |
+| --- | --- |
+| Read matrix | **22/23** prompts selected an acceptable tool |
+| Tools exercised by the model | 13 of 39 (read-only run — no write was attempted) |
+| Fabrication | **none** — Brightspace unconnected reported as untracked, empty finance reported as not connected, no stale deals reported as none |
+| Write journey + confirmation gate | **NOT RUN** — needs `-- --with-writes` |
+
+Two bugs had to be cleared to get there, and both are worth knowing about
+because neither was visible to any offline test:
+
+- The operator was routed to a free-tier Gemma endpoint that failed
+  non-deterministically — 500 and 503 on identical payloads, once on plain
+  text with no tools at all. It now runs on `structured`.
+- The provider rebuilt the model's turn from `{name, args}`, discarding the
+  `thoughtSignature` a thinking model requires back verbatim. Every
+  multi-round turn failed with a 400 until it echoed the model's own parts.
+
+The remaining unproven path is the one that matters most for safety: no
+high-risk tool has yet been confirmed, declined, or executed against a live
+model.
+
 ---
 
 ## 1. Environment variables
