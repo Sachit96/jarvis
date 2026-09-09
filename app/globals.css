@@ -9,7 +9,17 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
-  --font-heading: var(--font-sans);
+  /* Headings get the display face. This used to alias --font-sans, which
+     meant every `font-heading` in the app silently rendered in the body
+     face — the utility existed but did nothing. */
+  --font-heading: var(--font-display);
+  --font-display: var(--font-display);
+  /* New surface + ink tokens, exposed so components use `bg-panel` and
+     `text-foreground-secondary` rather than hardcoding an rgba. */
+  --color-panel: var(--panel);
+  --color-foreground-secondary: var(--foreground-secondary);
+  --color-foreground-tertiary: var(--foreground-tertiary);
+  --color-brand-2: var(--brand-2);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -111,37 +121,56 @@
   /* Geist (self-hosted via next/font/google, see app/layout.tsx) — a
      modern geometric sans matching the reference design, falling back to
      system UI fonts if a font variable somehow isn't present. */
-  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "SF Pro Text",
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "SF Pro Text",
     system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* Clash Display for headings: geometric, slightly condensed, architectural.
+     Space Grotesk is the fallback because it shares the geometric skeleton —
+     falling back to a humanist UI face would change the page's character
+     entirely while the webfont loads. */
+  --font-display: "Clash Display", "Space Grotesk", var(--font-inter), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, Monaco, "Cascadia Code",
     "Roboto Mono", "Segoe UI Mono", monospace;
 
-  /* True near-black, achromatic — the reference palette is neutral gray-
-     scale plus a sparing accent, not the previous blue-tinted dark theme. */
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  /* Card surfaces are translucent white over the page background (not a
-     flat lighter color) so depth reads from a barely-there fill, not a
-     visible box — 9% white ≈ the reference's subtle card contrast. */
-  --card: oklch(1 0 0 / 9%);
+  /* PURE black, deliberately #000 and not a near-black. On an OLED panel
+     the canvas switches off entirely, which is what makes the glass panels
+     above it read as lit rather than merely lighter. Any of the usual
+     near-blacks (#09090b, #0f172a) reintroduces a grey haze that the whole
+     neo-glass treatment then has to fight. */
+  --background: #000000;
+  --foreground: #ffffff;
+  /* Text hierarchy comes from OPACITY, not from a collection of grey hexes:
+     one ink, three strengths. Greys drift apart as soon as two components
+     pick different ones. */
+  --foreground-secondary: rgb(255 255 255 / 0.78);
+  --foreground-tertiary: rgb(255 255 255 / 0.45);
+  /* Glass, not a lighter box: 3% white over pure black, blurred. The panel
+     is defined by its edge and its blur, not by a fill you can name. */
+  --card: rgb(255 255 255 / 0.03);
+  /* The one solid surface, for the rare case where translucency would make
+     content unreadable (dense tables, stacked overlays). */
+  --panel: #0a0a0a;
+  --glass-blur: 12px;
   --card-foreground: oklch(0.985 0 0);
   /* Popovers/dialogs float above content and need to stay legible, so
-     they're a solid (non-translucent) neutral rather than an overlay. */
-  --popover: oklch(0.205 0 0);
+     they're the solid panel rather than another sheet of glass — stacking
+     two blurs makes text mush. */
+  --popover: #0a0a0a;
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.82 0.15 200);
-  --primary-foreground: oklch(0.145 0 0);
-  --secondary: oklch(0.205 0 0);
+  --primary: var(--brand);
+  --primary-foreground: #ffffff;
+  --secondary: #0a0a0a;
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.21 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(1 0 0 / 8%);
+  --muted: rgb(255 255 255 / 0.06);
+  --muted-foreground: var(--foreground-tertiary);
+  --accent: rgb(255 255 255 / 0.06);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: #ef4444;
-  /* Hairline borders — a faint translucent white edge, not a solid stroke. */
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.82 0.15 200);
+  /* Barely visible by design. The border exists to find the edge of a glass
+     pane, not to outline every component — anything heavier and the page
+     reads as a wireframe. */
+  --border: rgb(255 255 255 / 0.08);
+  --input: rgb(255 255 255 / 0.12);
+  --ring: var(--brand);
   /* Chart slots ARE the category palette, in the one order whose every
      adjacent pair passes the colorblind and normal-vision checks — so a
      chart that fills slots 1..n in order is safe by construction and needs
@@ -158,23 +187,34 @@
   /* Single-series charts have no identity to encode, so they wear the brand
      accent rather than borrowing a category's color and implying one. */
   --chart-primary: var(--brand);
-  --radius: 0.75rem;
+  --radius: 1rem;
   /* Sidebar reads as the same surface as the page, not a separate panel —
      no lightness/hue shift from --background. */
-  --sidebar: oklch(0.145 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.82 0.15 200);
-  --sidebar-primary-foreground: oklch(0.145 0 0);
-  --sidebar-accent: oklch(1 0 0 / 8%);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 8%);
-  --sidebar-ring: oklch(0.82 0.15 200);
+  --sidebar: #000000;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgb(255 255 255 / 0.06);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgb(255 255 255 / 0.08);
+  --sidebar-ring: var(--brand);
 
-  /* JARVIS brand palette — same cyan accent, applied more sparingly at the
-     component level (active nav state, icons, links) rather than as
-     heavy borders/rings. */
-  --brand: oklch(0.82 0.15 200); /* cyan #22D3EE-ish */
-  --brand-dim: oklch(0.55 0.1 210); /* muted teal */
+  /* JARVIS brand: purple primary, magenta secondary, and the 135° gradient
+     between them as the product's single visual signature. Applied at the
+     component level (active nav, icons, primary actions, radar) rather than
+     as heavy borders everywhere — the gradient means "important", so
+     spending it on ordinary chrome spends its meaning.
+
+     Replaced the previous cyan accent wholesale rather than adding a second
+     brand colour: two brand hues is not a brand. */
+  --brand: #9c35f0;
+  --brand-2: #ec4899;
+  --brand-dim: color-mix(in oklab, var(--brand) 55%, black);
+  --gradient-brand: linear-gradient(135deg, var(--brand), var(--brand-2));
+  /* Glow is the importance signal. Spread stays wide and opacity low so it
+     reads as light in the room rather than a coloured shadow on a box. */
+  --glow-brand: 0 0 80px -20px color-mix(in oklab, var(--brand) 70%, transparent);
+  --glow-brand-strong: 0 0 120px -24px color-mix(in oklab, var(--brand) 85%, transparent);
   --warn: oklch(0.77 0.15 70); /* amber */
   --danger: #ef4444;
   --success: #22c55e;
@@ -269,5 +309,193 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================ JARVIS
+   Neo-glass / aurora / radar primitives.
+
+   Centralised deliberately: these are the effects most likely to be
+   reimplemented slightly differently in each module, and five near-identical
+   glass recipes is exactly how an app stops looking like one product.
+
+   Every animation here is switched off under prefers-reduced-motion at the
+   bottom of this file. This is an operating system people work in, not a
+   landing page — motion is allowed to be expensive-looking, never to be in
+   the way. */
+
+@layer components {
+  /* A frosted pane floating above pure black. */
+  .glass {
+    background: var(--card);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  /* For the one or two panels per page that should read as nearer the
+     viewer — slightly more fill and a slightly brighter edge, nothing else. */
+  .glass-raised {
+    background: rgb(255 255 255 / 0.055);
+    backdrop-filter: blur(calc(var(--glass-blur) * 1.5));
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1.5));
+    border: 1px solid rgb(255 255 255 / 0.12);
+    border-radius: var(--radius);
+  }
+
+  /* The brand signature. Used on primary actions and on the few numbers
+     that carry the most meaning — not as decoration. */
+  .gradient-brand {
+    background-image: var(--gradient-brand);
+  }
+
+  .text-gradient-brand {
+    background-image: var(--gradient-brand);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* A gradient edge without a gradient fill: the border is painted, then
+     masked so only the 1px rim survives. Cheaper and sharper than the usual
+     two-stacked-elements trick. */
+  .gradient-border {
+    position: relative;
+    border-radius: var(--radius);
+  }
+  .gradient-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--gradient-brand);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .glow-brand {
+    box-shadow: var(--glow-brand);
+  }
+
+  /* Ambient light behind content. Very large, very blurred, very faint:
+     if an orb is identifiable as a shape it is too strong. Sits at -z with
+     pointer-events off so it can never intercept a click. */
+  .aurora-orb {
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: 9999px;
+    filter: blur(100px);
+    opacity: 0.16;
+    animation: aurora-drift 28s ease-in-out infinite alternate;
+  }
+  .aurora-orb-brand {
+    background: radial-gradient(circle, var(--brand) 0%, transparent 70%);
+  }
+  .aurora-orb-accent {
+    background: radial-gradient(circle, var(--brand-2) 0%, transparent 70%);
+    animation-duration: 36s;
+    animation-direction: alternate-reverse;
+  }
+
+  /* The radar sweep: a conic gradient rotating slowly under a masked disc.
+     This is JARVIS's identity mark, so it is one implementation reused
+     everywhere rather than a per-page SVG. */
+  .radar-sweep {
+    position: relative;
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+  .radar-sweep::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      color-mix(in oklab, var(--brand) 55%, transparent) 40deg,
+      color-mix(in oklab, var(--brand-2) 45%, transparent) 70deg,
+      transparent 110deg
+    );
+    animation: radar-rotate 4s linear infinite;
+    pointer-events: none;
+  }
+
+  /* Breathing, not flashing. Reserved for the single most important action
+     on a page; animating every button would make none of them read as
+     primary. */
+  .btn-pulse {
+    animation: btn-breathe 2.6s ease-in-out infinite;
+  }
+
+  /* Uppercase micro-label — system status, eyebrows, section identifiers. */
+  .eyebrow {
+    font-size: 11px;
+    line-height: 1.2;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--foreground-tertiary);
+  }
+}
+
+@keyframes aurora-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(4%, -6%, 0) scale(1.12);
+  }
+}
+
+@keyframes radar-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes btn-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--brand) 45%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 32px 4px color-mix(in oklab, var(--brand) 30%, transparent);
+  }
+}
+
+/* Ambient motion is the first thing to go for anyone who has asked for less
+   of it. The surfaces keep their glass and glow — only movement stops, so
+   nothing becomes harder to read. */
+@media (prefers-reduced-motion: reduce) {
+  .aurora-orb,
+  .radar-sweep::after,
+  .btn-pulse {
+    animation: none;
+  }
+}
+
+/* Headings wear the display face by default, so no page has to remember to
+   ask for it — and none can forget. Tracking and leading are tightened here
+   rather than per-heading: a display face at its default spacing reads loose
+   and generic, which is most of what makes a dashboard look untuned. */
+@layer base {
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.02;
   }
 }
