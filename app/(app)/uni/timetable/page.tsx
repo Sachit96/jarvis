@@ -23,7 +23,7 @@ export default async function UniTimetablePage() {
       <div>
         <p className="text-xs uppercase tracking-wider text-muted-foreground">University</p>
         <h1 className="flex items-center gap-2 text-xl font-semibold">
-          <CalendarRange className="size-5 text-cat-goals" strokeWidth={2} />
+          <CalendarRange className="size-5 text-brand" strokeWidth={2} />
           Timetable
         </h1>
       </div>

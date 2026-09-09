@@ -122,7 +122,7 @@ export default async function UniDashboardPage() {
           <KpiGrid columns={4}>
             <KpiCell
               label="Semester average"
-              accentClassName="text-cat-goals"
+              accentClassName="text-brand"
               value={average != null ? `${average.toFixed(1)}%` : "—"}
               hint={
                 average == null

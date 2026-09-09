@@ -24,7 +24,7 @@ export async function BrightspaceConnectionCard() {
     <Card padding="slotted">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <GraduationCap className="size-4 text-cat-goals" strokeWidth={2} />
+          <GraduationCap className="size-4 text-brand" strokeWidth={2} />
           Brightspace
         </CardTitle>
         <CardDescription>{status.message}</CardDescription>
