@@ -140,8 +140,13 @@ function report(r: Result) {
   }
 }
 
+/**
+ * A zero-argument tool now omits `parameters` altogether, which is the point
+ * of the fix. Step D below still needs one of those to prove the API accepts
+ * the new shape, so this splits on presence rather than on empty properties.
+ */
 const hasProperties = (d: GeminiFunctionDeclaration) =>
-  Object.keys((d.parameters as { properties?: object }).properties ?? {}).length > 0;
+  Object.keys(d.parameters?.properties ?? {}).length > 0;
 
 async function runTier(tier: GeminiTier) {
   console.log(`\n${YELLOW}════ ${tier} → ${TIER_MODEL[tier]} ════${RESET}`);
@@ -158,7 +163,7 @@ async function runTier(tier: GeminiTier) {
 
   const b = await send("B. one minimal synthetic tool (test_ping)", tier, [TEST_PING]);
   const c = await send(`C. one REAL tool WITH properties (${withProps[0]?.name})`, tier, withProps.slice(0, 1));
-  const d = await send(`D. one REAL tool with EMPTY properties (${withoutProps[0]?.name})`, tier, withoutProps.slice(0, 1));
+  const d = await send(`D. one REAL zero-argument tool (${withoutProps[0]?.name})`, tier, withoutProps.slice(0, 1));
   const e = await send(`E. all ${all.length} real tools`, tier, all);
 
   return { tier, a, b, c, d, e };
@@ -168,7 +173,7 @@ async function runTier(tier: GeminiTier) {
 function interpret(r: Awaited<ReturnType<typeof runTier>>): string {
   if (!r.a.ok) return "unusable before tools are involved";
   if (r.b && !r.b.ok) return "rejects function calling outright — even one minimal valid declaration";
-  if (r.c?.ok && r.d && !r.d.ok) return "PROVEN: rejects declarations whose properties object is empty";
+  if (r.c?.ok && r.d && !r.d.ok) return "still rejects zero-argument declarations — the omission is not sufficient";
   if (r.c?.ok && r.d?.ok && r.e && !r.e.ok) return "individual declarations fine — the full payload is not (size, or a combination)";
   if (r.e?.ok) return "function calling works with the full tool set";
   return "inconclusive — read the bodies above";
@@ -213,15 +218,15 @@ async function main() {
   const all = getToolDeclarations();
   const empty = all.filter((d) => !hasProperties(d));
   console.log(`\n${YELLOW}Static analysis${RESET}`);
-  console.log(`  ${all.length} declarations; ${empty.length} have an EMPTY properties object:`);
+  console.log(`  ${all.length} declarations; ${empty.length} take no arguments and now omit \`parameters\`:`);
   console.log(`  ${DIM}${empty.map((d) => d.name).join(", ")}${RESET}`);
-  console.log(`  Steps C and D below are the A/B that proves whether that is the cause.`);
+  console.log(`  Steps C and D are the A/B: D sends one of those, and must now be accepted.`);
 
   const runs = [];
   for (const tier of ["high_volume", "structured"] as GeminiTier[]) runs.push(await runTier(tier));
 
   console.log(`\n${YELLOW}════ matrix ════${RESET}`);
-  console.log("model                    plain  synth  real+props  real-empty  all-39");
+  console.log("model                    plain  synth  real+args   zero-arg    all-39");
   for (const r of runs) {
     const cell = (x: Result | null | undefined) => (!x ? "  —   " : x.ok ? ` ${GREEN}PASS${RESET} ` : ` ${RED}FAIL${RESET} `);
     console.log(

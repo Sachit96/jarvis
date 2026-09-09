@@ -98,7 +98,9 @@ describe("registry", () => {
     for (const d of declarations) {
       assert.equal(typeof d.name, "string");
       assert.ok(d.description.length > 0, `${d.name} needs a description`);
-      assert.equal(d.parameters.type, "OBJECT");
+      // A zero-argument tool omits `parameters` — see the zero-argument
+      // tests below. When present it must still be an OBJECT.
+      if (d.parameters) assert.equal(d.parameters.type, "OBJECT");
     }
   });
 
@@ -432,32 +434,87 @@ describe("tool descriptions are distinguishable", () => {
 
 describe("Gemini function declarations", () => {
   /**
-   * Gemini's OpenAPI subset rejects a function declaration whose `parameters`
-   * carries an empty `properties` object — a no-argument function must omit
-   * `parameters` altogether. z.object({}) converts to
-   * `{type:"OBJECT", properties:{}, required:[]}`, which is exactly that
-   * shape, and 13 of the tools take no arguments.
+   * Gemini's FunctionDeclaration treats `parameters` as optional, and its
+   * schema validation requires an OBJECT to carry a non-empty `properties`.
+   * Together those mean a zero-argument tool must send NO parameters field —
+   * `{type:"OBJECT", properties:{}, required:[]}` is the one shape the API
+   * rejects outright, and z.object({}) (how a tool declares "no arguments")
+   * converts to exactly that.
    *
-   * This test DOCUMENTS the current state rather than asserting the fix: the
-   * count is pinned so the diagnosis stays honest, and it is the test to
-   * invert once scripts/gemini-probe.ts confirms the cause.
+   * 13 of this app's tools take no arguments, so every payload containing one
+   * of them was malformed. Fixed once in the converter rather than in 13 tool
+   * files, which is why these assert on the converter's output.
    */
-  test("records how many declarations currently emit an empty properties object", () => {
-    const empty = getToolDeclarations().filter(
-      (d) => Object.keys((d.parameters as { properties?: object }).properties ?? {}).length === 0,
-    );
-    assert.equal(empty.length, 13, `expected the 13 known no-argument tools, got ${empty.map((d) => d.name).join(", ")}`);
+
+  test("a zero-argument tool omits parameters entirely", () => {
+    const decl = toGeminiDeclaration("no_args", "Takes nothing.", z.object({}));
+    assert.equal(decl.parameters, undefined);
+    // Not merely absent from JSON — the key must not be present at all,
+    // since `"parameters": null` would be rejected just the same.
+    assert.equal("parameters" in decl, false);
+    assert.deepEqual(JSON.parse(JSON.stringify(decl)), { name: "no_args", description: "Takes nothing." });
   });
 
-  test("every declaration Gemini receives is a well-formed OBJECT schema", () => {
+  test("no declaration in the registry carries an empty properties object", () => {
+    // The regression that matters: this is what was being sent to the API.
+    const offenders: string[] = [];
+    const walk = (schema: Record<string, unknown>, path: string) => {
+      if (!schema || typeof schema !== "object") return;
+      const properties = (schema.properties ?? {}) as Record<string, Record<string, unknown>>;
+      if (schema.type === "OBJECT" && Object.keys(properties).length === 0) offenders.push(path);
+      for (const [key, value] of Object.entries(properties)) walk(value, `${path}.${key}`);
+      if (schema.items) walk(schema.items as Record<string, unknown>, `${path}[]`);
+    };
+    for (const d of getToolDeclarations()) if (d.parameters) walk(d.parameters, d.name);
+    assert.deepEqual(offenders, []);
+  });
+
+  test("an all-optional tool keeps its properties but omits required", () => {
+    // The neighbouring case: it HAS properties, so parameters stays — but an
+    // empty `required` list carries no information and is not what the API's
+    // own SDKs emit.
+    const decl = toGeminiDeclaration("opt", "d", z.object({ a: z.string().optional() }));
+    assert.ok(decl.parameters);
+    assert.deepEqual(Object.keys(decl.parameters!.properties!), ["a"]);
+    assert.equal("required" in decl.parameters!, false);
+  });
+
+  test("required arguments are still listed", () => {
+    const decl = toGeminiDeclaration("req", "d", z.object({ a: z.string(), b: z.number().optional() }));
+    assert.deepEqual(decl.parameters!.required, ["a"]);
+  });
+
+  test("enums, arrays and nested objects survive the change", () => {
+    const decl = toGeminiDeclaration("shapes", "d", z.object({
+      choice: z.enum(["one", "two"]),
+      tags: z.array(z.string()),
+      nested: z.object({ inner: z.number() }),
+    }));
+    const props = decl.parameters!.properties!;
+    assert.deepEqual(props.choice, { type: "STRING", enum: ["one", "two"] });
+    assert.deepEqual(props.tags, { type: "ARRAY", items: { type: "STRING" } });
+    assert.equal(props.nested.type, "OBJECT");
+    assert.deepEqual(props.nested.required, ["inner"]);
+  });
+
+  test("a NESTED empty object is rejected at conversion, not sent", () => {
+    // A nested object cannot omit itself the way a top-level one can, so
+    // there is no valid representation — it fails at module load with the
+    // path attached, like every other unsupported shape in the converter.
+    assert.throws(
+      () => toGeminiDeclaration("bad", "d", z.object({ inner: z.object({}) })),
+      /Empty object at bad\.inner/,
+    );
+  });
+
+  test("every declaration is well-formed for the wire", () => {
     for (const d of getToolDeclarations()) {
-      const params = d.parameters as { type?: string; properties?: object; required?: string[] };
-      assert.equal(params.type, "OBJECT", `${d.name} must take an object`);
+      assert.ok(/^[a-zA-Z_][a-zA-Z0-9_]{0,63}$/.test(d.name), `${d.name}: invalid function name`);
       assert.ok(d.description.length > 0, `${d.name} needs a description`);
-      // Anything named in `required` must actually exist as a property,
-      // which is the other way a declaration gets rejected.
-      for (const key of params.required ?? []) {
-        assert.ok(key in (params.properties ?? {}), `${d.name}: required "${key}" is not a declared property`);
+      if (!d.parameters) continue;
+      assert.equal(d.parameters.type, "OBJECT", `${d.name} must take an object`);
+      for (const key of d.parameters.required ?? []) {
+        assert.ok(key in (d.parameters.properties ?? {}), `${d.name}: required "${key}" is not a property`);
       }
     }
   });
