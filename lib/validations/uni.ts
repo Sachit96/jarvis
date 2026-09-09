@@ -84,3 +84,19 @@ export const deadlineSchema = z.object({
 
 /** Flavor constants for course color-picking in the create/edit form — same idea as the app's existing category accent palette, distinct hues so courses are visually distinguishable across the calendar/schedule views. */
 export const COURSE_COLORS = ["#8b5cf6", "#3b82f6", "#22c55e", "#f97316", "#ec4899", "#22d3ee", "#ef4444", "#eab308"] as const;
+
+/**
+ * Marking a class attended or missed.
+ *
+ * schedule_block_id is optional because a one-off or rescheduled lecture has
+ * no recurring block behind it — the same reason the column is nullable.
+ */
+export const ATTENDANCE_STATUSES = ["present", "absent", "late", "excused", "cancelled"] as const;
+
+export const attendanceSchema = z.object({
+  course_id: z.string().uuid("Pick a course"),
+  schedule_block_id: z.string().uuid().optional(),
+  class_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD"),
+  status: z.enum(ATTENDANCE_STATUSES),
+  note: optionalTextInput,
+});
