@@ -158,6 +158,11 @@ export const MENTOR_TABS: ModuleTab[] = [
 export const UNI_TABS: ModuleTab[] = [
   { href: "/uni", label: "Dashboard" },
   { href: "/uni/courses", label: "Courses" },
+  // Timetable and Calendar answer different questions and both earn a tab:
+  // the timetable is "where do I need to be" (recurring blocks), the
+  // calendar is "what is due" (dated assessments and deadlines).
+  { href: "/uni/timetable", label: "Timetable" },
+  { href: "/uni/attendance", label: "Attendance" },
   { href: "/uni/calendar", label: "Calendar" },
   { href: "/uni/assessments", label: "Assessments" },
   { href: "/uni/deadlines", label: "Deadlines" },
