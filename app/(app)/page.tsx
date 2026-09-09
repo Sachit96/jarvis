@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { AuroraBackdrop } from "@/components/shell/aurora-backdrop";
 import { getGoals, getTasks } from "@/lib/db/queries/life";
 import { getAccounts, getMonthTransactions, computeAssetLiabilityTotals, computeMonthlyPnl } from "@/lib/db/queries/finance";
 import { todayStr } from "@/lib/date";
@@ -179,10 +180,14 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-4">
+      {/* Environmental lighting: Home is the command centre, so this is
+          one of the few surfaces §7 puts aurora on. Fixed and behind
+          everything, so it never intercepts a click or scrolls with content. */}
+      <AuroraBackdrop />
       {hasHevyKey() ? <HevyAutoSync /> : null}
 
       <div className="space-y-1">
-        <p className="text-label uppercase tracking-wide text-muted-foreground">
+        <p className="eyebrow">
           {new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })}
         </p>
         <h1 className="text-title">Today</h1>
