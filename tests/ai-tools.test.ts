@@ -1,6 +1,7 @@
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
 import { z } from "zod";
+import { readFileSync } from "node:fs";
 import { toGeminiDeclaration } from "../lib/ai/tools/gemini-schema.ts";
 import { getToolDeclarations, listTools, toolNamesByRisk } from "../lib/ai/tools/registry.ts";
 import { executeTool, toolResultForModel } from "../lib/ai/tools/executor.ts";
@@ -517,5 +518,25 @@ describe("Gemini function declarations", () => {
         assert.ok(key in (d.parameters.properties ?? {}), `${d.name}: required "${key}" is not a property`);
       }
     }
+  });
+});
+
+describe("the operator's model tier", () => {
+  /**
+   * The tier is a measured choice and an easy one to revert by accident, so
+   * it is pinned here with the evidence attached.
+   *
+   * gemini-3.5-flash-lite passed the full probe ladder — plain text, one
+   * synthetic declaration, one real declaration with arguments, one
+   * zero-argument declaration, all 39 — 5/5 on every one of three runs.
+   * gemma-4-31b-it failed unpredictably and in a different place each run,
+   * including once on plain text with no tools at all.
+   */
+  test("agentChat runs on the tier that survived the probe", () => {
+    const src = readFileSync("lib/ai/providers/gemini-mentor-provider.ts", "utf8");
+    const agentChat = src.slice(src.indexOf("agentChat"));
+    const call = agentChat.slice(agentChat.indexOf("callGemini({"));
+    assert.match(call.slice(0, 200), /tier: "structured"/,
+      "the operator must not be routed back to the high-volume tier without new evidence");
   });
 });
