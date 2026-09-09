@@ -1,106 +1,188 @@
 // MUST be the first import — see scripts/load-env.ts.
 import "./load-env";
 import { describeEnvSource } from "./load-env";
-import { callGemini, TIER_MODEL, type GeminiTier } from "../lib/ai/providers/gemini-client";
+import {
+  TIER_MODEL,
+  buildGeminiRequestBody,
+  geminiEndpoint,
+  type GeminiTier,
+} from "../lib/ai/providers/gemini-client";
 import { getToolDeclarations } from "../lib/ai/tools/registry";
-import { safeError } from "./safe-error";
+import type { GeminiFunctionDeclaration } from "../lib/ai/tools/gemini-schema";
+import { redactSecrets } from "../lib/redact";
 
 /**
- * Isolates a Gemini failure by changing one variable at a time.
+ * Isolated function-calling diagnostic. Diagnosis only — it fixes nothing.
  *
  *   npm run gemini:probe
  *
- * operator:live reported "Gemini request failed: 500" on the very first turn,
- * which on its own is not diagnosable: a 500 from this endpoint can mean an
- * unsupported model, a tool declaration the API rejects, a payload it will
- * not accept at size, or a genuine outage. Those need completely different
- * fixes, so guessing between them is worthless.
+ * Every request is built by buildGeminiRequestBody, the same function
+ * callGemini uses, so what is tested here is exactly what production sends.
  *
- * The ladder below separates them. Each step adds exactly one thing to the
- * one before it, so the first step that fails names the cause:
+ * It deliberately does NOT go through callGemini, for two reasons: callGemini
+ * records usage through a Supabase RPC (a database write, which a diagnostic
+ * must not perform), and it reduces the response to a short string, when the
+ * whole point here is the complete error body.
  *
- *   1 fails                → credentials or the model id itself
- *   2 passes, 3 fails      → that tier cannot do function calling at all
- *   3 passes, 4 fails      → something about the full 39-declaration payload
- *                            (size, or one specific declaration — step 5
- *                            then bisects to find which)
- *   all pass on one tier   → the operator should use that tier
+ * Nothing executes: no tool handler is ever invoked, no row is read or
+ * written, no external integration is touched. The only network calls are to
+ * generativelanguage.googleapis.com.
  *
- * Read-only: every call is a trivial prompt, no tool is ever executed, and
- * nothing touches the database.
+ * STATIC FINDING THIS IS BUILT TO TEST
+ *
+ * 13 of the 39 declarations carry `parameters: {type:"OBJECT", properties:{},
+ * required:[]}` — the shape produced for a tool that takes no arguments.
+ * Gemini's OpenAPI subset rejects a declaration with an empty `properties`
+ * object; a no-argument function must omit `parameters` altogether. Steps 3
+ * and 4 below are an A/B on exactly that, which settles it in two calls
+ * rather than by bisecting thirty-nine.
  */
 
 const RESET = "\x1b[0m", GREEN = "\x1b[32m", RED = "\x1b[31m", YELLOW = "\x1b[33m", DIM = "\x1b[2m";
 
-const HELLO = [{ role: "user" as const, parts: [{ text: "Reply with the single word: ready" }] }];
-const ASK = [{ role: "user" as const, parts: [{ text: "What are my tasks today?" }] }];
+const PROMPT = [{ role: "user" as const, parts: [{ text: "Reply with exactly: OK" }] }];
+const SYSTEM = "You are terse.";
 
-interface Outcome { ok: boolean; detail: string }
+/**
+ * A minimal, certainly-valid declaration. Never executed — the model only has
+ * to demonstrate that the API accepts it.
+ */
+const TEST_PING: GeminiFunctionDeclaration = {
+  name: "test_ping",
+  description: "A diagnostic no-op. Never call this.",
+  parameters: { type: "OBJECT", properties: { input: { type: "STRING" } }, required: [] },
+};
 
-async function attempt(label: string, run: () => Promise<string>): Promise<Outcome> {
-  process.stdout.write(`  ${label.padEnd(52)}`);
+interface Result {
+  label: string;
+  ok: boolean;
+  httpStatus: number | null;
+  model: string;
+  endpoint: string;
+  toolCount: number;
+  errorCode?: number;
+  errorStatus?: string;
+  errorMessage?: string;
+  errorDetails?: unknown;
+  rawBody?: unknown;
+  transportError?: string;
+}
+
+const results: Result[] = [];
+
+async function send(
+  label: string,
+  tier: GeminiTier,
+  tools: GeminiFunctionDeclaration[] | undefined,
+  { quiet = false } = {},
+): Promise<Result> {
+  const model = TIER_MODEL[tier];
+  const endpoint = geminiEndpoint(model);
+  const body = buildGeminiRequestBody({ tier, systemInstruction: SYSTEM, contents: PROMPT, tools });
+
+  const base: Result = { label, ok: false, httpStatus: null, model, endpoint, toolCount: tools?.length ?? 0 };
+
+  let response: Response;
   try {
-    const detail = await run();
-    console.log(`${GREEN}PASS${RESET} ${DIM}${detail}${RESET}`);
-    return { ok: true, detail };
+    response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // Header, never the URL — a key in a query string ends up in logs.
+        "x-goog-api-key": process.env.GEMINI_API_KEY as string,
+      },
+      body: JSON.stringify(body),
+    });
   } catch (error) {
-    const detail = safeError(error, 300);
-    console.log(`${RED}FAIL${RESET} ${detail}`);
-    return { ok: false, detail };
+    const result = { ...base, transportError: error instanceof Error ? error.message : String(error) };
+    if (!quiet) report(result);
+    results.push(result);
+    return result;
+  }
+
+  const text = await response.text();
+  let parsed: unknown;
+  try { parsed = JSON.parse(text); } catch { parsed = text; }
+
+  const envelope = (parsed as { error?: { code?: number; message?: string; status?: string; details?: unknown } })?.error;
+
+  const result: Result = {
+    ...base,
+    ok: response.ok,
+    httpStatus: response.status,
+    errorCode: envelope?.code,
+    errorStatus: envelope?.status,
+    errorMessage: envelope?.message,
+    errorDetails: envelope?.details,
+    rawBody: response.ok ? undefined : parsed,
+  };
+  if (!quiet) report(result);
+  results.push(result);
+  return result;
+}
+
+/** Full error body, minus anything credential-shaped. */
+function report(r: Result) {
+  const mark = r.ok ? `${GREEN}PASS${RESET}` : `${RED}FAIL${RESET}`;
+  console.log(`\n  ${mark} ${r.label}`);
+  console.log(`       model=${r.model}  tools=${r.toolCount}  http=${r.httpStatus ?? "—"}`);
+  if (r.transportError) {
+    console.log(`       ${RED}transport: ${redactSecrets(r.transportError)}${RESET}`);
+    return;
+  }
+  if (r.ok) return;
+  if (r.errorStatus || r.errorCode) console.log(`       error: ${r.errorStatus ?? ""} (code ${r.errorCode ?? "—"})`);
+  if (r.errorMessage) console.log(`       message: ${redactSecrets(r.errorMessage)}`);
+  if (r.errorDetails) console.log(`       details: ${redactSecrets(JSON.stringify(r.errorDetails))}`);
+  if (r.rawBody !== undefined) {
+    console.log(`       ${DIM}full body:${RESET}`);
+    console.log(redactSecrets(JSON.stringify(r.rawBody, null, 2)).split("\n").map((l) => `       ${DIM}${l}${RESET}`).join("\n"));
   }
 }
 
-const summarise = (r: { text: string | null; functionCalls: { name: string }[] }) =>
-  r.functionCalls.length
-    ? `called ${r.functionCalls.map((c) => c.name).join(", ")}`
-    : `text: ${(r.text ?? "").replace(/\s+/g, " ").slice(0, 60)}`;
+const hasProperties = (d: GeminiFunctionDeclaration) =>
+  Object.keys((d.parameters as { properties?: object }).properties ?? {}).length > 0;
 
-async function probeTier(tier: GeminiTier) {
-  console.log(`\n${YELLOW}${tier} → ${TIER_MODEL[tier]}${RESET}`);
+async function runTier(tier: GeminiTier) {
+  console.log(`\n${YELLOW}════ ${tier} → ${TIER_MODEL[tier]} ════${RESET}`);
+  const all = getToolDeclarations();
+  const withProps = all.filter(hasProperties);
+  const withoutProps = all.filter((d) => !hasProperties(d));
 
-  const plain = await attempt("1. plain text, no tools", async () =>
-    summarise(await callGemini({ tier, systemInstruction: "You are terse.", contents: HELLO })));
-  if (!plain.ok) return { tier, plain, oneTool: null, allTools: null };
+  const a = await send("A. plain text, no tools", tier, undefined);
+  if (!a.ok) {
+    console.log(`\n  ${YELLOW}Plain text failed — stopping this tier. The cause is credentials,`);
+    console.log(`  the model id, the endpoint or the request format, NOT tool declarations.${RESET}`);
+    return { tier, a, b: null, c: null, d: null, e: null };
+  }
 
-  const declarations = getToolDeclarations();
-  const oneTool = await attempt("2. one tool declaration", async () =>
-    summarise(await callGemini({
-      tier,
-      systemInstruction: "Use a tool if one fits.",
-      contents: ASK,
-      tools: declarations.filter((d) => d.name === "get_today_tasks"),
-    })));
+  const b = await send("B. one minimal synthetic tool (test_ping)", tier, [TEST_PING]);
+  const c = await send(`C. one REAL tool WITH properties (${withProps[0]?.name})`, tier, withProps.slice(0, 1));
+  const d = await send(`D. one REAL tool with EMPTY properties (${withoutProps[0]?.name})`, tier, withoutProps.slice(0, 1));
+  const e = await send(`E. all ${all.length} real tools`, tier, all);
 
-  const allTools = await attempt(`3. all ${declarations.length} tool declarations`, async () =>
-    summarise(await callGemini({
-      tier,
-      systemInstruction: "Use a tool if one fits.",
-      contents: ASK,
-      tools: declarations,
-    })));
+  return { tier, a, b, c, d, e };
+}
 
-  return { tier, plain, oneTool, allTools };
+/** Only meaningful when C and D disagree — that is the whole hypothesis. */
+function interpret(r: Awaited<ReturnType<typeof runTier>>): string {
+  if (!r.a.ok) return "unusable before tools are involved";
+  if (r.b && !r.b.ok) return "rejects function calling outright — even one minimal valid declaration";
+  if (r.c?.ok && r.d && !r.d.ok) return "PROVEN: rejects declarations whose properties object is empty";
+  if (r.c?.ok && r.d?.ok && r.e && !r.e.ok) return "individual declarations fine — the full payload is not (size, or a combination)";
+  if (r.e?.ok) return "function calling works with the full tool set";
+  return "inconclusive — read the bodies above";
 }
 
 /**
- * Halves the declaration list until the offending one is alone. Only worth
- * running when one tool works and all of them do not, which is the signature
- * of a single bad declaration rather than a size limit.
+ * Halves the list until the smallest failing set is found. Only worth running
+ * when single declarations pass and all of them do not.
  */
 async function bisect(tier: GeminiTier) {
-  console.log(`\n${YELLOW}bisecting the declaration list${RESET}`);
+  console.log(`\n${YELLOW}════ bisecting ════${RESET}`);
   let pool = getToolDeclarations();
-
-  const fails = async (subset: typeof pool) => {
-    try {
-      await callGemini({ tier, systemInstruction: "Use a tool if one fits.", contents: ASK, tools: subset });
-      return false;
-    } catch {
-      return true;
-    }
-  };
-
-  if (!(await fails(pool))) { console.log("  the full set now passes — the earlier failure was transient"); return; }
+  const fails = async (subset: GeminiFunctionDeclaration[]) =>
+    !(await send(`  subset of ${subset.length}`, tier, subset, { quiet: true })).ok;
 
   while (pool.length > 1) {
     const half = Math.ceil(pool.length / 2);
@@ -108,16 +190,16 @@ async function bisect(tier: GeminiTier) {
     if (await fails(left)) pool = left;
     else if (await fails(right)) pool = right;
     else {
-      // Neither half fails alone: the problem is the combination or the size,
-      // not one declaration.
-      console.log(`  ${YELLOW}neither half fails alone — this is payload size, not one bad tool${RESET}`);
-      console.log(`  ${DIM}smallest failing set: ${pool.length} declarations${RESET}`);
+      console.log(`  ${YELLOW}Neither half fails alone at ${pool.length} declarations.${RESET}`);
+      console.log(`  That is the signature of a SIZE/COMPLEXITY limit, not one bad declaration.`);
+      console.log(`  ${DIM}smallest failing set: ${pool.map((d) => d.name).join(", ")}${RESET}`);
       return;
     }
-    console.log(`  ${DIM}narrowed to ${pool.length}${RESET}`);
+    console.log(`  narrowed to ${pool.length}: ${DIM}${pool.map((d) => d.name).join(", ")}${RESET}`);
   }
-  console.log(`  ${RED}the API rejects this declaration: ${pool[0].name}${RESET}`);
-  console.log(`  ${DIM}${JSON.stringify(pool[0].parameters).slice(0, 400)}${RESET}`);
+  console.log(`\n  ${RED}The API rejects this single declaration: ${pool[0].name}${RESET}`);
+  console.log(`  ${DIM}${JSON.stringify(pool[0].parameters)}${RESET}`);
+  await send(`  ${pool[0].name} alone`, tier, pool);
 }
 
 async function main() {
@@ -127,31 +209,33 @@ async function main() {
     process.exit(2);
   }
   console.log(`${DIM}${describeEnvSource()}${RESET}`);
-  console.log("Each step adds one thing to the previous one. The first FAIL names the cause.");
 
-  const results = [];
-  for (const tier of ["high_volume", "structured"] as GeminiTier[]) {
-    results.push(await probeTier(tier));
+  const all = getToolDeclarations();
+  const empty = all.filter((d) => !hasProperties(d));
+  console.log(`\n${YELLOW}Static analysis${RESET}`);
+  console.log(`  ${all.length} declarations; ${empty.length} have an EMPTY properties object:`);
+  console.log(`  ${DIM}${empty.map((d) => d.name).join(", ")}${RESET}`);
+  console.log(`  Steps C and D below are the A/B that proves whether that is the cause.`);
+
+  const runs = [];
+  for (const tier of ["high_volume", "structured"] as GeminiTier[]) runs.push(await runTier(tier));
+
+  console.log(`\n${YELLOW}════ matrix ════${RESET}`);
+  console.log("model                    plain  synth  real+props  real-empty  all-39");
+  for (const r of runs) {
+    const cell = (x: Result | null | undefined) => (!x ? "  —   " : x.ok ? ` ${GREEN}PASS${RESET} ` : ` ${RED}FAIL${RESET} `);
+    console.log(
+      `${TIER_MODEL[r.tier].padEnd(24)}${cell(r.a)} ${cell(r.b)} ${cell(r.c)}     ${cell(r.d)}    ${cell(r.e)}`,
+    );
   }
+  console.log("");
+  for (const r of runs) console.log(`  ${TIER_MODEL[r.tier]}: ${interpret(r)}`);
 
-  console.log(`\n${YELLOW}=== verdict ===${RESET}`);
-  for (const r of results) {
-    if (!r.plain.ok) { console.log(`  ${r.tier}: unusable — ${r.plain.detail}`); continue; }
-    if (r.oneTool?.ok && r.allTools?.ok) { console.log(`  ${GREEN}${r.tier}: function calling works with the full tool set${RESET}`); continue; }
-    if (r.oneTool?.ok && !r.allTools?.ok) { console.log(`  ${r.tier}: one tool works, ${getToolDeclarations().length} do not — see the bisection below`); continue; }
-    console.log(`  ${RED}${r.tier}: cannot do function calling at all${RESET}`);
-  }
+  // Bisect only where it can still tell us something the A/B did not.
+  const needsBisect = runs.find((r) => r.c?.ok && r.d?.ok && r.e && !r.e.ok);
+  if (needsBisect) await bisect(needsBisect.tier);
 
-  // Only bisect where it can tell us something.
-  const partial = results.find((r) => r.oneTool?.ok && r.allTools && !r.allTools.ok);
-  if (partial) await bisect(partial.tier);
-
-  const usable = results.find((r) => r.oneTool?.ok && r.allTools?.ok);
-  if (usable) {
-    console.log(`\n${GREEN}Use tier "${usable.tier}" for the operator.${RESET}`);
-  } else {
-    console.log(`\n${RED}No tier currently supports the operator's tool set.${RESET}`);
-  }
+  console.log(`\n${DIM}Diagnosis only — nothing was changed and no tool was executed.${RESET}`);
 }
 
 main();
