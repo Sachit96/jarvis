@@ -13,6 +13,8 @@ import type { VoiceDashboardData } from "@/lib/db/queries/voice";
 export type VoiceStatusMode =
   | "idle"
   | "listening"
+  /** Listening AND words are arriving — see displayMode in voice-mode-client. */
+  | "transcribing"
   | "thinking"
   | "executing"
   | "waiting_for_confirmation"
@@ -120,6 +122,7 @@ export function StatusRail({ moduleStatus, geminiBudget, voiceSupported, ttsSupp
 const STATUS_LABEL: Record<VoiceStatusMode, string> = {
   idle: 'LISTENING FOR "HEY JARVIS"',
   listening: "LISTENING",
+  transcribing: "TRANSCRIBING",
   thinking: "THINKING",
   executing: "WORKING",
   waiting_for_confirmation: "AWAITING YOUR CONFIRMATION",
