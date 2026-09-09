@@ -28,14 +28,30 @@ import { redactSecrets } from "../lib/redact";
  * written, no external integration is touched. The only network calls are to
  * generativelanguage.googleapis.com.
  *
- * STATIC FINDING THIS IS BUILT TO TEST
+ * WHAT THIS ESTABLISHED (2026-09-09)
  *
- * 13 of the 39 declarations carry `parameters: {type:"OBJECT", properties:{},
- * required:[]}` — the shape produced for a tool that takes no arguments.
- * Gemini's OpenAPI subset rejects a declaration with an empty `properties`
- * object; a no-argument function must omit `parameters` altogether. Steps 3
- * and 4 below are an A/B on exactly that, which settles it in two calls
- * rather than by bisecting thirty-nine.
+ * It was built to test a hypothesis that turned out to be WRONG, and the
+ * record is kept here because the wrong answer is instructive.
+ *
+ * The theory: 13 of the 39 declarations carried
+ * `parameters: {type:"OBJECT", properties:{}, required:[]}`, and Gemini
+ * rejects an empty `properties`. Step D sends exactly one of those — and it
+ * PASSED, on both tiers, on every run. The declarations were never the
+ * problem. (Omitting `parameters` for a zero-argument tool is still correct
+ * per the contract, so that fix stands; it just was not this bug.)
+ *
+ * What the ladder actually showed is that gemma-4-31b-it fails
+ * NON-DETERMINISTICALLY: across three runs of identical code it failed at a
+ * different rung each time — once on plain text with no tools at all — while
+ * gemini-3.5-flash-lite passed 5/5 every time, all 39 declarations included.
+ * Every failure was 500 INTERNAL or 503 UNAVAILABLE. Not one 400. A payload
+ * the API dislikes returns 400 with a reason; these were server-side faults
+ * on an overloaded free-tier endpoint.
+ *
+ * Hence two changes elsewhere: the operator moved to the tier that works, and
+ * 500 became retryable. And one here: bisection now refuses to conclude
+ * anything when the endpoint contradicts itself, because on the first run it
+ * confidently reported a "SIZE/COMPLEXITY limit" that did not exist.
  */
 
 const RESET = "\x1b[0m", GREEN = "\x1b[32m", RED = "\x1b[31m", YELLOW = "\x1b[33m", DIM = "\x1b[2m";
@@ -169,7 +185,7 @@ async function runTier(tier: GeminiTier) {
   return { tier, a, b, c, d, e };
 }
 
-/** Only meaningful when C and D disagree — that is the whole hypothesis. */
+/** Reads the ladder: the first rung that failed names the cause. */
 function interpret(r: Awaited<ReturnType<typeof runTier>>): string {
   if (!r.a.ok) return "unusable before tools are involved";
   if (r.b && !r.b.ok) return "rejects function calling outright — even one minimal valid declaration";
@@ -180,14 +196,36 @@ function interpret(r: Awaited<ReturnType<typeof runTier>>): string {
 }
 
 /**
- * Halves the list until the smallest failing set is found. Only worth running
- * when single declarations pass and all of them do not.
+ * Halves the list until the smallest failing set is found.
+ *
+ * Bisection assumes a DETERMINISTIC failure, and the 2026-09-09 run showed
+ * this endpoint is not: the same payload returned 200, 500 and 200 across
+ * three attempts. A single probe per half therefore made the search a coin
+ * flip, and it confidently reported "SIZE/COMPLEXITY limit" for what was
+ * really an intermittent server fault. So each subset is now tried up to
+ * three times and only counts as failing if it fails EVERY time — and if a
+ * subset's results disagree with themselves, that is reported as flakiness
+ * rather than folded into a conclusion.
  */
 async function bisect(tier: GeminiTier) {
   console.log(`\n${YELLOW}════ bisecting ════${RESET}`);
   let pool = getToolDeclarations();
-  const fails = async (subset: GeminiFunctionDeclaration[]) =>
-    !(await send(`  subset of ${subset.length}`, tier, subset, { quiet: true })).ok;
+  let flaky = false;
+
+  const fails = async (subset: GeminiFunctionDeclaration[]) => {
+    const outcomes: boolean[] = [];
+    for (let attempt = 0; attempt < 3; attempt++) {
+      outcomes.push((await send(`  subset of ${subset.length}`, tier, subset, { quiet: true })).ok);
+      // A single success is enough to prove the payload is acceptable.
+      if (outcomes[outcomes.length - 1]) break;
+    }
+    const anyPassed = outcomes.some(Boolean);
+    if (anyPassed && outcomes.length > 1) {
+      console.log(`  ${YELLOW}${subset.length} declarations: failed then passed — the endpoint is flaky, not the payload${RESET}`);
+      flaky = true;
+    }
+    return !anyPassed;
+  };
 
   while (pool.length > 1) {
     const half = Math.ceil(pool.length / 2);
@@ -196,8 +234,18 @@ async function bisect(tier: GeminiTier) {
     else if (await fails(right)) pool = right;
     else {
       console.log(`  ${YELLOW}Neither half fails alone at ${pool.length} declarations.${RESET}`);
-      console.log(`  That is the signature of a SIZE/COMPLEXITY limit, not one bad declaration.`);
-      console.log(`  ${DIM}smallest failing set: ${pool.map((d) => d.name).join(", ")}${RESET}`);
+      if (flaky) {
+        // Said plainly, because the opposite claim is the one that costs a
+        // day rewriting perfectly valid schemas. The 2026-09-09 run reported
+        // a "SIZE/COMPLEXITY limit" on exactly this branch, and it was wrong.
+        console.log(`  ${RED}But this endpoint contradicted itself during the search.${RESET}`);
+        console.log(`  Draw NO conclusion about size or about any declaration: the failures`);
+        console.log(`  are not reproducible, so bisection cannot mean anything here.`);
+      } else {
+        console.log(`  Every subset reproduced across three attempts, so this is a real`);
+        console.log(`  SIZE/COMPLEXITY limit rather than one bad declaration.`);
+        console.log(`  ${DIM}smallest failing set: ${pool.map((d) => d.name).join(", ")}${RESET}`);
+      }
       return;
     }
     console.log(`  narrowed to ${pool.length}: ${DIM}${pool.map((d) => d.name).join(", ")}${RESET}`);

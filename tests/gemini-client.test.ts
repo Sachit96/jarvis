@@ -43,7 +43,7 @@ describe("isOverDailyLimit — the per-model budget boundary", () => {
   });
 });
 
-describe("isRetryableStatus — 429/503 backoff decision", () => {
+describe("isRetryableStatus — 429/500/503 backoff decision", () => {
   test("429 (rate limited) is retryable", () => {
     assert.equal(isRetryableStatus(429), true);
   });
@@ -52,10 +52,24 @@ describe("isRetryableStatus — 429/503 backoff decision", () => {
     assert.equal(isRetryableStatus(503), true);
   });
 
-  test("other failures (400, 401, 500) are not retried", () => {
-    assert.equal(isRetryableStatus(400), false);
-    assert.equal(isRetryableStatus(401), false);
-    assert.equal(isRetryableStatus(500), false);
+  test("500 is retryable — measured, not assumed", () => {
+    // This assertion used to read the other way. The gemini:probe run of
+    // 2026-09-09 sent the SAME payload three times to the same model and got
+    // 200, then 500 INTERNAL, then 200 — including for a single trivially
+    // valid declaration. A Google 500 is a server-side fault, not a verdict
+    // on the request, and treating it as fatal turned a transient blip into a
+    // failed operator turn.
+    assert.equal(isRetryableStatus(500), true);
+  });
+
+  test("a rejected request is still not retried", () => {
+    // 400 INVALID_ARGUMENT is a verdict on the payload: retrying only burns
+    // budget to be told the same thing. This is what keeps the 500 change
+    // from becoming "retry everything".
+    for (const status of [400, 401, 403, 404, 422]) {
+      assert.equal(isRetryableStatus(status), false, `${status} must not be retried`);
+    }
+    assert.equal(isRetryableStatus(200), false);
   });
 });
 

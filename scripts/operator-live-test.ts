@@ -99,8 +99,15 @@ const READ_CASES: Case[] = [
   { id: "C1", group: "calendar", prompt: "What's on my calendar today?", anyOf: ["get_upcoming", "get_today_tasks"] },
 
   // --- memory ------------------------------------------------------------
-  { id: "M1", group: "memory", prompt: "What do you remember about my current priorities?", anyOf: ["get_memory"],
-    forbid: ["get_finance_summary", "get_health_summary", "get_recent_workouts"] },
+  // NOT anyOf:["get_memory"]. buildPersonaPrefix already injects the pinned
+  // memory entries into the system prompt, so answering straight from context
+  // is CORRECT and calling the tool would be a redundant round trip. The 2026
+  // -09-09 run failed this case while producing a perfectly grounded answer —
+  // the test was wrong, not the model. What still matters is that it does not
+  // go wandering through unrelated modules.
+  { id: "M1", group: "memory", prompt: "What do you remember about my current priorities?",
+    forbid: ["get_finance_summary", "get_health_summary", "get_recent_workouts", "get_business_pipeline"],
+    maxTools: 2 },
 
   // --- cross-module ------------------------------------------------------
   // The actual JARVIS advantage. `maxTools` is the discipline check: a model
@@ -159,6 +166,8 @@ async function runCase(c: Case) {
     response = result.text.replace(/\s+/g, " ").trim();
 
     const names = calls.map((c) => c.name);
+    // A case with no `anyOf` asserts only the negative constraints — some
+    // prompts are correctly answered from the system prompt alone.
     if (c.anyOf && !c.anyOf.some((n) => names.includes(n))) {
       pass = false;
       why = `expected one of ${c.anyOf.join("/")}`;

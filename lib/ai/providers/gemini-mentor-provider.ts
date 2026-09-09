@@ -148,14 +148,33 @@ export class GeminiMentorProvider implements MentorProvider {
     parallelSafe = () => false,
     maxRounds = 5,
   }: AgentChatOptions): Promise<AgentChatResult> {
-    // Same tier as nutritionChat: this needs function calling, which was
-    // verified working on Gemma in both directions, not structured JSON.
+    // "structured" (gemini-3.5-flash-lite), NOT the high-volume Gemma tier.
+    //
+    // This is a measured choice, not a preference. scripts/gemini-probe.ts
+    // sent an identical ladder — plain text, one synthetic declaration, one
+    // real declaration with arguments, one zero-argument declaration, then
+    // all 39 — to both tiers, three times, on 2026-09-09:
+    //
+    //   gemini-3.5-flash-lite: 5/5 every run, including all 39 declarations.
+    //   gemma-4-31b-it:        failed unpredictably and in a different place
+    //                          each run — once on plain text with NO tools
+    //                          (503), once on the minimal synthetic tool
+    //                          (500), and on the full set every time.
+    //
+    // Every failure was 500 INTERNAL or 503 UNAVAILABLE — server-side faults
+    // on a free-tier endpoint under load. Not one 400: the payload was never
+    // the problem, which is why the earlier empty-properties theory was wrong.
+    //
+    // The cost is budget. This tier's daily allowance is far smaller than
+    // Gemma's, and the operator now shares it with the briefs and lead
+    // qualification. That is the right trade: an assistant that answers
+    // 500 times a day beats one that fails two turns in three.
     const contents = toGeminiContents(history);
     const trace: AgentTraceEntry[] = [];
 
     for (let round = 0; round < maxRounds; round++) {
       const result = await callGemini({
-        tier: "high_volume",
+        tier: "structured",
         systemInstruction: systemPrompt,
         contents,
         tools,

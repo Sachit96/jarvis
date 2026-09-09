@@ -74,9 +74,25 @@ export function withJitter(ms: number) {
   return Math.max(0, Math.round(ms + jitter));
 }
 
-/** 429 (rate limit) and 503 (transient "high demand", observed live on the free-tier Gemma endpoint) are both worth retrying; anything else is a real failure. Extracted so the exact retry decision is unit-testable without mocking fetch. */
+/**
+ * Which HTTP statuses are worth another attempt.
+ *
+ * 429 (rate limit) and 503 ("high demand") were always here. 500 was added
+ * on evidence: the gemini:probe run of 2026-09-09 sent the SAME payload three
+ * times and got 200, then 500 INTERNAL, then 200 — including for a single
+ * trivially-valid declaration. A Google 500 is a server-side fault, not a
+ * verdict on the request, and treating it as fatal turned a transient blip
+ * into a failed operator turn. That is exactly what took operator:live from
+ * usable to 7/23.
+ *
+ * A genuinely malformed request returns 400 INVALID_ARGUMENT with a specific
+ * message, which is still fatal and still not retried — so retrying 500 costs
+ * nothing on real errors.
+ *
+ * Extracted so the exact retry decision is unit-testable without mocking fetch.
+ */
 export function isRetryableStatus(status: number): boolean {
-  return status === 429 || status === 503;
+  return status === 429 || status === 500 || status === 503;
 }
 
 /** The exact boundary callGemini's budget guard checks — extracted so "does N count as over the limit" is directly testable without mocking Supabase. count is 1-indexed (the value incrementGeminiUsage returns after recording this call), so count === dailyLimit is still within budget; only count > dailyLimit trips it. */
@@ -281,9 +297,7 @@ export async function callGemini(options: GeminiCallOptions): Promise<GeminiCall
     lastError = new Error(
       `Gemini request failed: ${res.status} ${res.statusText}${detail ? ` — ${detail}` : ""}`,
     );
-    // 429 (rate limit) and 503 (transient "high demand" — observed live,
-    // twice, on the free-tier Gemma endpoint during verification) are both
-    // worth retrying; anything else is a real failure.
+    // See isRetryableStatus: 429, 500 and 503 are all transient here.
     if (!isRetryableStatus(res.status) || attempt === RETRY_DELAYS_MS.length) break;
     await sleep(withJitter(RETRY_DELAYS_MS[attempt]));
   }
