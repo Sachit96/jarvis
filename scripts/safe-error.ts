@@ -9,17 +9,16 @@
  * unhelpful "[object Object]". That is exactly what the live matrix printed
  * for every failing case, which made a real failure impossible to diagnose.
  *
- * Redaction is deliberately blunt: any long unbroken token is replaced. A
- * connection string or a key echoed back inside an error message is the
- * realistic leak here, and these scripts' output is the sort of thing that
- * gets pasted into an issue.
+ * Redaction is shared with the server code through lib/redact, so the two
+ * cannot drift: a connection string or a key echoed back inside an error
+ * message is the realistic leak, and these scripts' output is the sort of
+ * thing that gets pasted into an issue.
  */
-
-const LONG_TOKEN = /[A-Za-z0-9_-]{24,}/g;
+import { redactSecrets } from "../lib/redact";
 
 export function safeError(error: unknown, maxLength = 200): string {
   const raw = describe(error);
-  return raw.replace(LONG_TOKEN, "«redacted»").replace(/\s+/g, " ").trim().slice(0, maxLength);
+  return redactSecrets(raw).replace(/\s+/g, " ").trim().slice(0, maxLength);
 }
 
 function describe(error: unknown): string {

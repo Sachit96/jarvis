@@ -10,7 +10,8 @@
     "test": "NODE_OPTIONS=--conditions=react-server tsx --test tests/*.test.ts",
     "check-config": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-config.ts",
     "operator:live": "NODE_OPTIONS=--conditions=react-server tsx scripts/operator-live-test.ts",
-    "integration:check": "NODE_OPTIONS=--conditions=react-server tsx scripts/integration-check.ts"
+    "integration:check": "NODE_OPTIONS=--conditions=react-server tsx scripts/integration-check.ts",
+    "gemini:probe": "NODE_OPTIONS=--conditions=react-server tsx scripts/gemini-probe.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { loadEnvConfig } from "@next/env";
 import { safeError } from "../scripts/safe-error.ts";
+import { redactSecrets } from "../lib/redact.ts";
 
 /**
  * The standalone scripts get no framework env loading.
@@ -109,5 +110,25 @@ describe("script error reporting", () => {
   test("a thrown string or null still renders", () => {
     assert.match(safeError("just a string"), /just a string/);
     assert.match(safeError(null), /null/);
+  });
+});
+
+describe("secret redaction", () => {
+  /**
+   * Shared by lib/ai/providers/gemini-client (which now surfaces Google's own
+   * error message, so that message reaches logs) and the QA scripts. One rule,
+   * tested once.
+   */
+  test("a long token is removed, ordinary prose is not", () => {
+    assert.equal(redactSecrets("connection refused for db.example.com"), "connection refused for db.example.com");
+    assert.match(redactSecrets("key AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA failed"), /«redacted»/);
+  });
+
+  test("redaction does not swallow the diagnosis around it", () => {
+    // The point of surfacing an API error is the words; only the token goes.
+    const line = redactSecrets("INVALID_ARGUMENT: Unknown name at tools[0] token BBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+    assert.match(line, /INVALID_ARGUMENT/);
+    assert.match(line, /Unknown name/);
+    assert.doesNotMatch(line, /BBBBBBBB/);
   });
 });
