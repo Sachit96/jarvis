@@ -10,8 +10,10 @@ import {
   studySessionSchema,
   materialSchema,
   deadlineSchema,
+  attendanceSchema,
 } from "@/lib/validations/uni";
 import { actionStateFromZodError, type ActionState } from "@/lib/validation";
+import { isMissingRelation } from "@/lib/db/missing-relation";
 
 function revalidateUni() {
   revalidatePath("/uni");
@@ -344,4 +346,52 @@ export async function deleteDeadlineAction(id: string): Promise<void> {
   const supabase = await createClient();
   await supabase.from("uni_deadlines").delete().eq("id", id);
   revalidateUni();
+}
+
+// ============================================================= Attendance
+
+/**
+ * Records attendance for one class occurrence.
+ *
+ * Upsert, not insert: marking the same class twice is a CORRECTION, not a
+ * second data point, and the (course_id, class_date, schedule_block_id)
+ * unique constraint in migration 0038 is what makes that safe. Without this
+ * the obvious user action — realising you tapped "absent" by mistake — would
+ * fail on a constraint violation instead of fixing the record.
+ */
+export async function markAttendanceAction(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const rawBlock = formData.get("schedule_block_id");
+  const parsed = attendanceSchema.safeParse({
+    course_id: formData.get("course_id"),
+    // An empty select renders as "", which is not a uuid and not absent.
+    schedule_block_id: rawBlock ? String(rawBlock) : undefined,
+    class_date: formData.get("class_date"),
+    status: formData.get("status"),
+    note: formData.get("note"),
+  });
+  if (!parsed.success) return actionStateFromZodError(parsed.error);
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("uni_attendance").upsert(
+    {
+      course_id: parsed.data.course_id,
+      schedule_block_id: parsed.data.schedule_block_id ?? null,
+      class_date: parsed.data.class_date,
+      status: parsed.data.status,
+      note: parsed.data.note ?? null,
+    },
+    { onConflict: "course_id,class_date,schedule_block_id" },
+  );
+  if (error) {
+    // Migration 0038 not applied yet is the one failure worth naming, since
+    // the fix is a migration rather than anything the user did wrong.
+    return { error: isMissingRelation(error) ? "Attendance isn't set up yet — apply migration 0038." : error.message };
+  }
+
+  revalidatePath("/uni/attendance");
+  revalidatePath("/uni");
+  return {};
 }
