@@ -22,7 +22,16 @@ import { z } from "zod";
 export interface GeminiFunctionDeclaration {
   name: string;
   description: string;
-  parameters: GeminiSchema;
+  /**
+   * Omitted entirely for a tool that takes no arguments.
+   *
+   * Gemini's FunctionDeclaration treats `parameters` as optional, and its
+   * schema validation requires an OBJECT to carry a non-empty `properties`.
+   * The two together mean a zero-argument tool must send no `parameters` at
+   * all — `{type:"OBJECT", properties:{}, required:[]}` is rejected, and 13
+   * of this app's tools take no arguments.
+   */
+  parameters?: GeminiSchema;
 }
 
 interface GeminiSchema {
@@ -97,13 +106,28 @@ function convert(schema: z.ZodType, path: string): GeminiSchema {
     }
     case "object": {
       const shape = def.shape ?? {};
+      // A nested object with no fields has no valid representation: unlike a
+      // top-level one it cannot be omitted, and an empty `properties` is
+      // rejected. Consistent with the rest of this converter, that fails at
+      // module load with the path attached rather than at request time.
+      if (Object.keys(shape).length === 0 && path.includes(".")) {
+        throw new Error(
+          `Empty object at ${path}. A nested object must declare at least one field — ` +
+            `Gemini rejects an OBJECT schema with no properties.`,
+        );
+      }
       const properties: Record<string, GeminiSchema> = {};
       const required: string[] = [];
       for (const [key, value] of Object.entries(shape)) {
         properties[key] = convert(value, `${path}.${key}`);
         if (!isOptional(value)) required.push(key);
       }
-      return withDescription({ type: "OBJECT", properties, required });
+      // `required: []` is not wrong, but it is not what the API's own SDKs
+      // emit, and an empty list carries no information. Omitting it keeps the
+      // payload to exactly what the contract describes.
+      return withDescription(
+        required.length > 0 ? { type: "OBJECT", properties, required } : { type: "OBJECT", properties },
+      );
     }
     default:
       throw new Error(
@@ -123,5 +147,15 @@ export function toGeminiDeclaration(
   if (parameters.type !== "OBJECT") {
     throw new Error(`Tool "${name}" must take an object, got ${parameters.type}`);
   }
+
+  // A zero-argument tool sends NO parameters field. Emitting
+  // `{type:"OBJECT", properties:{}}` instead is the one shape Gemini's schema
+  // validation rejects outright, and z.object({}) — which is how a tool
+  // declares "no arguments" — converts to exactly that. Handled here, in the
+  // one converter every tool goes through, rather than in 13 tool files.
+  if (Object.keys(parameters.properties ?? {}).length === 0) {
+    return { name, description };
+  }
+
   return { name, description, parameters };
 }

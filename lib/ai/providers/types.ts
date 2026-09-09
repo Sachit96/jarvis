@@ -21,6 +21,8 @@ export interface LeadQualifierProvider {
 
 // ============================================================= AI Mentor
 
+import type { GeminiFunctionDeclaration } from "@/lib/ai/tools/gemini-schema";
+
 export interface MentorChatMessage {
   role: "user" | "assistant";
   content: string;
@@ -101,7 +103,7 @@ export interface AgentChatResult {
 export interface AgentChatOptions {
   systemPrompt: string;
   history: MentorChatMessage[];
-  tools: { name: string; description: string; parameters: Record<string, unknown> }[];
+  tools: GeminiFunctionDeclaration[];
   execute: (call: AgentToolCall) => Promise<AgentToolOutcome>;
   /**
    * Whether a tool is safe to run concurrently with its siblings in the same

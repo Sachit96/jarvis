@@ -1,6 +1,7 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { redactSecrets } from "@/lib/redact";
+import type { GeminiFunctionDeclaration } from "@/lib/ai/tools/gemini-schema";
 import { incrementGeminiUsage } from "@/lib/db/queries/gemini-usage";
 
 // Shared low-level helper behind every Gemini call in this app (mentor
@@ -98,13 +99,13 @@ export interface GeminiContent {
   parts: GeminiPart[];
 }
 
-export interface GeminiFunctionDeclaration {
-  name: string;
-  description: string;
-  // Gemini's schema dialect uses uppercase OpenAPI-style type names
-  // ("OBJECT", "STRING", ...), same as responseSchema below.
-  parameters: Record<string, unknown>;
-}
+/**
+ * Re-exported, not redefined. This shape used to exist here AND in
+ * gemini-schema.ts AND inline in AgentChatOptions, and the three drifted the
+ * moment `parameters` became optional for zero-argument tools — typecheck
+ * caught it as three incompatible types for one wire format.
+ */
+export type { GeminiFunctionDeclaration } from "@/lib/ai/tools/gemini-schema";
 
 export interface GeminiCallOptions {
   /** Which tier to call — see the routing rationale above. Required, not defaulted, so every call site states its capability need explicitly. */

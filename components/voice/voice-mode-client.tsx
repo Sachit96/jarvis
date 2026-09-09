@@ -98,7 +98,21 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
     setMode("listening");
   }, []);
 
-  const speakReply = useCallback((text: string) => {
+  /**
+   * `after` is the state to land in once JARVIS stops talking. It defaults to
+   * idle, but a confirmation question has to land in
+   * waiting_for_confirmation: the HUD declared that state and nothing ever
+   * set it, so asking "shall I go ahead?" looked identical to any other
+   * reply, with no visible sign that the turn was blocked on an answer.
+   */
+  // Derived rather than stored. "Transcribing" is precisely "listening while
+  // words are arriving", so computing it from the two facts that already
+  // exist avoids a second state machine racing the recognition events — and
+  // avoids the dead-state problem that waiting_for_confirmation had.
+  const displayMode: VoiceStatusMode =
+    mode === "listening" && interimTranscript.trim() ? "transcribing" : mode;
+
+  const speakReply = useCallback((text: string, after: VoiceStatusMode = "idle") => {
     setReplyText(text);
     setMode("speaking");
     // Gotcha 2, the single most important detail here: pause recognition
@@ -111,7 +125,7 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
         setFinalDisplay("");
         setInterimTranscript("");
         setReplyText("");
-        setMode("idle");
+        setMode(after);
       },
     });
   }, []);
@@ -138,7 +152,9 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
           // Deliberately does NOT fall through to treating it as a new
           // request: an unclear answer to "shall I delete this?" must
           // re-ask, never proceed and never silently drop the pending call.
-          speakReply(REPROMPT);
+          // Still blocked on the user: an unclear answer must not read as
+          // though the turn moved on.
+          speakReply(REPROMPT, "waiting_for_confirmation");
           return;
         }
         if (intent === "declined") {
@@ -197,7 +213,7 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
         // Spoken aloud so the user can answer without looking at the screen,
         // which is the whole point of a voice interface.
         setPendingConfirmation(result.pendingConfirmation);
-        speakReply(`${result.pendingConfirmation.summary}. Shall I go ahead?`);
+        speakReply(`${result.pendingConfirmation.summary}. Shall I go ahead?`, "waiting_for_confirmation");
       } else {
         speakReply(result.reply ?? "…");
       }
@@ -370,7 +386,7 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
       </div>
 
       <div className="pointer-events-none absolute left-1/2 top-6 z-10 -translate-x-1/2">
-        <StatusPill mode={mode} />
+        <StatusPill mode={displayMode} />
       </div>
 
       {!browserSupport.voice ? (
