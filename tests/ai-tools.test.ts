@@ -429,3 +429,36 @@ describe("tool descriptions are distinguishable", () => {
     }
   });
 });
+
+describe("Gemini function declarations", () => {
+  /**
+   * Gemini's OpenAPI subset rejects a function declaration whose `parameters`
+   * carries an empty `properties` object — a no-argument function must omit
+   * `parameters` altogether. z.object({}) converts to
+   * `{type:"OBJECT", properties:{}, required:[]}`, which is exactly that
+   * shape, and 13 of the tools take no arguments.
+   *
+   * This test DOCUMENTS the current state rather than asserting the fix: the
+   * count is pinned so the diagnosis stays honest, and it is the test to
+   * invert once scripts/gemini-probe.ts confirms the cause.
+   */
+  test("records how many declarations currently emit an empty properties object", () => {
+    const empty = getToolDeclarations().filter(
+      (d) => Object.keys((d.parameters as { properties?: object }).properties ?? {}).length === 0,
+    );
+    assert.equal(empty.length, 13, `expected the 13 known no-argument tools, got ${empty.map((d) => d.name).join(", ")}`);
+  });
+
+  test("every declaration Gemini receives is a well-formed OBJECT schema", () => {
+    for (const d of getToolDeclarations()) {
+      const params = d.parameters as { type?: string; properties?: object; required?: string[] };
+      assert.equal(params.type, "OBJECT", `${d.name} must take an object`);
+      assert.ok(d.description.length > 0, `${d.name} needs a description`);
+      // Anything named in `required` must actually exist as a property,
+      // which is the other way a declaration gets rejected.
+      for (const key of params.required ?? []) {
+        assert.ok(key in (params.properties ?? {}), `${d.name}: required "${key}" is not a declared property`);
+      }
+    }
+  });
+});

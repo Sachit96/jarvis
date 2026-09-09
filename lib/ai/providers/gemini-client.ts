@@ -162,8 +162,7 @@ function getApiKey(): string {
 }
 
 async function requestOnce(model: string, body: Record<string, unknown>): Promise<Response> {
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-  return fetch(endpoint, {
+  return fetch(geminiEndpoint(model), {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": getApiKey() },
     body: JSON.stringify(body),
@@ -188,10 +187,16 @@ async function readErrorDetail(res: Response): Promise<string> {
   }
 }
 
-export async function callGemini(options: GeminiCallOptions): Promise<GeminiCallResult> {
-  const model = TIER_MODEL[options.tier];
-  const dailyLimit = TIER_DAILY_LIMIT[options.tier];
-
+/**
+ * The exact JSON body sent to generateContent.
+ *
+ * Extracted so the diagnostic in scripts/gemini-probe.ts can send the REAL
+ * payload rather than a lookalike it maintains separately. A diagnostic that
+ * tests a slightly different request than production sends is worse than no
+ * diagnostic: it can clear a payload that is actually broken. Behaviour here
+ * is unchanged — callGemini calls this and sends the result as before.
+ */
+export function buildGeminiRequestBody(options: GeminiCallOptions): Record<string, unknown> {
   const generationConfig: Record<string, unknown> = { temperature: options.temperature ?? 0.5 };
   if (options.responseSchema) {
     generationConfig.responseMimeType = "application/json";
@@ -204,6 +209,19 @@ export async function callGemini(options: GeminiCallOptions): Promise<GeminiCall
   };
   if (options.tools) body.tools = [{ functionDeclarations: options.tools }];
   if (options.enableSearchGrounding) body.tools = [{ google_search: {} }];
+  return body;
+}
+
+/** The endpoint a given model is called on. Shared with the diagnostic. */
+export function geminiEndpoint(model: string): string {
+  return `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+}
+
+export async function callGemini(options: GeminiCallOptions): Promise<GeminiCallResult> {
+  const model = TIER_MODEL[options.tier];
+  const dailyLimit = TIER_DAILY_LIMIT[options.tier];
+
+  const body = buildGeminiRequestBody(options);
 
   const supabase = createAdminClient();
   let lastError: Error | null = null;
