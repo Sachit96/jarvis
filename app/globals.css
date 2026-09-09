@@ -245,10 +245,11 @@
   --cat-finance: #c08205;
   --cat-habits: #0d9488;
 
-  /* Primary brand gradient (logo mark, avatar, progress rings) — teal to
-     blue to violet, distinct from the flat --brand cyan used for smaller
-     accents like active nav icons and links. */
-  --gradient-brand: linear-gradient(135deg, #2dd4bf 0%, #3b82f6 55%, #8b5cf6 100%);
+  /* NOTE: --gradient-brand is defined once, above, as purple → magenta.
+     A second teal→blue→violet definition used to live here and silently won
+     on cascade order, so every gradient in the app still rendered in the old
+     palette while the tokens above read correctly. Caught in the browser,
+     not in the source. */
 }
 
 @layer base {
@@ -328,8 +329,12 @@
   /* A frosted pane floating above pure black. */
   .glass {
     background: var(--card);
+    /* No hand-written -webkit- prefix: Lightning CSS (Tailwind v4's
+       processor) generates prefixes itself, and writing one by hand made it
+       treat the unprefixed declaration as redundant and DROP it — leaving
+       only -webkit-backdrop-filter, which Chrome then did not apply. The
+       glass had no blur at all. Verified in the browser, not the source. */
     backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--border);
     border-radius: var(--radius);
   }
@@ -339,22 +344,18 @@
   .glass-raised {
     background: rgb(255 255 255 / 0.055);
     backdrop-filter: blur(calc(var(--glass-blur) * 1.5));
-    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1.5));
     border: 1px solid rgb(255 255 255 / 0.12);
     border-radius: var(--radius);
   }
 
   /* The brand signature. Used on primary actions and on the few numbers
      that carry the most meaning — not as decoration. */
+  /* .bg-gradient-brand and .text-gradient-brand already exist in the
+     utilities layer above and are what components use — redefining them here
+     would be the duplication this file is supposed to prevent. .gradient-brand
+     is kept only as the shorter alias the new primitives read better with. */
   .gradient-brand {
     background-image: var(--gradient-brand);
-  }
-
-  .text-gradient-brand {
-    background-image: var(--gradient-brand);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
   }
 
   /* A gradient edge without a gradient fill: the border is painted, then
