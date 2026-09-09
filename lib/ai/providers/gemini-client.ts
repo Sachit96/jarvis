@@ -105,6 +105,16 @@ export interface GeminiPart {
   /** Gemma's hidden reasoning, surfaced as a normal text part with this flag set — must never be treated as the answer. */
   thought?: boolean;
   functionCall?: { name: string; args: Record<string, unknown> };
+  /**
+   * Opaque token a THINKING model attaches to a functionCall part, which must
+   * be sent back verbatim alongside that call on the next request. Omitting it
+   * is a hard 400: "Function call is missing a thought_signature in
+   * functionCall parts."
+   *
+   * Never construct or inspect this — it is the model's own state. It is
+   * declared only so echoing a part back keeps it.
+   */
+  thoughtSignature?: string;
   functionResponse?: { name: string; response: Record<string, unknown> };
   /** File input (e.g. an uploaded syllabus PDF) — base64-encoded, sent inline rather than via the Files API, since these are one-shot single-request parses, not reused across calls. */
   inlineData?: { mimeType: string; data: string };
@@ -150,6 +160,16 @@ export interface GeminiCallOptions {
 export interface GeminiCallResult {
   text: string | null;
   functionCalls: { name: string; args: Record<string, unknown> }[];
+  /**
+   * The model's own functionCall parts, exactly as they arrived.
+   *
+   * Echo THESE back as the model turn rather than rebuilding parts from
+   * `functionCalls`. Rebuilding drops every field the reconstruction does not
+   * know about, which is how thoughtSignature went missing and made every
+   * multi-round turn fail with a 400 on a thinking model. Passing the parts
+   * through cannot lose a field, including one added later.
+   */
+  modelParts: GeminiPart[];
   /** True only if the response actually came back with real grounding citations (groundingMetadata.groundingChunks present and non-empty) — requesting the tool is not the same as it firing. */
   grounded: boolean;
 }
@@ -283,7 +303,14 @@ export async function callGemini(options: GeminiCallOptions): Promise<GeminiCall
         .map((p) => p.functionCall);
       const groundingChunks = data?.candidates?.[0]?.groundingMetadata?.groundingChunks;
       const grounded = Array.isArray(groundingChunks) && groundingChunks.length > 0;
-      return { text: textParts.length > 0 ? textParts.join("") : null, functionCalls, grounded };
+      // Kept whole, not rebuilt — see modelParts.
+      const modelParts = parts.filter((p) => p.functionCall);
+      return {
+        text: textParts.length > 0 ? textParts.join("") : null,
+        functionCalls,
+        modelParts,
+        grounded,
+      };
     }
 
     // The status alone is not diagnosable — a 500 from this endpoint can mean

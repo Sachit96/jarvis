@@ -132,7 +132,13 @@ export class GeminiMentorProvider implements MentorProvider {
       systemInstruction: systemPrompt,
       contents: [
         ...contents,
-        { role: "model", parts: [{ functionCall: call }] },
+        // Same reasoning as agentChat: echo the model's own part so its
+        // thoughtSignature survives. Matched by name so the single
+        // functionResponse below still answers exactly one call.
+        {
+          role: "model",
+          parts: first.modelParts.filter((p) => p.functionCall?.name === "log_nutrition_entry"),
+        },
         { role: "user", parts: [{ functionResponse: { name: "log_nutrition_entry", response: { result: resultMessage } } }] },
       ],
       tools: [LOG_NUTRITION_TOOL],
@@ -187,10 +193,13 @@ export class GeminiMentorProvider implements MentorProvider {
       // A round can carry several calls (Gemini returns an array), so all of
       // them are appended before the next request — replying to only the
       // first would leave the rest unanswered and the history malformed.
-      contents.push({
-        role: "model",
-        parts: result.functionCalls.map((call) => ({ functionCall: call })),
-      });
+      // The model's OWN parts, not a reconstruction of them. Rebuilding from
+      // {name, args} drops every other field on the part — which is exactly
+      // how thoughtSignature went missing and made every multi-round turn
+      // fail with "Function call is missing a thought_signature". A thinking
+      // model requires that token back verbatim; passing the parts through
+      // cannot lose it, or anything added later.
+      contents.push({ role: "model", parts: result.modelParts });
 
       // Scheduling rule (parallel reads, ordered writes) lives in
       // runToolRound, where it is testable without a model round trip.
