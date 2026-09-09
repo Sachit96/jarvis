@@ -1513,6 +1513,54 @@ export type Database = {
           },
         ]
       }
+      uni_attendance: {
+        Row: {
+          class_date: string
+          course_id: string
+          created_at: string
+          id: string
+          note: string | null
+          schedule_block_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          class_date: string
+          course_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          schedule_block_id?: string | null
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          class_date?: string
+          course_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          schedule_block_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uni_attendance_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "uni_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "uni_attendance_schedule_block_id_fkey"
+            columns: ["schedule_block_id"]
+            isOneToOne: false
+            referencedRelation: "uni_schedule_blocks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       uni_assessment_groups: {
         Row: {
           course_id: string

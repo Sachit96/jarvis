@@ -163,3 +163,27 @@ export async function getDueFlashcards(supabase: Client, materialIds: string[]) 
   }
   return data;
 }
+
+/**
+ * Attendance records, newest first.
+ *
+ * Degrades to [] when migration 0038 has not been applied — attendance is
+ * additive, and a university module that 500s because one optional table is
+ * missing would be a worse failure than showing no attendance.
+ */
+export async function getAttendance(supabase: Client, courseIds?: string[]) {
+  let query = supabase
+    .from("uni_attendance")
+    .select("*")
+    .order("class_date", { ascending: false });
+  if (courseIds) {
+    if (courseIds.length === 0) return [];
+    query = query.in("course_id", courseIds);
+  }
+  const { data, error } = await query;
+  if (error) {
+    if (isMissingRelation(error)) return [];
+    throw error;
+  }
+  return data;
+}
