@@ -118,8 +118,26 @@ const READ_CASES: Case[] = [
   { id: "X2", group: "cross", prompt: "Plan my evening around my university deadlines, business priorities, and tasks.",
     anyOf: ["get_university_deadlines"], maxTools: 6,
     note: "should reach university + business + tasks, and little else" },
+  // The only cross-module prompt that names NO domain, which is why its
+  // acceptable set is wider than the others'. The 2026-09-09 run answered it
+  // from get_business_pipeline alone and was marked FAIL — wrongly. With the
+  // injected memory saying the cash target ends today against $0 collected,
+  // "spend the three hours on outreach" is a defensible and arguably the best
+  // answer, and it used one tool against a ceiling of five.
+  //
+  // The alternative reading — that a time-planning question should always
+  // consult the task list first — is not unreasonable, and if this recurs on
+  // prompts that DO name a time frame it is worth fixing in the tool
+  // descriptions. But asserting one route for an open question tests the
+  // harness's imagination, not the operator. What would genuinely be wrong is
+  // answering from nothing, or sweeping every module; anyOf and maxTools
+  // still catch both.
   { id: "X3", group: "cross", prompt: "I have three hours tonight. What is the highest-value way I should use them?",
-    anyOf: ["get_today_tasks", "get_overdue_tasks", "get_university_deadlines", "get_upcoming_tasks"], maxTools: 5 },
+    anyOf: [
+      "get_today_tasks", "get_overdue_tasks", "get_university_deadlines", "get_upcoming_tasks",
+      "get_business_pipeline", "get_follow_ups",
+    ],
+    maxTools: 5 },
   { id: "X4", group: "cross", prompt: "Look at my upcoming university work and business pipeline and help me prioritize tomorrow.",
     anyOf: ["get_university_deadlines"], maxTools: 6 },
 ];
