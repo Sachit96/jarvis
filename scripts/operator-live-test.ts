@@ -22,6 +22,12 @@
  * queries every module on every turn is a real failure even when the answer
  * reads fine.
  */
+// MUST be the first import. ES modules evaluate in import order, so this
+// populates process.env before any module below is evaluated — see
+// scripts/load-env.ts.
+import "./load-env";
+import { describeEnvSource } from "./load-env";
+import { safeError } from "./safe-error";
 import { writeFileSync } from "node:fs";
 import { createAdminClient } from "../lib/supabase/admin";
 import { runAgentTurn } from "../lib/ai/agent";
@@ -175,7 +181,7 @@ async function runCase(c: Case) {
     if (!response) { pass = false; why = `${why ? why + "; " : ""}empty reply`; }
   } catch (error) {
     pass = false;
-    why = `threw: ${error instanceof Error ? error.message : String(error)}`;
+    why = `threw: ${safeError(error)}`;
   }
 
   rows.push({
@@ -350,9 +356,14 @@ async function main() {
     .filter((n) => !process.env[n]);
   if (missing.length) {
     console.error(`BLOCKED — live operator QA needs: ${missing.join(", ")}`);
+    // Says where configuration was read from, because the previous message
+    // implied the variables did not exist when in fact they were sitting in
+    // an .env.local this process had never opened.
+    console.error(describeEnvSource());
     console.error("Nothing was run. This is the one part of the suite that cannot be faked.");
     process.exit(2);
   }
+  console.log(`${DIM}${describeEnvSource()}${RESET}`);
 
   console.log(`${YELLOW}=== read-only operator matrix ===${RESET}`);
   for (const c of READ_CASES) await runCase(c);

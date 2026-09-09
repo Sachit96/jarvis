@@ -11,6 +11,12 @@
  * Reports PRESENT / MISSING / INVALID / NOT APPLICABLE per the brief, and
  * never prints a credential value.
  */
+// MUST be the first import. ES modules evaluate in import order, so this
+// populates process.env before any module below is evaluated — see
+// scripts/load-env.ts.
+import "./load-env";
+import { describeEnvSource } from "./load-env";
+import { safeError } from "./safe-error";
 import { createAdminClient } from "../lib/supabase/admin";
 import { getIntegrationStatuses } from "../lib/integrations/status";
 import { getIntegrationStatusesWithGrants } from "../lib/integrations/grants";
@@ -27,12 +33,6 @@ function record(area: string, item: string, verdict: Verdict, detail = "") {
   results.push({ area, item, verdict, detail });
   const colour = verdict === "PRESENT" ? GREEN : verdict === "MISSING" ? RED : verdict === "INVALID" ? RED : DIM;
   console.log(`  ${colour}${verdict.padEnd(15)}${RESET} ${item.padEnd(34)} ${DIM}${detail}${RESET}`);
-}
-
-/** Truncated and stripped of anything that could carry a credential. */
-function safeError(error: unknown): string {
-  const raw = error instanceof Error ? error.message : String(error);
-  return raw.replace(/[A-Za-z0-9_-]{24,}/g, "«redacted»").slice(0, 160);
 }
 
 async function checkSupabase() {
@@ -144,6 +144,7 @@ function checkYouTubeAndSms() {
 
 async function main() {
   console.log(`${YELLOW}=== JARVIS integration check (read-only) ===${RESET}`);
+  console.log(`${DIM}${describeEnvSource()}${RESET}`);
 
   await checkSupabase();
   await checkHevy();
