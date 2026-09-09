@@ -15,6 +15,11 @@
  * NEVER prints a value — only whether a name is set. A tool whose output you
  * might paste into an issue must not be able to leak a key.
  */
+// MUST be the first import. ES modules evaluate in import order, so this
+// populates process.env before any module below is evaluated — see
+// scripts/load-env.ts.
+import "./load-env";
+import { describeEnvSource } from "./load-env";
 import { getIntegrationStatuses } from "../lib/integrations/status";
 
 const RESET = "\x1b[0m", GREEN = "\x1b[32m", RED = "\x1b[31m", YELLOW = "\x1b[33m", DIM = "\x1b[2m";
@@ -45,6 +50,7 @@ function print(title: string, rows: Row[]) {
   }
 }
 
+console.log(`\n${DIM}${describeEnvSource()}${RESET}`);
 print("Core", CORE);
 
 console.log(`\n${YELLOW}Integrations${RESET} ${DIM}(state as the app and the AI tools see it)${RESET}`);
