@@ -74,7 +74,7 @@ async function checkSupabase() {
     ["uni_assessments", () => supabase.from("uni_assessments").select("id, title, due_at, status").limit(1)],
     ["workouts", () => supabase.from("workouts").select("id, started_at, completed").limit(1)],
     ["transactions", () => supabase.from("transactions").select("id, amount, occurred_at").limit(1)],
-    ["memory_entries", () => supabase.from("memory_entries").select("id, content").limit(1)],
+    ["memory_entries", () => supabase.from("memory_entries").select("id, title, body, type, pinned").limit(1)],
   ];
   for (const [name, run] of domains) {
     const { error } = await run();

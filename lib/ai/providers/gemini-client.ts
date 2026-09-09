@@ -1,5 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { redactSecrets } from "@/lib/redact";
 import { incrementGeminiUsage } from "@/lib/db/queries/gemini-usage";
 
 // Shared low-level helper behind every Gemini call in this app (mentor
@@ -169,6 +170,24 @@ async function requestOnce(model: string, body: Record<string, unknown>): Promis
   });
 }
 
+
+/**
+ * The short diagnostic from Google's error envelope, or "" if it cannot be
+ * read. Never throws: a failure to parse an error must not replace the error.
+ */
+async function readErrorDetail(res: Response): Promise<string> {
+  try {
+    const body = (await res.json()) as { error?: { message?: string; status?: string } };
+    const message = body?.error?.message;
+    const status = body?.error?.status;
+    if (!message && !status) return "";
+    const parts = [status, message].filter(Boolean).join(": ");
+    return redactSecrets(parts).slice(0, 300);
+  } catch {
+    return "";
+  }
+}
+
 export async function callGemini(options: GeminiCallOptions): Promise<GeminiCallResult> {
   const model = TIER_MODEL[options.tier];
   const dailyLimit = TIER_DAILY_LIMIT[options.tier];
@@ -232,9 +251,17 @@ export async function callGemini(options: GeminiCallOptions): Promise<GeminiCall
       return { text: textParts.length > 0 ? textParts.join("") : null, functionCalls, grounded };
     }
 
-    // Never log the response body (can echo request content on some error
-    // paths) or the key itself.
-    lastError = new Error(`Gemini request failed: ${res.status} ${res.statusText}`);
+    // The status alone is not diagnosable — a 500 from this endpoint can mean
+    // an unsupported model, a malformed tool declaration, or a genuine
+    // outage, and they need completely different responses. So the API's own
+    // error envelope is read, but ONLY its `message` and `status` fields:
+    // never the whole body, which can echo request content on some paths.
+    // What survives is truncated and redacted, because this string reaches
+    // logs and the QA matrix.
+    const detail = await readErrorDetail(res);
+    lastError = new Error(
+      `Gemini request failed: ${res.status} ${res.statusText}${detail ? ` — ${detail}` : ""}`,
+    );
     // 429 (rate limit) and 503 (transient "high demand" — observed live,
     // twice, on the free-tier Gemma endpoint during verification) are both
     // worth retrying; anything else is a real failure.
