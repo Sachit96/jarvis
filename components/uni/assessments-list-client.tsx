@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 
 type Assessment = Database["public"]["Tables"]["uni_assessments"]["Row"];
 type Course = Database["public"]["Tables"]["uni_courses"]["Row"];
+type Group = Database["public"]["Tables"]["uni_assessment_groups"]["Row"];
 
 const STATUS_LABEL: Record<string, string> = {
   not_started: "Not started",
@@ -18,7 +19,16 @@ const STATUS_LABEL: Record<string, string> = {
   graded: "Graded",
 };
 
-export function AssessmentsListClient({ assessments, courses }: { assessments: Assessment[]; courses: Course[] }) {
+export function AssessmentsListClient({
+  assessments,
+  courses,
+  groups,
+}: {
+  assessments: Assessment[];
+  courses: Course[];
+  /** Every course's grading groups; each row is handed only its own course's. */
+  groups: Group[];
+}) {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [courseFilter, setCourseFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"urgency" | "weight">("urgency");
@@ -92,6 +102,7 @@ export function AssessmentsListClient({ assessments, courses }: { assessments: A
               assessment={a}
               courseCode={courses.find((c) => c.id === a.course_id)?.code}
               courseColor={courses.find((c) => c.id === a.course_id)?.color ?? undefined}
+              groups={groups.filter((g) => g.course_id === a.course_id)}
             />
           ))}
         </div>

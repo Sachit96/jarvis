@@ -10,9 +10,11 @@ import { Badge } from "@/components/ui/badge";
 import { ASSESSMENT_STATUSES } from "@/lib/validations/uni";
 import { AssignmentBreakdown } from "@/components/uni/assignment-breakdown";
 import { AssessmentRequirements } from "@/components/uni/assessment-requirements";
+import { AssessmentForm } from "@/components/uni/assessment-form";
 import type { Database } from "@/lib/supabase/database.types";
 
 type Assessment = Database["public"]["Tables"]["uni_assessments"]["Row"];
+type Group = Database["public"]["Tables"]["uni_assessment_groups"]["Row"];
 
 const STATUS_LABEL: Record<(typeof ASSESSMENT_STATUSES)[number], string> = {
   not_started: "Not started",
@@ -29,7 +31,18 @@ function formatDue(due_at: string | null) {
   return { label, overdue };
 }
 
-export function AssessmentItem({ assessment, courseCode, courseColor }: { assessment: Assessment; courseCode?: string; courseColor?: string }) {
+export function AssessmentItem({
+  assessment,
+  courseCode,
+  courseColor,
+  groups,
+}: {
+  assessment: Assessment;
+  courseCode?: string;
+  courseColor?: string;
+  /** Grading groups for this assessment's course, so the edit form can reassign it. */
+  groups?: Group[];
+}) {
   const [isPending, startTransition] = useTransition();
   const [score, setScore] = useState(assessment.earned_score != null ? String(assessment.earned_score) : "");
   const due = formatDue(assessment.due_at);
@@ -96,6 +109,12 @@ export function AssessmentItem({ assessment, courseCode, courseColor }: { assess
       </Select>
 
       <AssignmentBreakdown assessmentId={assessment.id} courseId={assessment.course_id} />
+
+      {/* Title, type, due date, weight, max score, difficulty and estimate
+          were all write-once: set at creation and unreachable afterwards.
+          A mistyped weight silently skewed every grade projection on the
+          course. */}
+      <AssessmentForm courseId={assessment.course_id} assessment={assessment} groups={groups} />
 
       <button
         type="button"

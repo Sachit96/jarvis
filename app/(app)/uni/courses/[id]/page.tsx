@@ -8,7 +8,9 @@ import { RiskChip } from "@/components/uni/risk-chip";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CourseForm } from "@/components/uni/course-form";
+import { CourseArchiveControls } from "@/components/uni/course-archive-controls";
 import { AssessmentForm } from "@/components/uni/assessment-form";
+import { AssessmentGroupsCard } from "@/components/uni/assessment-groups-card";
 import { AssessmentItem } from "@/components/uni/assessment-item";
 import { ScheduleBlockForm } from "@/components/uni/schedule-block-form";
 import { MaterialForm } from "@/components/uni/material-form";
@@ -45,6 +47,11 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
   const worst = worstCase(assessments, groups);
   const unresolvedWeight = unresolvedWeightCount(assessments);
 
+  const memberCounts = new Map<string, number>();
+  for (const a of assessments) {
+    if (a.group_id) memberCounts.set(a.group_id, (memberCounts.get(a.group_id) ?? 0) + 1);
+  }
+
   const sortedBlocks = [...scheduleBlocks].sort((a, b) => a.day_of_week - b.day_of_week || a.start_time.localeCompare(b.start_time));
 
   return (
@@ -73,6 +80,11 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
             <RiskChip score={risk} />
             <SyllabusUpload courseId={course.id} />
             <CourseForm course={course} />
+            <CourseArchiveControls
+              courseId={course.id}
+              courseName={`${course.code} — ${course.name}`}
+              archived={course.archived}
+            />
           </>
         }
       />
@@ -154,10 +166,12 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
         </Card>
       </div>
 
+      <AssessmentGroupsCard courseId={course.id} groups={groups} memberCounts={memberCounts} />
+
       <div>
         <div className="mb-3 flex items-center justify-between">
           <p className="eyebrow">Assessments</p>
-          <AssessmentForm courseId={course.id} />
+          <AssessmentForm courseId={course.id} groups={groups} />
         </div>
         {assessments.length === 0 ? (
           <div className="surface">
@@ -170,7 +184,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
         ) : (
           <div className="space-y-2">
             {assessments.map((a) => (
-              <AssessmentItem key={a.id} assessment={a} courseColor={course.color ?? undefined} />
+              <AssessmentItem key={a.id} assessment={a} courseColor={course.color ?? undefined} groups={groups} />
             ))}
           </div>
         )}

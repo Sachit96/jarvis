@@ -41,8 +41,30 @@ export const scheduleBlockSchema = z.object({
   room: optionalTextInput,
 });
 
+/**
+ * A best-N-of-M bucket — "Quizzes, drop the lowest 2".
+ *
+ * The grading engine (lib/uni/grades.ts) has resolved these since it was
+ * written; nothing could ever create one, so drop-lowest grading was
+ * unreachable from the app.
+ */
+export const assessmentGroupSchema = z.object({
+  course_id: z.string().uuid(),
+  label: z.string().min(1, "Required").max(80),
+  // 0 means the grouping is display-only. The engine treats it that way too.
+  drop_lowest_count: numeric(z.number().int().min(0).max(20)).default(0),
+});
+
 export const assessmentSchema = z.object({
   course_id: z.string().uuid(),
+  // "Ungrouped" arrives as the "none" sentinel (Base UI's Select cannot hold
+  // an empty string), and the field is absent entirely on the flat
+  // /uni/assessments form. All three must land as SQL NULL rather than
+  // failing a uuid check.
+  group_id: z.preprocess(
+    (v) => (v === "" || v === "none" || v == null ? undefined : v),
+    z.string().uuid().optional(),
+  ),
   title: z.string().min(1, "Required").max(200),
   type: z.enum(ASSESSMENT_TYPES),
   due_at: optionalTextInput, // "YYYY-MM-DDTHH:mm" from <input type="datetime-local">, or empty

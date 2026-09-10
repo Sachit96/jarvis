@@ -6,6 +6,7 @@ import {
   courseSchema,
   scheduleBlockSchema,
   assessmentSchema,
+  assessmentGroupSchema,
   assessmentRequirementSchema,
   studySessionSchema,
   materialSchema,
@@ -146,11 +147,68 @@ export async function deleteScheduleBlockAction(id: string): Promise<void> {
   revalidateUni();
 }
 
+// =================================================== Assessment groups
+
+/**
+ * Best-N-of-M buckets. lib/uni/grades.ts has resolved these from the day it
+ * was written — courseGrade, neededOnRemaining, bestCase and worstCase all
+ * take a `groups` argument — but no action ever wrote one, so a syllabus
+ * that says "quizzes, lowest two dropped" could not be modelled and every
+ * projection for that course was wrong in the pessimistic direction.
+ */
+export async function createAssessmentGroupAction(_prevState: ActionState, formData: FormData): Promise<ActionState> {
+  const parsed = assessmentGroupSchema.safeParse({
+    course_id: formData.get("course_id"),
+    label: formData.get("label"),
+    drop_lowest_count: formData.get("drop_lowest_count") || "0",
+  });
+  if (!parsed.success) return actionStateFromZodError(parsed.error);
+  const supabase = await createClient();
+  const { error } = await supabase.from("uni_assessment_groups").insert(parsed.data);
+  if (error) return { error: error.message };
+  revalidateUni();
+  revalidatePath(`/uni/courses/${parsed.data.course_id}`);
+  return {};
+}
+
+export async function updateAssessmentGroupAction(_prevState: ActionState, formData: FormData): Promise<ActionState> {
+  const id = String(formData.get("id") ?? "");
+  if (!id) return { error: "Missing group id" };
+  const parsed = assessmentGroupSchema.safeParse({
+    course_id: formData.get("course_id"),
+    label: formData.get("label"),
+    drop_lowest_count: formData.get("drop_lowest_count") || "0",
+  });
+  if (!parsed.success) return actionStateFromZodError(parsed.error);
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("uni_assessment_groups")
+    .update({ label: parsed.data.label, drop_lowest_count: parsed.data.drop_lowest_count })
+    .eq("id", id);
+  if (error) return { error: error.message };
+  revalidateUni();
+  revalidatePath(`/uni/courses/${parsed.data.course_id}`);
+  return {};
+}
+
+/**
+ * Deleting a group must not delete its assessments. The FK is ON DELETE SET
+ * NULL, so members simply become ungrouped and keep their own weights —
+ * which is the same thing as a group with drop_lowest_count 0.
+ */
+export async function deleteAssessmentGroupAction(id: string, courseId: string): Promise<void> {
+  const supabase = await createClient();
+  await supabase.from("uni_assessment_groups").delete().eq("id", id);
+  revalidateUni();
+  revalidatePath(`/uni/courses/${courseId}`);
+}
+
 // ========================================================= Assessments
 
 export async function createAssessmentAction(_prevState: ActionState, formData: FormData): Promise<ActionState> {
   const parsed = assessmentSchema.safeParse({
     course_id: formData.get("course_id"),
+    group_id: formData.get("group_id"),
     title: formData.get("title"),
     type: formData.get("type"),
     due_at: formData.get("due_at"),
@@ -166,6 +224,7 @@ export async function createAssessmentAction(_prevState: ActionState, formData: 
   const supabase = await createClient();
   const { error } = await supabase.from("uni_assessments").insert({
     ...parsed.data,
+    group_id: parsed.data.group_id ?? null,
     due_at: parsed.data.due_at ?? null,
     earned_score: parsed.data.earned_score ?? null,
     estimated_hours: parsed.data.estimated_hours ?? null,
@@ -183,6 +242,7 @@ export async function updateAssessmentAction(_prevState: ActionState, formData: 
   if (!id) return { error: "Missing assessment id" };
   const parsed = assessmentSchema.safeParse({
     course_id: formData.get("course_id"),
+    group_id: formData.get("group_id"),
     title: formData.get("title"),
     type: formData.get("type"),
     due_at: formData.get("due_at"),
@@ -200,6 +260,7 @@ export async function updateAssessmentAction(_prevState: ActionState, formData: 
     .from("uni_assessments")
     .update({
       ...parsed.data,
+      group_id: parsed.data.group_id ?? null,
       due_at: parsed.data.due_at ?? null,
       earned_score: parsed.data.earned_score ?? null,
       estimated_hours: parsed.data.estimated_hours ?? null,
@@ -321,6 +382,7 @@ export async function deleteStudySessionAction(id: string): Promise<void> {
 export async function createMaterialAction(_prevState: ActionState, formData: FormData): Promise<ActionState> {
   const parsed = materialSchema.safeParse({
     course_id: formData.get("course_id"),
+    group_id: formData.get("group_id"),
     title: formData.get("title"),
     type: formData.get("type"),
     body: formData.get("body"),
