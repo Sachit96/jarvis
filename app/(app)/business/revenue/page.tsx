@@ -18,10 +18,11 @@ export default async function RevenuePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <PageHeader eyebrow="Business" title="Revenue &amp; Contracts" />
-        <ContractForm contacts={contacts} />
-      </div>
+      <PageHeader
+        eyebrow="Business"
+        title="Revenue &amp; Contracts"
+        actions={<ContractForm contacts={contacts} />}
+      />
 
       <ModuleTabs tabs={BUSINESS_TABS} />
 

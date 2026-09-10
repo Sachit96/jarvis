@@ -14,10 +14,11 @@ export default async function MarketAnalysisPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <PageHeader eyebrow="Finance" title="Top-Down Analysis" />
-        <MarketAnalysisForm />
-      </div>
+      <PageHeader
+        eyebrow="Finance"
+        title="Top-Down Analysis"
+        actions={<MarketAnalysisForm />}
+      />
 
       <ModuleTabs tabs={FINANCE_TABS} />
 

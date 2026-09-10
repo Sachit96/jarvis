@@ -39,13 +39,16 @@ export default async function WorkoutsPage() {
     <div className="space-y-6">
       {connected ? <HevyAutoSync /> : null}
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <PageHeader eyebrow="Health" title="Workouts" />
-        <div className="flex gap-2">
-          <ExerciseForm />
-          <WorkoutForm />
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="Health"
+        title="Workouts"
+        actions={
+          <>
+            <ExerciseForm />
+            <WorkoutForm />
+          </>
+        }
+      />
 
       <ModuleTabs tabs={HEALTH_TABS} />
 

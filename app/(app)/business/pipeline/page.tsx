@@ -42,10 +42,11 @@ export default async function PipelinePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <PageHeader eyebrow="Business" title="Lead Pipeline" />
-        <LeadForm stages={stages} />
-      </div>
+      <PageHeader
+        eyebrow="Business"
+        title="Lead Pipeline"
+        actions={<LeadForm stages={stages} />}
+      />
 
       <ModuleTabs tabs={BUSINESS_TABS} />
 

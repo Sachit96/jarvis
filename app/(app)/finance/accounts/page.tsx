@@ -14,10 +14,11 @@ export default async function AccountsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <PageHeader eyebrow="Finance" title="Accounts" />
-        <AccountForm />
-      </div>
+      <PageHeader
+        eyebrow="Finance"
+        title="Accounts"
+        actions={<AccountForm />}
+      />
 
       <ModuleTabs tabs={FINANCE_TABS} />
 

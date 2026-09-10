@@ -13,10 +13,11 @@ export default async function UniAssessmentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <PageHeader eyebrow="University" title="Assessments" />
-        <AssessmentForm courses={courses} />
-      </div>
+      <PageHeader
+        eyebrow="University"
+        title="Assessments"
+        actions={<AssessmentForm courses={courses} />}
+      />
 
       <ModuleTabs tabs={UNI_TABS} />
 

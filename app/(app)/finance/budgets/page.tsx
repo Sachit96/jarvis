@@ -19,10 +19,11 @@ export default async function BudgetsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <PageHeader eyebrow="Finance" title="Budgets" />
-        <BudgetForm />
-      </div>
+      <PageHeader
+        eyebrow="Finance"
+        title="Budgets"
+        actions={<BudgetForm />}
+      />
 
       <ModuleTabs tabs={FINANCE_TABS} />
 

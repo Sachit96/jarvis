@@ -22,10 +22,11 @@ export default async function TradesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <PageHeader eyebrow="Finance" title="Trading &amp; Venture Journal" />
-        <TradeForm checklistItems={checklistItems} />
-      </div>
+      <PageHeader
+        eyebrow="Finance"
+        title="Trading &amp; Venture Journal"
+        actions={<TradeForm checklistItems={checklistItems} />}
+      />
 
       <ModuleTabs tabs={FINANCE_TABS} />
 

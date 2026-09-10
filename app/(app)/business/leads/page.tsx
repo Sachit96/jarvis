@@ -35,10 +35,11 @@ export default async function LeadsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-3">
-        <PageHeader eyebrow="Business" title="Lead Research" />
-        <StartRunForm />
-      </div>
+      <PageHeader
+        eyebrow="Business"
+        title="Lead Research"
+        actions={<StartRunForm />}
+      />
 
       <ModuleTabs tabs={BUSINESS_TABS} />
 

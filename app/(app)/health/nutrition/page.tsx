@@ -40,10 +40,11 @@ export default async function NutritionPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <PageHeader eyebrow="Health" title="Nutrition" />
-        <NutritionTargetsForm targets={targets} />
-      </div>
+      <PageHeader
+        eyebrow="Health"
+        title="Nutrition"
+        actions={<NutritionTargetsForm targets={targets} />}
+      />
 
       <ModuleTabs tabs={HEALTH_TABS} />
 

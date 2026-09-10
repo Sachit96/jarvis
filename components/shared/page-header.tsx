@@ -31,8 +31,14 @@ export function PageHeader({
         {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
         {/* text-display, not text-title: the page's name is the one large
             moment above the fold, and at the old 22px it was competing with
-            card titles instead of ranking above them. */}
-        <h1 className="truncate text-display">{title}</h1>
+            card titles instead of ranking above them.
+
+            Wraps rather than truncates. A page title is the one string on
+            screen that must always be readable in full, and at display size
+            on a phone "Revenue & Contracts" has nowhere to go but a second
+            line. `min-w-0` on the column is what lets it shrink instead of
+            pushing the actions off the viewport. */}
+        <h1 className="text-display break-words">{title}</h1>
         {description ? <p className="text-body text-foreground-tertiary">{description}</p> : null}
       </div>
       {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}

@@ -14,13 +14,16 @@ export default async function BodyPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <PageHeader eyebrow="Health" title="Body" />
-        <div className="flex gap-2">
-          <WeightForm />
-          <SleepForm />
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="Health"
+        title="Body"
+        actions={
+          <>
+            <WeightForm />
+            <SleepForm />
+          </>
+        }
+      />
 
       <ModuleTabs tabs={HEALTH_TABS} />
 

@@ -23,10 +23,11 @@ export default async function UniCoursesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <PageHeader eyebrow="University" title="Courses" />
-        <CourseForm term={currentTerm} />
-      </div>
+      <PageHeader
+        eyebrow="University"
+        title="Courses"
+        actions={<CourseForm term={currentTerm} />}
+      />
 
       <ModuleTabs tabs={UNI_TABS} />
 

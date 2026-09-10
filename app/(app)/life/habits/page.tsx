@@ -39,10 +39,11 @@ export default async function RoutinePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <PageHeader eyebrow="Life" title="Routine" />
-        <HabitForm />
-      </div>
+      <PageHeader
+        eyebrow="Life"
+        title="Routine"
+        actions={<HabitForm />}
+      />
 
       <ModuleTabs tabs={TASKS_TABS} />
 

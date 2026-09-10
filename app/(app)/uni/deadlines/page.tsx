@@ -27,10 +27,11 @@ export default async function UniDeadlinesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <PageHeader eyebrow="University" title="Deadlines" />
-        <DeadlineForm />
-      </div>
+      <PageHeader
+        eyebrow="University"
+        title="Deadlines"
+        actions={<DeadlineForm />}
+      />
 
       <ModuleTabs tabs={UNI_TABS} />
 
