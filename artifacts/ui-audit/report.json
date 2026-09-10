@@ -25,13 +25,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=5CB68i4pnAekjehf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=5CB68i4pnAekjehf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=5CB68i4pnAekjehf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=5CB68i4pnAekjehf",
       "net::ERR_ABORTED http://127.0.0.1:3111/life/habits?_rsc=5CB68i4pnAekjehf",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=5CB68i4pnAekjehf",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=5CB68i4pnAekjehf",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=5CB68i4pnAekjehf",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=5CB68i4pnAekjehf",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=5CB68i4pnAekjehf",
-      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=5CB68i4pnAekjehf"
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=5CB68i4pnAekjehf"
     ]
   },
   {
@@ -65,13 +65,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=o3_12enZ8Cf_4Nei",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=o3_12enZ8Cf_4Nei",
-      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=o3_12enZ8Cf_4Nei",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=o3_12enZ8Cf_4Nei",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=o3_12enZ8Cf_4Nei",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline?_rsc=o3_12enZ8Cf_4Nei",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/revenue?_rsc=o3_12enZ8Cf_4Nei",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/clients?_rsc=o3_12enZ8Cf_4Nei",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/leads?_rsc=o3_12enZ8Cf_4Nei"
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=ZXtZ3nOcfX1NtfjC",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/leads?_rsc=o3_12enZ8Cf_4Nei",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/revenue?_rsc=HKNNtuUGRNm4PS5Y",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/clients?_rsc=HKNNtuUGRNm4PS5Y"
     ]
   },
   {
@@ -101,12 +101,12 @@
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/revenue?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/clients?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline?_rsc=D2Z8MufIpwjRWmfK",
       "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=D2Z8MufIpwjRWmfK",
       "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=D2Z8MufIpwjRWmfK",
-      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=D2Z8MufIpwjRWmfK",
-      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=D2Z8MufIpwjRWmfK",
-      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=D2Z8MufIpwjRWmfK",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=D2Z8MufIpwjRWmfK"
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=D2Z8MufIpwjRWmfK"
     ]
   },
   {
@@ -140,13 +140,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=oTsex1wSLfqHGEFq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=oTsex1wSLfqHGEFq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=oTsex1wSLfqHGEFq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=oTsex1wSLfqHGEFq",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline/deal-0000-0000-0000-000000000004?_rsc=oTsex1wSLfqHGEFq",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline/deal-0000-0000-0000-000000000002?_rsc=oTsex1wSLfqHGEFq",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline/deal-0000-0000-0000-000000000003?_rsc=oTsex1wSLfqHGEFq",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline/deal-0000-0000-0000-000000000001?_rsc=oTsex1wSLfqHGEFq",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/revenue?_rsc=oTsex1wSLfqHGEFq",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=oTsex1wSLfqHGEFq",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/leads?_rsc=oTsex1wSLfqHGEFq"
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline/deal-0000-0000-0000-000000000001?_rsc=oTsex1wSLfqHGEFq"
     ]
   },
   {
@@ -177,11 +177,11 @@
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=xWO5G7efR6odeVa4",
       "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=xWO5G7efR6odeVa4",
-      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=xWO5G7efR6odeVa4",
       "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=xWO5G7efR6odeVa4",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=xWO5G7efR6odeVa4",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=xWO5G7efR6odeVa4",
       "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=xWO5G7efR6odeVa4",
-      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=xWO5G7efR6odeVa4",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=xWO5G7efR6odeVa4"
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=xWO5G7efR6odeVa4"
     ]
   },
   {
@@ -215,13 +215,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=_RCMyx_lCvdpxNXV",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=_RCMyx_lCvdpxNXV",
       "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=_RCMyx_lCvdpxNXV",
       "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=_RCMyx_lCvdpxNXV",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=_RCMyx_lCvdpxNXV",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=_RCMyx_lCvdpxNXV",
       "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=_RCMyx_lCvdpxNXV",
-      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=_RCMyx_lCvdpxNXV",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=_RCMyx_lCvdpxNXV"
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/clients?_rsc=_RCMyx_lCvdpxNXV",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/leads?_rsc=_RCMyx_lCvdpxNXV"
     ]
   },
   {
@@ -255,13 +255,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=f2enUUpVF_qM4cSG",
-      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=f2enUUpVF_qM4cSG",
-      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=f2enUUpVF_qM4cSG",
-      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=f2enUUpVF_qM4cSG",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=f2enUUpVF_qM4cSG",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=f2enUUpVF_qM4cSG",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=f2enUUpVF_qM4cSG"
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=f2enUUpVF_qM4cSG",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=f2enUUpVF_qM4cSG",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/transactions?_rsc=f2enUUpVF_qM4cSG",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/analysis?_rsc=f2enUUpVF_qM4cSG",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/trades?_rsc=f2enUUpVF_qM4cSG",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=f2enUUpVF_qM4cSG",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=n5YPPXs6d1uo_ozf"
     ]
   },
   {
@@ -290,13 +290,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/analysis?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/trades?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=ptrt5iFeC7HpM30x",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=ptrt5iFeC7HpM30x",
       "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=ptrt5iFeC7HpM30x",
-      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=ptrt5iFeC7HpM30x",
-      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=ptrt5iFeC7HpM30x",
-      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=ptrt5iFeC7HpM30x",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/analysis?_rsc=ptrt5iFeC7HpM30x",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/trades?_rsc=ptrt5iFeC7HpM30x"
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=ptrt5iFeC7HpM30x"
     ]
   },
   {
@@ -330,13 +330,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/transactions?_rsc=n3IGH-egQkMqxWn1",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/analysis?_rsc=n3IGH-egQkMqxWn1",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/trades?_rsc=n3IGH-egQkMqxWn1",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=n3IGH-egQkMqxWn1",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=n3IGH-egQkMqxWn1",
-      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=n3IGH-egQkMqxWn1",
       "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=n3IGH-egQkMqxWn1",
-      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=n3IGH-egQkMqxWn1"
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=n3IGH-egQkMqxWn1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=n3IGH-egQkMqxWn1"
     ]
   },
   {
@@ -370,13 +370,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/transactions?_rsc=22pv1zVOKerFgnKj",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/analysis?_rsc=22pv1zVOKerFgnKj",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/trades?_rsc=22pv1zVOKerFgnKj",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=22pv1zVOKerFgnKj",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/transactions?_rsc=22pv1zVOKerFgnKj",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=22pv1zVOKerFgnKj",
       "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=22pv1zVOKerFgnKj",
-      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=22pv1zVOKerFgnKj"
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=22pv1zVOKerFgnKj"
     ]
   },
   {
@@ -412,10 +412,10 @@
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/analysis?_rsc=bag_GcvIBBJXPB5h",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=bag_GcvIBBJXPB5h",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=bag_GcvIBBJXPB5h",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/transactions?_rsc=bag_GcvIBBJXPB5h",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=bag_GcvIBBJXPB5h",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=bag_GcvIBBJXPB5h",
       "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=bag_GcvIBBJXPB5h",
-      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=bag_GcvIBBJXPB5h",
       "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=bag_GcvIBBJXPB5h"
     ]
   },
@@ -445,13 +445,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/transactions?_rsc=BE6pjSK8p-MA_Yfb",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/trades?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=BE6pjSK8p-MA_Yfb",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=BE6pjSK8p-MA_Yfb",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=BE6pjSK8p-MA_Yfb",
-      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=BE6pjSK8p-MA_Yfb",
-      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=BE6pjSK8p-MA_Yfb",
-      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=BE6pjSK8p-MA_Yfb"
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/transactions?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=BE6pjSK8p-MA_Yfb"
     ]
   },
   {
@@ -487,11 +487,11 @@
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
       "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=NuDYc2o2lOzWC31e",
       "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=NuDYc2o2lOzWC31e",
-      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=NuDYc2o2lOzWC31e",
-      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=NuDYc2o2lOzWC31e",
       "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=NuDYc2o2lOzWC31e",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=NuDYc2o2lOzWC31e",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=NuDYc2o2lOzWC31e"
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=NuDYc2o2lOzWC31e",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=NuDYc2o2lOzWC31e",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/body?_rsc=NuDYc2o2lOzWC31e"
     ]
   },
   {
@@ -522,11 +522,11 @@
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
       "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=ccvzu7DEeQuwtMWy",
       "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=ccvzu7DEeQuwtMWy",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=ccvzu7DEeQuwtMWy",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=ccvzu7DEeQuwtMWy",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/body?_rsc=ccvzu7DEeQuwtMWy",
       "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=ccvzu7DEeQuwtMWy",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/goals?_rsc=ccvzu7DEeQuwtMWy",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=ccvzu7DEeQuwtMWy",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=ccvzu7DEeQuwtMWy"
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/goals?_rsc=ccvzu7DEeQuwtMWy"
     ]
   },
   {
@@ -560,13 +560,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=j7HX79jea-HQ4hRQ",
-      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=j7HX79jea-HQ4hRQ",
-      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=j7HX79jea-HQ4hRQ",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=j7HX79jea-HQ4hRQ",
       "net::ERR_ABORTED http://127.0.0.1:3111/life/goals?_rsc=j7HX79jea-HQ4hRQ",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=j7HX79jea-HQ4hRQ",
-      "net::ERR_ABORTED http://127.0.0.1:3111/health/nutrition?_rsc=bwbd6Oe9H9L946q9"
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/nutrition?_rsc=j7HX79jea-HQ4hRQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/body?_rsc=bwbd6Oe9H9L946q9",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=bwbd6Oe9H9L946q9",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/nutrition?_rsc=bwbd6Oe9H9L946q9",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=bwbd6Oe9H9L946q9"
     ]
   },
   {
@@ -600,13 +600,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=2bQpa8NN0dgTns7a",
-      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=2bQpa8NN0dgTns7a",
-      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=2bQpa8NN0dgTns7a",
-      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=2bQpa8NN0dgTns7a",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=2bQpa8NN0dgTns7a",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=2bQpa8NN0dgTns7a",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=2bQpa8NN0dgTns7a"
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=2bQpa8NN0dgTns7a",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=2bQpa8NN0dgTns7a",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=2bQpa8NN0dgTns7a",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=khL-B0rLxYSeRi14",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=khL-B0rLxYSeRi14",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=BzU597TtV2dIXWk2",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=ylyPnvmTNwtr1ZrF"
     ]
   },
   {
@@ -635,13 +635,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=Ep5vvZ4dkaeJDSnf",
       "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=Ep5vvZ4dkaeJDSnf",
       "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=Ep5vvZ4dkaeJDSnf",
-      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=Ep5vvZ4dkaeJDSnf",
-      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=Ep5vvZ4dkaeJDSnf",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=Ep5vvZ4dkaeJDSnf",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=Ep5vvZ4dkaeJDSnf",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/journal?_rsc=Ep5vvZ4dkaeJDSnf"
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=Ep5vvZ4dkaeJDSnf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/journal?_rsc=Ep5vvZ4dkaeJDSnf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/habits?_rsc=Ep5vvZ4dkaeJDSnf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=Ep5vvZ4dkaeJDSnf"
     ]
   },
   {
@@ -670,13 +670,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/goals?_rsc=UG6lc75EF8TajgD1",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=UG6lc75EF8TajgD1",
-      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=UG6lc75EF8TajgD1",
-      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=UG6lc75EF8TajgD1",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=UG6lc75EF8TajgD1",
       "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=UG6lc75EF8TajgD1",
-      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=UG6lc75EF8TajgD1"
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=UG6lc75EF8TajgD1"
     ]
   },
   {
@@ -705,13 +705,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=jLp05vBH7c2QSDsN",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/habits?_rsc=jLp05vBH7c2QSDsN",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=jLp05vBH7c2QSDsN",
       "net::ERR_ABORTED http://127.0.0.1:3111/life/goals?_rsc=jLp05vBH7c2QSDsN",
       "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=jLp05vBH7c2QSDsN",
       "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=jLp05vBH7c2QSDsN",
-      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=jLp05vBH7c2QSDsN"
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=jLp05vBH7c2QSDsN",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=jLp05vBH7c2QSDsN",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=jLp05vBH7c2QSDsN",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=jLp05vBH7c2QSDsN"
     ]
   },
   {
@@ -745,13 +745,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/deadlines?_rsc=dQJGrTnWKDaHnCb6",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/assessments?_rsc=dQJGrTnWKDaHnCb6",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/calendar?_rsc=dQJGrTnWKDaHnCb6",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=dQJGrTnWKDaHnCb6",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=dQJGrTnWKDaHnCb6",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=dQJGrTnWKDaHnCb6",
       "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=dQJGrTnWKDaHnCb6",
       "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=dQJGrTnWKDaHnCb6",
-      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=dQJGrTnWKDaHnCb6"
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=dQJGrTnWKDaHnCb6",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=dQJGrTnWKDaHnCb6",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=dQJGrTnWKDaHnCb6"
     ]
   },
   {
@@ -785,13 +785,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses/crs-0000-0000-0000-000000000002?_rsc=D2cyvoThjh17kpJq",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses/crs-0000-0000-0000-000000000001?_rsc=D2cyvoThjh17kpJq",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/deadlines?_rsc=D2cyvoThjh17kpJq",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/assessments?_rsc=D2cyvoThjh17kpJq",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=D2cyvoThjh17kpJq",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/calendar?_rsc=D2cyvoThjh17kpJq",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=D2cyvoThjh17kpJq"
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=D2cyvoThjh17kpJq"
     ]
   },
   {
@@ -820,13 +820,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=_yMWtpyA1TM6x9D-",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=_yMWtpyA1TM6x9D-",
-      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=_yMWtpyA1TM6x9D-",
-      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=_yMWtpyA1TM6x9D-",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/deadlines?_rsc=_yMWtpyA1TM6x9D-",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/assessments?_rsc=_yMWtpyA1TM6x9D-",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/calendar?_rsc=_yMWtpyA1TM6x9D-"
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/calendar?_rsc=_yMWtpyA1TM6x9D-",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=_yMWtpyA1TM6x9D-",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=_yMWtpyA1TM6x9D-",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=_yMWtpyA1TM6x9D-",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=_yMWtpyA1TM6x9D-"
     ]
   },
   {
@@ -864,9 +864,9 @@
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/assessments?_rsc=VNxNCDZQiPFzDKse",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/calendar?_rsc=VNxNCDZQiPFzDKse",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=VNxNCDZQiPFzDKse",
-      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=VNxNCDZQiPFzDKse",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=VNxNCDZQiPFzDKse",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=VNxNCDZQiPFzDKse"
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=VNxNCDZQiPFzDKse",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=VNxNCDZQiPFzDKse"
     ]
   },
   {
@@ -903,10 +903,10 @@
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/deadlines?_rsc=fAJtcAUkWGjD45ay",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/assessments?_rsc=fAJtcAUkWGjD45ay",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=fAJtcAUkWGjD45ay",
-      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=fAJtcAUkWGjD45ay",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=fAJtcAUkWGjD45ay",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=fAJtcAUkWGjD45ay",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=fAJtcAUkWGjD45ay",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=fAJtcAUkWGjD45ay"
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=fAJtcAUkWGjD45ay",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=fAJtcAUkWGjD45ay"
     ]
   },
   {
@@ -935,13 +935,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=c8lDI1-FgQ4NaUpn",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/deadlines?_rsc=c8lDI1-FgQ4NaUpn",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/calendar?_rsc=c8lDI1-FgQ4NaUpn",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=c8lDI1-FgQ4NaUpn",
-      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=c8lDI1-FgQ4NaUpn",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=c8lDI1-FgQ4NaUpn",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=c8lDI1-FgQ4NaUpn"
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/calendar?_rsc=c8lDI1-FgQ4NaUpn"
     ]
   },
   {
@@ -975,13 +975,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=3qOzJPo3BJfB6ezt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/assessments?_rsc=3qOzJPo3BJfB6ezt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/calendar?_rsc=3qOzJPo3BJfB6ezt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=3qOzJPo3BJfB6ezt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=3qOzJPo3BJfB6ezt",
       "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=3qOzJPo3BJfB6ezt",
       "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=3qOzJPo3BJfB6ezt",
-      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=3qOzJPo3BJfB6ezt",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/goals?_rsc=3qOzJPo3BJfB6ezt",
-      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=3qOzJPo3BJfB6ezt",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=3qOzJPo3BJfB6ezt"
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=3qOzJPo3BJfB6ezt"
     ]
   },
   {
@@ -1015,13 +1015,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=_z6xjKsFLokdF5wt",
-      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=_z6xjKsFLokdF5wt",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor/weekly-review?_rsc=_z6xjKsFLokdF5wt",
       "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=_z6xjKsFLokdF5wt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=_z6xjKsFLokdF5wt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=_z6xjKsFLokdF5wt",
       "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=_z6xjKsFLokdF5wt",
       "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=_z6xjKsFLokdF5wt",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=_z6xjKsFLokdF5wt"
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=_z6xjKsFLokdF5wt"
     ]
   },
   {
@@ -1050,13 +1050,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=hc41BiiGnQumc4IY",
       "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=hc41BiiGnQumc4IY",
       "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=hc41BiiGnQumc4IY",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=hc41BiiGnQumc4IY",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=hc41BiiGnQumc4IY",
       "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=hc41BiiGnQumc4IY",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/goals?_rsc=hc41BiiGnQumc4IY",
       "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=hc41BiiGnQumc4IY",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=hc41BiiGnQumc4IY"
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=hc41BiiGnQumc4IY"
     ]
   },
   {
@@ -1116,10 +1116,10 @@
       "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=IvzQG1HTTo-_9-eQ",
       "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=IvzQG1HTTo-_9-eQ",
       "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=IvzQG1HTTo-_9-eQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=IvzQG1HTTo-_9-eQ",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=IvzQG1HTTo-_9-eQ",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=IvzQG1HTTo-_9-eQ",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=IvzQG1HTTo-_9-eQ",
-      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=IvzQG1HTTo-_9-eQ"
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=IvzQG1HTTo-_9-eQ"
     ]
   },
   {
@@ -1153,11 +1153,11 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=ODExhA-fjN9Pzh9j",
       "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=ODExhA-fjN9Pzh9j",
       "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=ODExhA-fjN9Pzh9j",
       "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=ODExhA-fjN9Pzh9j",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=ODExhA-fjN9Pzh9j",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=ODExhA-fjN9Pzh9j",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=ODExhA-fjN9Pzh9j",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=ODExhA-fjN9Pzh9j",
       "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=ODExhA-fjN9Pzh9j"
     ]
@@ -1196,10 +1196,10 @@
       "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=DQxjArDrgutTG17x",
       "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=DQxjArDrgutTG17x",
       "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=DQxjArDrgutTG17x",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=DQxjArDrgutTG17x",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=DQxjArDrgutTG17x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=DQxjArDrgutTG17x",
       "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=DQxjArDrgutTG17x",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/goals?_rsc=DQxjArDrgutTG17x"
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/goals?_rsc=DQxjArDrgutTG17x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=DQxjArDrgutTG17x"
     ]
   },
   {
@@ -1233,13 +1233,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=3Kf34hZiraCpULjt",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=3Kf34hZiraCpULjt",
-      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=3Kf34hZiraCpULjt",
-      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=3Kf34hZiraCpULjt",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/clients/con-0000-0000-0000-000000000002?_rsc=3Kf34hZiraCpULjt",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline?_rsc=3Kf34hZiraCpULjt",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=3Kf34hZiraCpULjt"
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=3Kf34hZiraCpULjt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=3Kf34hZiraCpULjt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=3Kf34hZiraCpULjt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=3Kf34hZiraCpULjt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=3Kf34hZiraCpULjt"
     ]
   },
   {
@@ -1268,13 +1268,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=-TJ3mbqaGy0mRfBd",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=-TJ3mbqaGy0mRfBd",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=-TJ3mbqaGy0mRfBd",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=-TJ3mbqaGy0mRfBd",
       "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=-TJ3mbqaGy0mRfBd",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline/deal-0000-0000-0000-000000000004?_rsc=-TJ3mbqaGy0mRfBd",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline/deal-0000-0000-0000-000000000001?_rsc=-TJ3mbqaGy0mRfBd",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/clients?_rsc=-TJ3mbqaGy0mRfBd",
       "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=-TJ3mbqaGy0mRfBd",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=-TJ3mbqaGy0mRfBd",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=-TJ3mbqaGy0mRfBd"
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=-TJ3mbqaGy0mRfBd"
     ]
   },
   {
@@ -1308,13 +1308,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=CpUIxn6wJPWOXOmb",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=CpUIxn6wJPWOXOmb",
       "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=CpUIxn6wJPWOXOmb",
       "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=CpUIxn6wJPWOXOmb",
-      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=CpUIxn6wJPWOXOmb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=CpUIxn6wJPWOXOmb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=CpUIxn6wJPWOXOmb",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=CpUIxn6wJPWOXOmb",
-      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=CpUIxn6wJPWOXOmb"
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=CpUIxn6wJPWOXOmb"
     ]
   },
   {
@@ -1343,10 +1343,10 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=5CB68i4pnAekjehf",
       "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=5CB68i4pnAekjehf",
       "net::ERR_ABORTED http://127.0.0.1:3111/life/habits?_rsc=5CB68i4pnAekjehf",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=5CB68i4pnAekjehf",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=5CB68i4pnAekjehf",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=5CB68i4pnAekjehf",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=5CB68i4pnAekjehf",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=5CB68i4pnAekjehf"
@@ -1383,13 +1383,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/clients?_rsc=o3_12enZ8Cf_4Nei",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/leads?_rsc=o3_12enZ8Cf_4Nei",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/revenue?_rsc=o3_12enZ8Cf_4Nei",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/clients?_rsc=o3_12enZ8Cf_4Nei",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline?_rsc=o3_12enZ8Cf_4Nei",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=o3_12enZ8Cf_4Nei",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=o3_12enZ8Cf_4Nei",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=o3_12enZ8Cf_4Nei",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=o3_12enZ8Cf_4Nei"
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=o3_12enZ8Cf_4Nei"
     ]
   },
   {
@@ -1418,13 +1418,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=D2Z8MufIpwjRWmfK",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/revenue?_rsc=D2Z8MufIpwjRWmfK",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/clients?_rsc=D2Z8MufIpwjRWmfK",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline?_rsc=D2Z8MufIpwjRWmfK",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=D2Z8MufIpwjRWmfK",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=D2Z8MufIpwjRWmfK",
-      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=D2Z8MufIpwjRWmfK"
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=D2Z8MufIpwjRWmfK"
     ]
   },
   {
@@ -1459,11 +1459,11 @@
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline/deal-0000-0000-0000-000000000001?_rsc=oTsex1wSLfqHGEFq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/revenue?_rsc=oTsex1wSLfqHGEFq",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/clients?_rsc=oTsex1wSLfqHGEFq",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline/deal-0000-0000-0000-000000000003?_rsc=oTsex1wSLfqHGEFq",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/leads?_rsc=oTsex1wSLfqHGEFq",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=oTsex1wSLfqHGEFq",
-      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=oTsex1wSLfqHGEFq",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=oTsex1wSLfqHGEFq"
     ]
   },
@@ -1493,12 +1493,12 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/revenue?_rsc=xWO5G7efR6odeVa4",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/clients/con-0000-0000-0000-000000000003?_rsc=xWO5G7efR6odeVa4",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/clients/con-0000-0000-0000-000000000002?_rsc=xWO5G7efR6odeVa4",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/clients/con-0000-0000-0000-000000000001?_rsc=xWO5G7efR6odeVa4",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline?_rsc=xWO5G7efR6odeVa4",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/leads?_rsc=xWO5G7efR6odeVa4",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/clients/con-0000-0000-0000-000000000001?_rsc=xWO5G7efR6odeVa4",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/revenue?_rsc=xWO5G7efR6odeVa4",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline?_rsc=xWO5G7efR6odeVa4",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=xWO5G7efR6odeVa4"
     ]
   },
@@ -1533,13 +1533,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/clients?_rsc=_RCMyx_lCvdpxNXV",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline?_rsc=_RCMyx_lCvdpxNXV",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/leads?_rsc=_RCMyx_lCvdpxNXV",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=_RCMyx_lCvdpxNXV",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/clients?_rsc=_RCMyx_lCvdpxNXV",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=_RCMyx_lCvdpxNXV",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=_RCMyx_lCvdpxNXV",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=_RCMyx_lCvdpxNXV"
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=_RCMyx_lCvdpxNXV",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=_RCMyx_lCvdpxNXV"
     ]
   },
   {
@@ -1573,13 +1573,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=f2enUUpVF_qM4cSG",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=f2enUUpVF_qM4cSG",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=f2enUUpVF_qM4cSG",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/transactions?_rsc=f2enUUpVF_qM4cSG",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=f2enUUpVF_qM4cSG",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=f2enUUpVF_qM4cSG",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=n5YPPXs6d1uo_ozf",
-      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=f2enUUpVF_qM4cSG"
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=f2enUUpVF_qM4cSG",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=n5YPPXs6d1uo_ozf"
     ]
   },
   {
@@ -1608,13 +1608,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=ptrt5iFeC7HpM30x",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=ptrt5iFeC7HpM30x",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=ptrt5iFeC7HpM30x",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=ptrt5iFeC7HpM30x",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=ptrt5iFeC7HpM30x",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=ptrt5iFeC7HpM30x",
-      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=ptrt5iFeC7HpM30x"
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=ptrt5iFeC7HpM30x"
     ]
   },
   {
@@ -1654,7 +1654,7 @@
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=n3IGH-egQkMqxWn1",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=n3IGH-egQkMqxWn1",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=n3IGH-egQkMqxWn1",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=n3IGH-egQkMqxWn1"
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=n3IGH-egQkMqxWn1"
     ]
   },
   {
@@ -1688,11 +1688,11 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=22pv1zVOKerFgnKj",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/transactions?_rsc=22pv1zVOKerFgnKj",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=22pv1zVOKerFgnKj",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=22pv1zVOKerFgnKj",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=22pv1zVOKerFgnKj",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=22pv1zVOKerFgnKj",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=22pv1zVOKerFgnKj",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=22pv1zVOKerFgnKj",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=22pv1zVOKerFgnKj"
     ]
@@ -1728,11 +1728,11 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=bag_GcvIBBJXPB5h",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=bag_GcvIBBJXPB5h",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/transactions?_rsc=bag_GcvIBBJXPB5h",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=bag_GcvIBBJXPB5h",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=bag_GcvIBBJXPB5h",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=bag_GcvIBBJXPB5h",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=bag_GcvIBBJXPB5h",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=bag_GcvIBBJXPB5h"
     ]
@@ -1763,13 +1763,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=BE6pjSK8p-MA_Yfb",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=BE6pjSK8p-MA_Yfb",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/transactions?_rsc=BE6pjSK8p-MA_Yfb",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=BE6pjSK8p-MA_Yfb",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=BE6pjSK8p-MA_Yfb",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=BE6pjSK8p-MA_Yfb",
-      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=BE6pjSK8p-MA_Yfb"
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=BE6pjSK8p-MA_Yfb"
     ]
   },
   {
@@ -1803,12 +1803,12 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=NuDYc2o2lOzWC31e",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/body?_rsc=NuDYc2o2lOzWC31e",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/nutrition?_rsc=NuDYc2o2lOzWC31e",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=NuDYc2o2lOzWC31e",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=NuDYc2o2lOzWC31e",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=NuDYc2o2lOzWC31e",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=NuDYc2o2lOzWC31e",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=NuDYc2o2lOzWC31e",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/body?_rsc=7_m01JHZVHMWsviE"
     ]
   },
@@ -1840,8 +1840,8 @@
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/body?_rsc=ccvzu7DEeQuwtMWy",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=ccvzu7DEeQuwtMWy",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=ccvzu7DEeQuwtMWy",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=ccvzu7DEeQuwtMWy",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=ccvzu7DEeQuwtMWy",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=ccvzu7DEeQuwtMWy",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=ccvzu7DEeQuwtMWy",
       "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=ccvzu7DEeQuwtMWy"
@@ -1878,13 +1878,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=j7HX79jea-HQ4hRQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=j7HX79jea-HQ4hRQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/nutrition?_rsc=j7HX79jea-HQ4hRQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=j7HX79jea-HQ4hRQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=j7HX79jea-HQ4hRQ",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=j7HX79jea-HQ4hRQ",
-      "net::ERR_ABORTED http://127.0.0.1:3111/health/body?_rsc=bwbd6Oe9H9L946q9",
-      "net::ERR_ABORTED http://127.0.0.1:3111/health/nutrition?_rsc=bwbd6Oe9H9L946q9",
-      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=bwbd6Oe9H9L946q9",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=IQAEjGsz4CSIb79S",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=FU8w2C2HrcLuwUxO"
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=j7HX79jea-HQ4hRQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/body?_rsc=bwbd6Oe9H9L946q9"
     ]
   },
   {
@@ -1918,13 +1918,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=2bQpa8NN0dgTns7a",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=2bQpa8NN0dgTns7a",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=2bQpa8NN0dgTns7a",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=2bQpa8NN0dgTns7a",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=2bQpa8NN0dgTns7a",
       "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=2bQpa8NN0dgTns7a",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=o9434jSLFzh2_yFa",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=xmgdrRPMsptIP5p5",
-      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=m6ePmjze9VQA-Ypp"
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=o9434jSLFzh2_yFa"
     ]
   },
   {
@@ -1955,11 +1955,11 @@
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
       "net::ERR_ABORTED http://127.0.0.1:3111/life/journal?_rsc=Ep5vvZ4dkaeJDSnf",
       "net::ERR_ABORTED http://127.0.0.1:3111/life/habits?_rsc=Ep5vvZ4dkaeJDSnf",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=Ep5vvZ4dkaeJDSnf",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=Ep5vvZ4dkaeJDSnf",
-      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=Ep5vvZ4dkaeJDSnf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=Ep5vvZ4dkaeJDSnf",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=Ep5vvZ4dkaeJDSnf",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=Ep5vvZ4dkaeJDSnf"
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=Ep5vvZ4dkaeJDSnf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=Ep5vvZ4dkaeJDSnf"
     ]
   },
   {
@@ -1988,13 +1988,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/journal?_rsc=UG6lc75EF8TajgD1",
       "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=UG6lc75EF8TajgD1",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/journal?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=UG6lc75EF8TajgD1",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=UG6lc75EF8TajgD1",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=UG6lc75EF8TajgD1",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/goals?_rsc=UG6lc75EF8TajgD1",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=g88AB-QcWjyv-NrW"
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=UG6lc75EF8TajgD1"
     ]
   },
   {
@@ -2023,13 +2023,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/habits?_rsc=jLp05vBH7c2QSDsN",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=jLp05vBH7c2QSDsN",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=jLp05vBH7c2QSDsN",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=jLp05vBH7c2QSDsN",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=jLp05vBH7c2QSDsN",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=jLp05vBH7c2QSDsN",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=jLp05vBH7c2QSDsN",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=jLp05vBH7c2QSDsN",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/goals?_rsc=jLp05vBH7c2QSDsN",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/journal?_rsc=lRgkUYeANosasO4m",
-      "net::ERR_ABORTED http://127.0.0.1:3111/life/habits?_rsc=lRgkUYeANosasO4m"
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=jLp05vBH7c2QSDsN"
     ]
   },
   {
@@ -2063,10 +2063,10 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=dQJGrTnWKDaHnCb6",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=dQJGrTnWKDaHnCb6",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=dQJGrTnWKDaHnCb6",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=dQJGrTnWKDaHnCb6",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=dQJGrTnWKDaHnCb6",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=dQJGrTnWKDaHnCb6",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=dQJGrTnWKDaHnCb6",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=dQJGrTnWKDaHnCb6",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=dQJGrTnWKDaHnCb6"
@@ -2103,10 +2103,10 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=D2cyvoThjh17kpJq",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses/crs-0000-0000-0000-000000000002?_rsc=D2cyvoThjh17kpJq",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses/crs-0000-0000-0000-000000000001?_rsc=D2cyvoThjh17kpJq",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=D2cyvoThjh17kpJq",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=D2cyvoThjh17kpJq",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=D2cyvoThjh17kpJq",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=D2cyvoThjh17kpJq"
@@ -2138,13 +2138,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=_yMWtpyA1TM6x9D-",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=_yMWtpyA1TM6x9D-",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=_yMWtpyA1TM6x9D-",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=_yMWtpyA1TM6x9D-",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=_yMWtpyA1TM6x9D-",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=_yMWtpyA1TM6x9D-",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=_yMWtpyA1TM6x9D-",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=_yMWtpyA1TM6x9D-",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=_yMWtpyA1TM6x9D-"
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=_yMWtpyA1TM6x9D-"
     ]
   },
   {
@@ -2178,13 +2178,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=VNxNCDZQiPFzDKse",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=VNxNCDZQiPFzDKse",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=VNxNCDZQiPFzDKse",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=VNxNCDZQiPFzDKse",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=VNxNCDZQiPFzDKse",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=VNxNCDZQiPFzDKse",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=VNxNCDZQiPFzDKse"
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=VNxNCDZQiPFzDKse",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=VNxNCDZQiPFzDKse",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=VNxNCDZQiPFzDKse",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=QHqAyk9uHt41JjAX"
     ]
   },
   {
@@ -2218,13 +2218,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=fAJtcAUkWGjD45ay",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=fAJtcAUkWGjD45ay",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=fAJtcAUkWGjD45ay",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=fAJtcAUkWGjD45ay",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=fAJtcAUkWGjD45ay",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=fAJtcAUkWGjD45ay",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=fAJtcAUkWGjD45ay",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=fAJtcAUkWGjD45ay",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=fAJtcAUkWGjD45ay"
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=fAJtcAUkWGjD45ay"
     ]
   },
   {
@@ -2256,10 +2256,10 @@
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=c8lDI1-FgQ4NaUpn",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=c8lDI1-FgQ4NaUpn",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=c8lDI1-FgQ4NaUpn",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=c8lDI1-FgQ4NaUpn",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=c8lDI1-FgQ4NaUpn",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=c8lDI1-FgQ4NaUpn",
-      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=c8lDI1-FgQ4NaUpn"
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=c8lDI1-FgQ4NaUpn"
     ]
   },
   {
@@ -2293,13 +2293,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=3qOzJPo3BJfB6ezt",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=3qOzJPo3BJfB6ezt",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=3qOzJPo3BJfB6ezt",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=3qOzJPo3BJfB6ezt",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=3qOzJPo3BJfB6ezt",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=3qOzJPo3BJfB6ezt",
-      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=3qOzJPo3BJfB6ezt",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=3qOzJPo3BJfB6ezt"
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=3qOzJPo3BJfB6ezt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=3qOzJPo3BJfB6ezt"
     ]
   },
   {
@@ -2333,13 +2333,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor/weekly-review?_rsc=_z6xjKsFLokdF5wt",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=_z6xjKsFLokdF5wt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor/weekly-review?_rsc=_z6xjKsFLokdF5wt",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=_z6xjKsFLokdF5wt",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=_z6xjKsFLokdF5wt",
       "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=_z6xjKsFLokdF5wt",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor/weekly-review?_rsc=s2CZf6syBfyfbP-r",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=s2CZf6syBfyfbP-r"
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=_z6xjKsFLokdF5wt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor/weekly-review?_rsc=s2CZf6syBfyfbP-r"
     ]
   },
   {
@@ -2368,13 +2368,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=hc41BiiGnQumc4IY",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=hc41BiiGnQumc4IY",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=hc41BiiGnQumc4IY",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=hc41BiiGnQumc4IY",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor/weekly-review?_rsc=hmRZCZitoNCeKBHx",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=hmRZCZitoNCeKBHx",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=5XI03wdTgZhEW4ao",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=Fg8Hn3JkM7jChZio",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=SktUYrnLuhwkQvcJ"
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=2m1IMR9IKv2VpmtI"
     ]
   },
   {
@@ -2432,11 +2432,11 @@
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=IvzQG1HTTo-_9-eQ",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=IvzQG1HTTo-_9-eQ",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=IvzQG1HTTo-_9-eQ",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=IvzQG1HTTo-_9-eQ",
       "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=IvzQG1HTTo-_9-eQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=8CBxlATsT8sp2AUm",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=UpQifAPtmKxaVanw",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=-yv4Acx9SoPtQLQV",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=fWlUvQT2TlnrcdVS"
     ]
   },
@@ -2471,13 +2471,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=ODExhA-fjN9Pzh9j",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=ODExhA-fjN9Pzh9j",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=ODExhA-fjN9Pzh9j",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=ODExhA-fjN9Pzh9j",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=ODExhA-fjN9Pzh9j",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=ODExhA-fjN9Pzh9j",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=hk3HAvPuLnTokieb",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=ODExhA-fjN9Pzh9j"
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=ODExhA-fjN9Pzh9j",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=phuxUfNDAWue8DAB"
     ]
   },
   {
@@ -2511,13 +2511,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=DQxjArDrgutTG17x",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=DQxjArDrgutTG17x",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=DQxjArDrgutTG17x",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=DQxjArDrgutTG17x",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=DQxjArDrgutTG17x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=DQxjArDrgutTG17x",
       "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=DQxjArDrgutTG17x",
-      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=63kLqKpnmbbA0dpI",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=2n6B1_X6pax2y3z3"
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=63kLqKpnmbbA0dpI"
     ]
   },
   {
@@ -2586,13 +2586,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline/deal-0000-0000-0000-000000000004?_rsc=-TJ3mbqaGy0mRfBd",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=-TJ3mbqaGy0mRfBd",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline/deal-0000-0000-0000-000000000001?_rsc=-TJ3mbqaGy0mRfBd",
       "net::ERR_ABORTED http://127.0.0.1:3111/business/clients?_rsc=-TJ3mbqaGy0mRfBd",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=-TJ3mbqaGy0mRfBd",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=-TJ3mbqaGy0mRfBd",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=-TJ3mbqaGy0mRfBd",
-      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=-TJ3mbqaGy0mRfBd",
-      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=-TJ3mbqaGy0mRfBd"
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=-TJ3mbqaGy0mRfBd"
     ]
   },
   {
@@ -2626,13 +2626,13 @@
     ],
     "failedRequests": [
       "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=CpUIxn6wJPWOXOmb",
       "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=CpUIxn6wJPWOXOmb",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=CpUIxn6wJPWOXOmb",
       "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=CpUIxn6wJPWOXOmb",
-      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=CpUIxn6wJPWOXOmb",
       "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=CpUIxn6wJPWOXOmb",
       "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=CpUIxn6wJPWOXOmb",
-      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=CpUIxn6wJPWOXOmb"
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=oxhQ-YQ-tfs93t9C"
     ]
   }
 ]
