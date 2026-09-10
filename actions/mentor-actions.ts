@@ -4,8 +4,9 @@ import { revalidatePath } from "next/cache";
 import { runAgentTurn } from "@/lib/ai/agent";
 import { toClientTrace } from "@/lib/ai/providers/types";
 import { toUserFacingError } from "@/lib/ai/user-error";
-import { getGeneralMentorMessages } from "@/lib/db/queries/mentor";
+import { getDailyRecommendation, getGeneralMentorMessages } from "@/lib/db/queries/mentor";
 import { createClient } from "@/lib/supabase/server";
+import { todayStr } from "@/lib/date";
 import { generateDailyBrief, generateWeeklyReview, runGeneralMentorChat } from "@/lib/ai/mentor-brief";
 
 export interface BriefActionResult {
@@ -18,6 +19,50 @@ export async function generateDailyBriefAction(): Promise<BriefActionResult> {
     await generateDailyBrief(supabase);
     revalidatePath("/mentor");
     return {};
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to generate today's brief" };
+  }
+}
+
+export interface BriefPayload {
+  recDate: string;
+  markdownBody: string;
+  focusAreas: string[];
+  strengths: string[];
+  weaknesses: string[];
+}
+
+/**
+ * Generate today's brief and hand it back, rather than only writing it.
+ *
+ * The console renders the brief as a turn in the conversation, so it needs
+ * the content — but the brief is still a stored artifact, not a chat reply:
+ * the weekly review and the scheduled job both read
+ * `daily_recommendations`. Writing it and returning it keeps one source of
+ * truth instead of a second, chat-shaped copy that drifts.
+ *
+ * Re-runs regenerate. That is the same behaviour the old "Regenerate
+ * today's brief" button had, and it is what a user pressing the chip a
+ * second time means.
+ */
+export async function generateBriefForConsoleAction(): Promise<
+  { brief: BriefPayload } | { error: string }
+> {
+  const supabase = await createClient();
+  try {
+    await generateDailyBrief(supabase);
+    const row = await getDailyRecommendation(supabase, todayStr());
+    if (!row) return { error: "The brief was generated but could not be read back." };
+    revalidatePath("/mentor");
+    return {
+      brief: {
+        recDate: row.rec_date,
+        markdownBody: row.markdown_body,
+        focusAreas: row.focus_areas ?? [],
+        strengths: row.strengths ?? [],
+        weaknesses: row.weaknesses ?? [],
+      },
+    };
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Failed to generate today's brief" };
   }

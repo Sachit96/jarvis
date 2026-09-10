@@ -1,69 +1,51 @@
-import { Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getDailyRecommendation, getGeneralMentorMessages } from "@/lib/db/queries/mentor";
-import { generateDailyBriefAction } from "@/actions/mentor-actions";
-import { BriefCard } from "@/components/mentor/brief-card";
-import { GenerateBriefButton } from "@/components/mentor/generate-brief-button";
-import { OperatorChat } from "@/components/mentor/operator-chat";
-import { EmptyState } from "@/components/shared/empty-state";
-import { ModuleTabs } from "@/components/shared/module-tabs";
-import { MENTOR_TABS } from "@/lib/nav-items";
-import { shortDate, todayStr } from "@/lib/date";
-import { PageHeader } from "@/components/shared/page-header";
+import { MentorConsole } from "@/components/mentor/mentor-console";
+import { TIER_MODEL } from "@/lib/ai/providers/gemini-client";
+import { todayStr } from "@/lib/date";
 
+/**
+ * The Mentor, as one console.
+ *
+ * Was a split screen: today's brief in a seven-column panel, the operator
+ * chat squeezed into five beside it. Two problems with that. The brief was
+ * long enough to own the page while being the thing you read once, and the
+ * chat — the part that actually does work — was the narrow column. Asking a
+ * follow-up about the brief meant looking at a 400px-wide reply next to the
+ * 800px-wide thing it was about.
+ *
+ * Now the conversation is the page and the brief is a turn inside it, so a
+ * follow-up sits directly under what it refers to. Nothing was thrown away:
+ * generateDailyBrief still writes `daily_recommendations`, which is what the
+ * weekly review and the scheduled job read.
+ */
 export default async function MentorPage() {
   const supabase = await createClient();
-  const today = todayStr();
-  const hasGeminiKey = Boolean(process.env.GEMINI_API_KEY);
-
   const [brief, messages] = await Promise.all([
-    getDailyRecommendation(supabase, today),
+    getDailyRecommendation(supabase, todayStr()),
     getGeneralMentorMessages(supabase),
   ]);
 
   return (
-    <div className="space-y-6">
-      <PageHeader eyebrow="AI Mentor" title="Today" />
-
-      <ModuleTabs tabs={MENTOR_TABS} />
-
-      {/* Brief and chat side by side rather than stacked. Stacked, the chat
-          sat below a brief long enough to push it off screen, so asking a
-          follow-up about the brief meant scrolling away from the thing you
-          were asking about. Side by side they're readable together, and the
-          chat sticks so it stays reachable while the brief scrolls. */}
-      <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-12">
-        <div className="space-y-3 xl:col-span-7">
-          {brief ? (
-            <>
-              <BriefCard
-                dateLabel={`Generated for ${shortDate(brief.rec_date)}`}
-                markdownBody={brief.markdown_body}
-                focusAreas={brief.focus_areas}
-                strengths={brief.strengths}
-                weaknesses={brief.weaknesses}
-              />
-              <GenerateBriefButton action={generateDailyBriefAction} label="Regenerate today's brief" hasKey={hasGeminiKey} />
-            </>
-          ) : (
-            <div className="rounded-2xl bg-card ring-1 ring-border">
-              <EmptyState
-                icon={Sparkles}
-                title="No brief yet today"
-                description="Generate one from your current tasks, habits, finances, health, and pipeline."
-                action={<GenerateBriefButton action={generateDailyBriefAction} label="Generate today's brief" hasKey={hasGeminiKey} />}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* top-19 clears the 14-unit sticky topbar plus the page's own top
-            padding, so the chat pins just below the header rather than
-            under it. */}
-        <div className="xl:sticky xl:top-19 xl:col-span-5">
-          <OperatorChat initialMessages={messages} hasKey={hasGeminiKey} />
-        </div>
-      </div>
-    </div>
+    <MentorConsole
+      initialMessages={messages}
+      initialBrief={
+        brief
+          ? {
+              recDate: brief.rec_date,
+              markdownBody: brief.markdown_body,
+              focusAreas: brief.focus_areas ?? [],
+              strengths: brief.strengths ?? [],
+              weaknesses: brief.weaknesses ?? [],
+            }
+          : null
+      }
+      // The key is read here, on the server, and only its presence crosses to
+      // the client — never the value itself.
+      hasKey={Boolean(process.env.GEMINI_API_KEY)}
+      // The real model, not a label. A status line that names a model the app
+      // does not run is worse than no status line.
+      model={TIER_MODEL.structured}
+    />
   );
 }
