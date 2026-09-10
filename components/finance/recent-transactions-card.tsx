@@ -4,6 +4,7 @@ import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/componen
 import { cn } from "@/lib/utils";
 import type { Database } from "@/lib/supabase/database.types";
 import { EmptyState } from "@/components/shared/empty-state";
+import { shortDate } from "@/lib/date";
 
 type Transaction = Database["public"]["Tables"]["transactions"]["Row"];
 
@@ -68,7 +69,7 @@ export function RecentTransactionsCard({ transactions }: { transactions: Transac
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-body">{t.description || t.category}</p>
                     <p className="text-caption text-muted-foreground">
-                      {t.category} · {t.occurred_at}
+                      {t.category} · {shortDate(t.occurred_at)}
                     </p>
                   </div>
 

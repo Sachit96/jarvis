@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { deleteTransactionAction } from "@/actions/finance-actions";
 import type { Database } from "@/lib/supabase/database.types";
+import { shortDate } from "@/lib/date";
 
 type Transaction = Database["public"]["Tables"]["transactions"]["Row"];
 
@@ -41,7 +42,7 @@ export function TransactionItem({
             {transaction.category}
           </Badge>
           <span className="tabular text-xs text-muted-foreground">{accountName}</span>
-          <span className="tabular text-xs text-muted-foreground">{transaction.occurred_at}</span>
+          <span className="text-xs text-muted-foreground">{shortDate(transaction.occurred_at)}</span>
         </div>
         {transaction.description ? (
           <p className="mt-1 text-sm text-muted-foreground">{transaction.description}</p>

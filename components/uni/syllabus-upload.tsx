@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ASSESSMENT_TYPES } from "@/lib/validations/uni";
+import { shortDate } from "@/lib/date";
 
 type EditableAssessment = { title: string; type: string; due_date: string | null; weight_pct: number | null; include: boolean };
 type EditableBlock = { type: string; day_of_week: number; start_time: string; end_time: string; room: string | null; include: boolean };
@@ -134,7 +135,7 @@ export function SyllabusUpload({ courseId }: { courseId: string }) {
                 </p>
                 {dateConflicts.map((c, i) => (
                   <p key={i} className="text-xs text-muted-foreground">
-                    &quot;{c.title}&quot; ({c.due_date}) shares a due date with: {c.conflictsWith.join(", ")}
+                    &quot;{c.title}&quot; ({shortDate(c.due_date)}) shares a due date with: {c.conflictsWith.join(", ")}
                   </p>
                 ))}
               </div>

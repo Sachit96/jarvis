@@ -1,7 +1,7 @@
 import { Briefcase, Dumbbell, GraduationCap, Wallet } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { AuroraBackdrop } from "@/components/shell/aurora-backdrop";
-import { todayStr } from "@/lib/date";
+import { dueLabel, todayStr } from "@/lib/date";
 import { getTasks } from "@/lib/db/queries/life";
 import { getAccounts, computeAssetLiabilityTotals } from "@/lib/db/queries/finance";
 import { getWorkouts, getWorkoutSets, computeWorkoutVolume } from "@/lib/db/queries/health";
@@ -285,8 +285,18 @@ export default async function DashboardPage() {
               {priorityTasks.map((task, i) => (
                 <li key={task.id} className={cn("min-w-0", i >= TASKS_SHOWN_SM && "max-md:hidden")}>
                   <p className="truncate text-body text-foreground-secondary">{task.title}</p>
+                  {/* "2026-09-08" made the reader do the arithmetic, and a
+                      date three days gone looked exactly like one three days
+                      away. */}
                   {task.due_date ? (
-                    <p className="tabular text-caption text-foreground-tertiary">{task.due_date}</p>
+                    <p
+                      className={cn(
+                        "text-caption",
+                        task.due_date < today ? "text-danger" : "text-foreground-tertiary",
+                      )}
+                    >
+                      {dueLabel(task.due_date, today)}
+                    </p>
                   ) : null}
                 </li>
               ))}

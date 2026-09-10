@@ -39,3 +39,64 @@ export function todayStr(d: Date = new Date()): string {
   const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 }
+
+/**
+ * A due date as a person reads it: "Overdue", "Today", "Tomorrow", or a
+ * short weekday-and-date.
+ *
+ * Home printed the raw "2026-09-08" from the column. On a dashboard whose
+ * whole job is telling you what needs doing next, an ISO string makes the
+ * reader do the arithmetic — and a date three days gone looks exactly like
+ * one three days away.
+ *
+ * Takes `today` rather than reading the clock so it can be tested, and
+ * compares as plain strings: both sides are "YYYY-MM-DD", which sorts
+ * chronologically as text and never touches a timezone.
+ */
+export function dueLabel(dueInput: string, today: string = todayStr()): string {
+  // Callers pass either a date column ("2026-09-08") or a timestamp
+  // ("2026-09-08T23:00"). Splitting a timestamp on "-" would make the day
+  // group "08T23:00" and every downstream number NaN.
+  const due = dueInput.slice(0, 10);
+  if (due < today) return "Overdue";
+  if (due === today) return "Today";
+
+  const [y, m, d] = due.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+
+  const [ty, tm, td] = today.split("-").map(Number);
+  const tomorrow = new Date(ty, tm - 1, td + 1);
+  if (date.getTime() === tomorrow.getTime()) return "Tomorrow";
+
+  // Inside the coming week the weekday is the useful part; past that, the
+  // date is.
+  const daysAway = Math.round((date.getTime() - new Date(ty, tm - 1, td).getTime()) / 86_400_000);
+  return daysAway < 7
+    ? date.toLocaleDateString(undefined, { weekday: "long" })
+    : date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+/**
+ * A past date as a person reads it: "Today", "Yesterday", "Sep 9", and the
+ * year once it is no longer the current one.
+ *
+ * The mirror of `dueLabel` for things that have already happened —
+ * transactions, activity, logged sets. Same reasoning: a ledger printing
+ * "2026-09-09" makes the reader parse a machine format to answer "was that
+ * this week?".
+ */
+export function shortDate(dateInput: string, today: string = todayStr()): string {
+  const date = dateInput.slice(0, 10);
+  if (date === today) return "Today";
+
+  const [y, m, d] = date.split("-").map(Number);
+  const [ty, tm, td] = today.split("-").map(Number);
+  const parsed = new Date(y, m - 1, d);
+  const yesterday = new Date(ty, tm - 1, td - 1);
+  if (parsed.getTime() === yesterday.getTime()) return "Yesterday";
+
+  return parsed.toLocaleDateString(
+    undefined,
+    y === ty ? { month: "short", day: "numeric" } : { month: "short", day: "numeric", year: "numeric" },
+  );
+}
