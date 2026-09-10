@@ -39,7 +39,6 @@ const ORDER: TaskBucket[] = ["overdue", "today", "upcoming", "someday", "done"];
 
 const BUCKET_TONE: Partial<Record<TaskBucket, string>> = {
   overdue: "text-danger",
-  today: "text-brand",
 };
 
 export function TaskBoard({ tasks, today }: { tasks: Task[]; today: string }) {
@@ -129,11 +128,9 @@ export function TaskBoard({ tasks, today }: { tasks: Task[]; today: string }) {
         ORDER.filter((b) => b !== "done").map((bucket) =>
           grouped[bucket].length === 0 ? null : (
             <section key={bucket} className="space-y-2">
-              <h2 className={cn("text-heading", BUCKET_TONE[bucket] ?? "text-muted-foreground")}>
+              <h2 className={cn("eyebrow", BUCKET_TONE[bucket])}>
                 {BUCKET_LABEL[bucket]}
-                <span className="ml-1.5 text-caption font-normal text-muted-foreground">
-                  {grouped[bucket].length}
-                </span>
+                <span className="ml-2 text-foreground-tertiary">{grouped[bucket].length}</span>
               </h2>
               <ul className="space-y-2">
                 {grouped[bucket].map((task) => (
@@ -149,11 +146,11 @@ export function TaskBoard({ tasks, today }: { tasks: Task[]; today: string }) {
         <section className="space-y-2">
           <button
             onClick={() => setShowDone((v) => !v)}
-            className="text-heading text-muted-foreground hover:text-foreground"
+            className="eyebrow hover:text-white"
             aria-expanded={showDone}
           >
             {BUCKET_LABEL.done}
-            <span className="ml-1.5 text-caption font-normal">{grouped.done.length}</span>
+            <span className="ml-2 text-foreground-tertiary">{grouped.done.length}</span>
           </button>
           {showDone ? (
             <ul className="space-y-2">

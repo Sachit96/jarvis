@@ -3,7 +3,6 @@
 import { useState, useTransition } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ConfirmDeleteButton } from "@/components/shared/confirm-delete-button";
 import { deleteWorkoutAction, toggleWorkoutCompletedAction } from "@/actions/health-actions";
@@ -51,42 +50,62 @@ export function WorkoutSessionCard({
   const volumeLbs = sets.length > 0 ? formatLbs(computeWorkoutVolume(sets)) : null;
 
   return (
-    <div className={cn("rounded-lg border border-border bg-card p-4 transition-opacity", isPending && "opacity-70")}>
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-start gap-2">
+    <div className={cn("surface px-4 py-3 transition-opacity", isPending && "opacity-70")}>
+      {/* A session row reads left-to-right: what it was, then what it came
+          to. The volume and exercise count used to be buried in the middle
+          of a single grey sentence; as right-aligned figures a list of
+          sessions can be scanned down its own column, which is the whole
+          point of a training log. */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 items-start gap-2.5">
           <Checkbox
             checked={completed}
             onCheckedChange={(c) => handleToggle(c === true)}
             className="mt-0.5"
             aria-label="Mark session completed"
           />
-          <div>
-            <div className="flex items-center gap-1.5">
-              <p className={cn("text-sm font-medium", completed && "text-muted-foreground line-through")}>
-                {workout.session_label}
-              </p>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              {/* NOT struck through when completed. A finished workout is an
+                  achievement; strikethrough is the visual language of a
+                  cancelled item, and it was being applied to every session
+                  in the log. */}
+              <p className="truncate text-body font-medium text-foreground">{workout.session_label}</p>
               {workout.source === "hevy" ? (
-                <Badge variant="outline" className="text-[10px] uppercase">
+                <span className="shrink-0 rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] tracking-[0.12em] text-foreground-tertiary uppercase">
                   Hevy
-                </Badge>
+                </span>
               ) : null}
             </div>
-            <p className="tabular text-xs text-muted-foreground">
+            <p className="tabular mt-0.5 text-caption text-foreground-tertiary">
               {date.toLocaleDateString()} {date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
               {" · "}
               {completed ? "Completed" : "In progress"}
-              {sets.length > 0 ? ` · ${exerciseCount} exercise${exerciseCount === 1 ? "" : "s"} · ${volumeLbs} lbs total volume` : ""}
             </p>
           </div>
         </div>
-        <ConfirmDeleteButton onDelete={handleDelete} isPending={isPending} label="session" />
+
+        <div className="flex shrink-0 items-start gap-4">
+          {sets.length > 0 ? (
+            <dl className="hidden text-right sm:block">
+              <dt className="eyebrow">Volume</dt>
+              <dd className="tabular mt-1 text-body font-medium text-foreground">
+                {volumeLbs} <span className="text-foreground-tertiary">lbs</span>
+              </dd>
+              <dd className="mt-0.5 text-caption text-foreground-tertiary">
+                {exerciseCount} exercise{exerciseCount === 1 ? "" : "s"}
+              </dd>
+            </dl>
+          ) : null}
+          <ConfirmDeleteButton onDelete={handleDelete} isPending={isPending} label="session" />
+        </div>
       </div>
 
-      {workout.notes ? <p className="mt-2 text-xs text-muted-foreground">{workout.notes}</p> : null}
+      {workout.notes ? <p className="mt-2 text-caption text-foreground-tertiary">{workout.notes}</p> : null}
 
       <button
         onClick={() => setExpanded((e) => !e)}
-        className="mt-3 flex items-center gap-1 text-xs font-medium text-brand hover:underline"
+        className="mt-2.5 flex items-center gap-1 text-caption font-medium text-brand hover:underline"
       >
         {expanded ? "Hide" : sets.length > 0 ? `Show ${sets.length} set${sets.length === 1 ? "" : "s"}` : "Log a set"}
         <ChevronDown className={cn("h-3 w-3 transition-transform", expanded && "rotate-180")} strokeWidth={2.5} />
