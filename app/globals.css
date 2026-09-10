@@ -275,6 +275,45 @@
 }
 
 @layer utilities {
+  /**
+   * The height a route gets when it must fit one screen exactly.
+   *
+   * `--shell-chrome` is everything the app shell already spends above and
+   * below the page: the floating command bar and its padding, the main
+   * element's own padding, and — under md — the mobile bottom bar. It is
+   * declared here rather than computed per page so a change to the shell's
+   * spacing cannot silently start clipping a fixed-viewport route.
+   *
+   * 100dvh, NOT 100vh. On mobile Safari and Chrome, 100vh is the height with
+   * the browser chrome *retracted*, so a 100vh page is taller than the
+   * visible viewport for as long as the address bar is showing — the bottom
+   * of the layout sits under it, which on a no-scroll page means it is
+   * simply unreachable. dvh tracks the actual visible height.
+   */
+  .fixed-viewport {
+    height: calc(100dvh - var(--shell-chrome));
+    overflow: hidden;
+  }
+}
+
+:root,
+.dark {
+  /* Measured, not derived: the shell's own padding does not add up to a
+     number you can read off the classes, so this is the value at which a
+     rendered Home reports scrollHeight === clientHeight at 390px wide.
+     tests + the QA probe assert it stays that way. */
+  --shell-chrome: 188px;
+}
+
+@media (min-width: 768px) {
+  :root,
+  .dark {
+    /* No bottom bar from md up, and main's bottom padding drops to 24. */
+    --shell-chrome: 132px;
+  }
+}
+
+@layer utilities {
   /* Teal→blue→violet brand gradient — logo mark, avatar, primary rings. */
   .bg-gradient-brand {
     background-image: var(--gradient-brand);
