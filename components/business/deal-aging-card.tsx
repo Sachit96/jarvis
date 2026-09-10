@@ -42,7 +42,7 @@ function money(n: number) {
 export function DealAgingCard({ openDealCount, buckets }: { openDealCount: number; buckets: AgingBucket[] }) {
   return (
     <Card>
-      <p className="text-label uppercase tracking-wide text-muted-foreground">Deal Aging</p>
+      <p className="eyebrow">Deal Aging</p>
       <p className="mt-0.5 text-caption text-muted-foreground">How long open deals have sat since creation.</p>
       {openDealCount === 0 ? (
         <p className="mt-3 text-body text-muted-foreground">No open deals right now.</p>
@@ -50,11 +50,11 @@ export function DealAgingCard({ openDealCount, buckets }: { openDealCount: numbe
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {buckets.map((b) => (
             <div key={b.label}>
-              <p className={`font-mono text-heading font-bold ${b.label === "30+ days" && b.count > 0 ? "text-danger" : "text-foreground"}`}>
+              <p className={`tabular text-heading font-bold ${b.label === "30+ days" && b.count > 0 ? "text-danger" : "text-foreground"}`}>
                 {b.count}
               </p>
               <p className="text-caption text-muted-foreground">{b.label}</p>
-              {b.count > 0 ? <p className="mt-0.5 font-mono text-caption text-muted-foreground">{money(b.value)}</p> : null}
+              {b.count > 0 ? <p className="mt-0.5 tabular text-caption text-muted-foreground">{money(b.value)}</p> : null}
             </div>
           ))}
         </div>

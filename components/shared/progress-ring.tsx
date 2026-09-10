@@ -50,7 +50,7 @@ export function ProgressRing({
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="font-mono text-heading font-semibold text-foreground">{label ?? `${Math.round(clamped)}%`}</span>
+        <span className="font-display text-heading font-semibold text-foreground">{label ?? `${Math.round(clamped)}%`}</span>
         {sublabel ? <span className="text-caption text-muted-foreground">{sublabel}</span> : null}
       </div>
     </div>

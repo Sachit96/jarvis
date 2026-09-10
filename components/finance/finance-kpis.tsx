@@ -1,3 +1,4 @@
+import { Banknote, PiggyBank, TrendingDown, Wallet } from "lucide-react";
 import { KpiCell, KpiGrid } from "@/components/shared/kpi-grid";
 import { DeltaBadge } from "@/components/shared/delta-badge";
 
@@ -56,7 +57,8 @@ export function FinanceKpis({
     <KpiGrid columns={4}>
       <KpiCell
         label="Net worth"
-        accentClassName="text-cat-money"
+        icon={Wallet}
+        primary
         value={money(netWorth)}
         // No balance history is stored, so there is no true month-ago net
         // worth to compare against. This states the one thing that IS known
@@ -66,14 +68,14 @@ export function FinanceKpis({
 
       <KpiCell
         label="Available cash"
-        accentClassName="text-cat-money"
+        icon={Banknote}
         value={money(availableCash)}
         hint="Cash and savings, excluding investments"
       />
 
       <KpiCell
         label="Monthly spend"
-        accentClassName="text-cat-finance"
+        icon={TrendingDown}
         value={money(monthSpend)}
         hint={previous.spend > 0 ? `${money(previous.spend)} last month` : "No prior month to compare"}
         action={
@@ -83,7 +85,7 @@ export function FinanceKpis({
 
       <KpiCell
         label="Savings rate"
-        accentClassName="text-cat-goals"
+        icon={PiggyBank}
         value={savingsRate === null ? "—" : `${savingsRate.toFixed(0)}%`}
         hint={
           savingsRate === null

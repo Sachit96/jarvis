@@ -3,7 +3,8 @@ import { Briefcase, HeartPulse, DollarSign, TrendingUp, CheckCircle2 } from "luc
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import { CATEGORY_BADGE_CLASS, categoryForHref, type Category } from "@/lib/category-colors";
+import { categoryForHref, type Category } from "@/lib/category-colors";
+import { IconChip } from "@/components/shared/icon-chip";
 import type { ActivityFeedItem } from "@/lib/db/queries/command-center";
 
 const CATEGORY_ICON: Record<Category, LucideIcon> = {
@@ -31,7 +32,7 @@ export function RecentActivityCard({ items, compact = false, className }: { item
   return (
     <Card padding={compact ? "compact" : "default"} className={cn("min-h-[100px]", className)}>
       <header className="mb-3 flex shrink-0 items-center justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Recent Activity</p>
+        <p className="eyebrow">Recent Activity</p>
         {items.length > 0 ? (
           <span className="rounded-full bg-white/[0.06] px-1.5 py-0.5 text-caption tabular-nums text-muted-foreground">
             {items.length}
@@ -54,12 +55,10 @@ export function RecentActivityCard({ items, compact = false, className }: { item
                   href={item.href}
                   className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-[13px] transition-colors hover:bg-white/[0.04]"
                 >
-                  <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${CATEGORY_BADGE_CLASS[category]}`}>
-                    <Icon className="h-3.5 w-3.5" strokeWidth={2} />
-                  </span>
+                  <IconChip icon={Icon} />
                   <span className="min-w-0 flex-1 truncate">{item.label}</span>
                   <span className="shrink-0 text-caption text-muted-foreground">{item.sublabel}</span>
-                  <span className="shrink-0 font-mono text-caption text-muted-foreground/70">{timeAgo(item.timestamp)}</span>
+                  <span className="shrink-0 tabular text-caption text-muted-foreground/70">{timeAgo(item.timestamp)}</span>
                 </Link>
               </li>
             );

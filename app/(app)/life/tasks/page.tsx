@@ -5,6 +5,7 @@ import { TaskBoard } from "@/components/life/task-board";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { TASKS_TABS } from "@/lib/nav-items";
 import { todayStr } from "@/lib/date";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function TasksPage() {
   const supabase = await createClient();
@@ -18,10 +19,7 @@ export default async function TasksPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
-        <div className="space-y-1">
-          <p className="text-label uppercase tracking-wide text-muted-foreground">Life</p>
-          <h1 className="text-title">Tasks</h1>
-        </div>
+        <PageHeader eyebrow="Life" title="Tasks" />
         <TaskForm />
       </div>
 

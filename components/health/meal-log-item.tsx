@@ -22,7 +22,7 @@ export function MealLogItem({ log }: { log: NutritionLog }) {
           {log.source === "chatbot" ? <Sparkles className="h-3.5 w-3.5 shrink-0 text-brand" /> : null}
           {log.description}
         </p>
-        <p className="mt-0.5 font-mono text-xs text-muted-foreground">
+        <p className="mt-0.5 tabular text-xs text-muted-foreground">
           {log.calories} kcal · P{Number(log.protein_g)} · C{Number(log.carbs_g)} · F{Number(log.fat_g)}
         </p>
       </div>

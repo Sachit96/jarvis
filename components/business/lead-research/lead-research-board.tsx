@@ -148,7 +148,7 @@ export function LeadResearchBoard({ rows, stages }: { rows: LeadRowData[]; stage
         <div className="overflow-x-auto rounded-lg border border-border bg-card">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-border text-caption uppercase tracking-wide text-muted-foreground">
+              <tr className="border-b border-border eyebrow">
                 <th className="px-3 py-2 font-medium">Score</th>
                 <th className="px-3 py-2 font-medium">Business</th>
                 <th className="px-3 py-2 font-medium">City</th>

@@ -50,8 +50,8 @@ export default async function FinanceOverviewPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <p className="text-label uppercase tracking-wide text-muted-foreground">Finance</p>
-        <h1 className="text-title">Overview</h1>
+        <p className="eyebrow">Finance</p>
+        <h1 className="text-display">Overview</h1>
         <p className="text-body text-muted-foreground">{monthLabel}</p>
       </div>
 

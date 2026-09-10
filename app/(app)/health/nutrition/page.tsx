@@ -15,6 +15,7 @@ import { MealLogItem } from "@/components/health/meal-log-item";
 import { MentorChat } from "@/components/health/mentor-chat";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { HEALTH_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
 
 const MEAL_SECTIONS = [
   { key: "breakfast", label: "Breakfast" },
@@ -38,10 +39,7 @@ export default async function NutritionPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Health</p>
-          <h1 className="text-xl font-semibold">Nutrition</h1>
-        </div>
+        <PageHeader eyebrow="Health" title="Nutrition" />
         <NutritionTargetsForm targets={targets} />
       </div>
 

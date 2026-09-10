@@ -55,12 +55,12 @@ export function TaskItem({ task }: { task: Task }) {
         <div className="mt-1 flex flex-wrap items-center gap-2">
           <Badge
             variant="outline"
-            className={cn("font-mono text-[10px] uppercase", PRIORITY_TONE[task.priority])}
+            className={cn("tabular text-[10px] uppercase", PRIORITY_TONE[task.priority])}
           >
             {task.priority}
           </Badge>
           {task.due_date ? (
-            <span className="font-mono text-xs text-muted-foreground">
+            <span className="tabular text-xs text-muted-foreground">
               {task.due_date}
             </span>
           ) : null}

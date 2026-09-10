@@ -8,6 +8,7 @@ import { DealsSparklineCard } from "@/components/business/deals-sparkline-card";
 import { LatestDealCard } from "@/components/business/latest-deal-card";
 import { DealAgingCard, computeDealAging } from "@/components/business/deal-aging-card";
 import { BUSINESS_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
 
 function money(n: number) {
   return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
@@ -64,26 +65,24 @@ export default async function BusinessDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">Business</p>
-        <h1 className="text-xl font-semibold">Dashboard</h1>
-      </div>
+      <PageHeader eyebrow="Business" title="Dashboard" />
 
       <ModuleTabs tabs={BUSINESS_TABS} />
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <StatTile
           label="Open Pipeline"
+          primary
           value={money(summary.openValue)}
           delta={`${summary.openCount} deal(s)`}
           icon={Briefcase}
-          category="business"
+
           unmeasured={summary.openValue === 0 && summary.openCount > 0}
           note={summary.openValue === 0 && summary.openCount > 0 ? "Deal values not set yet" : undefined}
         />
-        <StatTile label="Won (all time)" value={money(summary.wonValue)} tone="success" delta={`${summary.wonCount} deal(s)`} icon={Trophy} category="business" />
-        <StatTile label="Win Rate" value={`${summary.winRate}%`} delta={`${summary.closedCount} closed`} icon={Target} category="business" />
-        <StatTile label="MRR" value={money(mrr)} tone="success" icon={TrendingUp} category="business" />
+        <StatTile label="Won (all time)" value={money(summary.wonValue)} tone="success" delta={`${summary.wonCount} deal(s)`} icon={Trophy} />
+        <StatTile label="Win Rate" value={`${summary.winRate}%`} delta={`${summary.closedCount} closed`} icon={Target} />
+        <StatTile label="MRR" value={money(mrr)} tone="success" icon={TrendingUp} />
       </div>
 
       <div className="grid items-start gap-4 lg:grid-cols-2">

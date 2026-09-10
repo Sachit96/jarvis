@@ -4,6 +4,7 @@ import { AccountCard } from "@/components/finance/account-card";
 import { AccountForm } from "@/components/finance/account-form";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { FINANCE_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function AccountsPage() {
   const supabase = await createClient();
@@ -12,10 +13,7 @@ export default async function AccountsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Finance</p>
-          <h1 className="text-xl font-semibold">Accounts</h1>
-        </div>
+        <PageHeader eyebrow="Finance" title="Accounts" />
         <AccountForm />
       </div>
 

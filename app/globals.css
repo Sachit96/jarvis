@@ -171,19 +171,29 @@
   --border: rgb(255 255 255 / 0.08);
   --input: rgb(255 255 255 / 0.12);
   --ring: var(--brand);
-  /* Chart slots ARE the category palette, in the one order whose every
-     adjacent pair passes the colorblind and normal-vision checks — so a
-     chart that fills slots 1..n in order is safe by construction and needs
-     no per-chart color thinking. Slots 4 and 5 used to be near-achromatic
-     (chroma 0.03 and 0.02, i.e. two greys), which is why multi-series
-     charts read as flat. Assign in order; never cycle back to slot 1 for a
-     7th series. */
-  --chart-1: var(--cat-money);
-  --chart-2: var(--cat-goals);
-  --chart-3: var(--cat-health);
-  --chart-4: var(--cat-business);
-  --chart-5: var(--cat-finance);
-  --chart-6: var(--cat-habits);
+  /* Chart slots, in the one order whose every adjacent pair passes the
+     colorblind and normal-vision checks — so a chart that fills slots 1..n
+     in order is safe by construction and needs no per-chart color thinking.
+     Assign in order; never cycle back to slot 1 for a 7th series.
+
+     Slots 1 and 2 are the brand pair, not category hues. A four-series
+     chart is often the largest coloured object on a screen, and opening it
+     on green and teal made the command centre's biggest element the one
+     furthest from the product's own palette. Leading with purple → magenta
+     and continuing into the validated category hues keeps the separation
+     the CVD checks demand while letting the chart read as part of JARVIS.
+     One rule, no exceptions: charts take slots in order. The category
+     tokens below survive as the raw validated hues these slots are built
+     from, not as a second palette components choose between — reaching for
+     "the Health colour" directly is what produced a dashboard where the
+     same four numbers were green, red, amber and teal in the chart and
+     nowhere else in the product. */
+  --chart-1: var(--brand);
+  --chart-2: var(--brand-2);
+  --chart-3: var(--cat-finance);
+  --chart-4: var(--cat-goals);
+  --chart-5: var(--cat-money);
+  --chart-6: var(--cat-health);
   /* Single-series charts have no identity to encode, so they wear the brand
      accent rather than borrowing a category's color and implying one. */
   --chart-primary: var(--brand);
@@ -326,6 +336,85 @@
    the way. */
 
 @layer components {
+  /* ---- The surface ladder -------------------------------------------
+     §4's four levels, as three classes (level 1 is the canvas, which is
+     just `body`). Every card in the app goes through these, so depth is a
+     decision made once here rather than a box-shadow sprinkled per module.
+
+     The inset top hairline is doing most of the work: a translucent pane
+     with a lit top edge reads as a physical sheet catching light, and the
+     same pane without it reads as a slightly lighter rectangle. That single
+     line is the difference between "glass" and "dark admin dashboard".
+
+     Blur lives here, in plain CSS, and not as a Tailwind `backdrop-blur-*`
+     utility, because this is the file where it was proven to actually
+     survive Lightning CSS's prefixing. */
+
+  /* Level 2 — the default working surface. Most cards are this. */
+  .surface {
+    background: var(--card);
+    backdrop-filter: blur(var(--glass-blur));
+    border-radius: var(--radius);
+    box-shadow:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.055),
+      0 0 0 1px var(--border),
+      0 1px 3px 0 rgb(0 0 0 / 0.5);
+  }
+
+  /* Level 3 — the one or two panels per page that carry the page's answer.
+     Slightly more fill, a brighter edge, and a real cast shadow so it sits
+     nearer the viewer. Not a glow: glow means "interactive", not "important". */
+  .surface-raised {
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0.025));
+    backdrop-filter: blur(calc(var(--glass-blur) * 1.5));
+    border-radius: var(--radius);
+    box-shadow:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.1),
+      0 0 0 1px rgb(255 255 255 / 0.1),
+      0 12px 40px -16px rgb(0 0 0 / 0.9);
+  }
+
+  /* Level 3 + atmosphere — the same pane with brand light pooled behind it.
+     Reserved for the single most important panel on a screen. The glow is
+     wide and low-opacity on purpose: it should read as the room being lit,
+     never as a coloured shadow drawn on a box. */
+  .surface-lit {
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0.025));
+    backdrop-filter: blur(calc(var(--glass-blur) * 1.5));
+    border-radius: var(--radius);
+    box-shadow:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.12),
+      0 0 0 1px color-mix(in oklab, var(--brand) 22%, rgb(255 255 255 / 0.08)),
+      0 12px 40px -16px rgb(0 0 0 / 0.9),
+      var(--glow-brand);
+  }
+
+  /* Hover/press affordance for a surface that navigates. Transform and
+     colour only — never a size or border change, which would reflow. */
+  .surface-interactive {
+    transition:
+      background-color 220ms var(--ease-jarvis),
+      box-shadow 220ms var(--ease-jarvis),
+      transform 220ms var(--ease-jarvis);
+  }
+  .surface-interactive:hover {
+    background-color: rgb(255 255 255 / 0.055);
+    box-shadow:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.09),
+      0 0 0 1px rgb(255 255 255 / 0.14),
+      0 8px 28px -14px rgb(0 0 0 / 0.9);
+    transform: translateY(-1px);
+  }
+  .surface-interactive:active {
+    transform: translateY(0);
+  }
+
+  /* Divider that matches the surface edge rather than shouting. Used for
+     the hairlines inside fused blocks (KPI rows, list cards). */
+  .hairline {
+    border-color: var(--border);
+  }
+
   /* A frosted pane floating above pure black. */
   .glass {
     background: var(--card);
@@ -392,7 +481,6 @@
      pointer-events off so it can never intercept a click. */
   .aurora-orb {
     position: absolute;
-    z-index: -1;
     pointer-events: none;
     border-radius: 9999px;
     filter: blur(100px);

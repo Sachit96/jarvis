@@ -6,6 +6,7 @@ import { BUSINESS_TABS } from "@/lib/nav-items";
 import { StartRunForm } from "@/components/business/lead-research/start-run-form";
 import { LeadResearchBoard } from "@/components/business/lead-research/lead-research-board";
 import type { LeadRowData } from "@/components/business/lead-research/types";
+import { PageHeader } from "@/components/shared/page-header";
 
 /**
  * The Lead Research cockpit — the one page that turns the fully-built
@@ -35,10 +36,7 @@ export default async function LeadsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Business</p>
-          <h1 className="text-xl font-semibold">Lead Research</h1>
-        </div>
+        <PageHeader eyebrow="Business" title="Lead Research" />
         <StartRunForm />
       </div>
 

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Target, ListChecks, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import { CATEGORY_BADGE_CLASS, categoryForHref } from "@/lib/category-colors";
+import { IconChip } from "@/components/shared/icon-chip";
 import type { UpcomingItem } from "@/lib/db/queries/command-center";
 
 function formatDate(iso: string) {
@@ -19,7 +19,7 @@ export function UpcomingCard({ items, compact = false, className }: { items: Upc
   return (
     <Card padding={compact ? "compact" : "default"} className={cn("min-h-[210px]", className)}>
       <header className="mb-3 flex shrink-0 items-center justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Upcoming</p>
+        <p className="eyebrow">Upcoming</p>
         {items.length > 0 ? (
           <span className="rounded-full bg-white/[0.06] px-1.5 py-0.5 text-caption tabular-nums text-muted-foreground">
             {items.length}
@@ -33,21 +33,16 @@ export function UpcomingCard({ items, compact = false, className }: { items: Upc
           <ul className="-mx-2">
             {items.map((item) => {
               const Icon = item.kind === "task" ? ListChecks : Target;
-              const category = categoryForHref(item.href) ?? "habits";
               return (
                 <li key={item.id}>
                   <Link
                     href={item.href}
                     className={`flex items-start gap-2.5 rounded-lg px-2 transition-colors hover:bg-white/[0.04] ${compact ? "py-1" : "py-1.5"}`}
                   >
-                    <span
-                      className={`mt-0.5 flex shrink-0 items-center justify-center rounded-full ${compact ? "h-6 w-6" : "h-7 w-7"} ${CATEGORY_BADGE_CLASS[category]}`}
-                    >
-                      <Icon className="h-3.5 w-3.5" strokeWidth={2} />
-                    </span>
+                    <IconChip icon={Icon} size={compact ? "sm" : "md"} className="mt-0.5" />
                     <div className="min-w-0 flex-1">
                       <p className="line-clamp-2 text-[13px]">{item.label}</p>
-                      <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">{formatDate(item.date)}</p>
+                      <p className="mt-0.5 tabular text-caption text-foreground-tertiary">{formatDate(item.date)}</p>
                     </div>
                   </Link>
                 </li>

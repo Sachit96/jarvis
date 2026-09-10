@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getMemoryEntries } from "@/lib/db/queries/memory";
 import { MemoryPageClient } from "@/components/memory/memory-page-client";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function MemoryPage() {
   const supabase = await createClient();
@@ -8,10 +9,7 @@ export default async function MemoryPage() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <p className="text-label uppercase tracking-wide text-muted-foreground">Memory</p>
-        <h1 className="text-title">Library</h1>
-      </div>
+      <PageHeader eyebrow="Memory" title="Library" />
 
       <MemoryPageClient entries={entries} />
     </div>

@@ -7,6 +7,7 @@ import { GenerateBriefButton } from "@/components/mentor/generate-brief-button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { MENTOR_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function WeeklyReviewPage() {
   const supabase = await createClient();
@@ -15,10 +16,7 @@ export default async function WeeklyReviewPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">AI Mentor</p>
-        <h1 className="text-xl font-semibold">Weekly Review</h1>
-      </div>
+      <PageHeader eyebrow="AI Mentor" title="Weekly Review" />
 
       <ModuleTabs tabs={MENTOR_TABS} />
 

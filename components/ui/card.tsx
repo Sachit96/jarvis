@@ -26,20 +26,48 @@ interface CardProps extends ComponentProps<"div"> {
    * dashboard work should reach for.
    */
   padding?: "default" | "compact" | "slotted";
+  /**
+   * Where this card sits in the depth ladder (see `.surface*` in
+   * app/globals.css).
+   *
+   * "default" is level 2 — the working surface, and what almost every card
+   * should be. "raised" is level 3, for the one or two panels per page that
+   * carry the page's actual answer. "lit" is level 3 with brand light pooled
+   * behind it and is reserved for the single most important panel on a
+   * screen; a page with three lit cards has none.
+   */
+  elevation?: "default" | "raised" | "lit";
 }
 
 /**
- * The one card shape used everywhere — elevation over hard borders. A
- * near-black background already reads poorly with drop shadows, so depth
- * comes from a translucent-white fill (--card) plus a barely-there hairline
- * ring (--border), not a directional border.
+ * The one card shape used everywhere.
+ *
+ * Depth is a translucent fill over pure black, blurred, with a lit top edge
+ * and a barely-there hairline — never a directional border and never a
+ * drop shadow on its own, which on a near-black canvas just smudges.
+ *
+ * The radius is `--radius` (16px) rather than the old `rounded-2xl`, which
+ * resolved through the radius scale to 28.8px — soft enough that cards read
+ * as pills rather than panels. Caught in the browser: the token said 1rem
+ * and the rendered corner was 28.8px.
  */
-export function Card({ className, interactive, padding = "default", ...props }: CardProps) {
+export function Card({
+  className,
+  interactive,
+  padding = "default",
+  elevation = "default",
+  ...props
+}: CardProps) {
   return (
     <div
       data-slot="card"
+      data-elevation={elevation}
       className={cn(
-        "rounded-2xl bg-card ring-1 ring-border",
+        // The surface classes carry fill, blur, radius, the lit top edge and
+        // the hairline together — a card cannot end up with the fill but not
+        // the blur, which is precisely how the previous version drifted into
+        // looking like a flat panel.
+        elevation === "lit" ? "surface-lit" : elevation === "raised" ? "surface-raised" : "surface",
         // Compact cards (dashboard-only) are always a flex column so a card can host a
         // flex-1 body that either scrolls or pins a footer to the bottom via mt-auto —
         // required for the column-stretch layout on Home. overflow-hidden is the safety
@@ -55,8 +83,7 @@ export function Card({ className, interactive, padding = "default", ...props }: 
         // image, a divided sub-grid) reach the card's rounded edge cleanly.
         padding === "slotted" &&
           "flex flex-col gap-(--card-spacing) overflow-hidden py-(--card-spacing) [--card-spacing:--spacing(5)]",
-        interactive &&
-          "press cursor-pointer transition-[background-color,box-shadow] duration-200 ease-[var(--ease-jarvis)] hover:bg-[color-mix(in_oklch,var(--card),white_4%)] hover:ring-white/[0.14]",
+        interactive && "surface-interactive cursor-pointer",
         className,
       )}
       {...props}

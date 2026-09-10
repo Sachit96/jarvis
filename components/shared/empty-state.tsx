@@ -1,26 +1,60 @@
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 interface EmptyStateProps {
   title: string;
   description?: string;
   icon?: LucideIcon;
   action?: ReactNode;
+  /**
+   * The figure the absence is *about* — "$0", "0 / 8". Rendered above the
+   * title at metric scale.
+   *
+   * §18: a real zero is a measurement, not a fault. Showing it plainly,
+   * with the explanation directly under it, is what makes an empty panel
+   * read as intentional rather than broken — the alternative everyone
+   * reaches for is inventing activity to fill the space.
+   */
+  value?: ReactNode;
+  className?: string;
 }
 
 /**
- * The considered version of "no data yet" — generous whitespace instead of
- * a dashed placeholder box, and copy that sounds like it was actually
- * written rather than defaulted to. Keep titles short and specific to the
- * thing that's missing ("No trades logged yet" beats "No data").
+ * The considered version of "no data yet".
+ *
+ * Generous whitespace instead of a dashed placeholder box, copy that sounds
+ * written rather than defaulted to, and exactly one brand accent: a small
+ * ringed icon that echoes the radar motif. Keep titles short and specific to
+ * the thing that is missing ("No trades logged yet" beats "No data").
  */
-export function EmptyState({ title, description, icon: Icon, action }: EmptyStateProps) {
+export function EmptyState({ title, description, icon: Icon, action, value, className }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center gap-2 px-6 py-14 text-center">
-      {Icon ? <Icon className="mb-1 h-5 w-5 text-muted-foreground/60" strokeWidth={1.5} /> : null}
-      <p className="text-body font-medium text-foreground">{title}</p>
-      {description ? <p className="max-w-xs text-body text-muted-foreground">{description}</p> : null}
-      {action ? <div className="mt-2">{action}</div> : null}
+    <div className={cn("flex flex-col items-center gap-3 px-6 py-12 text-center", className)}>
+      {Icon ? (
+        <span
+          aria-hidden
+          className="relative flex size-11 items-center justify-center rounded-full bg-white/[0.03] text-foreground-tertiary shadow-[inset_0_1px_0_0_rgb(255_255_255/0.06),0_0_0_1px_var(--border)]"
+        >
+          {/* The one accent: a brand-tinted ring, echoing the radar rings
+              without drawing a whole radar into every empty panel. */}
+          <span className="absolute inset-[-5px] rounded-full border border-[color-mix(in_oklab,var(--brand)_28%,transparent)]" />
+          <Icon className="size-[18px]" strokeWidth={1.5} />
+        </span>
+      ) : null}
+
+      {value !== undefined ? (
+        <p className="tabular font-display text-metric text-foreground-tertiary">{value}</p>
+      ) : null}
+
+      <div className="space-y-1.5">
+        <p className="eyebrow">{title}</p>
+        {description ? (
+          <p className="mx-auto max-w-[34ch] text-body text-foreground-tertiary">{description}</p>
+        ) : null}
+      </div>
+
+      {action ? <div className="mt-1">{action}</div> : null}
     </div>
   );
 }

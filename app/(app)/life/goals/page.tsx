@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getGoals } from "@/lib/db/queries/life";
 import { GoalForm } from "@/components/life/goal-form";
 import { GoalCard } from "@/components/life/goal-card";
+import { PageHeader } from "@/components/shared/page-header";
 
 const SECTIONS = [
   { key: "daily", label: "Daily" },
@@ -15,10 +16,7 @@ export default async function GoalsPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">Life</p>
-        <h1 className="text-xl font-semibold">Goals</h1>
-      </div>
+      <PageHeader eyebrow="Life" title="Goals" />
 
       {SECTIONS.map((section) => {
         const sectionGoals = goals.filter((g) => g.timeframe === section.key);

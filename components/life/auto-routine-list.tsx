@@ -6,7 +6,7 @@ import type { RoutineItem } from "@/lib/db/queries/routine";
 export function AutoRoutineList({ items }: { items: RoutineItem[] }) {
   return (
     <div className="rounded-lg border border-border bg-card p-4">
-      <p className="text-xs uppercase tracking-wider text-muted-foreground">Auto-tracked today</p>
+      <p className="eyebrow">Auto-tracked today</p>
       <p className="mt-0.5 text-xs text-muted-foreground">
         These check themselves off from what you&apos;ve already logged elsewhere in JARVIS.
       </p>

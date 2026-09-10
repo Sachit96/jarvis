@@ -6,7 +6,7 @@ function TagList({ label, items, tone }: { label: string; items: string[]; tone:
   if (items.length === 0) return null;
   return (
     <div>
-      <p className="text-caption uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="eyebrow">{label}</p>
       <div className="mt-1.5 flex flex-wrap gap-1.5">
         {items.map((item, i) => (
           <Badge key={i} variant="outline" className={tone}>
@@ -33,7 +33,7 @@ export function BriefCard({
 }) {
   return (
     <Card className="space-y-4 ring-brand/25">
-      <p className="font-mono text-caption text-muted-foreground">{dateLabel}</p>
+      <p className="tabular text-caption text-muted-foreground">{dateLabel}</p>
       <MentorBriefSections markdownBody={markdownBody} />
       {focusAreas.length > 0 || strengths.length > 0 || weaknesses.length > 0 ? (
         <div className="space-y-3 border-t border-white/[0.08] pt-3.5">

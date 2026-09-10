@@ -36,15 +36,15 @@ export function CourseCard({
         </div>
         <div className="mt-4 flex items-baseline justify-between">
           <div>
-            <p className="text-caption uppercase tracking-wide text-muted-foreground">Current grade</p>
-            <p className={cn("mt-1 font-mono text-title tabular-nums", assessments.length === 0 ? "text-muted-foreground/50" : "text-foreground")}>
+            <p className="eyebrow">Current grade</p>
+            <p className={cn("mt-1 tabular text-title tabular-nums", assessments.length === 0 ? "text-muted-foreground/50" : "text-foreground")}>
               {assessments.length === 0 ? "No assessments" : grade != null ? `${grade.toFixed(1)}%` : "—"}
             </p>
           </div>
           {course.target_grade != null ? (
             <div className="text-right">
-              <p className="text-caption uppercase tracking-wide text-muted-foreground">Target</p>
-              <p className="mt-1 font-mono text-body tabular-nums text-muted-foreground">{course.target_grade}%</p>
+              <p className="eyebrow">Target</p>
+              <p className="mt-1 tabular text-body tabular-nums text-muted-foreground">{course.target_grade}%</p>
             </div>
           ) : null}
         </div>

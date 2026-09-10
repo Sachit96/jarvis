@@ -50,9 +50,9 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
         <div>
           <div className="flex items-center gap-2">
             <span className="h-3 w-3 rounded-full" style={{ backgroundColor: course.color ?? "#8b5cf6" }} />
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">{course.term}</p>
+            <p className="eyebrow">{course.term}</p>
           </div>
-          <h1 className="text-xl font-semibold">{course.code} — {course.name}</h1>
+          <h1 className="text-display">{course.code} — {course.name}</h1>
           {course.professor ? (
             <p className="mt-1 text-sm text-muted-foreground">
               {course.professor}
@@ -94,7 +94,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <div className="flex items-center justify-between">
-            <p className="text-caption uppercase tracking-wide text-muted-foreground">Schedule</p>
+            <p className="eyebrow">Schedule</p>
             <ScheduleBlockForm courseId={course.id} />
           </div>
           {sortedBlocks.length === 0 ? (
@@ -117,7 +117,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
 
         <Card>
           <div className="flex items-center justify-between">
-            <p className="text-caption uppercase tracking-wide text-muted-foreground">Materials</p>
+            <p className="eyebrow">Materials</p>
             <div className="flex items-center gap-2">
               <MaterialQa courseId={course.id} hasMaterials={materials.length > 0} />
               <MaterialForm courseId={course.id} />
@@ -147,7 +147,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
 
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <p className="text-caption uppercase tracking-wide text-muted-foreground">Assessments</p>
+          <p className="eyebrow">Assessments</p>
           <AssessmentForm courseId={course.id} />
         </div>
         {assessments.length === 0 ? (

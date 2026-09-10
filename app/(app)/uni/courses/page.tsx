@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { CourseForm } from "@/components/uni/course-form";
 import { CourseCard } from "@/components/uni/course-card";
 import { UNI_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function UniCoursesPage() {
   const supabase = await createClient();
@@ -23,10 +24,7 @@ export default async function UniCoursesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">University</p>
-          <h1 className="text-xl font-semibold">Courses</h1>
-        </div>
+        <PageHeader eyebrow="University" title="Courses" />
         <CourseForm term={currentTerm} />
       </div>
 

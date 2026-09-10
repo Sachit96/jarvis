@@ -25,7 +25,9 @@ import { getLifeScoreSnapshot, getLifeScoreTrend } from "@/lib/db/queries/life-s
 import { hasHevyKey } from "@/lib/integrations/hevy/client";
 import { getMemoryEntries } from "@/lib/db/queries/memory";
 import { formatLbs } from "@/lib/units";
+import { Briefcase, HeartPulse, ListChecks, Wallet } from "lucide-react";
 import { KpiCell, KpiGrid } from "@/components/shared/kpi-grid";
+import { PageHeader } from "@/components/shared/page-header";
 import { PriorityTasksWidget } from "@/components/dashboard/priority-tasks-widget";
 import { TodayRoutineCard } from "@/components/dashboard/today-routine-card";
 import { MentorInsightCard } from "@/components/dashboard/mentor-insight-card";
@@ -180,18 +182,16 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-4">
-      {/* Environmental lighting: Home is the command centre, so this is
-          one of the few surfaces §7 puts aurora on. Fixed and behind
-          everything, so it never intercepts a click or scrolls with content. */}
-      <AuroraBackdrop />
+      {/* The shell already lights every route at ambient strength; Home is
+          the command centre, so it turns the same lamps up rather than
+          adding different ones. */}
+      <AuroraBackdrop intensity="focal" />
       {hasHevyKey() ? <HevyAutoSync /> : null}
 
-      <div className="space-y-1">
-        <p className="eyebrow">
-          {new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })}
-        </p>
-        <h1 className="text-title">Today</h1>
-      </div>
+      <PageHeader
+        eyebrow={new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })}
+        title="Today"
+      />
 
       {/* The five separate stat tiles are one fused block now. They were
           always read as a set, and five outlines at the top of the page was
@@ -203,19 +203,20 @@ export default async function DashboardPage() {
       <KpiGrid columns={4}>
         <KpiCell
           label="Net worth"
-          accentClassName="text-cat-money"
+          icon={Wallet}
+          primary
           value={money(financeTotals.netWorth)}
           hint={accounts.length === 0 ? "No accounts connected yet" : `Across ${accounts.length} account(s)`}
         />
         <KpiCell
           label="Business revenue"
-          accentClassName="text-cat-business"
+          icon={Briefcase}
           value={money(mrr)}
           hint={`${pipelineSummary.openCount} open deal(s) · ${money(pipelineSummary.openValue)} pipeline`}
         />
         <KpiCell
           label="Health score"
-          accentClassName="text-cat-health"
+          icon={HeartPulse}
           value={`${lifeScore.health}`}
           hint={
             lifeScore.health === 0 && workouts.length > 0
@@ -227,7 +228,7 @@ export default async function DashboardPage() {
         />
         <KpiCell
           label="Discipline"
-          accentClassName="text-cat-goals"
+          icon={ListChecks}
           value={`${lifeScore.habits}`}
           hint={`${habitsDoneToday}/${routineItems.length} routine items done`}
         />
@@ -238,7 +239,7 @@ export default async function DashboardPage() {
           max-height plus filler cards stretched with flex-1 to avoid voids.
           That arrangement made any one card growing drag every other column
           with it; here a tall card affects only its own row. */}
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+      <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-12">
         <div className="xl:col-span-8">
           <OverallProgressChart points={lifeScoreTrend} narrative={progressNarrative} compact />
         </div>
@@ -247,7 +248,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
         <PriorityTasksWidget tasks={priorityTasks} compact />
         <TodayRoutineCard items={routineItems} compact />
         <MentorInsightCard
@@ -257,13 +258,13 @@ export default async function DashboardPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
         <UpcomingCard items={upcoming} compact />
         <GoalsRailCard goals={goals} />
         <RecentActivityCard items={recentActivity} compact />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
         <DetailStatsCard
           title="Finance"
           compact
@@ -306,7 +307,7 @@ export default async function DashboardPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+      <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-12">
         <div className="xl:col-span-4">
           <NotesRailCard entries={memoryEntries} />
         </div>

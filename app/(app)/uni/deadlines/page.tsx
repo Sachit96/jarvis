@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { DeadlineForm } from "@/components/uni/deadline-form";
 import { DeleteDeadlineButton } from "@/components/uni/uni-delete-buttons";
 import { UNI_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
 
 const CATEGORY_LABEL: Record<string, string> = {
   enrolment: "Enrolment",
@@ -27,10 +28,7 @@ export default async function UniDeadlinesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">University</p>
-          <h1 className="text-xl font-semibold">Deadlines</h1>
-        </div>
+        <PageHeader eyebrow="University" title="Deadlines" />
         <DeadlineForm />
       </div>
 

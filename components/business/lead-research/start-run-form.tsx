@@ -64,7 +64,7 @@ function RunProgress({ runId, onDone }: { runId: string; onDone: () => void }) {
         </p>
         {!isTerminal ? <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" /> : null}
       </div>
-      <div className="grid grid-cols-4 gap-2 text-center font-mono text-xs">
+      <div className="grid grid-cols-4 gap-2 text-center tabular text-xs">
         <div>
           <p className="text-muted-foreground">Found</p>
           <p className="tabular-nums">{run.found_count}</p>

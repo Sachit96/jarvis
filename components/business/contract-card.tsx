@@ -51,13 +51,13 @@ export function ContractCard({ contract, contact }: { contract: Contract; contac
       </div>
 
       <div className="mt-2 flex items-center gap-2">
-        <p className="font-mono text-lg text-brand">{money(Number(contract.monthly_value))}/mo</p>
+        <p className="tabular text-lg text-brand">{money(Number(contract.monthly_value))}/mo</p>
         <Badge variant="outline" className={cn("text-[10px] uppercase", STATUS_TONE[contract.status])}>
           {contract.status}
         </Badge>
       </div>
 
-      <p className="mt-1 font-mono text-xs text-muted-foreground">
+      <p className="mt-1 tabular text-xs text-muted-foreground">
         {contract.start_date} {contract.end_date ? `→ ${contract.end_date}` : "→ ongoing"}
       </p>
 

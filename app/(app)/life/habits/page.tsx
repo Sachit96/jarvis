@@ -7,6 +7,7 @@ import { HabitCard } from "@/components/life/habit-card";
 import { AutoRoutineList } from "@/components/life/auto-routine-list";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { TASKS_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function RoutinePage() {
   await ensureDefaultHabitsAction();
@@ -37,10 +38,7 @@ export default async function RoutinePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Life</p>
-          <h1 className="text-xl font-semibold">Routine</h1>
-        </div>
+        <PageHeader eyebrow="Life" title="Routine" />
         <HabitForm />
       </div>
 

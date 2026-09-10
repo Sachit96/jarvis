@@ -37,7 +37,7 @@ export function ContactCard({
           {contact.company_name ? (
             <p className="truncate text-xs text-muted-foreground">{contact.company_name}</p>
           ) : null}
-          <p className="mt-0.5 font-mono text-xs text-muted-foreground">
+          <p className="mt-0.5 tabular text-xs text-muted-foreground">
             {[contact.email, contact.phone].filter(Boolean).join(" · ")}
           </p>
         </div>
@@ -53,7 +53,7 @@ export function ContactCard({
       {contact.notes ? <p className="text-xs text-muted-foreground">{contact.notes}</p> : null}
 
       <div className="space-y-1.5 border-t border-border pt-2">
-        <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Activity</p>
+        <p className="eyebrow">Activity</p>
         {activities.length > 0 ? (
           <ul className="space-y-1">
             {activities.slice(0, 5).map((a) => (

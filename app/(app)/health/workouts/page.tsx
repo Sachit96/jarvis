@@ -10,6 +10,7 @@ import { HevyAutoSync } from "@/components/health/hevy-auto-sync";
 import { WorkoutCalendar } from "@/components/health/workout-calendar";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { HEALTH_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function WorkoutsPage() {
   await ensureDefaultExercisesAction();
@@ -37,10 +38,7 @@ export default async function WorkoutsPage() {
       {connected ? <HevyAutoSync /> : null}
 
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Health</p>
-          <h1 className="text-xl font-semibold">Workouts</h1>
-        </div>
+        <PageHeader eyebrow="Health" title="Workouts" />
         <div className="flex gap-2">
           <ExerciseForm />
           <WorkoutForm />

@@ -14,6 +14,7 @@ import { YoutubeConnectionCard } from "@/components/settings/youtube-connection-
 import { TIER_MODEL } from "@/lib/ai/providers/gemini-client";
 import { getAnthropicSpendCap, getAnthropicSpendToDate } from "@/lib/ai/providers/anthropic-client";
 import { isMissingRelation } from "@/lib/db/missing-relation";
+import { PageHeader } from "@/components/shared/page-header";
 
 // Extracted so Date.now() isn't called directly inside the Server
 // Component body — same react-hooks/purity pattern as daysAgoIso() in
@@ -67,10 +68,7 @@ export default async function SettingsPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">System</p>
-        <h1 className="text-xl font-semibold">Settings</h1>
-      </div>
+      <PageHeader eyebrow="System" title="Settings" />
 
       {youtube_connected ? (
         <div className="flex items-center gap-2 rounded-lg border border-success/30 bg-success/10 px-3 py-2 text-sm text-success">
@@ -105,7 +103,7 @@ export default async function SettingsPage({
       />
 
       <div className="rounded-lg border border-border bg-card p-4">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">Data export</p>
+        <p className="eyebrow">Data export</p>
         <p className="mt-2 text-sm text-muted-foreground">
           Download every record you own across all modules as a single JSON file.
         </p>

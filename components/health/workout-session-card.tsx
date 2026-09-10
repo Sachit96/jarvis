@@ -71,7 +71,7 @@ export function WorkoutSessionCard({
                 </Badge>
               ) : null}
             </div>
-            <p className="font-mono text-xs text-muted-foreground">
+            <p className="tabular text-xs text-muted-foreground">
               {date.toLocaleDateString()} {date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
               {" · "}
               {completed ? "Completed" : "In progress"}

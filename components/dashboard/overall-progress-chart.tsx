@@ -1,14 +1,32 @@
 "use client";
 
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts";
+import { ChartFrame } from "@/components/shared/chart-frame";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import { CATEGORY_HEX, CATEGORY_LABEL, type Category } from "@/lib/category-colors";
+import { CATEGORY_LABEL, type Category } from "@/lib/category-colors";
 import type { LifeScoreTrendPoint } from "@/lib/db/queries/life-score";
 
 // Goals has no daily history anywhere in the schema (see life-score.ts) —
 // only these four categories get a real, non-fabricated trend line.
 const SERIES: Category[] = ["business", "health", "finance", "habits"];
+
+/**
+ * Chart slots in order (see --chart-* in globals.css), not the category
+ * identity hues. This is the largest coloured object on Home, and keying it
+ * off the domain palette meant the command centre's biggest element opened
+ * on green, red, amber and teal — four colours that appear nowhere else in
+ * the product. Slots lead with the brand pair and stay inside the validated
+ * separation, so the chart is still readable and still four distinct series.
+ */
+const SERIES_COLOR: Record<Category, string> = {
+  business: "var(--chart-1)",
+  health: "var(--chart-2)",
+  finance: "var(--chart-3)",
+  habits: "var(--chart-4)",
+  money: "var(--chart-5)",
+  goals: "var(--chart-6)",
+};
 
 function compactTick(value: number) {
   return String(Math.round(value));
@@ -20,7 +38,7 @@ function ProgressTooltip({ active, payload, label }: { active?: boolean; payload
     <div className="rounded-xl bg-popover px-3 py-2 text-caption ring-1 ring-border">
       <p className="text-muted-foreground">{label}</p>
       {payload.map((p) => (
-        <p key={p.name} className="mt-0.5 flex items-center gap-1.5 font-mono font-medium text-foreground">
+        <p key={p.name} className="mt-0.5 flex items-center gap-1.5 tabular font-medium text-foreground">
           <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: p.color }} />
           {p.name}: {Math.round(p.value)}
         </p>
@@ -62,7 +80,7 @@ export function OverallProgressChart({
   return (
     <Card padding={compact ? "compact" : "default"} className={cn(compact && "min-h-[200px]", className)}>
       <header className="mb-3 flex shrink-0 items-center justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Overall Progress</p>
+        <p className="eyebrow">Overall Progress</p>
       </header>
       <div className="flex min-h-0 flex-1 flex-col">
         <div className={compact ? "h-[132px] w-full" : "h-64 w-full"}>
@@ -76,13 +94,13 @@ export function OverallProgressChart({
               ))}
             </ul>
           ) : hasActivity ? (
-            <ResponsiveContainer width="100%" height="100%">
+            <ChartFrame height={compact ? 132 : 256}>
               <AreaChart data={points} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
                 <defs>
                   {SERIES.map((cat) => (
                     <linearGradient key={cat} id={`progressFill-${cat}`} x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor={CATEGORY_HEX[cat]} stopOpacity={0.3} />
-                      <stop offset="100%" stopColor={CATEGORY_HEX[cat]} stopOpacity={0} />
+                      <stop offset="0%" stopColor={SERIES_COLOR[cat]} stopOpacity={0.22} />
+                      <stop offset="100%" stopColor={SERIES_COLOR[cat]} stopOpacity={0} />
                     </linearGradient>
                   ))}
                 </defs>
@@ -110,14 +128,14 @@ export function OverallProgressChart({
                     type="monotone"
                     dataKey={cat}
                     name={CATEGORY_LABEL[cat]}
-                    stroke={CATEGORY_HEX[cat]}
-                    strokeWidth={2}
+                    stroke={SERIES_COLOR[cat]}
+                    strokeWidth={1.75}
                     fill={`url(#progressFill-${cat})`}
                     animationDuration={600}
                   />
                 ))}
               </AreaChart>
-            </ResponsiveContainer>
+            </ChartFrame>
           ) : (
             <div className="flex h-full items-center justify-center text-body text-muted-foreground">
               Not enough activity yet to chart a trend.
@@ -127,7 +145,7 @@ export function OverallProgressChart({
         <ul className="mt-auto flex flex-wrap justify-center gap-x-3 gap-y-1 pt-1.5">
           {SERIES.map((cat) => (
             <li key={cat} className="flex items-center gap-1.5 text-caption text-muted-foreground">
-              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: CATEGORY_HEX[cat] }} />
+              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: SERIES_COLOR[cat] }} />
               {CATEGORY_LABEL[cat]}
             </li>
           ))}

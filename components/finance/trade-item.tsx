@@ -53,7 +53,7 @@ export function TradeItem({ trade }: { trade: Trade }) {
               {trade.status}
             </Badge>
           </div>
-          <p className="mt-1 font-mono text-xs text-muted-foreground">
+          <p className="mt-1 tabular text-xs text-muted-foreground">
             Entry {trade.entry_price}
             {trade.exit_price !== null ? ` → Exit ${trade.exit_price}` : ""}
             {trade.quantity !== null ? ` · Qty ${trade.quantity}` : ""}
@@ -62,7 +62,7 @@ export function TradeItem({ trade }: { trade: Trade }) {
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {pnl !== null ? (
-            <p className={cn("font-mono text-sm", pnl >= 0 ? "text-success" : "text-danger")}>
+            <p className={cn("tabular text-sm", pnl >= 0 ? "text-success" : "text-danger")}>
               {money(pnl)}
             </p>
           ) : null}

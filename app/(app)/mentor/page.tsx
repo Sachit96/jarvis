@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { MENTOR_TABS } from "@/lib/nav-items";
 import { todayStr } from "@/lib/date";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function MentorPage() {
   const supabase = await createClient();
@@ -22,10 +23,7 @@ export default async function MentorPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <p className="text-label uppercase tracking-wide text-muted-foreground">AI Mentor</p>
-        <h1 className="text-title">Today</h1>
-      </div>
+      <PageHeader eyebrow="AI Mentor" title="Today" />
 
       <ModuleTabs tabs={MENTOR_TABS} />
 

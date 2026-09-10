@@ -6,6 +6,7 @@ import { ContactCard } from "@/components/business/contact-card";
 import { StatTile } from "@/components/shared/stat-tile";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { BUSINESS_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function ClientsPage() {
   const supabase = await createClient();
@@ -33,18 +34,15 @@ export default async function ClientsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">Business</p>
-        <h1 className="text-xl font-semibold">Clients</h1>
-      </div>
+      <PageHeader eyebrow="Business" title="Clients" />
 
       <ModuleTabs tabs={BUSINESS_TABS} />
 
       {contacts.length > 0 ? (
         <div className="grid grid-cols-3 gap-4">
-          <StatTile label="Total Clients" value={String(contacts.length)} icon={Users} category="business" />
-          <StatTile label="Manual" value={String(contacts.filter((c) => c.source === "manual").length)} icon={UserPlus} category="business" />
-          <StatTile label="From Lead Research" value={String(contacts.filter((c) => c.source === "research_agent").length)} icon={Search} category="business" />
+          <StatTile label="Total Clients" value={String(contacts.length)} icon={Users} />
+          <StatTile label="Manual" value={String(contacts.filter((c) => c.source === "manual").length)} icon={UserPlus} />
+          <StatTile label="From Lead Research" value={String(contacts.filter((c) => c.source === "research_agent").length)} icon={Search} />
         </div>
       ) : null}
 

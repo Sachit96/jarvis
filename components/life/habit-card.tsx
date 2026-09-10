@@ -96,7 +96,7 @@ export function HabitCard({
               {METRIC_LABEL[habit.metric_type] ?? habit.metric_type}
             </Badge>
           </div>
-          <div className="mt-1 flex items-center gap-3 font-mono text-xs text-muted-foreground">
+          <div className="mt-1 flex items-center gap-3 tabular text-xs text-muted-foreground">
             <span className="flex items-center gap-1 text-brand">
               <Flame className="h-3.5 w-3.5" /> {current} day{current === 1 ? "" : "s"}
             </span>

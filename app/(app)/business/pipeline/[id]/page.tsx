@@ -31,7 +31,7 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
       </Link>
 
       <div>
-        <h1 className="text-xl font-semibold">{deal.title || "Untitled deal"}</h1>
+        <h1 className="text-display">{deal.title || "Untitled deal"}</h1>
         {contact ? (
           <Link href={`/business/clients/${contact.id}`} className="text-sm text-muted-foreground hover:underline">
             {contact.company_name || contact.contact_person}
@@ -53,7 +53,7 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
         </div>
 
         <div className="rounded-lg border border-border bg-card p-4">
-          <p className="text-label uppercase tracking-wide text-muted-foreground">Activity</p>
+          <p className="eyebrow">Activity</p>
           <div className="mt-2">
             <ActivityForm contactId={deal.contact_id} dealId={deal.id} />
           </div>

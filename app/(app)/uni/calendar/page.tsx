@@ -5,6 +5,7 @@ import { ModuleTabs } from "@/components/shared/module-tabs";
 import { Card } from "@/components/ui/card";
 import { UniCalendar, type CalendarItem, type UndatedItem } from "@/components/uni/uni-calendar";
 import { UNI_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
 
 function formatTime(t: string) {
   const [h, m] = t.split(":").map(Number);
@@ -140,10 +141,7 @@ export default async function UniCalendarPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">University</p>
-        <h1 className="text-xl font-semibold">Calendar</h1>
-      </div>
+      <PageHeader eyebrow="University" title="Calendar" />
 
       <ModuleTabs tabs={UNI_TABS} />
 

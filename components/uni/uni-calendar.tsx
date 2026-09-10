@@ -117,7 +117,7 @@ export function UniCalendar({ items, undatedItems = [] }: { items: CalendarItem[
       {view === "month" ? (
         <div className="mt-4 grid grid-cols-7 gap-1">
           {WEEKDAY_LABELS.map((label, i) => (
-            <div key={i} className="text-center font-mono text-[10px] text-muted-foreground/60">
+            <div key={i} className="text-center tabular text-[10px] text-muted-foreground/60">
               {label}
             </div>
           ))}
@@ -136,7 +136,7 @@ export function UniCalendar({ items, undatedItems = [] }: { items: CalendarItem[
                   isToday ? "bg-brand/10 ring-1 ring-brand" : "bg-white/[0.03]",
                 )}
               >
-                <span className={cn("font-mono text-[11px]", isToday ? "text-brand" : "text-muted-foreground")}>{day}</span>
+                <span className={cn("tabular text-[11px]", isToday ? "text-brand" : "text-muted-foreground")}>{day}</span>
                 <div className="flex flex-wrap gap-0.5">
                   {dayItems.slice(0, 4).map((item) => (
                     <span key={item.id} title={item.title} className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: item.color }} />

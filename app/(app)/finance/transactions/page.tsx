@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function TransactionsPage({
   searchParams,
@@ -33,10 +34,7 @@ export default async function TransactionsPage({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Finance</p>
-          <h1 className="text-xl font-semibold">Transactions</h1>
-        </div>
+        <PageHeader eyebrow="Finance" title="Transactions" />
         <TransactionForm accounts={accounts} />
       </div>
 

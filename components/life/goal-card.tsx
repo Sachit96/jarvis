@@ -62,7 +62,7 @@ export function GoalCard({ goal }: { goal: Goal }) {
 
       <div className="mt-3 flex items-center gap-3">
         <Progress value={progress} className="h-2 flex-1" />
-        <span className="w-10 shrink-0 font-mono text-xs text-brand">{progress}%</span>
+        <span className="w-10 shrink-0 tabular text-xs text-brand">{progress}%</span>
       </div>
 
       <div className="mt-2 flex items-center gap-2">

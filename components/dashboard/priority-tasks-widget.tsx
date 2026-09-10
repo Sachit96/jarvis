@@ -15,7 +15,7 @@ export function PriorityTasksWidget({ tasks, compact = false, className }: { tas
   return (
     <Card padding={compact ? "compact" : "default"} className={cn("min-h-[170px]", className)}>
       <header className="mb-3 flex shrink-0 items-center justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Priority tasks</p>
+        <p className="eyebrow">Priority tasks</p>
         <Link href="/life/tasks" className="text-[13px] font-medium text-brand hover:underline">
           View all
         </Link>
@@ -34,7 +34,7 @@ export function PriorityTasksWidget({ tasks, compact = false, className }: { tas
                 <div className="min-w-0 flex-1">
                   <p className="line-clamp-2 text-[13px]">{task.title}</p>
                   {task.due_date ? (
-                    <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">{task.due_date}</p>
+                    <p className="mt-0.5 tabular text-caption text-foreground-tertiary">{task.due_date}</p>
                   ) : null}
                 </div>
               </li>

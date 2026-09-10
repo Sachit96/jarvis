@@ -6,6 +6,7 @@ import { ContractCard } from "@/components/business/contract-card";
 import { StatTile } from "@/components/shared/stat-tile";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { BUSINESS_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function RevenuePage() {
   const supabase = await createClient();
@@ -17,18 +18,15 @@ export default async function RevenuePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Business</p>
-          <h1 className="text-xl font-semibold">Revenue &amp; Contracts</h1>
-        </div>
+        <PageHeader eyebrow="Business" title="Revenue &amp; Contracts" />
         <ContractForm contacts={contacts} />
       </div>
 
       <ModuleTabs tabs={BUSINESS_TABS} />
 
       <div className="grid grid-cols-2 gap-4">
-        <StatTile label="MRR" value={`$${mrr.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} tone="success" icon={TrendingUp} category="business" />
-        <StatTile label="Active Contracts" value={String(activeCount)} icon={FileText} category="business" />
+        <StatTile label="MRR" value={`$${mrr.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} tone="success" icon={TrendingUp} />
+        <StatTile label="Active Contracts" value={String(activeCount)} icon={FileText} />
       </div>
 
       {contracts.length === 0 ? (

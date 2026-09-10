@@ -65,7 +65,7 @@ export async function IntegrationStatusCard() {
                 {/* Names only. Printing a value here would put a secret into
                     server-rendered HTML. */}
                 {status.requires && status.state !== "connected" ? (
-                  <p className="mt-1 font-mono text-caption text-muted-foreground/60">
+                  <p className="mt-1 tabular text-caption text-muted-foreground/60">
                     {status.requires.join(" · ")}
                   </p>
                 ) : null}

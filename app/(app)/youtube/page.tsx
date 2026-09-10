@@ -4,6 +4,7 @@ import { getScripts, getYtConnection } from "@/lib/db/queries/youtube";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ScriptGenerateForm } from "@/components/youtube/script-generate-form";
 import { ScriptCard } from "@/components/youtube/script-card";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function YouTubePage() {
   const supabase = await createClient();
@@ -11,10 +12,7 @@ export default async function YouTubePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">Content</p>
-        <h1 className="text-xl font-semibold">YouTube</h1>
-      </div>
+      <PageHeader eyebrow="Content" title="YouTube" />
 
       <ScriptGenerateForm />
 

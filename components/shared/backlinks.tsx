@@ -32,7 +32,7 @@ export function Backlinks({ backlinks }: { backlinks: Backlink[] }) {
 
   return (
     <div>
-      <p className="flex items-center gap-1.5 text-caption uppercase tracking-wide text-muted-foreground">
+      <p className="flex items-center gap-1.5 eyebrow">
         <Link2 className="h-3 w-3" /> Referenced by
       </p>
       <ul className="mt-1.5 space-y-1">

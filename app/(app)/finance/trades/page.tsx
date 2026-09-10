@@ -9,6 +9,7 @@ import { PositionSizeCalculator } from "@/components/finance/position-size-calcu
 import { ChecklistManager } from "@/components/finance/checklist-manager";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { FINANCE_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function TradesPage() {
   await ensureDefaultChecklistAction();
@@ -20,10 +21,7 @@ export default async function TradesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Finance</p>
-          <h1 className="text-xl font-semibold">Trading &amp; Venture Journal</h1>
-        </div>
+        <PageHeader eyebrow="Finance" title="Trading &amp; Venture Journal" />
         <TradeForm checklistItems={checklistItems} />
       </div>
 

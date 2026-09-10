@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { UNI_TABS } from "@/lib/nav-items";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function UniDashboardPage() {
   const supabase = await createClient();
@@ -70,10 +71,7 @@ export default async function UniDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <p className="text-label uppercase tracking-wide text-muted-foreground">University</p>
-        <h1 className="text-title">Dashboard</h1>
-      </div>
+      <PageHeader eyebrow="University" title="Dashboard" />
 
       <ModuleTabs tabs={UNI_TABS} />
 
@@ -122,7 +120,8 @@ export default async function UniDashboardPage() {
           <KpiGrid columns={4}>
             <KpiCell
               label="Semester average"
-              accentClassName="text-brand"
+              icon={GraduationCap}
+              primary
               value={average != null ? `${average.toFixed(1)}%` : "—"}
               hint={
                 average == null

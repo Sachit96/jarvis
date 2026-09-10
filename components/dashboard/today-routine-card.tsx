@@ -13,7 +13,7 @@ export function TodayRoutineCard({ items, compact = false, className }: { items:
   return (
     <Card padding={compact ? "compact" : "default"} className={cn("min-h-0", className)}>
       <header className="mb-3 flex shrink-0 items-center justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Today&apos;s Routine</p>
+        <p className="eyebrow">Today&apos;s Routine</p>
         <Link href="/life/habits" className="text-[13px] font-medium text-brand hover:underline">
           View all
         </Link>
@@ -26,7 +26,7 @@ export function TodayRoutineCard({ items, compact = false, className }: { items:
           strokeWidth={compact ? 6 : 8}
           label={`${completedCount}/${items.length}`}
           sublabel={compact ? undefined : "Completed"}
-          colorClassName="stroke-success"
+          colorClassName="stroke-[var(--brand)]"
         />
         <ul className={cn("min-w-0 flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden", compact ? "space-y-1" : "space-y-1.5")}>
           {items.map((item) => (
@@ -34,12 +34,14 @@ export function TodayRoutineCard({ items, compact = false, className }: { items:
               <span
                 className={cn(
                   "flex h-4 w-4 shrink-0 items-center justify-center rounded-full",
-                  item.completed ? "bg-success text-white" : "bg-muted",
+                  item.completed
+                    ? "bg-[color-mix(in_oklab,var(--brand)_45%,transparent)] text-white"
+                    : "bg-white/[0.07]",
                 )}
               >
                 {item.completed ? <Check className="h-2.5 w-2.5" strokeWidth={3} /> : null}
               </span>
-              <span className={cn("truncate", item.completed && "text-muted-foreground line-through")}>{item.label}</span>
+              <span className={cn("truncate", item.completed && "text-foreground-tertiary line-through")}>{item.label}</span>
             </li>
           ))}
         </ul>

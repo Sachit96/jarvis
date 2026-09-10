@@ -15,7 +15,7 @@ function MacroBar({ label, value, target, unit }: MacroBarProps) {
     <div>
       <div className="flex items-center justify-between text-xs">
         <span className="text-muted-foreground">{label}</span>
-        <span className={cn("font-mono", over ? "text-danger" : "text-brand")}>
+        <span className={cn("tabular", over ? "text-danger" : "text-brand")}>
           {Math.round(value)} / {target} {unit}
         </span>
       </div>

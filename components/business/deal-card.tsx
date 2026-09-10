@@ -72,7 +72,7 @@ export function DealCard({
       </div>
 
       <div className="mt-2 flex items-center gap-2">
-        <p className="font-mono text-sm text-brand">{money(Number(deal.value))}</p>
+        <p className="tabular text-sm text-brand">{money(Number(deal.value))}</p>
       </div>
 
       {deal.notes ? <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{deal.notes}</p> : null}

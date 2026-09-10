@@ -14,7 +14,7 @@ export function NotesRailCard({ entries, className }: { entries: MemoryEntry[]; 
   return (
     <Card padding="compact" className={cn("min-h-[240px]", className)}>
       <header className="mb-3 flex shrink-0 items-center justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Recent Notes</p>
+        <p className="eyebrow">Recent Notes</p>
       </header>
       <div className="flex min-h-0 flex-1 flex-col">
         {recent.length === 0 ? (
@@ -26,7 +26,7 @@ export function NotesRailCard({ entries, className }: { entries: MemoryEntry[]; 
                 <MemoryTypeBadge type={entry.type as MemoryType} className="mt-0.5" />
                 <div className="min-w-0">
                   <p className="truncate text-[13px] font-medium">{entry.title}</p>
-                  <p className="font-mono text-[11px] text-muted-foreground">{timeAgo(entry.updated_at)}</p>
+                  <p className="tabular text-caption text-foreground-tertiary">{timeAgo(entry.updated_at)}</p>
                 </div>
               </li>
             ))}

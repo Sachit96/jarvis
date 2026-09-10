@@ -30,7 +30,7 @@ export function MemoryTimelineView({ entries, onOpen }: { entries: MemoryEntry[]
     <div className="space-y-6">
       {days.map((day) => (
         <div key={day}>
-          <p className="mb-2 text-label uppercase tracking-wide text-muted-foreground">{dayLabel(byDay.get(day)![0].updated_at)}</p>
+          <p className="mb-2 eyebrow">{dayLabel(byDay.get(day)![0].updated_at)}</p>
           <ul className="space-y-2">
             {byDay.get(day)!.map((entry) => (
               <li key={entry.id}>
@@ -43,7 +43,7 @@ export function MemoryTimelineView({ entries, onOpen }: { entries: MemoryEntry[]
                     <p className="truncate font-medium text-foreground">{entry.title}</p>
                     <p className="truncate text-caption text-muted-foreground">{bodyPreview(entry.body, entry.title)}</p>
                   </div>
-                  <span className="shrink-0 font-mono text-caption text-muted-foreground">
+                  <span className="shrink-0 tabular text-caption text-muted-foreground">
                     {new Date(entry.updated_at).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
                   </span>
                 </button>

@@ -5,6 +5,7 @@ import { BudgetForm } from "@/components/finance/budget-form";
 import { SpendByCategoryChart } from "@/components/finance/spend-by-category-chart";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { FINANCE_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function BudgetsPage() {
   const supabase = await createClient();
@@ -17,10 +18,7 @@ export default async function BudgetsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Finance</p>
-          <h1 className="text-xl font-semibold">Budgets</h1>
-        </div>
+        <PageHeader eyebrow="Finance" title="Budgets" />
         <BudgetForm />
       </div>
 

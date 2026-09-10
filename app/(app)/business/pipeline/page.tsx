@@ -6,6 +6,7 @@ import { DealCard } from "@/components/business/deal-card";
 import { DealAgingCard, computeDealAging } from "@/components/business/deal-aging-card";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { BUSINESS_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
 
 function money(n: number) {
   return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
@@ -40,10 +41,7 @@ export default async function PipelinePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Business</p>
-          <h1 className="text-xl font-semibold">Lead Pipeline</h1>
-        </div>
+        <PageHeader eyebrow="Business" title="Lead Pipeline" />
         <LeadForm stages={stages} />
       </div>
 
@@ -63,7 +61,7 @@ export default async function PipelinePage() {
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     {stage.name}
                   </p>
-                  <p className="font-mono text-xs text-brand">{money(valueByStage.get(stage.id) ?? 0)}</p>
+                  <p className="tabular text-xs text-brand">{money(valueByStage.get(stage.id) ?? 0)}</p>
                 </div>
                 <div className="space-y-2">
                   {stageDeals.length === 0 ? (
