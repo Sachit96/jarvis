@@ -29,7 +29,7 @@ export function WaterTracker({ totalMl, targetMl }: { totalMl: number; targetMl:
         <span className="flex items-center gap-1 text-muted-foreground">
           <Droplet className="h-3.5 w-3.5" /> Water
         </span>
-        <span className="font-mono text-brand">
+        <span className="tabular text-brand">
           {total} / {targetMl} ml
         </span>
       </div>

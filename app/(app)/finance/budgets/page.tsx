@@ -1,3 +1,4 @@
+import { PiggyBank } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getBudgets, getMonthTransactions, computeSpendByCategory } from "@/lib/db/queries/finance";
 import { BudgetBar } from "@/components/finance/budget-bar";
@@ -5,6 +6,8 @@ import { BudgetForm } from "@/components/finance/budget-form";
 import { SpendByCategoryChart } from "@/components/finance/spend-by-category-chart";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { FINANCE_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
+import { EmptyState } from "@/components/shared/empty-state";
 
 export default async function BudgetsPage() {
   const supabase = await createClient();
@@ -16,13 +19,11 @@ export default async function BudgetsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Finance</p>
-          <h1 className="text-xl font-semibold">Budgets</h1>
-        </div>
-        <BudgetForm />
-      </div>
+      <PageHeader
+        eyebrow="Finance"
+        title="Budgets"
+        actions={<BudgetForm />}
+      />
 
       <ModuleTabs tabs={FINANCE_TABS} />
 
@@ -31,11 +32,11 @@ export default async function BudgetsPage() {
       </p>
 
       {budgets.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
-          No budgets yet — set your first monthly cap above.
-        </p>
+        <div className="surface">
+          <EmptyState icon={PiggyBank} title="No budgets set" description="Set a monthly cap for a category and this month\u2019s spend will track against it." />
+        </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid items-start gap-4 sm:grid-cols-2">
           {budgets.map((budget) => (
             <BudgetBar
               key={budget.id}

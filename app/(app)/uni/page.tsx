@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { UNI_TABS } from "@/lib/nav-items";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function UniDashboardPage() {
   const supabase = await createClient();
@@ -70,10 +71,7 @@ export default async function UniDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <p className="text-label uppercase tracking-wide text-muted-foreground">University</p>
-        <h1 className="text-title">Dashboard</h1>
-      </div>
+      <PageHeader eyebrow="University" title="Dashboard" />
 
       <ModuleTabs tabs={UNI_TABS} />
 
@@ -122,7 +120,8 @@ export default async function UniDashboardPage() {
           <KpiGrid columns={4}>
             <KpiCell
               label="Semester average"
-              accentClassName="text-brand"
+              icon={GraduationCap}
+              primary
               value={average != null ? `${average.toFixed(1)}%` : "—"}
               hint={
                 average == null
@@ -146,7 +145,7 @@ export default async function UniDashboardPage() {
             />
           </KpiGrid>
 
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
             <Card padding="slotted">
               <CardHeader>
                 <CardTitle>Today&apos;s classes</CardTitle>
@@ -162,7 +161,7 @@ export default async function UniDashboardPage() {
                         <li key={b.id} className="flex items-center gap-2.5 py-2.5 text-body">
                           <span
                             className="size-2 shrink-0 rounded-full"
-                            style={{ backgroundColor: course?.color ?? "var(--cat-business)" }}
+                            style={{ backgroundColor: course?.color ?? "var(--brand)" }}
                           />
                           <span className="tabular shrink-0 text-caption text-muted-foreground">
                             {b.start_time.slice(0, 5)}
@@ -228,7 +227,7 @@ export default async function UniDashboardPage() {
                       <div className="flex min-w-0 items-center gap-2">
                         <span
                           className="size-2 shrink-0 rounded-full"
-                          style={{ backgroundColor: c.color ?? "var(--cat-business)" }}
+                          style={{ backgroundColor: c.color ?? "var(--brand)" }}
                         />
                         <span className="truncate text-body font-medium">{c.code}</span>
                       </div>

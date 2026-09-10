@@ -1,4 +1,5 @@
 "use client";
+import { TrendingUp } from "lucide-react";
 
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { EmptyState } from "@/components/shared/empty-state";
 
 interface Point {
   date: string;
@@ -127,9 +129,11 @@ export function CashflowTrendChart({ points }: { points: Point[] }) {
             </LineChart>
           </ChartContainer>
         ) : (
-          <div className="flex h-56 items-center justify-center text-body text-muted-foreground">
-            No transactions in the last 30 days yet.
-          </div>
+          <EmptyState
+            icon={TrendingUp}
+            title="No cash flow yet"
+            description="Thirty days of running totals appear here once transactions exist."
+          />
         )}
       </CardContent>
     </Card>

@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { ArrowRight, Flame } from "lucide-react";
+import { ArrowRight, Flame, Repeat } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { computeStreak } from "@/lib/db/queries/life";
 import type { Database } from "@/lib/supabase/database.types";
+import { EmptyState } from "@/components/shared/empty-state";
 
 type Habit = Database["public"]["Tables"]["habits"]["Row"];
 
@@ -33,14 +34,19 @@ export function HabitHeatmapCard({
   return (
     <Card padding="compact" className={cn("min-h-[132px] overflow-x-auto", className)}>
       <header className="mb-3 flex shrink-0 items-center justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Habit History — Last 12 Weeks</p>
+        <p className="eyebrow">Habit History — Last 12 Weeks</p>
         <Link href="/life/habits" className="inline-flex shrink-0 items-center gap-1 text-[13px] font-medium text-brand hover:underline">
           Routine
           <ArrowRight className="h-3 w-3" strokeWidth={2.5} />
         </Link>
       </header>
       {visibleHabits.length === 0 ? (
-        <p className="text-[13px] text-muted-foreground">No active habits yet.</p>
+        <EmptyState
+          compact
+          icon={Repeat}
+          title="No routine yet"
+          description="Twelve weeks of history will build here once you have habits to track."
+        />
       ) : (
         <div className="min-w-[480px] space-y-2">
           {visibleHabits.map((habit) => {
@@ -51,7 +57,7 @@ export function HabitHeatmapCard({
                 <div className="sticky left-0 flex min-w-0 items-center gap-1.5 text-[13px]">
                   <span className="truncate">{habit.name}</span>
                   {current > 0 ? (
-                    <span className="flex shrink-0 items-center gap-0.5 font-mono tabular-nums text-brand">
+                    <span className="flex shrink-0 items-center gap-0.5 tabular text-brand">
                       <Flame className="h-2.5 w-2.5" /> {current}
                     </span>
                   ) : null}

@@ -18,7 +18,7 @@ export function ActivityItem({ activity }: { activity: Activity }) {
         {activity.type}
       </Badge>
       <span className="min-w-0 flex-1 text-muted-foreground">{activity.notes}</span>
-      <span className="shrink-0 font-mono text-muted-foreground">
+      <span className="shrink-0 tabular text-muted-foreground">
         {new Date(activity.occurred_at).toLocaleDateString()}
       </span>
       <button

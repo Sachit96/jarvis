@@ -14,6 +14,7 @@ import { YoutubeConnectionCard } from "@/components/settings/youtube-connection-
 import { TIER_MODEL } from "@/lib/ai/providers/gemini-client";
 import { getAnthropicSpendCap, getAnthropicSpendToDate } from "@/lib/ai/providers/anthropic-client";
 import { isMissingRelation } from "@/lib/db/missing-relation";
+import { PageHeader, SectionHeader } from "@/components/shared/page-header";
 
 // Extracted so Date.now() isn't called directly inside the Server
 // Component body — same react-hooks/purity pattern as daysAgoIso() in
@@ -66,51 +67,81 @@ export default async function SettingsPage({
   const hasYoutubeKeys = statusOf("youtube") !== "configuration_required";
 
   return (
-    <div className="space-y-6">
-      <div>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">System</p>
-        <h1 className="text-xl font-semibold">Settings</h1>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        eyebrow="System"
+        title="Settings"
+        description="What JARVIS can reach, what it is allowed to spend, and how to get your data out."
+      />
 
       {youtube_connected ? (
-        <div className="flex items-center gap-2 rounded-lg border border-success/30 bg-success/10 px-3 py-2 text-sm text-success">
-          <CheckCircle2 className="h-4 w-4" /> YouTube connected.
+        <div className="flex items-center gap-2 rounded-xl border border-success/30 bg-success/10 px-3.5 py-2.5 text-body text-success">
+          <CheckCircle2 className="size-4 shrink-0" /> YouTube connected.
         </div>
       ) : youtube_error ? (
-        <div className="flex items-center gap-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
-          <XCircle className="h-4 w-4" /> {YOUTUBE_ERROR_MESSAGE[youtube_error] ?? "YouTube connection failed."}
+        <div className="flex items-center gap-2 rounded-xl border border-danger/30 bg-danger/10 px-3.5 py-2.5 text-body text-danger">
+          <XCircle className="size-4 shrink-0" />{" "}
+          {YOUTUBE_ERROR_MESSAGE[youtube_error] ?? "YouTube connection failed."}
         </div>
       ) : null}
 
       {/* The at-a-glance board goes first; the cards below it stay because
           each does something this one does not (spend caps, OAuth connect,
-          saved searches) rather than just reporting a state. */}
-      <IntegrationStatusCard />
+          saved searches) rather than just reporting a state.
 
-      <BrightspaceConnectionCard />
+          Grouped into three sections and paired into two columns from lg up:
+          as one flat stack of eight equally-weighted cards at full page
+          width, every line ran ~120 characters and nothing indicated which
+          card was a status readout and which needed action. */}
+      <section className="space-y-3">
+        <SectionHeader
+          title="Connections"
+          description="Anything not connected is simply unavailable — no data is invented in its place."
+        />
+        <IntegrationStatusCard />
+        <div className="grid items-start gap-4 lg:grid-cols-2">
+          <BrightspaceConnectionCard />
+          <YoutubeConnectionCard
+            configured={hasYoutubeKeys}
+            connected={!!ytConnection}
+            channelTitle={ytConnection?.channel_title ?? null}
+            connectedAt={ytConnection?.connected_at ?? null}
+          />
+        </div>
+      </section>
 
-      <AiMentorStatusCard
-        hasKey={hasGeminiKey}
-        model={`${TIER_MODEL.high_volume} (high-volume) + ${TIER_MODEL.structured} (structured)`}
-      />
+      <section className="space-y-3">
+        <SectionHeader
+          title="Intelligence"
+          description="Which models are reachable, and the ceiling on what the paid one may spend."
+        />
+        <div className="grid items-start gap-4 lg:grid-cols-2">
+          <AiMentorStatusCard
+            hasKey={hasGeminiKey}
+            model={`${TIER_MODEL.high_volume} (high-volume) + ${TIER_MODEL.structured} (structured)`}
+          />
+          <AnthropicStatusCard hasKey={hasAnthropicKey} spentUsd={anthropicSpent} capUsd={anthropicCap} />
+        </div>
+      </section>
 
-      <SavedLeadSearchesCard searches={savedSearches} />
-      <SmsStatusCard configured={smsConfigured} ownerNumber={process.env.OWNER_PHONE_NUMBER ?? null} recentCount={smsRecentCount} />
-      <AnthropicStatusCard hasKey={hasAnthropicKey} spentUsd={anthropicSpent} capUsd={anthropicCap} />
-      <YoutubeConnectionCard
-        configured={hasYoutubeKeys}
-        connected={!!ytConnection}
-        channelTitle={ytConnection?.channel_title ?? null}
-        connectedAt={ytConnection?.connected_at ?? null}
-      />
-
-      <div className="rounded-lg border border-border bg-card p-4">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">Data export</p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Download every record you own across all modules as a single JSON file.
-        </p>
-        <ExportBackupButton />
-      </div>
+      <section className="space-y-3">
+        <SectionHeader title="Automation and data" />
+        <SavedLeadSearchesCard searches={savedSearches} />
+        <div className="grid items-start gap-4 lg:grid-cols-2">
+          <SmsStatusCard
+            configured={smsConfigured}
+            ownerNumber={process.env.OWNER_PHONE_NUMBER ?? null}
+            recentCount={smsRecentCount}
+          />
+          <div className="surface p-5">
+            <p className="eyebrow">Data export</p>
+            <p className="mt-2 mb-3 text-body text-foreground-tertiary">
+              Download every record you own across all modules as a single JSON file.
+            </p>
+            <ExportBackupButton />
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

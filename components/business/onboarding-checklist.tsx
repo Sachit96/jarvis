@@ -64,7 +64,7 @@ export function OnboardingChecklist({ contactId, tasks }: { contactId: string; t
 
   return (
     <div>
-      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+      <p className="eyebrow">
         Onboarding {tasks.length > 0 ? `(${doneCount}/${tasks.length})` : ""}
       </p>
       {tasks.length > 0 ? (

@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { ArrowRight, ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { ArrowDownLeft, ArrowLeftRight, ArrowRight, ArrowUpRight } from "lucide-react";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { Database } from "@/lib/supabase/database.types";
+import { EmptyState } from "@/components/shared/empty-state";
 
 type Transaction = Database["public"]["Tables"]["transactions"]["Row"];
 
@@ -40,7 +41,11 @@ export function RecentTransactionsCard({ transactions }: { transactions: Transac
 
       <CardContent>
         {rows.length === 0 ? (
-          <p className="py-8 text-center text-body text-muted-foreground">No transactions logged yet.</p>
+          <EmptyState
+            icon={ArrowLeftRight}
+            title="No transactions"
+            description="Log income and spending and the most recent land here."
+          />
         ) : (
           <ul className="-my-1 divide-y divide-border">
             {rows.map((t) => {

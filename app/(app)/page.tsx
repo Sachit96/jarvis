@@ -25,7 +25,9 @@ import { getLifeScoreSnapshot, getLifeScoreTrend } from "@/lib/db/queries/life-s
 import { hasHevyKey } from "@/lib/integrations/hevy/client";
 import { getMemoryEntries } from "@/lib/db/queries/memory";
 import { formatLbs } from "@/lib/units";
+import { Briefcase, HeartPulse, ListChecks, Wallet } from "lucide-react";
 import { KpiCell, KpiGrid } from "@/components/shared/kpi-grid";
+import { PageHeader, SectionHeader } from "@/components/shared/page-header";
 import { PriorityTasksWidget } from "@/components/dashboard/priority-tasks-widget";
 import { TodayRoutineCard } from "@/components/dashboard/today-routine-card";
 import { MentorInsightCard } from "@/components/dashboard/mentor-insight-card";
@@ -179,43 +181,46 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="space-y-4">
-      {/* Environmental lighting: Home is the command centre, so this is
-          one of the few surfaces §7 puts aurora on. Fixed and behind
-          everything, so it never intercepts a click or scrolls with content. */}
-      <AuroraBackdrop />
+    <div className="space-y-8">
+      {/* The shell already lights every route at ambient strength; Home is
+          the command centre, so it turns the same lamps up rather than
+          adding different ones. */}
+      <AuroraBackdrop intensity="focal" />
       {hasHevyKey() ? <HevyAutoSync /> : null}
 
-      <div className="space-y-1">
-        <p className="eyebrow">
-          {new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })}
-        </p>
-        <h1 className="text-title">Today</h1>
+      <PageHeader
+        eyebrow={new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })}
+        title="Today"
+      />
+
+      {/* The page's answer, and the only lit panel on it. It and the KPI
+          block are the only two things on Home that animate in — §19's
+          "selectively", meant literally. */}
+      <div className="rise">
+        <JarvisPriorityCard priority={priority} runnersUp={ranked.slice(1, 3)} />
       </div>
 
-      {/* The five separate stat tiles are one fused block now. They were
-          always read as a set, and five outlines at the top of the page was
-          most of what made the dashboard look busy. Goal completion is the
-          one that dropped: LifeScoreCard and the goals rail below both
-          already carry it, where the other four have no second home. */}
-      <JarvisPriorityCard priority={priority} runnersUp={ranked.slice(1, 3)} />
-
-      <KpiGrid columns={4}>
+      {/* One fused block. These four are always read as a set, and four
+          separate outlines at the top of a dashboard is most of what makes
+          one look busy. Goal completion is the figure that dropped:
+          LifeScoreCard and the goals rail both already carry it. */}
+      <KpiGrid columns={4} className="rise rise-delay-1">
         <KpiCell
           label="Net worth"
-          accentClassName="text-cat-money"
+          icon={Wallet}
+          primary
           value={money(financeTotals.netWorth)}
           hint={accounts.length === 0 ? "No accounts connected yet" : `Across ${accounts.length} account(s)`}
         />
         <KpiCell
           label="Business revenue"
-          accentClassName="text-cat-business"
+          icon={Briefcase}
           value={money(mrr)}
           hint={`${pipelineSummary.openCount} open deal(s) · ${money(pipelineSummary.openValue)} pipeline`}
         />
         <KpiCell
           label="Health score"
-          accentClassName="text-cat-health"
+          icon={HeartPulse}
           value={`${lifeScore.health}`}
           hint={
             lifeScore.health === 0 && workouts.length > 0
@@ -227,43 +232,54 @@ export default async function DashboardPage() {
         />
         <KpiCell
           label="Discipline"
-          accentClassName="text-cat-goals"
+          icon={ListChecks}
           value={`${lifeScore.habits}`}
           hint={`${habitsDoneToday}/${routineItems.length} routine items done`}
         />
       </KpiGrid>
 
-      {/* A plain 12-column grid on natural heights, replacing four flex
-          columns that equalised against the tallest and needed a viewport
-          max-height plus filler cards stretched with flex-1 to avoid voids.
-          That arrangement made any one card growing drag every other column
-          with it; here a tall card affects only its own row. */}
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
-        <div className="xl:col-span-8">
-          <OverallProgressChart points={lifeScoreTrend} narrative={progressNarrative} compact />
+      {/* Three named bands rather than eight anonymous grid rows at identical
+          weight and identical spacing. The page reads top-to-bottom as: what
+          is happening now, how the last month went, where each module
+          stands — which is the order the questions actually arrive in. */}
+      <section className="space-y-3">
+        <SectionHeader title="Now" description="What today asks of you." />
+        <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <PriorityTasksWidget tasks={priorityTasks} compact />
+          <TodayRoutineCard items={routineItems} compact />
+          <MentorInsightCard
+            markdownBody={dailyBrief?.markdown_body ?? null}
+            focusAreas={dailyBrief?.focus_areas ?? []}
+            compact
+          />
         </div>
-        <div className="xl:col-span-4">
-          <LifeScoreCard score={lifeScore} compact />
+      </section>
+
+      <section className="space-y-3">
+        <SectionHeader title="Momentum" description="The last thirty days, and where each area sits." />
+        {/* A plain 12-column grid on natural heights, replacing four flex
+            columns that equalised against the tallest and needed a viewport
+            max-height plus filler cards stretched with flex-1 to avoid voids.
+            That arrangement made any one card growing drag every other column
+            with it; here a tall card affects only its own row. */}
+        <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-12">
+          <div className="xl:col-span-8">
+            <OverallProgressChart points={lifeScoreTrend} narrative={progressNarrative} compact elevated />
+          </div>
+          <div className="xl:col-span-4">
+            <LifeScoreCard score={lifeScore} compact />
+          </div>
         </div>
-      </div>
+        <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <UpcomingCard items={upcoming} compact />
+          <GoalsRailCard goals={goals} />
+          <RecentActivityCard items={recentActivity} compact />
+        </div>
+      </section>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <PriorityTasksWidget tasks={priorityTasks} compact />
-        <TodayRoutineCard items={routineItems} compact />
-        <MentorInsightCard
-          markdownBody={dailyBrief?.markdown_body ?? null}
-          focusAreas={dailyBrief?.focus_areas ?? []}
-          compact
-        />
-      </div>
+      <SectionHeader title="Modules" description="A line each, and a way in." />
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <UpcomingCard items={upcoming} compact />
-        <GoalsRailCard goals={goals} />
-        <RecentActivityCard items={recentActivity} compact />
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
         <DetailStatsCard
           title="Finance"
           compact
@@ -271,8 +287,11 @@ export default async function DashboardPage() {
           rows={[
             { label: "Assets", value: money(financeTotals.assets) },
             { label: "Liabilities", value: money(financeTotals.liabilities), tone: financeTotals.liabilities > 0 ? "danger" : "neutral" },
-            { label: "Income (mo)", value: money(pnl.income), tone: "success" },
-            { label: "Expenses (mo)", value: money(pnl.expense), tone: "danger" },
+            // Tone only when there is something to tone. A green $0 income
+            // and a red $0 expense on a first-run dashboard dress an absence
+            // up as a reading.
+            { label: "Income (mo)", value: money(pnl.income), tone: pnl.income > 0 ? "success" : "neutral" },
+            { label: "Expenses (mo)", value: money(pnl.expense), tone: pnl.expense > 0 ? "danger" : "neutral" },
           ]}
           footerLabel="Finance Overview"
           footerHref="/finance/overview"
@@ -306,7 +325,7 @@ export default async function DashboardPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+      <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-12">
         <div className="xl:col-span-4">
           <NotesRailCard entries={memoryEntries} />
         </div>

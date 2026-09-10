@@ -19,7 +19,7 @@ export function AiMentorStatusCard({ hasKey, model }: { hasKey: boolean; model: 
 
   return (
     <div className="rounded-lg border border-border bg-card p-4">
-      <p className="text-xs uppercase tracking-wider text-muted-foreground">AI Mentor (Gemini)</p>
+      <p className="eyebrow">AI Mentor (Gemini)</p>
       <div className="mt-2 flex items-center gap-2 text-sm">
         {hasKey ? (
           <CheckCircle2 className="h-4 w-4 text-success" />
@@ -28,7 +28,7 @@ export function AiMentorStatusCard({ hasKey, model }: { hasKey: boolean; model: 
         )}
         <span>{hasKey ? "GEMINI_API_KEY is configured" : "GEMINI_API_KEY is not set"}</span>
       </div>
-      <p className="mt-1 font-mono text-xs text-muted-foreground">model: {model}</p>
+      <p className="mt-1 tabular text-xs text-muted-foreground">model: {model}</p>
       {!hasKey ? (
         <p className="mt-2 text-xs text-muted-foreground">
           Set GEMINI_API_KEY in your environment variables (.env.local locally, Netlify env vars in

@@ -47,7 +47,7 @@ export async function BrightspaceConnectionCard() {
             </Alert>
             {/* Names only — printing a value would put a secret into
                 server-rendered HTML. */}
-            <p className="font-mono text-caption text-muted-foreground/60">
+            <p className="tabular text-caption text-muted-foreground/60">
               {status.requires?.join(" · ")}
             </p>
           </>

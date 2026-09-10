@@ -12,7 +12,7 @@ const BAND_CLASS: Record<ReturnType<typeof scoreBand>, string> = {
 export function ScoreBandBadge({ score, className }: { score: number; className?: string }) {
   const band = scoreBand(score);
   return (
-    <Badge variant="outline" className={cn("gap-1 font-mono text-[10px] uppercase", BAND_CLASS[band], className)}>
+    <Badge variant="outline" className={cn("gap-1 tabular text-[10px] uppercase", BAND_CLASS[band], className)}>
       {SCORE_BAND_LABEL[band]} · {score}
     </Badge>
   );

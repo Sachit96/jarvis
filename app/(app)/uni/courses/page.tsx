@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { CourseForm } from "@/components/uni/course-form";
 import { CourseCard } from "@/components/uni/course-card";
 import { UNI_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function UniCoursesPage() {
   const supabase = await createClient();
@@ -22,13 +23,11 @@ export default async function UniCoursesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">University</p>
-          <h1 className="text-xl font-semibold">Courses</h1>
-        </div>
-        <CourseForm term={currentTerm} />
-      </div>
+      <PageHeader
+        eyebrow="University"
+        title="Courses"
+        actions={<CourseForm term={currentTerm} />}
+      />
 
       <ModuleTabs tabs={UNI_TABS} />
 
@@ -38,7 +37,7 @@ export default async function UniCoursesPage() {
         Array.from(byTerm.entries()).map(([term, termCourses]) => (
           <div key={term} className="space-y-3">
             <h2 className="text-sm font-semibold text-muted-foreground">{term}</h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {termCourses.map((course) => (
                 <CourseCard
                   key={course.id}

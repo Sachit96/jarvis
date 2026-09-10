@@ -1,3 +1,4 @@
+import { ArrowLeftRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getAccounts, getTransactions } from "@/lib/db/queries/finance";
 import { TransactionForm } from "@/components/finance/transaction-form";
@@ -13,6 +14,8 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/shared/page-header";
+import { EmptyState } from "@/components/shared/empty-state";
 
 export default async function TransactionsPage({
   searchParams,
@@ -32,13 +35,11 @@ export default async function TransactionsPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Finance</p>
-          <h1 className="text-xl font-semibold">Transactions</h1>
-        </div>
-        <TransactionForm accounts={accounts} />
-      </div>
+      <PageHeader
+        eyebrow="Finance"
+        title="Transactions"
+        actions={<TransactionForm accounts={accounts} />}
+      />
 
       <ModuleTabs tabs={FINANCE_TABS} />
 
@@ -77,9 +78,9 @@ export default async function TransactionsPage({
       </form>
 
       {transactions.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
-          No transactions match these filters.
-        </p>
+        <div className="surface">
+          <EmptyState icon={ArrowLeftRight} title="Nothing matches" description="No transactions fall inside the current filters. Widen the date range or clear a filter." />
+        </div>
       ) : (
         <ul className="space-y-2">
           {transactions.map((t) => (

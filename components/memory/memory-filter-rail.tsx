@@ -47,7 +47,7 @@ export function MemoryFilterRail({
   return (
     <div className="w-[200px] shrink-0 space-y-5">
       <div>
-        <p className="mb-1.5 text-label uppercase tracking-wide text-muted-foreground">Type</p>
+        <p className="mb-1.5 eyebrow">Type</p>
         <ul className="space-y-0.5">
           {MEMORY_TYPES.map((type) => (
             <li key={type}>
@@ -59,7 +59,7 @@ export function MemoryFilterRail({
                 )}
               >
                 <span>{MEMORY_TYPE_LABEL[type]}</span>
-                <span className="font-mono text-caption text-muted-foreground">{stats.byType[type]}</span>
+                <span className="tabular text-caption text-muted-foreground">{stats.byType[type]}</span>
               </button>
             </li>
           ))}
@@ -75,12 +75,12 @@ export function MemoryFilterRail({
           )}
         >
           <span>Pinned</span>
-          <span className="font-mono text-caption text-muted-foreground">{pinnedCount}</span>
+          <span className="tabular text-caption text-muted-foreground">{pinnedCount}</span>
         </button>
       </div>
 
       <div>
-        <p className="mb-1.5 text-label uppercase tracking-wide text-muted-foreground">Source</p>
+        <p className="mb-1.5 eyebrow">Source</p>
         <div className="flex flex-col gap-0.5">
           {SOURCE_OPTIONS.map((opt) => (
             <button
@@ -99,7 +99,7 @@ export function MemoryFilterRail({
 
       {tagCounts.length > 0 ? (
         <div>
-          <p className="mb-1.5 text-label uppercase tracking-wide text-muted-foreground">Tags</p>
+          <p className="mb-1.5 eyebrow">Tags</p>
           <ul className="space-y-0.5">
             {tagCounts.map(({ tag, count }) => (
               <li key={tag}>
@@ -111,7 +111,7 @@ export function MemoryFilterRail({
                   )}
                 >
                   <span className="min-w-0 truncate">{tag}</span>
-                  <span className="font-mono text-caption text-muted-foreground">{count}</span>
+                  <span className="tabular text-caption text-muted-foreground">{count}</span>
                 </button>
               </li>
             ))}

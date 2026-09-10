@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { Database } from "@/lib/supabase/database.types";
+import { EmptyState } from "@/components/shared/empty-state";
 
 type Goal = Database["public"]["Tables"]["goals"]["Row"];
 
@@ -30,11 +31,16 @@ export function GoalsRailCard({ goals, className }: { goals: Goal[]; className?:
   return (
     <Card padding="compact" className={cn("min-h-0", className)}>
       <header className="mb-3 flex shrink-0 items-center justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Goals</p>
+        <p className="eyebrow">Goals</p>
       </header>
       <div className="flex min-h-0 flex-1 flex-col">
         {active.length === 0 ? (
-          <p className="text-[13px] text-muted-foreground">No active goals.</p>
+          <EmptyState
+            compact
+            icon={Target}
+            title="No objectives"
+            description="Set a goal and its progress tracks here."
+          />
         ) : noneStarted ? (
           <div className="flex items-center gap-2.5 text-[13px] text-muted-foreground">
             <Target className="h-4 w-4 shrink-0 text-muted-foreground/70" strokeWidth={1.75} />
@@ -55,7 +61,7 @@ export function GoalsRailCard({ goals, className }: { goals: Goal[]; className?:
                     PriorityTasksWidget already uses for the same reason. */}
                 <div className="flex items-start justify-between gap-2">
                   <p className="min-w-0 flex-1 line-clamp-2 text-[13px] font-medium">{goal.title}</p>
-                  <span className="shrink-0 text-right font-mono text-[13px] font-medium tabular-nums text-brand">
+                  <span className="shrink-0 text-right tabular text-[13px] font-medium text-brand">
                     {goal.progress_percent}%
                   </span>
                 </div>

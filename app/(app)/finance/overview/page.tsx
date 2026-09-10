@@ -50,8 +50,8 @@ export default async function FinanceOverviewPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <p className="text-label uppercase tracking-wide text-muted-foreground">Finance</p>
-        <h1 className="text-title">Overview</h1>
+        <p className="eyebrow">Finance</p>
+        <h1 className="text-display">Overview</h1>
         <p className="text-body text-muted-foreground">{monthLabel}</p>
       </div>
 
@@ -68,7 +68,7 @@ export default async function FinanceOverviewPage() {
       {/* 12-column grid rather than fixed pixel columns so the split holds
           at every width — the chart needs the majority share, and the two
           list cards below are equal-weight. */}
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+      <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-12">
         <div className="xl:col-span-7">
           <CashflowTrendChart points={cashflowPoints} />
         </div>
@@ -77,7 +77,7 @@ export default async function FinanceOverviewPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+      <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-12">
         <div className="xl:col-span-7">
           <RecentTransactionsCard transactions={recentTransactions} />
         </div>

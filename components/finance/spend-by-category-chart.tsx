@@ -1,4 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PieChart } from "lucide-react";
+import { EmptyState } from "@/components/shared/empty-state";
 
 /**
  * Spending by category is a ranked-magnitude comparison, which is a bar's
@@ -51,9 +53,11 @@ export function SpendByCategoryChart({ spendByCategory }: { spendByCategory: Map
 
       <CardContent>
         {rows.length === 0 ? (
-          <div className="flex h-40 items-center justify-center text-body text-muted-foreground">
-            No expenses logged this month yet.
-          </div>
+          <EmptyState
+            icon={PieChart}
+            title="Nothing spent yet"
+            description="This month's spending splits by category here as you log it."
+          />
         ) : (
           <ul className="space-y-3.5">
             {rows.map((row) => {
@@ -69,7 +73,7 @@ export function SpendByCategoryChart({ spendByCategory }: { spendByCategory: Map
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
                     <div
-                      className="h-full rounded-full bg-cat-finance"
+                      className="gradient-brand h-full rounded-full"
                       style={{ width: `${max > 0 ? Math.max((row.amount / max) * 100, 2) : 0}%` }}
                     />
                   </div>

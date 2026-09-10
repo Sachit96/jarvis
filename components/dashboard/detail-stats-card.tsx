@@ -49,7 +49,7 @@ export function DetailStatsCard({
   return (
     <Card padding={compact ? "compact" : "default"} className={cn("min-h-0", className)}>
       <header className="mb-3 flex shrink-0 flex-col gap-0.5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">{title}</p>
+        <p className="eyebrow">{title}</p>
         {footnote ? <p className="text-caption text-muted-foreground/80">{footnote}</p> : null}
       </header>
       <div className="flex min-h-0 flex-1 flex-col">
@@ -57,7 +57,7 @@ export function DetailStatsCard({
           {rows.map((row) => (
             <div key={row.label} className="flex items-baseline justify-between text-[13px]">
               <span className="text-muted-foreground">{row.label}</span>
-              <span className={`font-mono font-medium tabular-nums ${TONE_CLASS[row.tone ?? "neutral"]}`}>{row.value}</span>
+              <span className={`tabular font-medium ${TONE_CLASS[row.tone ?? "neutral"]}`}>{row.value}</span>
             </div>
           ))}
         </div>

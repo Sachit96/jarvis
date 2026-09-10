@@ -24,11 +24,11 @@ export function TradeStats({
         value={money(totalPnl)}
         tone={totalPnl >= 0 ? "success" : "danger"}
         icon={DollarSign}
-        category="finance"
+
       />
-      <StatTile label="Win Rate" value={`${winRate.toFixed(0)}%`} icon={Target} category="finance" />
-      <StatTile label="Closed Trades" value={String(closedCount)} icon={CheckCircle2} category="finance" />
-      <StatTile label="Open Trades" value={String(openCount)} icon={Activity} category="finance" />
+      <StatTile label="Win Rate" value={`${winRate.toFixed(0)}%`} icon={Target} />
+      <StatTile label="Closed Trades" value={String(closedCount)} icon={CheckCircle2} />
+      <StatTile label="Open Trades" value={String(openCount)} icon={Activity} />
     </div>
   );
 }

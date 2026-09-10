@@ -1,9 +1,12 @@
+import { LineChart } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getMarketAnalyses } from "@/lib/db/queries/trading";
 import { MarketAnalysisForm } from "@/components/finance/market-analysis-form";
 import { MarketAnalysisCard } from "@/components/finance/market-analysis-card";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { FINANCE_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
+import { EmptyState } from "@/components/shared/empty-state";
 
 export default async function MarketAnalysisPage() {
   const supabase = await createClient();
@@ -11,13 +14,11 @@ export default async function MarketAnalysisPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Finance</p>
-          <h1 className="text-xl font-semibold">Top-Down Analysis</h1>
-        </div>
-        <MarketAnalysisForm />
-      </div>
+      <PageHeader
+        eyebrow="Finance"
+        title="Top-Down Analysis"
+        actions={<MarketAnalysisForm />}
+      />
 
       <ModuleTabs tabs={FINANCE_TABS} />
 
@@ -26,11 +27,11 @@ export default async function MarketAnalysisPage() {
       </p>
 
       {analyses.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
-          No analyses logged yet — add your first pair above.
-        </p>
+        <div className="surface">
+          <EmptyState icon={LineChart} title="No analyses yet" description="Add a pair above to keep a running read on the setups you are watching." />
+        </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid items-start gap-4 sm:grid-cols-2">
           {analyses.map((analysis) => (
             <MarketAnalysisCard key={analysis.id} analysis={analysis} />
           ))}

@@ -46,7 +46,7 @@ export function ChecklistManager({ items }: { items: ChecklistItem[] }) {
 
   return (
     <div className="rounded-lg border border-border bg-card p-4">
-      <p className="text-xs uppercase tracking-wider text-muted-foreground">Pre-trade confluence checklist</p>
+      <p className="eyebrow">Pre-trade confluence checklist</p>
       <p className="mt-1 text-xs text-muted-foreground">
         Every item here must be checked before you can log a new trade.
       </p>

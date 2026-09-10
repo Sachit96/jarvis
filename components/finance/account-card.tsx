@@ -77,7 +77,7 @@ export function AccountCard({ account }: { account: Account }) {
               step="0.01"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              className="h-8 w-28 font-mono"
+              className="h-8 w-28 tabular"
               autoFocus
             />
             <button onClick={handleSave} aria-label="Save balance" className="text-success">
@@ -96,7 +96,7 @@ export function AccountCard({ account }: { account: Account }) {
           </>
         ) : (
           <>
-            <p className={cn("font-mono text-title", isLiability && "text-danger")}>
+            <p className={cn("tabular text-title", isLiability && "text-danger")}>
               {isLiability ? "Owed " : ""}${fmt(display)}
             </p>
             <button

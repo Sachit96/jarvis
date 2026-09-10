@@ -1,13 +1,14 @@
 import { Briefcase, Trophy, Target, TrendingUp } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getPipelineStages, getDeals, getContracts, getContacts, computeMrr, computePipelineSummary } from "@/lib/db/queries/business";
-import { StatTile } from "@/components/shared/stat-tile";
+import { KpiCell, KpiGrid } from "@/components/shared/kpi-grid";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { PipelineDonutCard } from "@/components/business/pipeline-donut-card";
 import { DealsSparklineCard } from "@/components/business/deals-sparkline-card";
 import { LatestDealCard } from "@/components/business/latest-deal-card";
 import { DealAgingCard, computeDealAging } from "@/components/business/deal-aging-card";
 import { BUSINESS_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
 
 function money(n: number) {
   return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
@@ -64,27 +65,30 @@ export default async function BusinessDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">Business</p>
-        <h1 className="text-xl font-semibold">Dashboard</h1>
-      </div>
+      <PageHeader eyebrow="Business" title="Dashboard" />
 
       <ModuleTabs tabs={BUSINESS_TABS} />
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatTile
-          label="Open Pipeline"
-          value={money(summary.openValue)}
-          delta={`${summary.openCount} deal(s)`}
+      {/* One fused block, like Home, Finance and University — four separate
+          cards here sized to their own content, so a two-line label made one
+          tile taller than its neighbours and the row read as ragged. */}
+      <KpiGrid columns={4}>
+        <KpiCell
+          label="Open pipeline"
           icon={Briefcase}
-          category="business"
-          unmeasured={summary.openValue === 0 && summary.openCount > 0}
-          note={summary.openValue === 0 && summary.openCount > 0 ? "Deal values not set yet" : undefined}
+          primary
+          value={money(summary.openValue)}
+          hint={
+            summary.openValue === 0 && summary.openCount > 0
+              ? `${summary.openCount} deal(s) — values not set yet`
+              : `${summary.openCount} open deal(s)`
+          }
+          valueClassName={summary.openValue === 0 && summary.openCount > 0 ? "text-foreground-tertiary/60" : undefined}
         />
-        <StatTile label="Won (all time)" value={money(summary.wonValue)} tone="success" delta={`${summary.wonCount} deal(s)`} icon={Trophy} category="business" />
-        <StatTile label="Win Rate" value={`${summary.winRate}%`} delta={`${summary.closedCount} closed`} icon={Target} category="business" />
-        <StatTile label="MRR" value={money(mrr)} tone="success" icon={TrendingUp} category="business" />
-      </div>
+        <KpiCell label="Won (all time)" icon={Trophy} value={money(summary.wonValue)} hint={`${summary.wonCount} deal(s) closed won`} />
+        <KpiCell label="Win rate" icon={Target} value={`${summary.winRate}%`} hint={`${summary.closedCount} closed`} />
+        <KpiCell label="MRR" icon={TrendingUp} value={money(mrr)} hint="From active contracts" />
+      </KpiGrid>
 
       <div className="grid items-start gap-4 lg:grid-cols-2">
         <DealAgingCard openDealCount={openDeals.length} buckets={dealAgingBuckets} />

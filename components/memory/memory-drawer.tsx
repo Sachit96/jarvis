@@ -140,7 +140,7 @@ export function MemoryDrawer({
               <Backlinks backlinks={backlinks} />
 
               <div className="border-t border-border pt-3">
-                <p className="text-label uppercase tracking-wide text-muted-foreground">Referenced by</p>
+                <p className="eyebrow">Referenced by</p>
                 <p className="mt-1 text-body text-muted-foreground">
                   Not tracked yet — JARVIS doesn&apos;t currently record which mentor briefs or pages pull from
                   each memory. This is next to instrument.

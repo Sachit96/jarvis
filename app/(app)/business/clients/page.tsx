@@ -3,9 +3,11 @@ import { createClient } from "@/lib/supabase/server";
 import { getContacts, getAllActivities, getAllOnboardingTasks } from "@/lib/db/queries/business";
 import { ensureOnboardingTasksAction } from "@/actions/business-actions";
 import { ContactCard } from "@/components/business/contact-card";
-import { StatTile } from "@/components/shared/stat-tile";
+import { KpiCell, KpiGrid } from "@/components/shared/kpi-grid";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { BUSINESS_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
+import { EmptyState } from "@/components/shared/empty-state";
 
 export default async function ClientsPage() {
   const supabase = await createClient();
@@ -33,27 +35,32 @@ export default async function ClientsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">Business</p>
-        <h1 className="text-xl font-semibold">Clients</h1>
-      </div>
+      <PageHeader eyebrow="Business" title="Clients" />
 
       <ModuleTabs tabs={BUSINESS_TABS} />
 
       {contacts.length > 0 ? (
-        <div className="grid grid-cols-3 gap-4">
-          <StatTile label="Total Clients" value={String(contacts.length)} icon={Users} category="business" />
-          <StatTile label="Manual" value={String(contacts.filter((c) => c.source === "manual").length)} icon={UserPlus} category="business" />
-          <StatTile label="From Lead Research" value={String(contacts.filter((c) => c.source === "research_agent").length)} icon={Search} category="business" />
-        </div>
+        <KpiGrid columns={3}>
+          <KpiCell label="Total clients" value={contacts.length} icon={Users} primary />
+          <KpiCell
+            label="Added by hand"
+            value={contacts.filter((c) => c.source === "manual").length}
+            icon={UserPlus}
+          />
+          <KpiCell
+            label="From lead research"
+            value={contacts.filter((c) => c.source === "research_agent").length}
+            icon={Search}
+          />
+        </KpiGrid>
       ) : null}
 
       {contacts.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
-          No clients yet — add a lead from the Pipeline tab to get started.
-        </p>
+        <div className="surface">
+          <EmptyState icon={Users} title="No clients yet" description="Move a deal to a won stage on the Pipeline board and the client will appear here." />
+        </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid items-start gap-4 sm:grid-cols-2">
           {contacts.map((contact) => (
             <ContactCard
               key={contact.id}

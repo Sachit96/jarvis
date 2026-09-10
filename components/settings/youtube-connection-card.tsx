@@ -29,7 +29,7 @@ export function YoutubeConnectionCard({ configured, connected, channelTitle, con
 
   return (
     <div className="rounded-lg border border-border bg-card p-4">
-      <p className="text-xs uppercase tracking-wider text-muted-foreground">YouTube Upload</p>
+      <p className="eyebrow">YouTube Upload</p>
       <div className="mt-2 flex items-center gap-2 text-sm">
         {!configured ? (
           <>
@@ -56,7 +56,7 @@ export function YoutubeConnectionCard({ configured, connected, channelTitle, con
         </p>
       ) : connected ? (
         <>
-          <p className="mt-1 font-mono text-xs text-muted-foreground">connected {age}d ago</p>
+          <p className="mt-1 tabular text-xs text-muted-foreground">connected {age}d ago</p>
           {likelyExpired ? (
             <p className="mt-2 flex items-center gap-1.5 text-xs text-danger">
               <AlertTriangle className="h-3.5 w-3.5" />

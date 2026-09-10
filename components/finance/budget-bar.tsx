@@ -41,7 +41,7 @@ export function BudgetBar({ budget, spent }: { budget: Budget; spent: number }) 
             style={{ width: `${pct}%` }}
           />
         </div>
-        <span className={cn("w-24 shrink-0 text-right font-mono text-xs", over ? "text-danger" : "text-brand")}>
+        <span className={cn("w-24 shrink-0 text-right tabular text-xs", over ? "text-danger" : "text-brand")}>
           {money(spent)} / {money(limit)}
         </span>
       </div>

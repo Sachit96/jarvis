@@ -55,8 +55,8 @@ export default async function UniAttendancePage() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">University</p>
-        <h1 className="flex items-center gap-2 text-xl font-semibold">
+        <p className="eyebrow">University</p>
+        <h1 className="flex items-center gap-2 text-display">
           <UserCheck className="size-5 text-brand" strokeWidth={2} />
           Attendance
         </h1>

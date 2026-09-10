@@ -6,6 +6,7 @@ import { SleepForm } from "@/components/health/sleep-form";
 import { SleepTrendCard } from "@/components/health/sleep-trend-card";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { HEALTH_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function BodyPage() {
   const supabase = await createClient();
@@ -13,20 +14,20 @@ export default async function BodyPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Health</p>
-          <h1 className="text-xl font-semibold">Body</h1>
-        </div>
-        <div className="flex gap-2">
-          <WeightForm />
-          <SleepForm />
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="Health"
+        title="Body"
+        actions={
+          <>
+            <WeightForm />
+            <SleepForm />
+          </>
+        }
+      />
 
       <ModuleTabs tabs={HEALTH_TABS} />
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid items-start gap-4 sm:grid-cols-2">
         <WeightTrendCard entries={bodyMetrics} />
         <SleepTrendCard entries={sleepLogs} />
       </div>

@@ -27,7 +27,7 @@ function TimeframeRow({
   if (!sentiment && !notes) return null;
   return (
     <div className="flex items-start gap-2 text-sm">
-      <span className="w-10 shrink-0 font-mono text-xs text-muted-foreground">{label}</span>
+      <span className="w-10 shrink-0 tabular text-xs text-muted-foreground">{label}</span>
       {sentiment ? (
         <Badge variant="outline" className={cn("shrink-0 text-[10px] uppercase", SENTIMENT_TONE[sentiment])}>
           {sentiment}
@@ -46,7 +46,7 @@ export function MarketAnalysisCard({ analysis }: { analysis: MarketAnalysis }) {
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-sm font-medium">{analysis.pair}</p>
-          <p className="font-mono text-xs text-muted-foreground">{analysis.analysis_date}</p>
+          <p className="tabular text-xs text-muted-foreground">{analysis.analysis_date}</p>
         </div>
         <button
           onClick={() => startTransition(() => deleteMarketAnalysisAction(analysis.id))}

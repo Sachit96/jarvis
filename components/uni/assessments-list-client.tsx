@@ -1,10 +1,12 @@
 "use client";
 
+import { BookOpen } from "lucide-react";
 import { useMemo, useState } from "react";
 import { AssessmentItem } from "@/components/uni/assessment-item";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ASSESSMENT_STATUSES } from "@/lib/validations/uni";
 import type { Database } from "@/lib/supabase/database.types";
+import { EmptyState } from "@/components/shared/empty-state";
 
 type Assessment = Database["public"]["Tables"]["uni_assessments"]["Row"];
 type Course = Database["public"]["Tables"]["uni_courses"]["Row"];
@@ -79,7 +81,9 @@ export function AssessmentsListClient({ assessments, courses }: { assessments: A
       </div>
 
       {filtered.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border bg-card px-4 py-6 text-center text-sm text-muted-foreground">No assessments match.</p>
+        <div className="surface">
+        <EmptyState icon={BookOpen} title="Nothing matches" description="No assessments fall inside the current filters." />
+      </div>
       ) : (
         <div className="space-y-2">
           {filtered.map((a) => (

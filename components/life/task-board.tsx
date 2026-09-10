@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, X } from "lucide-react";
+import { ListChecks, Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { TaskItem } from "@/components/life/task-item";
@@ -15,6 +15,7 @@ import {
   type TaskLike,
 } from "@/lib/life/task-views";
 import type { Database } from "@/lib/supabase/database.types";
+import { EmptyState } from "@/components/shared/empty-state";
 
 type Task = Database["public"]["Tables"]["tasks"]["Row"];
 
@@ -38,7 +39,6 @@ const ORDER: TaskBucket[] = ["overdue", "today", "upcoming", "someday", "done"];
 
 const BUCKET_TONE: Partial<Record<TaskBucket, string>> = {
   overdue: "text-danger",
-  today: "text-brand",
 };
 
 export function TaskBoard({ tasks, today }: { tasks: Task[]; today: string }) {
@@ -121,18 +121,16 @@ export function TaskBoard({ tasks, today }: { tasks: Task[]; today: string }) {
       ) : null}
 
       {visibleCount === 0 ? (
-        <p className="rounded-xl border border-dashed border-border bg-card px-4 py-8 text-center text-body text-muted-foreground">
-          {isFiltered ? "No tasks match that filter." : "Nothing open — nice."}
-        </p>
+        <div className="surface">
+        <EmptyState icon={ListChecks} title="Nothing on the list" description="Add a task above and it will be sorted into today, upcoming and overdue for you." />
+      </div>
       ) : (
         ORDER.filter((b) => b !== "done").map((bucket) =>
           grouped[bucket].length === 0 ? null : (
             <section key={bucket} className="space-y-2">
-              <h2 className={cn("text-heading", BUCKET_TONE[bucket] ?? "text-muted-foreground")}>
+              <h2 className={cn("eyebrow", BUCKET_TONE[bucket])}>
                 {BUCKET_LABEL[bucket]}
-                <span className="ml-1.5 text-caption font-normal text-muted-foreground">
-                  {grouped[bucket].length}
-                </span>
+                <span className="ml-2 text-foreground-tertiary">{grouped[bucket].length}</span>
               </h2>
               <ul className="space-y-2">
                 {grouped[bucket].map((task) => (
@@ -148,11 +146,11 @@ export function TaskBoard({ tasks, today }: { tasks: Task[]; today: string }) {
         <section className="space-y-2">
           <button
             onClick={() => setShowDone((v) => !v)}
-            className="text-heading text-muted-foreground hover:text-foreground"
+            className="eyebrow hover:text-white"
             aria-expanded={showDone}
           >
             {BUCKET_LABEL.done}
-            <span className="ml-1.5 text-caption font-normal">{grouped.done.length}</span>
+            <span className="ml-2 text-foreground-tertiary">{grouped.done.length}</span>
           </button>
           {showDone ? (
             <ul className="space-y-2">

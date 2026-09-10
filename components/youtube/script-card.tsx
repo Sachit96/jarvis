@@ -55,19 +55,19 @@ export function ScriptCard({ script, youtubeConnected }: { script: Script; youtu
       {expanded ? (
         <div className="mt-4 space-y-4 border-t border-border pt-4">
           <div>
-            <p className="text-caption uppercase tracking-wide text-muted-foreground">Research summary</p>
+            <p className="eyebrow">Research summary</p>
             <p className="mt-1 text-sm text-muted-foreground">{script.research_summary}</p>
           </div>
           <div>
-            <p className="text-caption uppercase tracking-wide text-muted-foreground">Hook</p>
+            <p className="eyebrow">Hook</p>
             <p className="mt-1 text-sm font-medium text-foreground">{script.hook}</p>
           </div>
           <div>
-            <p className="text-caption uppercase tracking-wide text-muted-foreground">Sections</p>
+            <p className="eyebrow">Sections</p>
             <ul className="mt-1 space-y-1.5">
               {sections.map((s, i) => (
                 <li key={i} className="text-sm">
-                  <span className="font-mono text-caption text-muted-foreground">{Math.floor(s.startSec / 60)}:{String(s.startSec % 60).padStart(2, "0")}</span>{" "}
+                  <span className="tabular text-caption text-muted-foreground">{Math.floor(s.startSec / 60)}:{String(s.startSec % 60).padStart(2, "0")}</span>{" "}
                   <span className="font-medium text-foreground">{s.label}</span>
                   <p className="text-caption text-muted-foreground">{s.content}</p>
                 </li>
@@ -75,11 +75,11 @@ export function ScriptCard({ script, youtubeConnected }: { script: Script; youtu
             </ul>
           </div>
           <div>
-            <p className="text-caption uppercase tracking-wide text-muted-foreground">Full script</p>
+            <p className="eyebrow">Full script</p>
             <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{script.script_body}</p>
           </div>
           <div>
-            <p className="text-caption uppercase tracking-wide text-muted-foreground">Titles</p>
+            <p className="eyebrow">Titles</p>
             <div className="mt-1 flex flex-wrap gap-1.5">
               {script.suggested_titles.map((t, i) => (
                 <Badge key={i} variant={i === 0 ? "default" : "outline"}>{t}</Badge>

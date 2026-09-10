@@ -138,8 +138,8 @@ export function StatusPill({ mode }: { mode: VoiceStatusMode }) {
         PANEL_CLASS,
         "rounded-full px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] transition-colors",
         mode === "listening" && "border-brand/50 text-brand",
-        mode === "thinking" && "border-violet-400/50 text-violet-300",
-        mode === "executing" && "border-violet-400/50 text-violet-300",
+        mode === "thinking" && "border-brand-2/50 text-brand-2",
+        mode === "executing" && "border-brand-2/50 text-brand-2",
         // Amber, and the only state whose label is a full sentence: the user
         // has to notice this one, because nothing proceeds until they answer.
         mode === "waiting_for_confirmation" && "border-warn/60 text-warn",

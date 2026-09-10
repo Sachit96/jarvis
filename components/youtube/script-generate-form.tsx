@@ -28,7 +28,7 @@ export function ScriptGenerateForm() {
 
   return (
     <Card>
-      <p className="text-caption uppercase tracking-wide text-muted-foreground">New script</p>
+      <p className="eyebrow">New script</p>
       <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
         <Input placeholder="Topic — e.g. 'why most budgets fail'" value={topic} onChange={(e) => setTopic(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleGenerate()} />
         <Input placeholder="Niche (optional) — e.g. personal finance" value={niche} onChange={(e) => setNiche(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleGenerate()} />

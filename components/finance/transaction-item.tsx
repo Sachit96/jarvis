@@ -40,14 +40,14 @@ export function TransactionItem({
           <Badge variant="outline" className="text-[10px] uppercase">
             {transaction.category}
           </Badge>
-          <span className="font-mono text-xs text-muted-foreground">{accountName}</span>
-          <span className="font-mono text-xs text-muted-foreground">{transaction.occurred_at}</span>
+          <span className="tabular text-xs text-muted-foreground">{accountName}</span>
+          <span className="tabular text-xs text-muted-foreground">{transaction.occurred_at}</span>
         </div>
         {transaction.description ? (
           <p className="mt-1 text-sm text-muted-foreground">{transaction.description}</p>
         ) : null}
       </div>
-      <p className={cn("shrink-0 font-mono text-sm", isIncome ? "text-success" : "text-danger")}>
+      <p className={cn("shrink-0 tabular text-sm", isIncome ? "text-success" : "text-danger")}>
         {isIncome ? "+" : "-"}
         {money(transaction.amount)}
       </p>

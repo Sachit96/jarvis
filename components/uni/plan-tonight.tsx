@@ -39,7 +39,7 @@ export function PlanTonight({ assessmentCourseIds }: { assessmentCourseIds: Reco
   return (
     <Card>
       <div className="flex items-center justify-between">
-        <p className="text-caption uppercase tracking-wide text-muted-foreground">Plan tonight</p>
+        <p className="eyebrow">Plan tonight</p>
         <div className="flex items-center gap-2">
           <Input type="number" value={hours} onChange={(e) => setHours(e.target.value)} className="h-8 w-16 text-sm" />
           <span className="text-xs text-muted-foreground">hours</span>

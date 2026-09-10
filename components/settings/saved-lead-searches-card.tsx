@@ -85,7 +85,7 @@ export function SavedLeadSearchesCard({ searches }: { searches: SavedLeadSearch[
   return (
     <div className="rounded-lg border border-border bg-card p-4">
       <div className="flex items-center justify-between">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">Recurring Lead Research</p>
+        <p className="eyebrow">Recurring Lead Research</p>
         {!showForm && searches.length > 0 ? (
           <Button size="sm" variant="secondary" className="gap-1.5" onClick={() => setShowForm(true)}>
             <Plus className="h-3.5 w-3.5" /> New saved search

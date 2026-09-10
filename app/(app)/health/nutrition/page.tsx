@@ -1,3 +1,4 @@
+import { Apple } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { todayStr } from "@/lib/date";
 import {
@@ -15,6 +16,8 @@ import { MealLogItem } from "@/components/health/meal-log-item";
 import { MentorChat } from "@/components/health/mentor-chat";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { HEALTH_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
+import { EmptyState } from "@/components/shared/empty-state";
 
 const MEAL_SECTIONS = [
   { key: "breakfast", label: "Breakfast" },
@@ -37,13 +40,11 @@ export default async function NutritionPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Health</p>
-          <h1 className="text-xl font-semibold">Nutrition</h1>
-        </div>
-        <NutritionTargetsForm targets={targets} />
-      </div>
+      <PageHeader
+        eyebrow="Health"
+        title="Nutrition"
+        actions={<NutritionTargetsForm targets={targets} />}
+      />
 
       <ModuleTabs tabs={HEALTH_TABS} />
 
@@ -60,9 +61,9 @@ export default async function NutritionPage() {
                 <MealLogForm defaultMealType={section.key} />
               </div>
               {sectionLogs.length === 0 ? (
-                <p className="rounded-lg border border-dashed border-border bg-card px-4 py-4 text-center text-xs text-muted-foreground">
-                  Nothing logged yet.
-                </p>
+                <div className="surface">
+          <EmptyState icon={Apple} title="Nothing logged yet" description="Meals you log today will total up here against your targets." />
+        </div>
               ) : (
                 <ul className="space-y-2">
                   {sectionLogs.map((log) => (

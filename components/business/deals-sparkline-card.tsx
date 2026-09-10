@@ -1,6 +1,7 @@
 "use client";
 
-import { Bar, BarChart, ResponsiveContainer } from "recharts";
+import { Bar, BarChart } from "recharts";
+import { ChartFrame } from "@/components/shared/chart-frame";
 import { Card } from "@/components/ui/card";
 
 interface Point {
@@ -15,15 +16,21 @@ export function DealsSparklineCard({ points }: { points: Point[] }) {
 
   return (
     <Card>
-      <p className="text-label uppercase tracking-wide text-muted-foreground">New Deals</p>
-      <p className="mt-0.5 text-caption text-muted-foreground">{total} in the last 14 days</p>
+      <p className="eyebrow">New Deals</p>
+      <p className="mt-1 text-caption text-foreground-tertiary">{total} in the last 14 days</p>
+      {total === 0 ? (
+        <p className="mt-4 text-body text-foreground-tertiary">
+          Nothing new in this window. New deals appear here as they are created.
+        </p>
+      ) : (
       <div className="mt-3 h-20">
-        <ResponsiveContainer width="100%" height="100%">
+        <ChartFrame height={80}>
           <BarChart data={recent} barCategoryGap="20%">
-            <Bar dataKey="count" radius={[2, 2, 2, 2]} fill="#8b5cf6" />
+            <Bar dataKey="count" radius={[2, 2, 2, 2]} fill="var(--chart-primary)" />
           </BarChart>
-        </ResponsiveContainer>
+        </ChartFrame>
       </div>
+      )}
     </Card>
   );
 }

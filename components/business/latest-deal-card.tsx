@@ -22,7 +22,7 @@ export function LatestDealCard({
 }) {
   return (
     <Card>
-      <p className="text-label uppercase tracking-wide text-muted-foreground">Latest Deal</p>
+      <p className="eyebrow">Latest Deal</p>
       {!deal ? (
         <p className="mt-3 text-body text-muted-foreground">No deals yet.</p>
       ) : (
@@ -35,13 +35,13 @@ export function LatestDealCard({
           </div>
           <div className="flex items-center justify-between text-body">
             <span className="text-muted-foreground">Value</span>
-            <span className="font-mono font-medium text-cat-business">{money(deal.value)}</span>
+            <span className="tabular font-medium text-foreground">{money(deal.value)}</span>
           </div>
           <div className="flex items-center justify-between text-body">
             <span className="text-muted-foreground">Stage</span>
             <span
               className={`rounded-full px-2 py-0.5 text-caption font-medium ${
-                stage?.is_won ? "bg-success/15 text-success" : "bg-cat-business/15 text-cat-business"
+                stage?.is_won ? "bg-success/15 text-success" : "bg-white/[0.06] text-foreground-secondary"
               }`}
             >
               {stage?.name ?? "Unknown"}

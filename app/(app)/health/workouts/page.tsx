@@ -1,3 +1,4 @@
+import { Dumbbell } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getExercises, getWorkouts, getWorkoutSets } from "@/lib/db/queries/health";
 import { ensureDefaultExercisesAction } from "@/actions/health-actions";
@@ -10,6 +11,8 @@ import { HevyAutoSync } from "@/components/health/hevy-auto-sync";
 import { WorkoutCalendar } from "@/components/health/workout-calendar";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { HEALTH_TABS } from "@/lib/nav-items";
+import { PageHeader } from "@/components/shared/page-header";
+import { EmptyState } from "@/components/shared/empty-state";
 
 export default async function WorkoutsPage() {
   await ensureDefaultExercisesAction();
@@ -36,16 +39,16 @@ export default async function WorkoutsPage() {
     <div className="space-y-6">
       {connected ? <HevyAutoSync /> : null}
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Health</p>
-          <h1 className="text-xl font-semibold">Workouts</h1>
-        </div>
-        <div className="flex gap-2">
-          <ExerciseForm />
-          <WorkoutForm />
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="Health"
+        title="Workouts"
+        actions={
+          <>
+            <ExerciseForm />
+            <WorkoutForm />
+          </>
+        }
+      />
 
       <ModuleTabs tabs={HEALTH_TABS} />
 
@@ -57,9 +60,9 @@ export default async function WorkoutsPage() {
       </div>
 
       {workouts.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
-          No sessions logged yet — start one above.
-        </p>
+        <div className="surface">
+          <EmptyState icon={Dumbbell} title="No sessions logged" description="Start a session above, or sync from Hevy, and your history will build here." />
+        </div>
       ) : (
         <WorkoutsList
           rows={workouts.map((workout) => ({ workout, sets: setsByWorkout.get(workout.id) ?? [] }))}

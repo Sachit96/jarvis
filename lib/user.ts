@@ -7,10 +7,3 @@ export const user = {
   avatar: "/avatar.jpg",
   initial: "S",
 };
-
-// Sidebar wordmark shown in the header (replaces the plain "JARVIS / Personal OS"
-// text lockup). Falls back to that text if the file isn't present yet — see
-// the onError handler in Sidebar.
-export const brand = {
-  logo: "/jarvis-logo.png",
-};

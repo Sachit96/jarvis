@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import { CATEGORY_HEX, CATEGORY_LABEL, type Category } from "@/lib/category-colors";
+import { CATEGORY_LABEL, type Category } from "@/lib/category-colors";
 import type { LifeScoreSnapshot } from "@/lib/db/queries/life-score";
 
 const CATEGORY_ORDER: Exclude<Category, "money">[] = ["business", "health", "finance", "goals", "habits"];
@@ -9,14 +9,30 @@ const RING_STROKE = 10;
 
 /**
  * Composite score across all five modules, shown as a gradient donut with a
- * per-category legend. Every number here comes from getLifeScoreSnapshot —
+ * per-category readout. Every number here comes from getLifeScoreSnapshot —
  * see that function's doc comment for exactly how each category is
  * computed from real rows (nothing here is estimated or invented).
  *
- * Fixed height (168px) — this card never needs to absorb column overflow,
- * it's a deliberately small, dense readout next to taller neighbors.
+ * Two visual decisions worth stating:
+ *
+ * The ring was a teal → blue → violet gradient, hard-coded in hex, left over
+ * from the palette before this one. It is the brand gradient now, and it
+ * reads from the tokens so it cannot drift again.
+ *
+ * The legend was five colour dots, one per category. A dot next to its own
+ * label communicates nothing the label doesn't, so all it actually did was
+ * put five unrelated hues on the command centre. Each row is a thin meter
+ * instead: same footprint, but now the colour is carrying the score.
  */
-export function LifeScoreCard({ score, compact = false, className }: { score: LifeScoreSnapshot; compact?: boolean; className?: string }) {
+export function LifeScoreCard({
+  score,
+  compact = false,
+  className,
+}: {
+  score: LifeScoreSnapshot;
+  compact?: boolean;
+  className?: string;
+}) {
   const size = RING_SIZE;
   const strokeWidth = RING_STROKE;
   const radius = (size - strokeWidth) / 2;
@@ -27,15 +43,18 @@ export function LifeScoreCard({ score, compact = false, className }: { score: Li
   const gradientId = "lifeScoreGradient";
 
   const ring = (
-    <div className="relative inline-flex shrink-0 items-center justify-center" style={{ width: size, height: size }}>
+    <div
+      className="relative inline-flex shrink-0 items-center justify-center"
+      style={{ width: size, height: size }}
+    >
       <svg width={size} height={size} className="-rotate-90">
         <defs>
           <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#2dd4bf" />
-            <stop offset="55%" stopColor="#3b82f6" />
-            <stop offset="100%" stopColor="#8b5cf6" />
+            <stop offset="0%" stopColor="var(--brand)" />
+            <stop offset="100%" stopColor="var(--brand-2)" />
           </linearGradient>
         </defs>
+        {/* Ticked track — the radar motif, at instrument scale. */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -57,8 +76,8 @@ export function LifeScoreCard({ score, compact = false, className }: { score: Li
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="font-mono text-body font-bold text-foreground">{score.overall}</span>
-        <span className="text-caption text-muted-foreground">/100</span>
+        <span className="tabular font-display text-title leading-none text-foreground">{score.overall}</span>
+        <span className="mt-1 text-caption text-foreground-tertiary">/100</span>
       </div>
     </div>
   );
@@ -66,18 +85,21 @@ export function LifeScoreCard({ score, compact = false, className }: { score: Li
   return (
     <Card padding={compact ? "compact" : "default"} className={cn("h-[168px]", className)}>
       <header className="mb-3 flex shrink-0 items-center justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Life Score</p>
+        <p className="eyebrow">Life Score</p>
       </header>
-      <div className="flex min-h-0 flex-1 items-center gap-4">
+      <div className="flex min-h-0 flex-1 items-center gap-5">
         {ring}
-        <ul className="flex-1 space-y-2">
+        <ul className="flex-1 space-y-[7px]">
           {CATEGORY_ORDER.map((cat) => (
-            <li key={cat} className="flex items-center justify-between text-[12px]">
-              <span className="flex items-center gap-1.5 text-muted-foreground">
-                <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: CATEGORY_HEX[cat] }} />
-                {CATEGORY_LABEL[cat]}
+            <li key={cat} className="grid grid-cols-[1fr_auto] items-center gap-x-2 text-caption">
+              <span className="text-foreground-tertiary">{CATEGORY_LABEL[cat]}</span>
+              <span className="tabular font-medium text-foreground">{score[cat]}</span>
+              <span className="col-span-2 h-[3px] overflow-hidden rounded-full bg-white/[0.07]">
+                <span
+                  className="gradient-brand block h-full rounded-full"
+                  style={{ width: `${Math.max(0, Math.min(100, score[cat]))}%` }}
+                />
               </span>
-              <span className="font-mono tabular-nums text-foreground">{score[cat]}</span>
             </li>
           ))}
         </ul>

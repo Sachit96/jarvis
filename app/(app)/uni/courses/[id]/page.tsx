@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { FileText } from "lucide-react";
+import { BookOpen, FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCourse, getAssessments, getAssessmentGroups, getScheduleBlocks, getMaterials } from "@/lib/db/queries/uni";
 import { courseGrade, neededOnRemaining, bestCase, worstCase, riskScore, unresolvedWeightCount } from "@/lib/uni/grades";
@@ -18,6 +18,7 @@ import { MaterialQa } from "@/components/uni/material-qa";
 import { DeleteScheduleBlockButton, DeleteMaterialButton } from "@/components/uni/uni-delete-buttons";
 import { Backlinks } from "@/components/shared/backlinks";
 import { getBacklinks } from "@/lib/obsidian/wikilinks";
+import { EmptyState } from "@/components/shared/empty-state";
 
 const DAY_LABEL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -50,9 +51,9 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
         <div>
           <div className="flex items-center gap-2">
             <span className="h-3 w-3 rounded-full" style={{ backgroundColor: course.color ?? "#8b5cf6" }} />
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">{course.term}</p>
+            <p className="eyebrow">{course.term}</p>
           </div>
-          <h1 className="text-xl font-semibold">{course.code} — {course.name}</h1>
+          <h1 className="text-display">{course.code} — {course.name}</h1>
           {course.professor ? (
             <p className="mt-1 text-sm text-muted-foreground">
               {course.professor}
@@ -68,7 +69,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 items-start gap-4 md:grid-cols-4">
         <StatTile
           label="Current Grade"
           value={assessments.length === 0 ? "No assessments recorded" : grade != null ? `${grade.toFixed(1)}%` : "—"}
@@ -91,10 +92,10 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
         <StatTile label="Best / Worst Case" value={assessments.length === 0 ? "—" : `${best.toFixed(0)}% / ${worst.toFixed(0)}%`} />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid items-start gap-4 lg:grid-cols-2">
         <Card>
           <div className="flex items-center justify-between">
-            <p className="text-caption uppercase tracking-wide text-muted-foreground">Schedule</p>
+            <p className="eyebrow">Schedule</p>
             <ScheduleBlockForm courseId={course.id} />
           </div>
           {sortedBlocks.length === 0 ? (
@@ -117,7 +118,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
 
         <Card>
           <div className="flex items-center justify-between">
-            <p className="text-caption uppercase tracking-wide text-muted-foreground">Materials</p>
+            <p className="eyebrow">Materials</p>
             <div className="flex items-center gap-2">
               <MaterialQa courseId={course.id} hasMaterials={materials.length > 0} />
               <MaterialForm courseId={course.id} />
@@ -147,13 +148,13 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
 
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <p className="text-caption uppercase tracking-wide text-muted-foreground">Assessments</p>
+          <p className="eyebrow">Assessments</p>
           <AssessmentForm courseId={course.id} />
         </div>
         {assessments.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-border bg-card px-4 py-6 text-center text-sm text-muted-foreground">
-            No assessments yet.
-          </p>
+          <div className="surface">
+          <EmptyState icon={BookOpen} title="No assessments yet" description="Assignments and exams added to this course will be listed here with their weightings." />
+        </div>
         ) : (
           <div className="space-y-2">
             {assessments.map((a) => (

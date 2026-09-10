@@ -96,7 +96,7 @@ export function UploadToYoutube({ scriptId, title, description, youtubeVideoId, 
 
   return (
     <div className="border-t border-border pt-4">
-      <p className="text-caption uppercase tracking-wide text-muted-foreground">YouTube</p>
+      <p className="eyebrow">YouTube</p>
       {error ? <p className="mt-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-xs text-danger">{error}</p> : null}
 
       {!youtubeVideoId ? (

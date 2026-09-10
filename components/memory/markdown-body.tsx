@@ -9,7 +9,7 @@ function renderInline(text: string, key: number) {
         const bold = part.match(/^\*\*(.+)\*\*$/);
         if (bold) return <strong key={i} className="font-semibold text-foreground">{bold[1]}</strong>;
         const code = part.match(/^`(.+)`$/);
-        if (code) return <code key={i} className="rounded bg-white/[0.08] px-1 py-0.5 font-mono text-[0.85em]">{code[1]}</code>;
+        if (code) return <code key={i} className="rounded bg-white/[0.08] px-1 py-0.5 tabular text-[0.85em]">{code[1]}</code>;
         return <span key={i}>{part}</span>;
       })}
     </Fragment>

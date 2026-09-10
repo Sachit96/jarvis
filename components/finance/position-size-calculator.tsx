@@ -21,7 +21,7 @@ export function PositionSizeCalculator() {
 
   return (
     <div className="rounded-lg border border-border bg-card p-4">
-      <p className="text-xs uppercase tracking-wider text-muted-foreground">Position size &amp; risk calculator</p>
+      <p className="eyebrow">Position size &amp; risk calculator</p>
       <div className="mt-3 grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label htmlFor="calc-balance">Account balance</Label>
@@ -46,11 +46,11 @@ export function PositionSizeCalculator() {
       <div className="mt-3 grid grid-cols-2 gap-3 rounded-md border border-border bg-muted/30 p-3">
         <div>
           <p className="text-[10px] uppercase text-muted-foreground">Risk amount</p>
-          <p className="font-mono text-lg text-brand">${riskAmount.toFixed(2)}</p>
+          <p className="tabular text-lg text-brand">${riskAmount.toFixed(2)}</p>
         </div>
         <div>
           <p className="text-[10px] uppercase text-muted-foreground">Lot size</p>
-          <p className="font-mono text-lg text-brand">{valid ? lotSize.toFixed(2) : "—"}</p>
+          <p className="tabular text-lg text-brand">{valid ? lotSize.toFixed(2) : "—"}</p>
         </div>
       </div>
     </div>

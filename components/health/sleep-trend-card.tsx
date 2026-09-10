@@ -1,6 +1,7 @@
 "use client";
 
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from "recharts";
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis, Cell } from "recharts";
+import { ChartFrame } from "@/components/shared/chart-frame";
 import { Card } from "@/components/ui/card";
 import type { Database } from "@/lib/supabase/database.types";
 
@@ -11,7 +12,7 @@ function SleepTooltip({ active, payload, label }: { active?: boolean; payload?: 
   return (
     <div className="rounded-xl bg-popover px-3 py-2 text-caption ring-1 ring-border">
       <p className="text-muted-foreground">{label}</p>
-      <p className="mt-0.5 font-mono font-medium text-foreground">{payload[0].value.toFixed(1)}h</p>
+      <p className="mt-0.5 tabular font-medium text-foreground">{payload[0].value.toFixed(1)}h</p>
     </div>
   );
 }
@@ -26,10 +27,10 @@ export function SleepTrendCard({ entries }: { entries: SleepLog[] }) {
 
   return (
     <Card>
-      <p className="text-label uppercase tracking-wide text-muted-foreground">Sleep</p>
+      <p className="eyebrow">Sleep</p>
       {latest ? (
         <>
-          <p className="mt-1 font-mono text-title font-bold text-foreground">{Number(latest.hours_slept).toFixed(1)}h</p>
+          <p className="mt-1 tabular text-title font-bold text-foreground">{Number(latest.hours_slept).toFixed(1)}h</p>
           <p className="mt-0.5 text-caption text-muted-foreground">
             {avg.toFixed(1)}h average over {entries.length} night{entries.length === 1 ? "" : "s"}
           </p>
@@ -40,7 +41,7 @@ export function SleepTrendCard({ entries }: { entries: SleepLog[] }) {
 
       {points.length > 1 ? (
         <div className="mt-4 h-40">
-          <ResponsiveContainer width="100%" height="100%">
+          <ChartFrame height={160}>
             <BarChart data={points} margin={{ top: 8, right: 4, left: -20, bottom: 0 }}>
               <CartesianGrid vertical={false} stroke="var(--muted-foreground)" strokeOpacity={0.15} strokeDasharray="3 3" />
               <XAxis dataKey="date" tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} axisLine={false} tickLine={false} interval="preserveStartEnd" minTickGap={32} />
@@ -52,7 +53,7 @@ export function SleepTrendCard({ entries }: { entries: SleepLog[] }) {
                 ))}
               </Bar>
             </BarChart>
-          </ResponsiveContainer>
+          </ChartFrame>
         </div>
       ) : null}
     </Card>

@@ -12,7 +12,7 @@ function signalRow(label: string, value: string | boolean) {
   return (
     <div key={label} className="flex items-baseline justify-between gap-2 text-xs">
       <span className="text-muted-foreground">{label}</span>
-      <span className="truncate text-right font-mono tabular-nums">{display}</span>
+      <span className="truncate text-right tabular">{display}</span>
     </div>
   );
 }
@@ -81,7 +81,7 @@ export function LeadDetailDrawer({ row, onClose }: { row: LeadRowData | null; on
 
           {opportunities.length > 0 ? (
             <div>
-              <p className="text-label uppercase tracking-wide text-muted-foreground">Opportunities</p>
+              <p className="eyebrow">Opportunities</p>
               <ul className="mt-1.5 space-y-2">
                 {opportunities.map((o) => (
                   <li key={o.tag} className="rounded-lg border border-border bg-card p-2.5">
@@ -97,12 +97,12 @@ export function LeadDetailDrawer({ row, onClose }: { row: LeadRowData | null; on
 
           {breakdown ? (
             <div>
-              <p className="text-label uppercase tracking-wide text-muted-foreground">Score breakdown</p>
+              <p className="eyebrow">Score breakdown</p>
               <div className="mt-1.5 space-y-1">
                 {Object.entries(SCORE_CATEGORY_MAX).map(([key, max]) => (
                   <div key={key} className="flex items-center justify-between gap-2 text-xs">
                     <span className="capitalize text-muted-foreground">{key.replace(/_/g, " ")}</span>
-                    <span className="font-mono tabular-nums">
+                    <span className="tabular">
                       {breakdown[key] ?? 0}/{max}
                     </span>
                   </div>
@@ -112,7 +112,7 @@ export function LeadDetailDrawer({ row, onClose }: { row: LeadRowData | null; on
           ) : null}
 
           <div>
-            <p className="text-label uppercase tracking-wide text-muted-foreground">Website audit</p>
+            <p className="eyebrow">Website audit</p>
             {!payload?.signals.hasWebsite ? (
               <p className="mt-1 text-xs text-muted-foreground">No website found — strongest possible opportunity signal.</p>
             ) : audit?.auditBlocked ? (

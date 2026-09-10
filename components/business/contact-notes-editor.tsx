@@ -24,7 +24,7 @@ export function ContactNotesEditor({ contactId, notes }: { contactId: string; no
     return (
       <div className="group/notes">
         <div className="flex items-center justify-between">
-          <p className="text-label uppercase tracking-wide text-muted-foreground">Notes</p>
+          <p className="eyebrow">Notes</p>
           <button onClick={() => setEditing(true)} className="text-muted-foreground opacity-0 hover:text-foreground group-hover/notes:opacity-100">
             <Pencil className="h-3 w-3" />
           </button>
@@ -39,7 +39,7 @@ export function ContactNotesEditor({ contactId, notes }: { contactId: string; no
   return (
     <form action={formAction} className="space-y-2">
       <input type="hidden" name="id" value={contactId} />
-      <p className="text-label uppercase tracking-wide text-muted-foreground">Notes</p>
+      <p className="eyebrow">Notes</p>
       <Textarea name="notes" defaultValue={notes ?? ""} rows={4} placeholder="Notes… use [[Title]] to link to a memory entry, course, or journal entry" />
       {state.error ? <p className="text-xs text-danger">{state.error}</p> : null}
       <div className="flex gap-2">

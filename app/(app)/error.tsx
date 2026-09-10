@@ -31,7 +31,7 @@ export default function AppError({ error, reset }: { error: Error & { digest?: s
         <p className="mt-1.5 text-sm text-muted-foreground">
           {error.message || "This page hit an unexpected error."}
         </p>
-        {error.digest ? <p className="mt-1 font-mono text-caption text-muted-foreground/60">digest: {error.digest}</p> : null}
+        {error.digest ? <p className="mt-1 tabular text-caption text-muted-foreground/60">digest: {error.digest}</p> : null}
         <div className="mt-4 flex justify-center gap-2">
           <Button size="sm" variant="secondary" onClick={reset} className="gap-1.5">
             <RotateCw className="h-3.5 w-3.5" /> Try again

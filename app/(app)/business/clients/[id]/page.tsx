@@ -47,7 +47,7 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-semibold">{contact.contact_person}</h1>
+            <h1 className="text-display">{contact.contact_person}</h1>
             {contact.source !== "manual" ? (
               <Badge variant="outline" className="text-[10px] uppercase">
                 {contact.source}
@@ -78,7 +78,7 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
 
           {deals.length > 0 ? (
             <div className="rounded-lg border border-border bg-card p-4">
-              <p className="text-label uppercase tracking-wide text-muted-foreground">Deals</p>
+              <p className="eyebrow">Deals</p>
               <ul className="mt-2 space-y-1.5">
                 {deals.map((d) => (
                   <li key={d.id} className="flex items-center justify-between gap-2 text-sm">
@@ -94,7 +94,7 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
 
           {contracts.length > 0 ? (
             <div className="space-y-3">
-              <p className="text-label uppercase tracking-wide text-muted-foreground">Contracts</p>
+              <p className="eyebrow">Contracts</p>
               {contracts.map((c) => (
                 <ContractCard key={c.id} contract={c} contact={contact} />
               ))}
@@ -111,7 +111,7 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
         </div>
 
         <div className="rounded-lg border border-border bg-card p-4">
-          <p className="text-label uppercase tracking-wide text-muted-foreground">Activity</p>
+          <p className="eyebrow">Activity</p>
           <div className="mt-2">
             <ActivityForm contactId={contact.id} />
           </div>

@@ -50,7 +50,11 @@ export function MentorBriefSections({
   if (maxSections) sections = sections.slice(0, maxSections);
 
   if (sections.length === 0) {
-    return <p className="text-body text-muted-foreground whitespace-pre-line">{markdownBody}</p>;
+    // A brief with no "## Heading" still gets its inline bold rendered —
+    // otherwise the fallback path prints literal asterisks at the user.
+    return (
+      <p className="text-body whitespace-pre-line text-foreground-secondary">{renderInline(markdownBody)}</p>
+    );
   }
 
   return (
@@ -64,7 +68,7 @@ export function MentorBriefSections({
               <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${style.badge}`}>
                 <Icon className={`h-3.5 w-3.5 ${style.accent}`} strokeWidth={2.25} />
               </span>
-              <p className={`text-label font-semibold uppercase tracking-wide ${style.accent}`}>{section.heading}</p>
+              <p className={`eyebrow ${style.accent}`}>{section.heading}</p>
             </div>
             <div className={compact ? "mt-1.5 ml-8 space-y-1" : "mt-2 ml-8 space-y-1.5"}>
               {section.lines.map((line, j) => {
