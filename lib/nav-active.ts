@@ -59,3 +59,24 @@ export function activeNavHref<T extends NavTarget>(pathname: string, items: T[])
   const owners = items.filter((item) => item.href !== "/" && `/${item.href.split("/")[1]}` === segment);
   return owners.length === 1 ? owners[0].href : null;
 }
+
+/**
+ * Where a breadcrumb crumb should actually link.
+ *
+ * A trail built straight from path segments points its module crumb at
+ * `/business`, `/finance`, `/health`, `/life` — and none of those are
+ * routes. Every sub-page in four modules shipped a breadcrumb whose second
+ * link 404s, and Next prefetched it on hover, so the failure showed up in
+ * the console before anyone clicked.
+ *
+ * A module crumb resolves to that module's landing route instead
+ * (/business → /business/dashboard). When nothing in the nav lives under
+ * the segment there is no honest destination, so this returns null and the
+ * caller renders plain text: a breadcrumb that goes nowhere is worse than
+ * one that is not a link.
+ */
+export function crumbHref<T extends NavTarget>(href: string, items: T[]): string | null {
+  if (items.some((item) => item.href === href)) return href;
+  const landing = items.find((item) => item.href.startsWith(`${href}/`));
+  return landing?.href ?? null;
+}

@@ -54,9 +54,7 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
             <DealNotesEditor dealId={deal.id} notes={deal.notes} />
           </div>
 
-          <div className="surface p-4">
-            <Backlinks backlinks={backlinks} />
-          </div>
+          <Backlinks backlinks={backlinks} card />
         </div>
 
         <div className="surface p-4">

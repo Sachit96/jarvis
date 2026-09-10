@@ -158,7 +158,11 @@
   --popover-foreground: oklch(0.985 0 0);
   --primary: var(--brand);
   --primary-foreground: #ffffff;
-  --secondary: #0a0a0a;
+  /* Was #0a0a0a — the surface colour, which over a #000 canvas with no
+     border made every secondary button and badge read as unstyled text
+     floating in space. A translucent white sits in the same material
+     family as .surface and is actually visible against black. */
+  --secondary: rgb(255 255 255 / 0.06);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: rgb(255 255 255 / 0.06);
   --muted-foreground: var(--foreground-tertiary);

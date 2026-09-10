@@ -112,7 +112,10 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
         <StatTile label="Best / Worst Case" value={assessments.length === 0 ? "—" : `${best.toFixed(0)}% / ${worst.toFixed(0)}%`} />
       </div>
 
-      <div className="grid items-start gap-4 lg:grid-cols-2">
+      {/* Three peers, not two peers and a full-width card underneath: the
+          groups card is usually empty, and at full width its empty state was
+          a 250px band of nothing in the middle of the page. */}
+      <div className="grid items-start gap-4 lg:grid-cols-3">
         <Card>
           <div className="flex items-center justify-between">
             <p className="eyebrow">Schedule</p>
@@ -164,9 +167,9 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
             </ul>
           )}
         </Card>
-      </div>
 
-      <AssessmentGroupsCard courseId={course.id} groups={groups} memberCounts={memberCounts} />
+        <AssessmentGroupsCard courseId={course.id} groups={groups} memberCounts={memberCounts} />
+      </div>
 
       <div>
         <div className="mb-3 flex items-center justify-between">
@@ -190,7 +193,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
         )}
       </div>
 
-      <Backlinks backlinks={backlinks} />
+      <Backlinks backlinks={backlinks} card />
     </div>
   );
 }

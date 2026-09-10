@@ -107,9 +107,7 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
             <OnboardingChecklist contactId={contact.id} tasks={onboardingTasks} />
           </div>
 
-          <div className="surface p-4">
-            <Backlinks backlinks={backlinks} />
-          </div>
+          <Backlinks backlinks={backlinks} card />
         </div>
 
         <div className="surface p-4">

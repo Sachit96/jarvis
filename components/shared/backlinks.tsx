@@ -26,12 +26,23 @@ const TYPE_LABEL: Record<NoteLinkType, string> = {
   journal_entry: "Journal",
 };
 
-/** "Referenced by" section — shown on memory entries, contacts, courses, deals, and journal entries, anywhere something else's [[wikilink]] points at this note. Renders nothing if there are no backlinks, rather than an empty "Referenced by" heading. */
-export function Backlinks({ backlinks }: { backlinks: Backlink[] }) {
+/**
+ * "Referenced by" — shown on memory entries, contacts, courses, deals and
+ * journal entries, wherever something else's [[wikilink]] points at this
+ * note. Renders nothing when there are no backlinks, rather than an empty
+ * heading.
+ *
+ * `card` puts the surface INSIDE this component, so an empty backlinks list
+ * takes its panel with it. Three detail pages wrapped it in their own
+ * `<div className="surface p-4">`, and since the wrapper rendered whether or
+ * not there was anything to wrap, every record with no inbound links showed
+ * a blank card sitting in the middle of the page.
+ */
+export function Backlinks({ backlinks, card = false }: { backlinks: Backlink[]; card?: boolean }) {
   if (backlinks.length === 0) return null;
 
   return (
-    <div>
+    <div className={card ? "surface p-4" : undefined}>
       <p className="flex items-center gap-1.5 eyebrow">
         <Link2 className="h-3 w-3" /> Referenced by
       </p>

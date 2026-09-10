@@ -3,15 +3,15 @@
   · serverActions
 
   Creating an optimized production build ...
-✓ Compiled successfully in 28.5s
+✓ Compiled successfully in 14.0s
   Running TypeScript ...
-  Finished TypeScript in 19.0s ...
+  Finished TypeScript in 18.9s ...
   Collecting page data using 3 workers ...
   Generating static pages using 3 workers (0/12) ...
   Generating static pages using 3 workers (3/12) 
   Generating static pages using 3 workers (6/12) 
   Generating static pages using 3 workers (9/12) 
-✓ Generating static pages using 3 workers (12/12) in 179ms
+✓ Generating static pages using 3 workers (12/12) in 206ms
   Finalizing page optimization ...
 
 Route (app)
@@ -72,7 +72,147 @@ Route (app)
 ▲ Next.js 16.2.12
 - Local:         http://localhost:3111
 - Network:       http://192.0.2.2:3111
-✓ Ready in 201ms
+✓ Ready in 169ms
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
+[proxy] SITE_PASSWORD is not set — the site is running with no access control.
 [proxy] SITE_PASSWORD is not set — the site is running with no access control.
 [proxy] SITE_PASSWORD is not set — the site is running with no access control.
 [proxy] SITE_PASSWORD is not set — the site is running with no access control.

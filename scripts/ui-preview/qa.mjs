@@ -78,6 +78,12 @@ const ALL_ROUTES = [
   "/youtube",
   "/memory",
   "/settings",
+  // Detail routes, with ids that exist in the stub fixtures. Without these
+  // three the audit covered every list and no record — and the detail pages
+  // are where the densest layouts live.
+  "/business/pipeline/deal-0000-0000-0000-000000000002",
+  "/business/clients/con-0000-0000-0000-000000000001",
+  "/uni/courses/crs-0000-0000-0000-000000000001",
 ];
 const evalExpr = argOf("eval", "").trim() || null;
 /**
@@ -129,6 +135,9 @@ const PAGE_NAMES = {
   "/youtube": "youtube",
   "/memory": "memory",
   "/settings": "settings",
+  "/business/pipeline/deal-0000-0000-0000-000000000002": "business-deal-detail",
+  "/business/clients/con-0000-0000-0000-000000000001": "business-client-detail",
+  "/uni/courses/crs-0000-0000-0000-000000000001": "university-course-detail",
 };
 const clickWaitMs = Number(argOf("click-wait", "4000"));
 const routes = argOf("routes", "").trim() ? argOf("routes", "").split(",") : ALL_ROUTES;
