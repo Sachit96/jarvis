@@ -149,14 +149,19 @@ export function OverallProgressChart({
             </div>
           )}
         </div>
+        {/* No legend when there is no chart. In narrative mode the card was
+            still printing four coloured series dots under a bulleted list —
+            a key to a chart that is not on screen. */}
+        {showNarrative || !hasActivity ? null : (
         <ul className="mt-auto flex flex-wrap justify-center gap-x-3 gap-y-1 pt-1.5">
           {SERIES.map((cat) => (
-            <li key={cat} className="flex items-center gap-1.5 text-caption text-muted-foreground">
+            <li key={cat} className="flex items-center gap-1.5 text-caption text-foreground-tertiary">
               <span className="h-2 w-2 rounded-full" style={{ backgroundColor: SERIES_COLOR[cat] }} />
               {CATEGORY_LABEL[cat]}
             </li>
           ))}
         </ul>
+        )}
       </div>
     </Card>
   );
