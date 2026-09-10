@@ -366,7 +366,11 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
           about the assistant. It sweeps only while JARVIS is actually doing
           something — a permanently rotating sweep is decoration, whereas one
           that starts when you speak is the system showing it is working. */}
-      <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center">
+      {/* Inset to match the neural map's own reserved top/bottom chrome
+          (TOP_INSET/BOTTOM_INSET in neural-map.tsx) so the radar shares the
+          map's centre. Centred on the viewport instead, the two centres sat
+          ~65px apart and read as a misalignment rather than one object. */}
+      <div className="pointer-events-none absolute inset-x-0 top-[90px] bottom-[220px] z-[5] flex items-center justify-center">
         <RadarMark
           size={520}
           sweep={displayMode !== "idle" && displayMode !== "error"}

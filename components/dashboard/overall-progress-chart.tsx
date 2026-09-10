@@ -62,11 +62,14 @@ function seriesRange(points: LifeScoreTrendPoint[], key: keyof Omit<LifeScoreTre
 export function OverallProgressChart({
   points,
   compact = false,
+  elevated = false,
   className,
   narrative,
 }: {
   points: LifeScoreTrendPoint[];
   compact?: boolean;
+  /** Step up the surface — this is the page's main visualisation. */
+  elevated?: boolean;
   className?: string;
   /** Short, real per-category lines (e.g. "Business: 0 deals won this week") shown instead of the chart when none of the four series moves enough to be worth charting yet. Omit to always show the chart/its own empty state. */
   narrative?: string[];
@@ -78,7 +81,11 @@ export function OverallProgressChart({
   const showNarrative = Boolean(narrative?.length) && (!hasActivity || !hasMeaningfulVariance);
 
   return (
-    <Card padding={compact ? "compact" : "default"} className={cn(compact && "min-h-[200px]", className)}>
+    <Card
+      padding={compact ? "compact" : "default"}
+      elevation={elevated ? "raised" : "default"}
+      className={cn(compact && "min-h-[200px]", className)}
+    >
       <header className="mb-3 flex shrink-0 items-center justify-between">
         <p className="eyebrow">Overall Progress</p>
       </header>

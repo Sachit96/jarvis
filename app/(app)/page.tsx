@@ -27,7 +27,7 @@ import { getMemoryEntries } from "@/lib/db/queries/memory";
 import { formatLbs } from "@/lib/units";
 import { Briefcase, HeartPulse, ListChecks, Wallet } from "lucide-react";
 import { KpiCell, KpiGrid } from "@/components/shared/kpi-grid";
-import { PageHeader } from "@/components/shared/page-header";
+import { PageHeader, SectionHeader } from "@/components/shared/page-header";
 import { PriorityTasksWidget } from "@/components/dashboard/priority-tasks-widget";
 import { TodayRoutineCard } from "@/components/dashboard/today-routine-card";
 import { MentorInsightCard } from "@/components/dashboard/mentor-insight-card";
@@ -181,7 +181,7 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-8">
       {/* The shell already lights every route at ambient strength; Home is
           the command centre, so it turns the same lamps up rather than
           adding different ones. */}
@@ -193,13 +193,13 @@ export default async function DashboardPage() {
         title="Today"
       />
 
-      {/* The five separate stat tiles are one fused block now. They were
-          always read as a set, and five outlines at the top of the page was
-          most of what made the dashboard look busy. Goal completion is the
-          one that dropped: LifeScoreCard and the goals rail below both
-          already carry it, where the other four have no second home. */}
+      {/* The page's answer, and the only lit panel on it. */}
       <JarvisPriorityCard priority={priority} runnersUp={ranked.slice(1, 3)} />
 
+      {/* One fused block. These four are always read as a set, and four
+          separate outlines at the top of a dashboard is most of what makes
+          one look busy. Goal completion is the figure that dropped:
+          LifeScoreCard and the goals rail both already carry it. */}
       <KpiGrid columns={4}>
         <KpiCell
           label="Net worth"
@@ -234,35 +234,46 @@ export default async function DashboardPage() {
         />
       </KpiGrid>
 
-      {/* A plain 12-column grid on natural heights, replacing four flex
-          columns that equalised against the tallest and needed a viewport
-          max-height plus filler cards stretched with flex-1 to avoid voids.
-          That arrangement made any one card growing drag every other column
-          with it; here a tall card affects only its own row. */}
-      <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-12">
-        <div className="xl:col-span-8">
-          <OverallProgressChart points={lifeScoreTrend} narrative={progressNarrative} compact />
+      {/* Three named bands rather than eight anonymous grid rows at identical
+          weight and identical spacing. The page reads top-to-bottom as: what
+          is happening now, how the last month went, where each module
+          stands — which is the order the questions actually arrive in. */}
+      <section className="space-y-3">
+        <SectionHeader title="Now" description="What today asks of you." />
+        <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <PriorityTasksWidget tasks={priorityTasks} compact />
+          <TodayRoutineCard items={routineItems} compact />
+          <MentorInsightCard
+            markdownBody={dailyBrief?.markdown_body ?? null}
+            focusAreas={dailyBrief?.focus_areas ?? []}
+            compact
+          />
         </div>
-        <div className="xl:col-span-4">
-          <LifeScoreCard score={lifeScore} compact />
+      </section>
+
+      <section className="space-y-3">
+        <SectionHeader title="Momentum" description="The last thirty days, and where each area sits." />
+        {/* A plain 12-column grid on natural heights, replacing four flex
+            columns that equalised against the tallest and needed a viewport
+            max-height plus filler cards stretched with flex-1 to avoid voids.
+            That arrangement made any one card growing drag every other column
+            with it; here a tall card affects only its own row. */}
+        <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-12">
+          <div className="xl:col-span-8">
+            <OverallProgressChart points={lifeScoreTrend} narrative={progressNarrative} compact elevated />
+          </div>
+          <div className="xl:col-span-4">
+            <LifeScoreCard score={lifeScore} compact />
+          </div>
         </div>
-      </div>
+        <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <UpcomingCard items={upcoming} compact />
+          <GoalsRailCard goals={goals} />
+          <RecentActivityCard items={recentActivity} compact />
+        </div>
+      </section>
 
-      <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <PriorityTasksWidget tasks={priorityTasks} compact />
-        <TodayRoutineCard items={routineItems} compact />
-        <MentorInsightCard
-          markdownBody={dailyBrief?.markdown_body ?? null}
-          focusAreas={dailyBrief?.focus_areas ?? []}
-          compact
-        />
-      </div>
-
-      <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <UpcomingCard items={upcoming} compact />
-        <GoalsRailCard goals={goals} />
-        <RecentActivityCard items={recentActivity} compact />
-      </div>
+      <SectionHeader title="Modules" description="A line each, and a way in." />
 
       <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
         <DetailStatsCard

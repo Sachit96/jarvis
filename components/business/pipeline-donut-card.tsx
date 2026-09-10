@@ -70,9 +70,13 @@ export function PipelineDonutCard({ stages, deals }: { stages: PipelineStage[]; 
         />
       ) : (
         <>
+          {/* A fixed square rather than a capped percentage width: a donut is
+              square, and giving the frame a size it cannot disagree with
+              removes the class of bug where the chart draws at one width
+              inside a box of another and hangs out of its own centre. */}
           {slices.length > 0 ? (
-            <div className="relative mx-auto mt-3 h-44 w-full max-w-[16rem]">
-              <ChartFrame height={176} width={256}>
+            <div className="relative mx-auto mt-3 size-44">
+              <ChartFrame height={176} width={176}>
                 <PieChart>
                   <Pie data={slices} dataKey="value" nameKey="name" innerRadius="62%" outerRadius="90%" paddingAngle={2} stroke="var(--card)" strokeWidth={2}>
                     {slices.map((s, i) => (

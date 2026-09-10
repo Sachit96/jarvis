@@ -428,9 +428,12 @@ export function NeuralMap({ activity }: { activity: RegionActivity }) {
       const avgActivity = totalActivity / REGIONS.length / 100;
       const coreRadius = (14 + avgActivity * 26) * dpr;
       const gradient = ctx!.createRadialGradient(cx, cy, 0, cx, cy, coreRadius * 2.4);
+      // The core was white → pale cyan → cyan, the one remaining piece of the
+      // pre-brand palette and, being dead centre, the first thing the eye
+      // lands on. It falls off through the brand pair now.
       gradient.addColorStop(0, `rgba(255,255,255,${0.85 + avgActivity * 0.15})`);
-      gradient.addColorStop(0.35, `rgba(180,240,255,${0.4 + avgActivity * 0.3})`);
-      gradient.addColorStop(1, "rgba(34,211,238,0)");
+      gradient.addColorStop(0.35, `rgba(236,72,153,${0.4 + avgActivity * 0.3})`);
+      gradient.addColorStop(1, "rgba(156,53,240,0)");
       ctx!.fillStyle = gradient;
       ctx!.beginPath();
       ctx!.arc(cx, cy, coreRadius * 2.4, 0, Math.PI * 2);
