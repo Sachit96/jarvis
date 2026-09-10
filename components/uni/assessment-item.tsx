@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { ASSESSMENT_STATUSES } from "@/lib/validations/uni";
 import { AssignmentBreakdown } from "@/components/uni/assignment-breakdown";
+import { AssessmentRequirements } from "@/components/uni/assessment-requirements";
 import type { Database } from "@/lib/supabase/database.types";
 
 type Assessment = Database["public"]["Tables"]["uni_assessments"]["Row"];
@@ -104,6 +105,13 @@ export function AssessmentItem({ assessment, courseCode, courseColor }: { assess
       >
         <Trash2 className="h-3.5 w-3.5" />
       </button>
+
+      {/* Full-width so the checklist opens under the row rather than being
+          squeezed into the control strip. The breakdown above writes these;
+          this is where they are read back. */}
+      <div className="w-full">
+        <AssessmentRequirements assessmentId={assessment.id} />
+      </div>
     </div>
   );
 }

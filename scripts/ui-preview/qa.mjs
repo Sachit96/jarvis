@@ -80,6 +80,17 @@ const ALL_ROUTES = [
   "/settings",
 ];
 const evalExpr = argOf("eval", "").trim() || null;
+/**
+ * --click "<selector>" performs a REAL Playwright click before --eval runs.
+ *
+ * Not the same as clicking from inside --eval: Base UI's controls (the
+ * checkbox, the select) are driven by pointer events, so an element.click()
+ * dispatched from page script moves nothing and the component reads as
+ * broken when it is fine. Anything interactive has to be driven with real
+ * input to be believed.
+ */
+const clickSelector = argOf("click", "").trim() || null;
+const clickWaitMs = Number(argOf("click-wait", "4000"));
 const routes = argOf("routes", "").trim() ? argOf("routes", "").split(",") : ALL_ROUTES;
 
 // Playwright's bundled build does not match the Chromium preinstalled in
@@ -299,6 +310,15 @@ async function main() {
         // records the result per route. This is the workhorse for "why does
         // this card look empty" questions, which the screenshot poses and
         // only the live DOM answers.
+        if (clickSelector) {
+          try {
+            await page.click(clickSelector, { timeout: 10_000 });
+            await page.waitForTimeout(clickWaitMs);
+            entry.clicked = clickSelector;
+          } catch (err) {
+            entry.clickError = String(err).slice(0, 200);
+          }
+        }
         if (evalExpr) entry.eval = await page.evaluate(evalExpr);
         await page.screenshot({ path: file, fullPage: true });
       } catch (err) {

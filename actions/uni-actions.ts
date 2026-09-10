@@ -14,6 +14,7 @@ import {
 } from "@/lib/validations/uni";
 import { actionStateFromZodError, type ActionState } from "@/lib/validation";
 import { isMissingRelation } from "@/lib/db/missing-relation";
+import { getAssessmentRequirements } from "@/lib/db/queries/uni";
 
 function revalidateUni() {
   revalidatePath("/uni");
@@ -235,6 +236,19 @@ export async function deleteAssessmentAction(id: string, courseId: string): Prom
 }
 
 // ============================================ Assessment requirements
+
+/**
+ * Read a single assessment's requirement checklist.
+ *
+ * A server action wrapping a query, matching getFlashcardsForMaterialAction:
+ * requirements are fetched only when a checklist is opened, so the
+ * assessments list does not pay for a per-row query it usually would not
+ * show.
+ */
+export async function getAssessmentRequirementsAction(assessmentId: string) {
+  const supabase = await createClient();
+  return getAssessmentRequirements(supabase, assessmentId);
+}
 
 export async function createAssessmentRequirementAction(_prevState: ActionState, formData: FormData): Promise<ActionState> {
   const parsed = assessmentRequirementSchema.safeParse({

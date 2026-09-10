@@ -185,8 +185,24 @@ export const fixtures = {
   ],
 
   uni_assessments: [
-    { id: id("asm", 1), course_id: id("crs", 1), title: "SAMPLE Assignment 1", type: "assignment", status: "pending", due_at: iso(5, 23), max_score: 100, earned_score: null, weight_pct: 20, difficulty: 3, estimated_hours: 8, group_id: null, needs_verification: false, verification_note: null, notes: null, source: "manual", ...stamps },
+    { id: id("asm", 1), course_id: id("crs", 1), title: "SAMPLE Assignment 1", type: "assignment", status: "not_started", due_at: iso(5, 23), max_score: 100, earned_score: null, weight_pct: 20, difficulty: 3, estimated_hours: 8, group_id: null, needs_verification: false, verification_note: null, notes: null, source: "manual", ...stamps },
     { id: id("asm", 2), course_id: id("crs", 2), title: "SAMPLE Midterm", type: "exam", status: "graded", due_at: iso(-10, 9), max_score: 100, earned_score: 78, weight_pct: 30, difficulty: 4, estimated_hours: 12, group_id: null, needs_verification: false, verification_note: null, notes: null, source: "manual", ...stamps },
+  ],
+
+  // Rows the study-plan loop reads: previously written by "Plan tonight" and
+  // the AI assignment breakdown, and displayed by nothing.
+  uni_study_sessions: [
+    { id: id("sts", 1), course_id: id("crs", 1), assessment_id: id("asm", 1), planned_start: iso(0, 19), planned_minutes: 90, actual_minutes: null, completed: false, notes: "Draft the intro", ...stamps },
+    { id: id("sts", 2), course_id: id("crs", 2), assessment_id: null, planned_start: iso(0, 21), planned_minutes: 45, actual_minutes: null, completed: false, notes: null, ...stamps },
+    { id: id("sts", 3), course_id: id("crs", 1), assessment_id: id("asm", 1), planned_start: iso(-2, 19), planned_minutes: 60, actual_minutes: null, completed: false, notes: null, ...stamps },
+    { id: id("sts", 4), course_id: id("crs", 2), assessment_id: id("asm", 2), planned_start: iso(-4, 18), planned_minutes: 60, actual_minutes: 75, completed: true, notes: null, ...stamps },
+    { id: id("sts", 5), course_id: id("crs", 1), assessment_id: null, planned_start: iso(2, 18), planned_minutes: 120, actual_minutes: null, completed: false, notes: null, ...stamps },
+  ],
+
+  uni_assessment_requirements: [
+    { id: id("req", 1), assessment_id: id("asm", 1), requirement: "SAMPLE — 2000 word report", completed: true, sort_order: 0, ...stamps },
+    { id: id("req", 2), assessment_id: id("asm", 1), requirement: "SAMPLE — cite at least six sources", completed: false, sort_order: 1, ...stamps },
+    { id: id("req", 3), assessment_id: id("asm", 1), requirement: "SAMPLE — submit via the portal", completed: false, sort_order: 2, ...stamps },
   ],
 
   uni_deadlines: [
