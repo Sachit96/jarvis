@@ -28,9 +28,12 @@ export function KpiGrid({
     <div className={cn("surface overflow-hidden", className)} {...props}>
       <div
         className={cn(
-          "grid grid-cols-1 sm:grid-cols-2",
+          // Two up on a phone, not one. Stacked, four figures filled an
+          // entire phone screen before any of the page's actual content
+          // started — and these are meant to be read as a set.
+          "grid grid-cols-2",
           columns === 2 && "xl:grid-cols-2",
-          columns === 3 && "xl:grid-cols-3",
+          columns === 3 && "sm:grid-cols-3",
           columns === 4 && "xl:grid-cols-4",
         )}
       >

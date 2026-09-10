@@ -31,26 +31,39 @@ function deg(d: number) {
   return (d * Math.PI) / 180;
 }
 
-// Colors reuse the app's existing category palette verbatim (lib/category-colors.ts,
-// app/globals.css --cat-*/--brand/--warn) — nothing new invented for this.
-const VIOLET: [number, number, number] = [139, 92, 246]; // --cat-business
-const RED: [number, number, number] = [239, 68, 68]; // --cat-health / --danger
-const ORANGE: [number, number, number] = [249, 115, 22]; // --cat-finance
-const MAGENTA: [number, number, number] = [236, 72, 153]; // --cat-habits
-const GREEN: [number, number, number] = [34, 197, 94]; // --cat-money / --success
-const CYAN: [number, number, number] = [34, 211, 238]; // --brand
-const AMBER: [number, number, number] = [245, 158, 11]; // --warn
-const BLUE: [number, number, number] = [59, 130, 246]; // --cat-goals
+/**
+ * One nebula, not eight.
+ *
+ * The regions were painted from the category palette — violet, red, orange,
+ * blue, amber, cyan, magenta and green, all at full saturation, on a
+ * full-screen black canvas. It was the single most off-brand surface in the
+ * product: nothing else in JARVIS uses more than two hues at once, and this
+ * is the screen the user looks at while talking to their operating system.
+ *
+ * The ramp walks brand purple to brand magenta with a small lightness wobble
+ * so adjacent clusters still separate. Each region is also labelled in the
+ * HUD, so the colour is atmosphere rather than the only thing telling them
+ * apart — which is what lets the range be this narrow.
+ */
+const BRAND: [number, number, number] = [156, 53, 240]; // --brand
+const BRAND_2: [number, number, number] = [236, 72, 153]; // --brand-2
+
+function nebula(step: number, total: number, lift = 0): [number, number, number] {
+  const t = total <= 1 ? 0 : step / (total - 1);
+  return [0, 1, 2].map((i) =>
+    Math.round(Math.min(255, BRAND[i] + (BRAND_2[i] - BRAND[i]) * t + lift)),
+  ) as [number, number, number];
+}
 
 const REGIONS: RegionConfig[] = [
-  { key: "prefrontal", label: "PREFRONTAL", neurons: 340, color: VIOLET, angle: deg(-62), radiusFactor: 0.6, pointCount: 90 },
-  { key: "motor_cortex", label: "MOTOR CORTEX", neurons: 150, color: RED, angle: deg(-15), radiusFactor: 0.7, pointCount: 55 },
-  { key: "association", label: "ASSOCIATION", neurons: 220, color: ORANGE, angle: deg(28), radiusFactor: 0.68, pointCount: 70 },
-  { key: "hippocampus", label: "HIPPOCAMPUS", neurons: 180, color: BLUE, angle: deg(78), radiusFactor: 0.62, pointCount: 65 },
-  { key: "language", label: "LANGUAGE", neurons: 170, color: AMBER, angle: deg(132), radiusFactor: 0.6, pointCount: 60 },
-  { key: "feature_layer", label: "FEATURE LAYER", neurons: 160, color: CYAN, angle: deg(182), radiusFactor: 0.66, pointCount: 55 },
-  { key: "concept_layer", label: "CONCEPT LAYER", neurons: 190, color: MAGENTA, angle: deg(-148), radiusFactor: 0.7, pointCount: 65 },
-  { key: "sensory_cortex", label: "SENSORY CORTEX", neurons: 260, color: GREEN, angle: deg(-100), radiusFactor: 0.58, pointCount: 80 },
+  { key: "prefrontal", label: "PREFRONTAL", neurons: 340, color: nebula(0, 8, 12), angle: deg(-62), radiusFactor: 0.6, pointCount: 90 },
+  { key: "motor_cortex", label: "MOTOR CORTEX", neurons: 150, color: nebula(1, 8, -18), angle: deg(-15), radiusFactor: 0.7, pointCount: 55 },
+  { key: "association", label: "ASSOCIATION", neurons: 220, color: nebula(2, 8, 10), angle: deg(28), radiusFactor: 0.68, pointCount: 70 },
+  { key: "hippocampus", label: "HIPPOCAMPUS", neurons: 180, color: nebula(3, 8, -14), angle: deg(78), radiusFactor: 0.62, pointCount: 65 },
+  { key: "language", label: "LANGUAGE", neurons: 170, color: nebula(4, 8, 14), angle: deg(132), radiusFactor: 0.6, pointCount: 60 },
+  { key: "feature_layer", label: "FEATURE LAYER", neurons: 160, color: nebula(5, 8, -12), angle: deg(182), radiusFactor: 0.66, pointCount: 55 },
+  { key: "concept_layer", label: "CONCEPT LAYER", neurons: 190, color: nebula(6, 8, 8), angle: deg(-148), radiusFactor: 0.7, pointCount: 65 },
+  { key: "sensory_cortex", label: "SENSORY CORTEX", neurons: 260, color: nebula(7, 8, 0), angle: deg(-100), radiusFactor: 0.58, pointCount: 80 },
 ];
 
 const STAR_COUNT = 240;

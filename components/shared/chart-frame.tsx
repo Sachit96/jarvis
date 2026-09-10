@@ -18,14 +18,22 @@ import { ResponsiveContainer } from "recharts";
  */
 export function ChartFrame({
   height,
+  width = 320,
   children,
 }: {
   /** The height of the box this chart is being dropped into, in px. */
   height: number;
+  /**
+   * The width to draw at before the observer reports the real one. Pass the
+   * box's actual width whenever it is capped — a donut in a `max-w-[16rem]`
+   * box drawn at the 320px default renders offset from its own centre and
+   * overlapping its centre label, which is exactly what it did on tablet.
+   */
+  width?: number;
   children: ComponentProps<typeof ResponsiveContainer>["children"];
 }) {
   return (
-    <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 320, height }}>
+    <ResponsiveContainer width="100%" height="100%" initialDimension={{ width, height }}>
       {children}
     </ResponsiveContainer>
   );

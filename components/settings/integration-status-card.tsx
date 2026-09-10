@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { type IntegrationState } from "@/lib/integrations/status";
 import { getIntegrationStatusesWithGrants } from "@/lib/integrations/grants";
@@ -42,16 +42,11 @@ const STATE_DOT: Record<IntegrationState, string> = {
 export async function IntegrationStatusCard() {
   const statuses = await getIntegrationStatusesWithGrants();
 
+  // No card header: the section this card sits in already carries the title
+  // and the "anything not connected is simply unavailable" line, so both were
+  // printing the same sentence twice, one directly under the other.
   return (
     <Card padding="slotted">
-      <CardHeader>
-        <CardTitle>Integrations</CardTitle>
-        <CardDescription>
-          What JARVIS can reach. Anything not connected is simply unavailable — no data is
-          invented in its place.
-        </CardDescription>
-      </CardHeader>
-
       <CardContent>
         <ul className="-my-1 divide-y divide-border">
           {statuses.map((status) => (

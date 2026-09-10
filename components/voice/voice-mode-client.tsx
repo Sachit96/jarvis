@@ -10,6 +10,7 @@ import { useSyntheticEnvelope } from "@/lib/voice/use-synthetic-envelope";
 import { browserTts } from "@/lib/voice/tts";
 import { interpretConfirmation, REPROMPT } from "@/lib/voice/confirmation";
 import { sendVoiceMessageAction } from "@/actions/voice-actions";
+import { RadarMark } from "@/components/shell/radar-mark";
 import { NeuralMap, type RegionActivity } from "@/components/voice/neural-map";
 import {
   TopLeftPanel,
@@ -358,6 +359,19 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
     <div className="relative flex h-dvh w-full flex-col overflow-hidden bg-black">
       <div className="absolute inset-0">
         <NeuralMap activity={regionActivity} />
+      </div>
+
+      {/* The radar sits at the centre of the map, behind the interaction
+          (§14/§21): the identity mark on the one screen that is entirely
+          about the assistant. It sweeps only while JARVIS is actually doing
+          something — a permanently rotating sweep is decoration, whereas one
+          that starts when you speak is the system showing it is working. */}
+      <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center">
+        <RadarMark
+          size={520}
+          sweep={displayMode !== "idle" && displayMode !== "error"}
+          className="max-w-[70vw] opacity-[0.35]"
+        />
       </div>
 
       {/* Corner HUD panels — supplementary context, not core to the voice

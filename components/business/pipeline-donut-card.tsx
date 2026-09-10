@@ -72,7 +72,7 @@ export function PipelineDonutCard({ stages, deals }: { stages: PipelineStage[]; 
         <>
           {slices.length > 0 ? (
             <div className="relative mx-auto mt-3 h-44 w-full max-w-[16rem]">
-              <ChartFrame height={176}>
+              <ChartFrame height={176} width={256}>
                 <PieChart>
                   <Pie data={slices} dataKey="value" nameKey="name" innerRadius="62%" outerRadius="90%" paddingAngle={2} stroke="var(--card)" strokeWidth={2}>
                     {slices.map((s, i) => (
