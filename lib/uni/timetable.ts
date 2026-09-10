@@ -91,11 +91,24 @@ export function nowContext(date: Date): NowContext {
   return { dayOfWeek: date.getDay(), minutes: date.getHours() * 60 + date.getMinutes() };
 }
 
+/**
+ * Whether a block genuinely runs on the day `daysAhead` from now — false
+ * during a reading week or outside the course's term. Without one of these,
+ * "In class now" fires on statutory holidays and "Next · in 2 days" points
+ * at a lecture that has been cancelled all week.
+ */
+export type OccursOn = (block: TimetableBlock, daysAhead: number) => boolean;
+
 /** The block happening right now, or null. Inclusive of start, exclusive of end. */
-export function currentBlock(blocks: TimetableBlock[], now: NowContext): TimetableBlock | null {
+export function currentBlock(
+  blocks: TimetableBlock[],
+  now: NowContext,
+  occursOn?: OccursOn,
+): TimetableBlock | null {
   return (
     blocks.find((b) => {
       if (b.day_of_week !== now.dayOfWeek) return false;
+      if (occursOn && !occursOn(b, 0)) return false;
       const start = toMinutes(b.start_time);
       const end = toMinutes(b.end_time);
       if (start === null || end === null) return false;
@@ -114,11 +127,20 @@ export interface NextClass {
 
 /**
  * The next class that starts after now, searching forward through the week
- * and wrapping around. Returns null only when there are no timed blocks at
- * all — with any timetable there is always a next class, even if it is next
- * Monday.
+ * and wrapping around. Returns null when there are no timed blocks at all,
+ * or — with an `occursOn` predicate — when nothing in the coming week
+ * actually runs, which is the correct answer during a full reading week.
+ *
+ * The search only ever looks 7 days ahead, so a break longer than a week
+ * yields null rather than the first class after it. That is deliberate:
+ * "no classes this week" is honest, and guessing a date two weeks out from
+ * a recurring pattern is not.
  */
-export function nextClass(blocks: TimetableBlock[], now: NowContext): NextClass | null {
+export function nextClass(
+  blocks: TimetableBlock[],
+  now: NowContext,
+  occursOn?: OccursOn,
+): NextClass | null {
   let best: NextClass | null = null;
 
   for (const block of blocks) {
@@ -129,6 +151,7 @@ export function nextClass(blocks: TimetableBlock[], now: NowContext): NextClass 
     let daysAhead = (block.day_of_week - now.dayOfWeek + 7) % 7;
     // Same weekday but already started → it is next week's occurrence.
     if (daysAhead === 0 && start <= now.minutes) daysAhead = 7;
+    if (occursOn && !occursOn(block, daysAhead)) continue;
 
     const minutesUntil = daysAhead * 24 * 60 + start - now.minutes;
     if (!best || minutesUntil < best.minutesUntil) best = { block, daysAhead, minutesUntil };
