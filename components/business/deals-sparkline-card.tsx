@@ -3,6 +3,7 @@
 import { Bar, BarChart } from "recharts";
 import { ChartFrame } from "@/components/shared/chart-frame";
 import { Card } from "@/components/ui/card";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 interface Point {
   date: string;
@@ -11,6 +12,10 @@ interface Point {
 
 /** Deals created per day, last 14 days — a compact companion to the pipeline donut. */
 export function DealsSparklineCard({ points }: { points: Point[] }) {
+  // recharts animates in JS and never reads the media query, so the
+  // preference has to be threaded in by hand.
+  const reducedMotion = useReducedMotion();
+
   const recent = points.slice(-14);
   const total = recent.reduce((sum, p) => sum + p.count, 0);
 
@@ -26,7 +31,7 @@ export function DealsSparklineCard({ points }: { points: Point[] }) {
       <div className="mt-3 h-20">
         <ChartFrame height={80}>
           <BarChart data={recent} barCategoryGap="20%">
-            <Bar dataKey="count" radius={[2, 2, 2, 2]} fill="var(--chart-primary)" />
+            <Bar dataKey="count" radius={[2, 2, 2, 2]} fill="var(--chart-primary)" isAnimationActive={!reducedMotion} />
           </BarChart>
         </ChartFrame>
       </div>

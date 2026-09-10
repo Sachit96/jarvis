@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { CATEGORY_LABEL, type Category } from "@/lib/category-colors";
 import type { LifeScoreTrendPoint } from "@/lib/db/queries/life-score";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 // Goals has no daily history anywhere in the schema (see life-score.ts) —
 // only these four categories get a real, non-fabricated trend line.
@@ -74,6 +75,10 @@ export function OverallProgressChart({
   /** Short, real per-category lines (e.g. "Business: 0 deals won this week") shown instead of the chart when none of the four series moves enough to be worth charting yet. Omit to always show the chart/its own empty state. */
   narrative?: string[];
 }) {
+  // recharts animates in JS and never reads the media query, so the
+  // preference has to be threaded in by hand.
+  const reducedMotion = useReducedMotion();
+
   const hasActivity = points.some((p) => p.business + p.health + p.finance + p.habits > 0);
   const hasMeaningfulVariance = (["business", "health", "finance", "habits"] as const).some(
     (cat) => seriesRange(points, cat) >= MEANINGFUL_RANGE,
@@ -139,6 +144,7 @@ export function OverallProgressChart({
                     strokeWidth={1.75}
                     fill={`url(#progressFill-${cat})`}
                     animationDuration={600}
+                    isAnimationActive={!reducedMotion}
                   />
                 ))}
               </AreaChart>

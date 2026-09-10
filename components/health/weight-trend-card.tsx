@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { deleteBodyMetricAction } from "@/actions/health-actions";
 import { kgToLbs, formatLbs } from "@/lib/units";
 import type { Database } from "@/lib/supabase/database.types";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 type BodyMetric = Database["public"]["Tables"]["body_metrics"]["Row"];
 
@@ -22,6 +23,10 @@ function WeightTooltip({ active, payload, label }: { active?: boolean; payload?:
 }
 
 export function WeightTrendCard({ entries }: { entries: BodyMetric[] }) {
+  // recharts animates in JS and never reads the media query, so the
+  // preference has to be threaded in by hand.
+  const reducedMotion = useReducedMotion();
+
   const [isPending, startTransition] = useTransition();
   const points = entries.map((e) => ({
     date: new Date(e.logged_at + "T00:00:00").toLocaleDateString(undefined, { month: "short", day: "numeric" }),
@@ -73,7 +78,15 @@ export function WeightTrendCard({ entries }: { entries: BodyMetric[] }) {
               <XAxis dataKey="date" tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} axisLine={false} tickLine={false} interval="preserveStartEnd" minTickGap={32} />
               <YAxis domain={["dataMin - 2", "dataMax + 2"]} tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} axisLine={false} tickLine={false} width={36} />
               <Tooltip content={<WeightTooltip />} cursor={{ stroke: "var(--border)" }} />
-              <Area type="monotone" dataKey="lbs" stroke="#ef4444" strokeWidth={2} fill="url(#weightFill)" animationDuration={600} />
+              <Area
+                type="monotone"
+                dataKey="lbs"
+                stroke="#ef4444"
+                strokeWidth={2}
+                fill="url(#weightFill)"
+                animationDuration={600}
+                isAnimationActive={!reducedMotion}
+              />
             </AreaChart>
           </ChartFrame>
         </div>

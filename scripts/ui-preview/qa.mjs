@@ -356,7 +356,13 @@ async function main() {
           .catch(() => {
             entry.chartsNeverSized = true;
           });
-        await page.waitForTimeout(500);
+        // 500ms was enough to prove the page had rendered, and not enough
+        // for recharts to finish sweeping a series in. Every screenshot of
+        // the pipeline donut caught it a few degrees into its 1.5s entrance
+        // and showed a broken-looking arc — a harness artefact that reads
+        // exactly like a chart bug. Waiting past the longest chart
+        // animation makes the captures deterministic.
+        await page.waitForTimeout(2000);
         entry.probe = await page.evaluate(PROBE);
         // --eval '<expression>' runs an arbitrary expression in the page and
         // records the result per route. This is the workhorse for "why does
