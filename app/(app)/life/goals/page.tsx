@@ -2,7 +2,9 @@ import { createClient } from "@/lib/supabase/server";
 import { getGoals } from "@/lib/db/queries/life";
 import { GoalForm } from "@/components/life/goal-form";
 import { GoalCard } from "@/components/life/goal-card";
-import { PageHeader } from "@/components/shared/page-header";
+import { Target } from "lucide-react";
+import { EmptyState } from "@/components/shared/empty-state";
+import { PageHeader, SectionHeader } from "@/components/shared/page-header";
 
 const SECTIONS = [
   { key: "daily", label: "Daily" },
@@ -22,14 +24,23 @@ export default async function GoalsPage() {
         const sectionGoals = goals.filter((g) => g.timeframe === section.key);
         return (
           <div key={section.key} className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-muted-foreground">{section.label}</h2>
-              <GoalForm defaultTimeframe={section.key} />
-            </div>
+            <SectionHeader
+              title={section.label}
+              description={
+                sectionGoals.length > 0
+                  ? `${sectionGoals.filter((g) => g.status === "achieved").length} of ${sectionGoals.length} achieved`
+                  : undefined
+              }
+              action={<GoalForm defaultTimeframe={section.key} />}
+            />
             {sectionGoals.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-border bg-card px-4 py-6 text-center text-sm text-muted-foreground">
-                No {section.label.toLowerCase()} goals yet.
-              </p>
+              <div className="surface">
+                <EmptyState
+                  icon={Target}
+                  title={`No ${section.label.toLowerCase()} objectives`}
+                  description={`Set a ${section.label.toLowerCase()} goal and it will track its own progress here.`}
+                />
+              </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
                 {sectionGoals.map((goal) => (

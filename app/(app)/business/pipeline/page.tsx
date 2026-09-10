@@ -1,3 +1,4 @@
+import { KanbanSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getPipelineStages, getDeals, getContacts, getDealTasks, computePipelineValueByStage } from "@/lib/db/queries/business";
 import { ensureDefaultPipelineStagesAction } from "@/actions/business-actions";
@@ -7,6 +8,7 @@ import { DealAgingCard, computeDealAging } from "@/components/business/deal-agin
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { BUSINESS_TABS } from "@/lib/nav-items";
 import { PageHeader } from "@/components/shared/page-header";
+import { EmptyState } from "@/components/shared/empty-state";
 
 function money(n: number) {
   return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
@@ -48,9 +50,9 @@ export default async function PipelinePage() {
       <ModuleTabs tabs={BUSINESS_TABS} />
 
       {stages.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
-          No pipeline stages yet.
-        </p>
+        <div className="surface">
+          <EmptyState icon={KanbanSquare} title="No pipeline yet" description="Add the stages a deal moves through and the board will appear here." />
+        </div>
       ) : (
         <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
           {stages.map((stage) => {
@@ -65,8 +67,8 @@ export default async function PipelinePage() {
                 </div>
                 <div className="space-y-2">
                   {stageDeals.length === 0 ? (
-                    <p className="rounded-lg border border-dashed border-border px-3 py-4 text-center text-xs text-muted-foreground">
-                      No deals
+                    <p className="rounded-lg bg-white/[0.02] px-3 py-5 text-center text-caption text-foreground-tertiary">
+                      No deals in this stage
                     </p>
                   ) : (
                     stageDeals.map((deal) => (

@@ -79,9 +79,9 @@ export const fixtures = {
   ],
 
   goals: [
-    { id: id("gol", 1), title: "SAMPLE quarterly revenue goal", description: null, category: "business", progress_percent: 62, status: "active", target_date: day(45), timeframe: "quarter", ...stamps },
-    { id: id("gol", 2), title: "SAMPLE training consistency", description: null, category: "health", progress_percent: 88, status: "active", target_date: day(20), timeframe: "month", ...stamps },
-    { id: id("gol", 3), title: "SAMPLE savings target", description: null, category: "finance", progress_percent: 31, status: "active", target_date: day(120), timeframe: "year", ...stamps },
+    { id: id("gol", 1), title: "SAMPLE quarterly revenue goal", description: null, category: "business", progress_percent: 62, status: "active", target_date: day(45), timeframe: "weekly", ...stamps },
+    { id: id("gol", 2), title: "SAMPLE training consistency", description: null, category: "health", progress_percent: 88, status: "active", target_date: day(20), timeframe: "daily", ...stamps },
+    { id: id("gol", 3), title: "SAMPLE savings target", description: null, category: "finance", progress_percent: 31, status: "active", target_date: day(120), timeframe: "monthly", ...stamps },
   ],
 
   habits: [

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { FileText } from "lucide-react";
+import { BookOpen, FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCourse, getAssessments, getAssessmentGroups, getScheduleBlocks, getMaterials } from "@/lib/db/queries/uni";
 import { courseGrade, neededOnRemaining, bestCase, worstCase, riskScore, unresolvedWeightCount } from "@/lib/uni/grades";
@@ -18,6 +18,7 @@ import { MaterialQa } from "@/components/uni/material-qa";
 import { DeleteScheduleBlockButton, DeleteMaterialButton } from "@/components/uni/uni-delete-buttons";
 import { Backlinks } from "@/components/shared/backlinks";
 import { getBacklinks } from "@/lib/obsidian/wikilinks";
+import { EmptyState } from "@/components/shared/empty-state";
 
 const DAY_LABEL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -151,9 +152,9 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
           <AssessmentForm courseId={course.id} />
         </div>
         {assessments.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-border bg-card px-4 py-6 text-center text-sm text-muted-foreground">
-            No assessments yet.
-          </p>
+          <div className="surface">
+          <EmptyState icon={BookOpen} title="No assessments yet" description="Assignments and exams added to this course will be listed here with their weightings." />
+        </div>
         ) : (
           <div className="space-y-2">
             {assessments.map((a) => (

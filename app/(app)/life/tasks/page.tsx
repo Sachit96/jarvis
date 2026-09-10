@@ -1,3 +1,4 @@
+import { ListChecks } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getTasks } from "@/lib/db/queries/life";
 import { TaskForm } from "@/components/life/task-form";
@@ -6,6 +7,7 @@ import { ModuleTabs } from "@/components/shared/module-tabs";
 import { TASKS_TABS } from "@/lib/nav-items";
 import { todayStr } from "@/lib/date";
 import { PageHeader } from "@/components/shared/page-header";
+import { EmptyState } from "@/components/shared/empty-state";
 
 export default async function TasksPage() {
   const supabase = await createClient();
@@ -26,9 +28,9 @@ export default async function TasksPage() {
       <ModuleTabs tabs={TASKS_TABS} />
 
       {tasks.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-border bg-card px-4 py-8 text-center text-body text-muted-foreground">
-          No tasks yet — add your first one above.
-        </p>
+        <div className="surface">
+          <EmptyState icon={ListChecks} title="Nothing on the list" description="Add a task above and it will be sorted into today, upcoming and overdue for you." />
+        </div>
       ) : (
         <TaskBoard tasks={tasks} today={today} />
       )}

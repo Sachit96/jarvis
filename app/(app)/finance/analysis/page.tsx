@@ -1,3 +1,4 @@
+import { LineChart } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getMarketAnalyses } from "@/lib/db/queries/trading";
 import { MarketAnalysisForm } from "@/components/finance/market-analysis-form";
@@ -5,6 +6,7 @@ import { MarketAnalysisCard } from "@/components/finance/market-analysis-card";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { FINANCE_TABS } from "@/lib/nav-items";
 import { PageHeader } from "@/components/shared/page-header";
+import { EmptyState } from "@/components/shared/empty-state";
 
 export default async function MarketAnalysisPage() {
   const supabase = await createClient();
@@ -24,9 +26,9 @@ export default async function MarketAnalysisPage() {
       </p>
 
       {analyses.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
-          No analyses logged yet — add your first pair above.
-        </p>
+        <div className="surface">
+          <EmptyState icon={LineChart} title="No analyses yet" description="Add a pair above to keep a running read on the setups you are watching." />
+        </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {analyses.map((analysis) => (

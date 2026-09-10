@@ -1,3 +1,4 @@
+import { PiggyBank } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getBudgets, getMonthTransactions, computeSpendByCategory } from "@/lib/db/queries/finance";
 import { BudgetBar } from "@/components/finance/budget-bar";
@@ -6,6 +7,7 @@ import { SpendByCategoryChart } from "@/components/finance/spend-by-category-cha
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { FINANCE_TABS } from "@/lib/nav-items";
 import { PageHeader } from "@/components/shared/page-header";
+import { EmptyState } from "@/components/shared/empty-state";
 
 export default async function BudgetsPage() {
   const supabase = await createClient();
@@ -29,9 +31,9 @@ export default async function BudgetsPage() {
       </p>
 
       {budgets.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
-          No budgets yet — set your first monthly cap above.
-        </p>
+        <div className="surface">
+          <EmptyState icon={PiggyBank} title="No budgets set" description="Set a monthly cap for a category and this month\u2019s spend will track against it." />
+        </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {budgets.map((budget) => (

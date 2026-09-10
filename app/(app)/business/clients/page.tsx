@@ -7,6 +7,7 @@ import { StatTile } from "@/components/shared/stat-tile";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { BUSINESS_TABS } from "@/lib/nav-items";
 import { PageHeader } from "@/components/shared/page-header";
+import { EmptyState } from "@/components/shared/empty-state";
 
 export default async function ClientsPage() {
   const supabase = await createClient();
@@ -47,9 +48,9 @@ export default async function ClientsPage() {
       ) : null}
 
       {contacts.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
-          No clients yet — add a lead from the Pipeline tab to get started.
-        </p>
+        <div className="surface">
+          <EmptyState icon={Users} title="No clients yet" description="Move a deal to a won stage on the Pipeline board and the client will appear here." />
+        </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {contacts.map((contact) => (

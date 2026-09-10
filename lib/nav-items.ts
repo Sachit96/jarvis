@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import type { NavTarget } from "@/lib/nav-active";
 import {
   LayoutDashboard,
   Target,
@@ -14,11 +15,15 @@ import {
   Settings as SettingsIcon,
 } from "lucide-react";
 
-export interface NavItem {
+export interface NavItem extends NavTarget {
   href: string;
   label: string;
   icon: LucideIcon;
 }
+
+// Re-exported so callers keep importing navigation from one place, while the
+// resolution logic stays in a module the test runner can load.
+export { activeNavHref } from "@/lib/nav-active";
 
 /**
  * Full nav — desktop sidebar, in the app's priority order.
@@ -33,7 +38,7 @@ export const SIDEBAR_ITEMS: NavItem[] = [
   { href: "/health/workouts", label: "Health", icon: HeartPulse },
   { href: "/finance/overview", label: "Finance", icon: Wallet },
   { href: "/life/goals", label: "Goals", icon: Target },
-  { href: "/life/tasks", label: "Tasks & Routine", icon: ListChecks },
+  { href: "/life/tasks", label: "Tasks & Routine", icon: ListChecks, matches: ["/life/habits", "/life/journal"] },
   { href: "/uni", label: "University", icon: GraduationCap },
   { href: "/mentor", label: "AI Mentor", icon: Sparkles },
   { href: "/voice", label: "Voice Mode", icon: Mic },
@@ -75,7 +80,7 @@ export const SIDEBAR_GROUPS: NavGroup[] = [
     items: [
       { href: "/health/workouts", label: "Health", icon: HeartPulse },
       { href: "/life/goals", label: "Goals", icon: Target },
-      { href: "/life/tasks", label: "Tasks & Routine", icon: ListChecks },
+      { href: "/life/tasks", label: "Tasks & Routine", icon: ListChecks, matches: ["/life/habits", "/life/journal"] },
       { href: "/uni", label: "University", icon: GraduationCap },
     ],
   },

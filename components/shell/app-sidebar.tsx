@@ -18,19 +18,9 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { RadarMark } from "@/components/shell/radar-mark";
-import { SIDEBAR_GROUPS } from "@/lib/nav-items";
+import { activeNavHref, SIDEBAR_GROUPS, SIDEBAR_ITEMS } from "@/lib/nav-items";
 import { cn } from "@/lib/utils";
 import { user } from "@/lib/user";
-
-/**
- * A nav row is active for its whole module, not just its exact href —
- * /finance/budgets should still light "Finance" up. Home is the exception,
- * since every path starts with "/".
- */
-function isActiveHref(pathname: string, href: string) {
-  if (href === "/") return pathname === "/";
-  return pathname.startsWith(`/${href.split("/")[1]}`);
-}
 
 /**
  * The active row, styled here rather than in the vendored ui/sidebar so the
@@ -59,6 +49,10 @@ const ACTIVE_ROW = cn(
 
 export function AppSidebar() {
   const pathname = usePathname();
+  // Resolved once against the flat list, not per row: asking each row "is
+  // this me?" independently is exactly how two rows ended up active at the
+  // same time on /life/goals.
+  const activeHref = activeNavHref(pathname, SIDEBAR_ITEMS);
 
   return (
     <Sidebar collapsible="icon" className="border-sidebar-border border-r">
@@ -89,7 +83,7 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 {group.items.map((item) => {
-                  const isActive = isActiveHref(pathname, item.href);
+                  const isActive = activeHref === item.href;
                   const Icon = item.icon;
                   return (
                     <SidebarMenuItem key={item.href}>
@@ -120,7 +114,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               render={<Link href="/settings" />}
-              isActive={pathname.startsWith("/settings")}
+              isActive={activeHref === "/settings"}
               tooltip="Settings"
               className={cn("h-9 gap-2.5 rounded-lg pl-3 text-foreground-secondary", ACTIVE_ROW)}
             >

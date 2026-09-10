@@ -1,4 +1,4 @@
-import { TrendingUp, FileText } from "lucide-react";
+import { FileText, Receipt, TrendingUp } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getContracts, getContacts, computeMrr } from "@/lib/db/queries/business";
 import { ContractForm } from "@/components/business/contract-form";
@@ -7,6 +7,7 @@ import { StatTile } from "@/components/shared/stat-tile";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { BUSINESS_TABS } from "@/lib/nav-items";
 import { PageHeader } from "@/components/shared/page-header";
+import { EmptyState } from "@/components/shared/empty-state";
 
 export default async function RevenuePage() {
   const supabase = await createClient();
@@ -30,9 +31,9 @@ export default async function RevenuePage() {
       </div>
 
       {contracts.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
-          No contracts yet — add one above once you have a client.
-        </p>
+        <div className="surface">
+          <EmptyState icon={Receipt} title="No contracts yet" description="Recurring revenue is calculated from active contracts. Add one once a client is signed." />
+        </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {contracts.map((contract) => (

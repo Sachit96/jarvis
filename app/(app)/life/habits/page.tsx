@@ -1,3 +1,4 @@
+import { Repeat } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getHabits, getHabitLogsForHeatmap } from "@/lib/db/queries/life";
 import { getTodayRoutineItems } from "@/lib/db/queries/routine";
@@ -8,6 +9,7 @@ import { AutoRoutineList } from "@/components/life/auto-routine-list";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { TASKS_TABS } from "@/lib/nav-items";
 import { PageHeader } from "@/components/shared/page-header";
+import { EmptyState } from "@/components/shared/empty-state";
 
 export default async function RoutinePage() {
   await ensureDefaultHabitsAction();
@@ -55,9 +57,9 @@ export default async function RoutinePage() {
       ) : null}
 
       {habits.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
-          No routine items yet — add your first one above.
-        </p>
+        <div className="surface">
+          <EmptyState icon={Repeat} title="No routine yet" description="Add the things you want to do every day and they will appear on Home each morning." />
+        </div>
       ) : null}
     </div>
   );

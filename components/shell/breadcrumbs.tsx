@@ -60,7 +60,14 @@ export function Breadcrumbs() {
       segment,
       href: `/${segments.slice(0, index + 1).join("/")}`,
     }))
-    .filter((crumb) => !ID_LIKE.test(crumb.segment));
+    .filter((crumb) => !ID_LIKE.test(crumb.segment))
+    .map((crumb) => ({ ...crumb, label: labelFor(crumb.segment, crumb.href) }))
+    // Consecutive crumbs that resolve to the same words are one crumb.
+    // /life/goals titled both segments "Goals" (the module lookup finds
+    // "Goals" for /life, and the leaf is literally "goals"), so the trail
+    // read "Home › Goals › Goals". A repeated word in a breadcrumb reads as
+    // a bug even when the path is perfectly sensible.
+    .filter((crumb, index, all) => index === 0 || all[index - 1].label !== crumb.label);
 
   return (
     <Breadcrumb>
@@ -71,15 +78,14 @@ export function Breadcrumbs() {
 
         {crumbs.map((crumb, index) => {
           const isLast = index === crumbs.length - 1;
-          const label = labelFor(crumb.segment, crumb.href);
           return (
             <Fragment key={crumb.href}>
               <BreadcrumbSeparator className="hidden sm:block" />
               <BreadcrumbItem>
                 {isLast ? (
-                  <BreadcrumbPage>{label}</BreadcrumbPage>
+                  <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
                 ) : (
-                  <BreadcrumbLink render={<Link href={crumb.href} />}>{label}</BreadcrumbLink>
+                  <BreadcrumbLink render={<Link href={crumb.href} />}>{crumb.label}</BreadcrumbLink>
                 )}
               </BreadcrumbItem>
             </Fragment>

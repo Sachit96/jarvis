@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Phone, Download, Search } from "lucide-react";
+import { Download, Phone, Radar, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -141,9 +141,9 @@ export function LeadResearchBoard({ rows, stages }: { rows: LeadRowData[]; stage
       </div>
 
       {filtered.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
-          Nothing matches this filter.
-        </p>
+        <div className="surface">
+        <EmptyState icon={Radar} title="No leads yet" description="Start a research run and scored leads will appear on this board." />
+      </div>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-border bg-card">
           <table className="w-full text-left text-sm">

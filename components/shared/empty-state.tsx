@@ -48,9 +48,13 @@ export function EmptyState({ title, description, icon: Icon, action, value, clas
       ) : null}
 
       <div className="space-y-1.5">
+        {/* Uppercase micro-label, per §18's own example ("$0 / NO ACCOUNTS
+            CONNECTED / Connect a financial account…"). Keep titles to a
+            short phrase — a full sentence at 11px with 0.2em tracking is
+            unreadable, and the sentence belongs in `description`. */}
         <p className="eyebrow">{title}</p>
         {description ? (
-          <p className="mx-auto max-w-[34ch] text-body text-foreground-tertiary">{description}</p>
+          <p className="mx-auto max-w-[36ch] text-body text-foreground-tertiary">{description}</p>
         ) : null}
       </div>
 
