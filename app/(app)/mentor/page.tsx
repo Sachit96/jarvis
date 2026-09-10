@@ -8,7 +8,7 @@ import { OperatorChat } from "@/components/mentor/operator-chat";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { MENTOR_TABS } from "@/lib/nav-items";
-import { todayStr } from "@/lib/date";
+import { shortDate, todayStr } from "@/lib/date";
 import { PageHeader } from "@/components/shared/page-header";
 
 export default async function MentorPage() {
@@ -37,7 +37,7 @@ export default async function MentorPage() {
           {brief ? (
             <>
               <BriefCard
-                dateLabel={`Generated for ${brief.rec_date}`}
+                dateLabel={`Generated for ${shortDate(brief.rec_date)}`}
                 markdownBody={brief.markdown_body}
                 focusAreas={brief.focus_areas}
                 strengths={brief.strengths}
