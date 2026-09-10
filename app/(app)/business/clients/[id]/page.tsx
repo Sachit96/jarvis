@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Phone, Mail } from "lucide-react";
+import { Phone, Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import {
   getContact,
@@ -19,6 +19,8 @@ import { OnboardingChecklist } from "@/components/business/onboarding-checklist"
 import { ContractCard } from "@/components/business/contract-card";
 import { ContactNotesEditor } from "@/components/business/contact-notes-editor";
 import { Backlinks } from "@/components/shared/backlinks";
+import { BackLink } from "@/components/shared/back-link";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default async function ContactDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -40,44 +42,44 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className="space-y-6">
-      <Link href="/business/clients" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-3.5 w-3.5" /> Clients
-      </Link>
+      <BackLink href="/business/clients" label="Clients" />
 
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-display">{contact.contact_person}</h1>
-            {contact.source !== "manual" ? (
-              <Badge variant="outline" className="text-[10px] uppercase">
-                {contact.source}
-              </Badge>
-            ) : null}
-          </div>
-          {contact.company_name ? <p className="text-sm text-muted-foreground">{contact.company_name}</p> : null}
-          <div className="mt-1.5 flex flex-wrap items-center gap-3 text-sm">
-            {contact.phone ? (
-              <a href={`tel:${contact.phone}`} className="inline-flex items-center gap-1.5 text-success hover:underline">
-                <Phone className="h-3.5 w-3.5" /> {contact.phone}
-              </a>
-            ) : null}
-            {contact.email ? (
-              <a href={`mailto:${contact.email}`} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
-                <Mail className="h-3.5 w-3.5" /> {contact.email}
-              </a>
-            ) : null}
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        eyebrow={contact.company_name ?? "Client"}
+        title={contact.contact_person}
+        description={
+          contact.phone || contact.email ? (
+            <span className="flex flex-wrap items-center gap-x-4 gap-y-1">
+              {contact.phone ? (
+                <a href={`tel:${contact.phone}`} className="inline-flex items-center gap-1.5 hover:text-foreground">
+                  <Phone className="size-3.5" strokeWidth={2} /> {contact.phone}
+                </a>
+              ) : null}
+              {contact.email ? (
+                <a href={`mailto:${contact.email}`} className="inline-flex items-center gap-1.5 hover:text-foreground">
+                  <Mail className="size-3.5" strokeWidth={2} /> {contact.email}
+                </a>
+              ) : null}
+            </span>
+          ) : undefined
+        }
+        actions={
+          contact.source !== "manual" ? (
+            <Badge variant="outline" className="uppercase">
+              {contact.source}
+            </Badge>
+          ) : null
+        }
+      />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.3fr]">
         <div className="space-y-6">
-          <div className="rounded-lg border border-border bg-card p-4">
+          <div className="surface p-4">
             <ContactNotesEditor contactId={contact.id} notes={contact.notes} />
           </div>
 
           {deals.length > 0 ? (
-            <div className="rounded-lg border border-border bg-card p-4">
+            <div className="surface p-4">
               <p className="eyebrow">Deals</p>
               <ul className="mt-2 space-y-1.5">
                 {deals.map((d) => (
@@ -101,16 +103,14 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
             </div>
           ) : null}
 
-          <div className="rounded-lg border border-border bg-card p-4">
+          <div className="surface p-4">
             <OnboardingChecklist contactId={contact.id} tasks={onboardingTasks} />
           </div>
 
-          <div className="rounded-lg border border-border bg-card p-4">
-            <Backlinks backlinks={backlinks} />
-          </div>
+          <Backlinks backlinks={backlinks} card />
         </div>
 
-        <div className="rounded-lg border border-border bg-card p-4">
+        <div className="surface p-4">
           <p className="eyebrow">Activity</p>
           <div className="mt-2">
             <ActivityForm contactId={contact.id} />
@@ -122,7 +122,7 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
               ))}
             </ul>
           ) : (
-            <p className="mt-3 text-sm text-muted-foreground">No activity logged yet.</p>
+            <p className="mt-3 text-body text-foreground-tertiary">No activity logged yet.</p>
           )}
         </div>
       </div>

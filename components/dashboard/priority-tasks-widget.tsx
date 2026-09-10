@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import type { Database } from "@/lib/supabase/database.types";
 import { EmptyState } from "@/components/shared/empty-state";
+import { dueLabel, todayStr } from "@/lib/date";
 
 type Task = Database["public"]["Tables"]["tasks"]["Row"];
 
@@ -14,6 +15,10 @@ const PRIORITY_DOT: Record<string, string> = {
 };
 
 export function PriorityTasksWidget({ tasks, compact = false, className }: { tasks: Task[]; compact?: boolean; className?: string }) {
+  // Read once for the whole list rather than per row, so every date on the
+  // card is measured against the same day.
+  const today = todayStr();
+
   return (
     <Card padding={compact ? "compact" : "default"} className={cn("min-h-[170px]", className)}>
       <header className="mb-3 flex shrink-0 items-center justify-between">
@@ -41,7 +46,14 @@ export function PriorityTasksWidget({ tasks, compact = false, className }: { tas
                 <div className="min-w-0 flex-1">
                   <p className="line-clamp-2 text-[13px]">{task.title}</p>
                   {task.due_date ? (
-                    <p className="mt-0.5 tabular text-caption text-foreground-tertiary">{task.due_date}</p>
+                    <p
+                      className={cn(
+                        "mt-0.5 text-caption",
+                        task.due_date < today ? "text-danger" : "text-foreground-tertiary",
+                      )}
+                    >
+                      {dueLabel(task.due_date, today)}
+                    </p>
                   ) : null}
                 </div>
               </li>

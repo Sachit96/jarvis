@@ -37,7 +37,7 @@ export function MacroProgressBars({
   targets: { target_calories: number; target_protein_g: number; target_carbs_g: number; target_fat_g: number } | null;
 }) {
   return (
-    <div className="space-y-3 rounded-lg border border-border bg-card p-4">
+    <div className="space-y-3 surface p-4">
       <MacroBar label="Calories" value={totals.calories} target={targets?.target_calories ?? 2000} unit="kcal" />
       <MacroBar label="Protein" value={totals.protein_g} target={targets?.target_protein_g ?? 150} unit="g" />
       <MacroBar label="Carbs" value={totals.carbs_g} target={targets?.target_carbs_g ?? 200} unit="g" />

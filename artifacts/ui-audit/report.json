@@ -1,0 +1,1032 @@
+{
+  "generatedAt": "2026-09-10T17:40:01.246Z",
+  "scenario": "populated",
+  "mode": "prod",
+  "viewports": {
+    "desktop": "1512x950",
+    "mobile": "390x844"
+  },
+  "summary": {
+    "routes": 35,
+    "screenshots": 70,
+    "passed": 35,
+    "failed": 0
+  },
+  "routes": [
+    {
+      "route": "/",
+      "page": "home",
+      "desktop": {
+        "file": "home-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "home-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/business/dashboard",
+      "page": "business-dashboard",
+      "desktop": {
+        "file": "business-dashboard-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "business-dashboard-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/business/leads",
+      "page": "business-leads",
+      "desktop": {
+        "file": "business-leads-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "business-leads-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/business/pipeline",
+      "page": "business-pipeline",
+      "desktop": {
+        "file": "business-pipeline-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "business-pipeline-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/business/clients",
+      "page": "business-clients",
+      "desktop": {
+        "file": "business-clients-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "business-clients-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/business/revenue",
+      "page": "business-revenue",
+      "desktop": {
+        "file": "business-revenue-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "business-revenue-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/finance/overview",
+      "page": "finance-overview",
+      "desktop": {
+        "file": "finance-overview-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "finance-overview-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/finance/transactions",
+      "page": "finance-transactions",
+      "desktop": {
+        "file": "finance-transactions-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "finance-transactions-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/finance/accounts",
+      "page": "finance-accounts",
+      "desktop": {
+        "file": "finance-accounts-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "finance-accounts-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/finance/budgets",
+      "page": "finance-budgets",
+      "desktop": {
+        "file": "finance-budgets-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "finance-budgets-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/finance/trades",
+      "page": "finance-trades",
+      "desktop": {
+        "file": "finance-trades-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "finance-trades-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/finance/analysis",
+      "page": "finance-analysis",
+      "desktop": {
+        "file": "finance-analysis-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "finance-analysis-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/health/workouts",
+      "page": "health-workouts",
+      "desktop": {
+        "file": "health-workouts-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "health-workouts-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/health/nutrition",
+      "page": "health-nutrition",
+      "desktop": {
+        "file": "health-nutrition-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "health-nutrition-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/health/body",
+      "page": "health-body",
+      "desktop": {
+        "file": "health-body-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "health-body-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/life/goals",
+      "page": "goals",
+      "desktop": {
+        "file": "goals-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "goals-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/life/tasks",
+      "page": "tasks",
+      "desktop": {
+        "file": "tasks-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "tasks-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/life/habits",
+      "page": "routine",
+      "desktop": {
+        "file": "routine-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "routine-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/life/journal",
+      "page": "journal",
+      "desktop": {
+        "file": "journal-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "journal-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/uni",
+      "page": "university-dashboard",
+      "desktop": {
+        "file": "university-dashboard-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "university-dashboard-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/uni/courses",
+      "page": "university-courses",
+      "desktop": {
+        "file": "university-courses-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "university-courses-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/uni/timetable",
+      "page": "university-timetable",
+      "desktop": {
+        "file": "university-timetable-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "university-timetable-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/uni/attendance",
+      "page": "university-attendance",
+      "desktop": {
+        "file": "university-attendance-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "university-attendance-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/uni/calendar",
+      "page": "university-calendar",
+      "desktop": {
+        "file": "university-calendar-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "university-calendar-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/uni/assessments",
+      "page": "university-assessments",
+      "desktop": {
+        "file": "university-assessments-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "university-assessments-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/uni/deadlines",
+      "page": "university-deadlines",
+      "desktop": {
+        "file": "university-deadlines-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "university-deadlines-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/mentor",
+      "page": "mentor-today",
+      "desktop": {
+        "file": "mentor-today-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "mentor-today-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/mentor/weekly-review",
+      "page": "mentor-weekly-review",
+      "desktop": {
+        "file": "mentor-weekly-review-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "mentor-weekly-review-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/voice",
+      "page": "voice",
+      "desktop": {
+        "file": "voice-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "voice-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/youtube",
+      "page": "youtube",
+      "desktop": {
+        "file": "youtube-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "youtube-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/memory",
+      "page": "memory",
+      "desktop": {
+        "file": "memory-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "memory-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/settings",
+      "page": "settings",
+      "desktop": {
+        "file": "settings-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "settings-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/business/pipeline/deal-0000-0000-0000-000000000002",
+      "page": "business-deal-detail",
+      "desktop": {
+        "file": "business-deal-detail-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "business-deal-detail-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/business/clients/con-0000-0000-0000-000000000001",
+      "page": "business-client-detail",
+      "desktop": {
+        "file": "business-client-detail-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "business-client-detail-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    },
+    {
+      "route": "/uni/courses/crs-0000-0000-0000-000000000001",
+      "page": "university-course-detail",
+      "desktop": {
+        "file": "university-course-detail-desktop.png",
+        "viewport": "1512x950",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "mobile": {
+        "file": "university-course-detail-mobile.png",
+        "viewport": "390x844",
+        "status": 200,
+        "hydrated": true,
+        "horizontalOverflow": 0,
+        "chartsSized": true,
+        "pageErrors": [],
+        "failedRequests": [],
+        "error": null,
+        "render": "pass"
+      },
+      "pass": true
+    }
+  ]
+}

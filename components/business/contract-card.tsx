@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { deleteContractAction, updateContractStatusAction } from "@/actions/business-actions";
 import type { Database } from "@/lib/supabase/database.types";
+import { shortDate } from "@/lib/date";
 
 type Contract = Database["public"]["Tables"]["contracts"]["Row"];
 type Contact = Database["public"]["Tables"]["contacts"]["Row"];
@@ -32,7 +33,7 @@ export function ContractCard({ contract, contact }: { contract: Contract; contac
   const [isPending, startTransition] = useTransition();
 
   return (
-    <div className={cn("rounded-lg border border-border bg-card p-4", isPending && "opacity-60")}>
+    <div className={cn("surface p-4", isPending && "opacity-60")}>
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="truncate text-sm font-medium">{contract.title}</p>
@@ -57,8 +58,8 @@ export function ContractCard({ contract, contact }: { contract: Contract; contac
         </Badge>
       </div>
 
-      <p className="mt-1 tabular text-xs text-muted-foreground">
-        {contract.start_date} {contract.end_date ? `→ ${contract.end_date}` : "→ ongoing"}
+      <p className="mt-1 text-xs text-muted-foreground">
+        {shortDate(contract.start_date)} → {contract.end_date ? shortDate(contract.end_date) : "ongoing"}
       </p>
 
       {contract.notes ? <p className="mt-1 text-xs text-muted-foreground">{contract.notes}</p> : null}

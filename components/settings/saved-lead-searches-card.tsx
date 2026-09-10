@@ -83,7 +83,7 @@ export function SavedLeadSearchesCard({ searches }: { searches: SavedLeadSearch[
   }, [isPending, state.error]);
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
+    <div className="surface p-4">
       <div className="flex items-center justify-between">
         <p className="eyebrow">Recurring Lead Research</p>
         {!showForm && searches.length > 0 ? (

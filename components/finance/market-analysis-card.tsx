@@ -42,7 +42,7 @@ export function MarketAnalysisCard({ analysis }: { analysis: MarketAnalysis }) {
   const [isPending, startTransition] = useTransition();
 
   return (
-    <div className={cn("rounded-lg border border-border bg-card p-4", isPending && "opacity-50")}>
+    <div className={cn("surface p-4", isPending && "opacity-50")}>
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-sm font-medium">{analysis.pair}</p>

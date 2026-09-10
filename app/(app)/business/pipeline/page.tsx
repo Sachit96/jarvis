@@ -55,21 +55,32 @@ export default async function PipelinePage() {
           <EmptyState icon={KanbanSquare} title="No pipeline yet" description="Add the stages a deal moves through and the board will appear here." />
         </div>
       ) : (
-        <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
+        // Each stage is a surface of its own rather than loose cards under a
+        // bare label. Without a column body the board reads as one wide row
+        // of cards, and the rightmost stage looked truncated rather than
+        // scrollable.
+        <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:thin] sm:mx-0 sm:px-0">
           {stages.map((stage) => {
             const stageDeals = deals.filter((d) => d.stage_id === stage.id);
             return (
-              <div key={stage.id} className="w-64 shrink-0 space-y-2">
-                <div className="flex items-center justify-between px-1">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <section
+                key={stage.id}
+                className="flex w-[17rem] shrink-0 flex-col rounded-[var(--radius)] bg-white/[0.02] p-2.5 ring-1 ring-inset ring-white/[0.05]"
+                aria-label={stage.name}
+              >
+                <header className="flex items-baseline justify-between gap-2 px-1 pb-2.5">
+                  <p className="eyebrow truncate">
                     {stage.name}
+                    <span className="ml-2 text-foreground-tertiary">{stageDeals.length}</span>
                   </p>
-                  <p className="tabular text-xs text-brand">{money(valueByStage.get(stage.id) ?? 0)}</p>
-                </div>
+                  <p className="tabular shrink-0 text-caption text-foreground-secondary">
+                    {money(valueByStage.get(stage.id) ?? 0)}
+                  </p>
+                </header>
                 <div className="space-y-2">
                   {stageDeals.length === 0 ? (
-                    <p className="rounded-lg bg-white/[0.02] px-3 py-5 text-center text-caption text-foreground-tertiary">
-                      No deals in this stage
+                    <p className="rounded-lg border border-dashed border-white/[0.07] px-3 py-6 text-center text-caption text-foreground-tertiary">
+                      Nothing here
                     </p>
                   ) : (
                     stageDeals.map((deal) => (
@@ -83,7 +94,7 @@ export default async function PipelinePage() {
                     ))
                   )}
                 </div>
-              </div>
+              </section>
             );
           })}
         </div>

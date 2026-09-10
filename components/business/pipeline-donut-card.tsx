@@ -7,6 +7,7 @@ import { ArrowRight, KanbanSquare } from "lucide-react";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Card } from "@/components/ui/card";
 import type { Database } from "@/lib/supabase/database.types";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 type PipelineStage = Database["public"]["Tables"]["pipeline_stages"]["Row"];
 type Deal = Database["public"]["Tables"]["deals"]["Row"];
@@ -47,6 +48,10 @@ function DonutTooltip({ active, payload }: { active?: boolean; payload?: { name:
  * list elsewhere on the page.
  */
 export function PipelineDonutCard({ stages, deals }: { stages: PipelineStage[]; deals: Deal[] }) {
+  // recharts animates in JS and never reads the media query, so the
+  // preference has to be threaded in by hand.
+  const reducedMotion = useReducedMotion();
+
   const rows = stages.map((s) => {
     const stageDeals = deals.filter((d) => d.stage_id === s.id);
     return {
@@ -78,7 +83,17 @@ export function PipelineDonutCard({ stages, deals }: { stages: PipelineStage[]; 
             <div className="relative mx-auto mt-3 size-44">
               <ChartFrame height={176} width={176}>
                 <PieChart>
-                  <Pie data={slices} dataKey="value" nameKey="name" innerRadius="62%" outerRadius="90%" paddingAngle={2} stroke="var(--card)" strokeWidth={2}>
+                  <Pie
+                    data={slices}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius="62%"
+                    outerRadius="90%"
+                    paddingAngle={2}
+                    stroke="var(--card)"
+                    strokeWidth={2}
+                    isAnimationActive={!reducedMotion}
+                  >
                     {slices.map((s, i) => (
                       <Cell key={s.id} fill={SLICE_COLORS[i % SLICE_COLORS.length]} />
                     ))}

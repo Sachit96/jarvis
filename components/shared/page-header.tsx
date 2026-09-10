@@ -18,8 +18,12 @@ export function PageHeader({
   actions,
   className,
 }: {
-  /** The module this page belongs to — "Health", "Finance". Uppercase micro-label. */
-  eyebrow?: string;
+  /**
+   * The module this page belongs to — "Health", "Finance". Uppercase
+   * micro-label. Takes a node rather than a string so a detail page can put
+   * its subject's colour dot inline with the label.
+   */
+  eyebrow?: ReactNode;
   title: ReactNode;
   description?: ReactNode;
   actions?: ReactNode;
@@ -41,7 +45,15 @@ export function PageHeader({
         <h1 className="text-display break-words">{title}</h1>
         {description ? <p className="text-body text-foreground-tertiary">{description}</p> : null}
       </div>
-      {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
+      {/* Not shrink-0. With five controls — a risk chip, two dialog buttons
+          and two icon buttons — the row's intrinsic width is 416px, and
+          shrink-0 held it there at 390px rather than letting its own
+          flex-wrap break it onto a second line. min-w-0 is what allows the
+          wrap; justify-end keeps a wrapped row aligned with the actions
+          above it rather than drifting left. */}
+      {actions ? (
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">{actions}</div>
+      ) : null}
     </div>
   );
 }

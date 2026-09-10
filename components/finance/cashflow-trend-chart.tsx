@@ -12,6 +12,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { EmptyState } from "@/components/shared/empty-state";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 interface Point {
   date: string;
@@ -43,6 +44,10 @@ const compact = new Intl.NumberFormat(undefined, {
 const compactMoney = (value: number) => `$${compact.format(value)}`;
 
 export function CashflowTrendChart({ points }: { points: Point[] }) {
+  // recharts animates in JS and never reads the media query, so the
+  // preference has to be threaded in by hand.
+  const reducedMotion = useReducedMotion();
+
   const hasActivity = points.some((p) => p.income !== 0 || p.expense !== 0);
 
   // Plotted cumulatively rather than per-day. Income arrives in a few large
@@ -117,9 +122,11 @@ export function CashflowTrendChart({ points }: { points: Point[] }) {
                 strokeWidth={2}
                 dot={false}
                 activeDot={{ r: 4 }}
+                isAnimationActive={!reducedMotion}
               />
               <Line
                 dataKey="expense"
+                isAnimationActive={!reducedMotion}
                 type="monotone"
                 stroke="var(--color-expense)"
                 strokeWidth={2}

@@ -22,15 +22,24 @@ export function AddDealTaskForm({ dealId }: { dealId: string }) {
   }, [isPending, state.error]);
 
   return (
-    <form ref={formRef} action={formAction} className="mt-1.5 flex items-center gap-1.5">
+    <form ref={formRef} action={formAction} className="flex flex-wrap items-start gap-2">
       <input type="hidden" name="deal_id" value={dealId} />
-      <div className="flex-1">
-        <Input name="title" placeholder="Follow-up task…" className="h-6 text-xs" {...fieldAria(state, "title")} />
+      <div className="min-w-40 flex-1">
+        <Input name="title" placeholder="Follow-up task…" {...fieldAria(state, "title")} />
         <FieldError id="title-error" message={state.fieldErrors?.title} />
       </div>
-      <Button type="submit" size="sm" variant="ghost" className="h-6 px-2 text-xs" disabled={isPending}>
+      {/* The action has always accepted a due date; nothing ever sent one, so
+          every task landed undated and the overdue signal could never fire. */}
+      <Input
+        type="date"
+        name="due_date"
+        aria-label="Due date"
+        className="w-36 shrink-0 text-foreground-secondary"
+      />
+      <Button type="submit" variant="secondary" className="shrink-0" disabled={isPending}>
         Add
       </Button>
+      {state.error ? <FieldError id="deal-task-error" message={state.error} /> : null}
     </form>
   );
 }

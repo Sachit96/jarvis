@@ -8,7 +8,9 @@ import { RiskChip } from "@/components/uni/risk-chip";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CourseForm } from "@/components/uni/course-form";
+import { CourseArchiveControls } from "@/components/uni/course-archive-controls";
 import { AssessmentForm } from "@/components/uni/assessment-form";
+import { AssessmentGroupsCard } from "@/components/uni/assessment-groups-card";
 import { AssessmentItem } from "@/components/uni/assessment-item";
 import { ScheduleBlockForm } from "@/components/uni/schedule-block-form";
 import { MaterialForm } from "@/components/uni/material-form";
@@ -19,6 +21,8 @@ import { DeleteScheduleBlockButton, DeleteMaterialButton } from "@/components/un
 import { Backlinks } from "@/components/shared/backlinks";
 import { getBacklinks } from "@/lib/obsidian/wikilinks";
 import { EmptyState } from "@/components/shared/empty-state";
+import { BackLink } from "@/components/shared/back-link";
+import { PageHeader } from "@/components/shared/page-header";
 
 const DAY_LABEL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -43,31 +47,47 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
   const worst = worstCase(assessments, groups);
   const unresolvedWeight = unresolvedWeightCount(assessments);
 
+  const memberCounts = new Map<string, number>();
+  for (const a of assessments) {
+    if (a.group_id) memberCounts.set(a.group_id, (memberCounts.get(a.group_id) ?? 0) + 1);
+  }
+
   const sortedBlocks = [...scheduleBlocks].sort((a, b) => a.day_of_week - b.day_of_week || a.start_time.localeCompare(b.start_time));
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full" style={{ backgroundColor: course.color ?? "#8b5cf6" }} />
-            <p className="eyebrow">{course.term}</p>
-          </div>
-          <h1 className="text-display">{course.code} — {course.name}</h1>
-          {course.professor ? (
-            <p className="mt-1 text-sm text-muted-foreground">
-              {course.professor}
-              {course.professor_email ? ` · ${course.professor_email}` : ""}
-              {course.room ? ` · ${course.room}` : ""}
-            </p>
-          ) : null}
-        </div>
-        <div className="flex items-center gap-2">
-          <RiskChip score={risk} />
-          <SyllabusUpload courseId={course.id} />
-          <CourseForm course={course} />
-        </div>
-      </div>
+      <BackLink href="/uni/courses" label="Courses" />
+
+      <PageHeader
+        eyebrow={
+          <span className="flex items-center gap-2">
+            <span
+              aria-hidden
+              className="size-2.5 rounded-full"
+              style={{ backgroundColor: course.color ?? "var(--brand)" }}
+            />
+            {course.term}
+          </span>
+        }
+        title={`${course.code} — ${course.name}`}
+        description={
+          course.professor
+            ? [course.professor, course.professor_email, course.room].filter(Boolean).join(" · ")
+            : undefined
+        }
+        actions={
+          <>
+            <RiskChip score={risk} />
+            <SyllabusUpload courseId={course.id} />
+            <CourseForm course={course} />
+            <CourseArchiveControls
+              courseId={course.id}
+              courseName={`${course.code} — ${course.name}`}
+              archived={course.archived}
+            />
+          </>
+        }
+      />
 
       <div className="grid grid-cols-2 items-start gap-4 md:grid-cols-4">
         <StatTile
@@ -92,14 +112,17 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
         <StatTile label="Best / Worst Case" value={assessments.length === 0 ? "—" : `${best.toFixed(0)}% / ${worst.toFixed(0)}%`} />
       </div>
 
-      <div className="grid items-start gap-4 lg:grid-cols-2">
+      {/* Three peers, not two peers and a full-width card underneath: the
+          groups card is usually empty, and at full width its empty state was
+          a 250px band of nothing in the middle of the page. */}
+      <div className="grid items-start gap-4 lg:grid-cols-3">
         <Card>
           <div className="flex items-center justify-between">
             <p className="eyebrow">Schedule</p>
             <ScheduleBlockForm courseId={course.id} />
           </div>
           {sortedBlocks.length === 0 ? (
-            <p className="mt-3 text-sm text-muted-foreground/50">No class times added</p>
+            <p className="mt-3 text-body text-foreground-tertiary">No class times added</p>
           ) : (
             <ul className="mt-3 space-y-2">
               {sortedBlocks.map((b) => (
@@ -125,7 +148,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
             </div>
           </div>
           {materials.length === 0 ? (
-            <p className="mt-3 text-sm text-muted-foreground/50">No materials uploaded</p>
+            <p className="mt-3 text-body text-foreground-tertiary">No materials uploaded</p>
           ) : (
             <ul className="mt-3 space-y-2">
               {materials.map((m) => (
@@ -144,27 +167,33 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
             </ul>
           )}
         </Card>
+
+        <AssessmentGroupsCard courseId={course.id} groups={groups} memberCounts={memberCounts} />
       </div>
 
       <div>
         <div className="mb-3 flex items-center justify-between">
           <p className="eyebrow">Assessments</p>
-          <AssessmentForm courseId={course.id} />
+          <AssessmentForm courseId={course.id} groups={groups} />
         </div>
         {assessments.length === 0 ? (
           <div className="surface">
-          <EmptyState icon={BookOpen} title="No assessments yet" description="Assignments and exams added to this course will be listed here with their weightings." />
-        </div>
+            <EmptyState
+              icon={BookOpen}
+              title="No assessments yet"
+              description="Assignments and exams added to this course will be listed here with their weightings."
+            />
+          </div>
         ) : (
           <div className="space-y-2">
             {assessments.map((a) => (
-              <AssessmentItem key={a.id} assessment={a} courseColor={course.color ?? undefined} />
+              <AssessmentItem key={a.id} assessment={a} courseColor={course.color ?? undefined} groups={groups} />
             ))}
           </div>
         )}
       </div>
 
-      <Backlinks backlinks={backlinks} />
+      <Backlinks backlinks={backlinks} card />
     </div>
   );
 }

@@ -27,7 +27,7 @@ export function TradeItem({ trade }: { trade: Trade }) {
   return (
     <li
       className={cn(
-        "rounded-lg border border-border bg-card p-3 transition-opacity",
+        "surface p-3 transition-opacity",
         isPending && "opacity-70",
       )}
     >

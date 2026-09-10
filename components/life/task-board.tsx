@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ListChecks, Search, X } from "lucide-react";
+import { ChevronRight, ListChecks, Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { TaskItem } from "@/components/life/task-item";
@@ -144,13 +144,21 @@ export function TaskBoard({ tasks, today }: { tasks: Task[]; today: string }) {
 
       {grouped.done.length > 0 ? (
         <section className="space-y-2">
+          {/* The chevron is what makes this read as collapsed rather than
+              empty. Without it "Done 1" above a blank space looks like a
+              section that failed to render its rows. */}
           <button
             onClick={() => setShowDone((v) => !v)}
-            className="eyebrow hover:text-white"
+            className="eyebrow inline-flex items-center gap-1.5 hover:text-white"
             aria-expanded={showDone}
           >
+            <ChevronRight
+              aria-hidden
+              className={cn("size-3 transition-transform", showDone && "rotate-90")}
+              strokeWidth={2.5}
+            />
             {BUCKET_LABEL.done}
-            <span className="ml-2 text-foreground-tertiary">{grouped.done.length}</span>
+            <span className="text-foreground-tertiary">{grouped.done.length}</span>
           </button>
           {showDone ? (
             <ul className="space-y-2">

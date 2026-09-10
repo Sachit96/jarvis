@@ -6,6 +6,12 @@ import {
   byDay, gridRange, formatTime, toMinutes, nowContext, currentBlock, nextClass,
   describeUntil, DAY_LABELS, type TimetableBlock,
 } from "@/lib/uni/timetable";
+import {
+  classesOnDate,
+  noClassReason,
+  type ClassDayCourse,
+  type NoClassPeriod,
+} from "@/lib/uni/class-day";
 
 export interface TimetableCourse {
   id: string;
@@ -58,9 +64,14 @@ function subscribeToMinute(onChange: () => void): () => void {
 export function WeeklyTimetable({
   blocks,
   courses,
+  noClassPeriods = [],
+  courseTerms = [],
 }: {
   blocks: TimetableBlock[];
   courses: TimetableCourse[];
+  /** Holidays and reading weeks. Applied client-side so the dates are the viewer's, not the server's. */
+  noClassPeriods?: NoClassPeriod[];
+  courseTerms?: ClassDayCourse[];
 }) {
   // Ticks each minute so "in 25 min" stays true and the current-class
   // highlight moves without a reload. useSyncExternalStore rather than
@@ -78,8 +89,26 @@ export function WeeklyTimetable({
   // Null until the client has mounted: rendering a "current class" during SSR
   // would hydrate against a different minute and flash the wrong highlight.
   const context = now ? nowContext(now) : null;
-  const current = context ? currentBlock(blocks, context) : null;
-  const next = context ? nextClass(blocks, context) : null;
+
+  // Resolved against real calendar dates derived from the CLIENT's clock.
+  // Doing this on the server would use the server's timezone, which is the
+  // exact off-by-one-day bug the rest of this module is careful to avoid.
+  const occursOn = now
+    ? (block: TimetableBlock, daysAhead: number) => {
+        const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysAhead);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        return classesOnDate([block], key, { courses: courseTerms, noClassPeriods }).length > 0;
+      }
+    : undefined;
+
+  const current = context ? currentBlock(blocks, context, occursOn) : null;
+  const next = context ? nextClass(blocks, context, occursOn) : null;
+  const todayReason = now
+    ? noClassReason(
+        `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`,
+        { courses: courseTerms, noClassPeriods },
+      )
+    : null;
 
   const hours = Array.from({ length: endHour - startHour + 1 }, (_, i) => startHour + i);
 
@@ -89,11 +118,21 @@ export function WeeklyTimetable({
         <div className="flex flex-wrap gap-3">
           <StatusPill
             tone={current ? "live" : "idle"}
-            label={current ? "In class now" : "No class right now"}
+            label={
+              current
+                ? "In class now"
+                : todayReason?.kind === "break"
+                  ? todayReason.label
+                  : todayReason?.kind === "outside_term"
+                    ? "Outside term"
+                    : "No class right now"
+            }
             detail={
               current
                 ? `${courseById.get(current.course_id)?.code ?? "Class"} · until ${formatTime(current.end_time)}`
-                : undefined
+                : todayReason
+                  ? "Classes are suspended today"
+                  : undefined
             }
           />
           {next ? (

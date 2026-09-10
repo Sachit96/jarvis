@@ -23,7 +23,7 @@ export interface NavItem extends NavTarget {
 
 // Re-exported so callers keep importing navigation from one place, while the
 // resolution logic stays in a module the test runner can load.
-export { activeNavHref } from "@/lib/nav-active";
+export { activeNavHref, crumbHref } from "@/lib/nav-active";
 
 /**
  * Full nav — desktop sidebar, in the app's priority order.

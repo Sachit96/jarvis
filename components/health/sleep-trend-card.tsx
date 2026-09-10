@@ -4,6 +4,7 @@ import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis, Cell } from "recha
 import { ChartFrame } from "@/components/shared/chart-frame";
 import { Card } from "@/components/ui/card";
 import type { Database } from "@/lib/supabase/database.types";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 type SleepLog = Database["public"]["Tables"]["sleep_logs"]["Row"];
 
@@ -18,6 +19,10 @@ function SleepTooltip({ active, payload, label }: { active?: boolean; payload?: 
 }
 
 export function SleepTrendCard({ entries }: { entries: SleepLog[] }) {
+  // recharts animates in JS and never reads the media query, so the
+  // preference has to be threaded in by hand.
+  const reducedMotion = useReducedMotion();
+
   const points = entries.map((e) => ({
     date: new Date(e.log_date + "T00:00:00").toLocaleDateString(undefined, { month: "short", day: "numeric" }),
     hours: Number(e.hours_slept),
@@ -47,7 +52,7 @@ export function SleepTrendCard({ entries }: { entries: SleepLog[] }) {
               <XAxis dataKey="date" tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} axisLine={false} tickLine={false} interval="preserveStartEnd" minTickGap={32} />
               <YAxis domain={[0, 12]} tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} axisLine={false} tickLine={false} width={28} />
               <Tooltip content={<SleepTooltip />} cursor={{ fill: "var(--border)", opacity: 0.3 }} />
-              <Bar dataKey="hours" radius={[3, 3, 0, 0]}>
+              <Bar dataKey="hours" radius={[3, 3, 0, 0]} isAnimationActive={!reducedMotion}>
                 {points.map((p, i) => (
                   <Cell key={i} fill={p.hours >= 7 ? "#3b82f6" : "#f97316"} />
                 ))}

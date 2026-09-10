@@ -90,11 +90,19 @@ export default async function BusinessDashboardPage() {
         <KpiCell label="MRR" icon={TrendingUp} value={money(mrr)} hint="From active contracts" />
       </KpiGrid>
 
+      {/* Two independent columns rather than four cells in one grid. Grid
+          rows align, and the donut is roughly twice the height of the aging
+          card beside it — so row one left a 250px hole under aging before
+          the next row could start. Stacking each column packs them. */}
       <div className="grid items-start gap-4 lg:grid-cols-2">
-        <DealAgingCard openDealCount={openDeals.length} buckets={dealAgingBuckets} />
-        <PipelineDonutCard stages={stages} deals={deals} />
-        <DealsSparklineCard points={dealsPerDay} />
-        <LatestDealCard deal={latestDeal} contact={latestDealContact} stage={latestDealStage} />
+        <div className="space-y-4">
+          <DealAgingCard openDealCount={openDeals.length} buckets={dealAgingBuckets} />
+          <DealsSparklineCard points={dealsPerDay} />
+        </div>
+        <div className="space-y-4">
+          <PipelineDonutCard stages={stages} deals={deals} />
+          <LatestDealCard deal={latestDeal} contact={latestDealContact} stage={latestDealStage} />
+        </div>
       </div>
     </div>
   );

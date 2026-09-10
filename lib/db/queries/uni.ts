@@ -107,6 +107,21 @@ export async function getStudySessions(supabase: Client, courseIds?: string[]) {
   return data;
 }
 
+/** Materials across several courses at once — the flat version of getMaterials, for anything that spans the whole term rather than one course page. */
+export async function getMaterialsForCourses(supabase: Client, courseIds: string[]) {
+  if (courseIds.length === 0) return [];
+  const { data, error } = await supabase
+    .from("uni_materials")
+    .select("*")
+    .in("course_id", courseIds)
+    .order("uploaded_at", { ascending: false });
+  if (error) {
+    if (isMissingRelation(error)) return [];
+    throw error;
+  }
+  return data;
+}
+
 export async function getMaterials(supabase: Client, courseId: string) {
   const { data, error } = await supabase
     .from("uni_materials")

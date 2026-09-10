@@ -1,12 +1,13 @@
-import { UserCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getCourses, getAttendance, getScheduleBlocks } from "@/lib/db/queries/uni";
+import { getCourses, getAttendance, getScheduleBlocks, getNoClassPeriods } from "@/lib/db/queries/uni";
 import { ModuleTabs } from "@/components/shared/module-tabs";
+import { PageHeader } from "@/components/shared/page-header";
 import { AttendanceOverview } from "@/components/uni/attendance-overview";
 import { AttendanceMarker, type TodayClass } from "@/components/uni/attendance-marker";
 import { todayStr } from "@/lib/date";
 import { UNI_TABS } from "@/lib/nav-items";
 import type { AttendanceRecord, AttendanceStatus } from "@/lib/uni/attendance";
+import { classesOnDate, noClassReason } from "@/lib/uni/class-day";
 
 /**
  * Attendance, entirely from JARVIS's own records.
@@ -21,16 +22,13 @@ export default async function UniAttendancePage() {
   const courses = await getCourses(supabase);
   const courseIds = courses.map((c) => c.id);
   // Independent of each other, so one round trip rather than three.
-  const [records, blocks] = await Promise.all([
+  const [records, blocks, noClassPeriods] = await Promise.all([
     getAttendance(supabase, courseIds),
     getScheduleBlocks(supabase, courseIds),
+    getNoClassPeriods(supabase),
   ]);
 
   const today = todayStr();
-  // getDay() on a bare YYYY-MM-DD would read it as UTC midnight and land on
-  // the wrong weekday west of UTC — the same trap lib/uni/schedule-occurrences
-  // documents. Appending the time forces local interpretation.
-  const weekday = new Date(`${today}T00:00:00`).getDay();
   const courseById = new Map(courses.map((c) => [c.id, c]));
   const markedToday = new Map(
     records
@@ -38,8 +36,10 @@ export default async function UniAttendancePage() {
       .map((r) => [r.schedule_block_id as string, r.status as AttendanceStatus]),
   );
 
-  const todayClasses: TodayClass[] = blocks
-    .filter((b) => b.day_of_week === weekday)
+  // Weekday alone used to decide this, which listed classes on statutory
+  // holidays, through reading week, and for weeks after the term ended —
+  // inviting attendance records for classes that never happened.
+  const todayClasses: TodayClass[] = classesOnDate(blocks, today, { courses, noClassPeriods })
     .sort((a, b) => a.start_time.localeCompare(b.start_time))
     .map((b) => ({
       scheduleBlockId: b.id,
@@ -54,17 +54,15 @@ export default async function UniAttendancePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="eyebrow">University</p>
-        <h1 className="flex items-center gap-2 text-display">
-          <UserCheck className="size-5 text-brand" strokeWidth={2} />
-          Attendance
-        </h1>
-      </div>
+      <PageHeader eyebrow="University" title="Attendance" />
 
       <ModuleTabs tabs={UNI_TABS} />
 
-      <AttendanceMarker classes={todayClasses} date={today} />
+      <AttendanceMarker
+        classes={todayClasses}
+        date={today}
+        reason={noClassReason(today, { courses, noClassPeriods })}
+      />
 
       <AttendanceOverview
         records={records as AttendanceRecord[]}

@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { cn } from "@/lib/utils";
 import { formatTime } from "@/lib/uni/timetable";
 import type { AttendanceStatus } from "@/lib/uni/attendance";
+import type { NoClassReason } from "@/lib/uni/class-day";
 
 export interface TodayClass {
   scheduleBlockId: string;
@@ -39,14 +40,36 @@ const OPTIONS: { status: AttendanceStatus; label: string; icon: typeof Check; to
   { status: "cancelled", label: "Cancelled", icon: Ban, tone: "text-muted-foreground border-border bg-muted/40" },
 ];
 
-export function AttendanceMarker({ classes, date }: { classes: TodayClass[]; date: string }) {
+export function AttendanceMarker({
+  classes,
+  date,
+  reason = null,
+}: {
+  classes: TodayClass[];
+  date: string;
+  /**
+   * Why the day is empty, when it is. "No classes today" on Thanksgiving
+   * reads as missing data; naming the holiday says the app knows.
+   */
+  reason?: NoClassReason;
+}) {
   if (classes.length === 0) {
     return (
       <Card padding="slotted">
         <CardHeader>
-          <CardTitle>No classes today</CardTitle>
+          <CardTitle>
+            {reason?.kind === "break"
+              ? reason.label
+              : reason?.kind === "outside_term"
+                ? "Outside term"
+                : "No classes today"}
+          </CardTitle>
           <CardDescription>
-            Nothing on the timetable for today, so there is nothing to mark.
+            {reason?.kind === "break"
+              ? "No classes run during this break, so nothing counts against your attendance."
+              : reason?.kind === "outside_term"
+                ? "Today falls outside every course's term dates. Attendance resumes when the next term starts."
+                : "Nothing on the timetable for today, so there is nothing to mark."}
           </CardDescription>
         </CardHeader>
       </Card>

@@ -1,28 +1,50 @@
 import Link from "next/link";
 import { AlertTriangle, CalendarClock, GraduationCap } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getCourses, getAssessments, getAssessmentGroups, getScheduleBlocks, getDeadlines } from "@/lib/db/queries/uni";
+import {
+  getCourses,
+  getAssessments,
+  getAssessmentGroups,
+  getScheduleBlocks,
+  getDeadlines,
+  getStudySessions,
+} from "@/lib/db/queries/uni";
 import { courseGrade, semesterAverage, riskScore } from "@/lib/uni/grades";
 import { KpiCell, KpiGrid } from "@/components/shared/kpi-grid";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { RiskChip } from "@/components/uni/risk-chip";
 import { PlanTonight } from "@/components/uni/plan-tonight";
+import { TermOverview } from "@/components/uni/term-overview";
+import { StudySessionsCard, type StudySessionRow } from "@/components/uni/study-sessions-card";
+import { DueFlashcardsCard } from "@/components/uni/due-flashcards-card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { UNI_TABS } from "@/lib/nav-items";
 import { cn } from "@/lib/utils";
-import { PageHeader } from "@/components/shared/page-header";
+import { PageHeader, SectionHeader } from "@/components/shared/page-header";
 
 export default async function UniDashboardPage() {
   const supabase = await createClient();
   const [courses, deadlines] = await Promise.all([getCourses(supabase), getDeadlines(supabase)]);
   const courseIds = courses.map((c) => c.id);
-  const [assessments, groups, scheduleBlocks] = await Promise.all([
+  const [assessments, groups, scheduleBlocks, studySessions] = await Promise.all([
     getAssessments(supabase, courseIds),
     getAssessmentGroups(supabase, courseIds),
     getScheduleBlocks(supabase, courseIds),
+    getStudySessions(supabase, courseIds),
   ]);
+  // Study sessions carry only ids, so the card is given the course code and
+  // assessment title it needs to be readable — resolved here, where both
+  // lists are already in hand, rather than with another round trip.
+  const assessmentTitleById = new Map(assessments.map((a) => [a.id, a.title]));
+  const courseCodeById = new Map(courses.map((c) => [c.id, c.code]));
+  const studySessionRows: StudySessionRow[] = studySessions.map((s) => ({
+    ...s,
+    courseCode: courseCodeById.get(s.course_id) ?? "Course",
+    assessmentTitle: s.assessment_id ? (assessmentTitleById.get(s.assessment_id) ?? null) : null,
+  }));
+
   const groupsByCourse = new Map<string, typeof groups>();
   for (const g of groups) {
     const list = groupsByCourse.get(g.course_id) ?? [];
@@ -211,10 +233,22 @@ export default async function UniDashboardPage() {
             </Card>
           </div>
 
-          <PlanTonight assessmentCourseIds={Object.fromEntries(assessments.map((a) => [a.id, a.course_id]))} />
+          <TermOverview courses={courses} />
+
+          {/* Plan, then the plan. These sat unpaired: PlanTonight wrote rows
+              into uni_study_sessions and nothing in the app ever read them
+              back, so a saved plan vanished the moment it was saved. */}
+          <div className="space-y-4">
+            <PlanTonight assessmentCourseIds={Object.fromEntries(assessments.map((a) => [a.id, a.course_id]))} />
+            <StudySessionsCard sessions={studySessionRows} />
+            {/* The other half of the same loop: reviewing a flashcard has
+                always pushed its next_review out, and nothing ever read that
+                schedule back. */}
+            <DueFlashcardsCard />
+          </div>
 
           <div className="space-y-3">
-            <h2 className="text-heading text-muted-foreground">Courses</h2>
+            <SectionHeader title="Courses" />
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {coursesWithGrades.map((c) => (
                 <Link

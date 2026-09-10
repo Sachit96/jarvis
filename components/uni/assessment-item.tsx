@@ -9,9 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { ASSESSMENT_STATUSES } from "@/lib/validations/uni";
 import { AssignmentBreakdown } from "@/components/uni/assignment-breakdown";
+import { AssessmentRequirements } from "@/components/uni/assessment-requirements";
+import { AssessmentForm } from "@/components/uni/assessment-form";
 import type { Database } from "@/lib/supabase/database.types";
 
 type Assessment = Database["public"]["Tables"]["uni_assessments"]["Row"];
+type Group = Database["public"]["Tables"]["uni_assessment_groups"]["Row"];
 
 const STATUS_LABEL: Record<(typeof ASSESSMENT_STATUSES)[number], string> = {
   not_started: "Not started",
@@ -28,7 +31,18 @@ function formatDue(due_at: string | null) {
   return { label, overdue };
 }
 
-export function AssessmentItem({ assessment, courseCode, courseColor }: { assessment: Assessment; courseCode?: string; courseColor?: string }) {
+export function AssessmentItem({
+  assessment,
+  courseCode,
+  courseColor,
+  groups,
+}: {
+  assessment: Assessment;
+  courseCode?: string;
+  courseColor?: string;
+  /** Grading groups for this assessment's course, so the edit form can reassign it. */
+  groups?: Group[];
+}) {
   const [isPending, startTransition] = useTransition();
   const [score, setScore] = useState(assessment.earned_score != null ? String(assessment.earned_score) : "");
   const due = formatDue(assessment.due_at);
@@ -41,9 +55,13 @@ export function AssessmentItem({ assessment, courseCode, courseColor }: { assess
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-xl bg-white/[0.03] px-3 py-2.5">
+    // Below sm the title takes the full width and the controls sit under it.
+    // Sharing one line at 390px squeezed the title column to nothing — the
+    // due date rendered one character per line under an input that overlapped
+    // it — because five fixed-width controls left it no room to be.
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-2.5 rounded-xl bg-white/[0.03] px-3 py-2.5">
       {courseColor ? <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: courseColor }} /> : null}
-      <div className="min-w-0 flex-1">
+      <div className="w-full min-w-0 sm:w-auto sm:flex-1">
         <p className="truncate text-sm font-medium text-foreground">
           {courseCode ? <span className="text-muted-foreground">{courseCode} · </span> : null}
           {assessment.title}
@@ -61,7 +79,7 @@ export function AssessmentItem({ assessment, courseCode, courseColor }: { assess
         ) : null}
       </div>
 
-      <div className="flex items-center gap-1.5">
+      <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap">
         <Input
           type="number"
           step="0.5"
@@ -73,37 +91,50 @@ export function AssessmentItem({ assessment, courseCode, courseColor }: { assess
           className={cn("h-8 w-20 text-sm", isGraded && "border-success/40")}
           disabled={isPending}
         />
+
+        <Select
+          value={assessment.status}
+          onValueChange={(v) => {
+            if (!v) return;
+            startTransition(() => setAssessmentStatusAction(assessment.id, v, assessment.course_id));
+          }}
+        >
+          <SelectTrigger className="h-8 w-[130px] shrink-0 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {ASSESSMENT_STATUSES.map((s) => (
+              <SelectItem key={s} value={s} label={STATUS_LABEL[s]}>
+                {STATUS_LABEL[s]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <AssignmentBreakdown assessmentId={assessment.id} courseId={assessment.course_id} />
+
+        {/* Title, type, due date, weight, max score, difficulty and estimate
+            were all write-once: set at creation and unreachable afterwards.
+            A mistyped weight silently skewed every grade projection on the
+            course. */}
+        <AssessmentForm courseId={assessment.course_id} assessment={assessment} groups={groups} />
+
+        <button
+          type="button"
+          onClick={() => startTransition(() => deleteAssessmentAction(assessment.id, assessment.course_id))}
+          className="relative ml-auto after:absolute after:-inset-3.5 text-muted-foreground/60 hover:text-danger sm:ml-0"
+          aria-label="Delete assessment"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
       </div>
 
-      <Select
-        value={assessment.status}
-        onValueChange={(v) => {
-          if (!v) return;
-          startTransition(() => setAssessmentStatusAction(assessment.id, v, assessment.course_id));
-        }}
-      >
-        <SelectTrigger className="h-8 w-[130px] text-xs">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {ASSESSMENT_STATUSES.map((s) => (
-            <SelectItem key={s} value={s} label={STATUS_LABEL[s]}>
-              {STATUS_LABEL[s]}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <AssignmentBreakdown assessmentId={assessment.id} courseId={assessment.course_id} />
-
-      <button
-        type="button"
-        onClick={() => startTransition(() => deleteAssessmentAction(assessment.id, assessment.course_id))}
-        className="relative after:absolute after:-inset-3.5 text-muted-foreground/60 hover:text-danger"
-        aria-label="Delete assessment"
-      >
-        <Trash2 className="h-3.5 w-3.5" />
-      </button>
+      {/* Full-width so the checklist opens under the row rather than being
+          squeezed into the control strip. The breakdown above writes these;
+          this is where they are read back. */}
+      <div className="w-full">
+        <AssessmentRequirements assessmentId={assessment.id} />
+      </div>
     </div>
   );
 }

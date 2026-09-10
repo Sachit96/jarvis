@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { activeNavHref, type NavTarget } from "../lib/nav-active";
+import { activeNavHref, crumbHref, type NavTarget } from "../lib/nav-active";
 
 // The real tables live in lib/nav-items.ts, which imports lucide-react and
 // therefore cannot be loaded here. Mirrored as plain hrefs instead — the
@@ -105,4 +105,34 @@ test("the mobile bar resolves against its own shorter list", () => {
   // rather than falling through to an unrelated tab.
   assert.equal(activeNavHref("/life/goals", NAV_ITEMS), null);
   assert.equal(activeNavHref("/health/body", NAV_ITEMS), "/health/workouts");
+});
+
+test("breadcrumb crumb destinations", async (t) => {
+  const items = [
+    { href: "/" },
+    { href: "/business/dashboard" },
+    { href: "/finance/overview" },
+    { href: "/uni" },
+    { href: "/settings" },
+  ];
+
+  await t.test("a real route links to itself", () => {
+    assert.equal(crumbHref("/uni", items), "/uni");
+    assert.equal(crumbHref("/settings", items), "/settings");
+  });
+
+  await t.test("a module segment resolves to its landing route", () => {
+    // /business is not a route; linking it 404s.
+    assert.equal(crumbHref("/business", items), "/business/dashboard");
+    assert.equal(crumbHref("/finance", items), "/finance/overview");
+  });
+
+  await t.test("a segment nothing lives under is not a link", () => {
+    assert.equal(crumbHref("/nowhere", items), null);
+  });
+
+  await t.test("a prefix match must be a path boundary", () => {
+    // "/busine" must not capture "/business/dashboard".
+    assert.equal(crumbHref("/busine", items), null);
+  });
 });

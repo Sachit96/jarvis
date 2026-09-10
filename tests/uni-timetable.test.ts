@@ -137,3 +137,31 @@ describe("countdown wording", () => {
     assert.equal(describeUntil(4 * 24 * 60), "in 4 days");
   });
 });
+
+test("occursOn keeps cancelled days out of current/next", async (t) => {
+  const blocks = [
+    { id: "b1", course_id: "c1", day_of_week: 1, start_time: "09:00", end_time: "10:00", room: null, type: "lecture" },
+    { id: "b2", course_id: "c1", day_of_week: 3, start_time: "09:00", end_time: "10:00", room: null, type: "lecture" },
+  ];
+  // Monday 09:30 — mid-class.
+  const now = { dayOfWeek: 1, minutes: 570 };
+
+  await t.test("without a predicate the Monday class is current", () => {
+    assert.equal(currentBlock(blocks, now)?.id, "b1");
+  });
+
+  await t.test("a suspended today has no current class", () => {
+    assert.equal(currentBlock(blocks, now, () => false), null);
+  });
+
+  await t.test("next skips days that do not run", () => {
+    // Only Wednesday (2 days ahead) survives.
+    const next = nextClass(blocks, now, (_b, daysAhead) => daysAhead === 2);
+    assert.equal(next?.block.id, "b2");
+    assert.equal(next?.daysAhead, 2);
+  });
+
+  await t.test("a full week off yields no next class rather than a guess", () => {
+    assert.equal(nextClass(blocks, now, () => false), null);
+  });
+});

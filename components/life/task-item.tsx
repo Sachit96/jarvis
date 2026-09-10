@@ -5,6 +5,7 @@ import { Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { deleteTaskAction, toggleTaskStatusAction } from "@/actions/life-actions";
+import { dueLabel, todayStr } from "@/lib/date";
 import type { Database } from "@/lib/supabase/database.types";
 
 type Task = Database["public"]["Tables"]["tasks"]["Row"];
@@ -67,8 +68,13 @@ export function TaskItem({ task }: { task: Task }) {
             {task.priority}
           </span>
           {task.due_date ? (
-            <span className="tabular text-caption text-foreground-tertiary">
-              {task.due_date}
+            <span
+              className={cn(
+                "text-caption",
+                task.due_date < todayStr() ? "text-danger" : "text-foreground-tertiary",
+              )}
+            >
+              {dueLabel(task.due_date)}
             </span>
           ) : null}
           {task.tags.map((tag) => (

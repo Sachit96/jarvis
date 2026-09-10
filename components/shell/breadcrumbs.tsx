@@ -11,7 +11,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { activeNavHref, SIDEBAR_ITEMS } from "@/lib/nav-items";
+import { activeNavHref, crumbHref, SIDEBAR_ITEMS } from "@/lib/nav-items";
 
 /**
  * Titles a segment the way the nav does wherever possible, so the trail and
@@ -37,6 +37,7 @@ function labelFor(segment: string, href: string, fullPath: string) {
   return segment.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+
 /**
  * Route-derived trail. Deliberately not configurable per page: a trail that
  * pages hand-write drifts out of sync with the routes it claims to describe,
@@ -46,7 +47,17 @@ function labelFor(segment: string, href: string, fullPath: string) {
  * a raw uuid in a breadcrumb is noise, and the page's own <h1> names the
  * record properly.
  */
-const ID_LIKE = /^[0-9a-f]{8}-[0-9a-f]{4}-/i;
+function isRecordId(segment: string): boolean {
+  // Long, hyphenated, and mostly hex. That covers canonical uuids and any
+  // prefixed variant of them, while real slugs fall out: "weekly-review"
+  // has only two groups, and no route slug in this app is 20 characters of
+  // hex-and-hyphens.
+  if (segment.length < 20) return false;
+  const parts = segment.split("-");
+  if (parts.length < 3) return false;
+  const hexGroups = parts.filter((part) => part.length > 0 && /^[0-9a-f]+$/i.test(part));
+  return hexGroups.length >= parts.length - 1;
+}
 
 export function Breadcrumbs() {
   const pathname = usePathname();
@@ -69,8 +80,12 @@ export function Breadcrumbs() {
       segment,
       href: `/${segments.slice(0, index + 1).join("/")}`,
     }))
-    .filter((crumb) => !ID_LIKE.test(crumb.segment))
-    .map((crumb) => ({ ...crumb, label: labelFor(crumb.segment, crumb.href, pathname) }))
+    .filter((crumb) => !isRecordId(crumb.segment))
+    .map((crumb) => ({
+      ...crumb,
+      label: labelFor(crumb.segment, crumb.href, pathname),
+      linkHref: crumbHref(crumb.href, SIDEBAR_ITEMS),
+    }))
     // Consecutive crumbs that resolve to the same words are one crumb.
     // /life/goals titled both segments "Goals" (the module lookup finds
     // "Goals" for /life, and the leaf is literally "goals"), so the trail
@@ -91,10 +106,10 @@ export function Breadcrumbs() {
             <Fragment key={crumb.href}>
               <BreadcrumbSeparator className="hidden sm:block" />
               <BreadcrumbItem>
-                {isLast ? (
+                {isLast || !crumb.linkHref ? (
                   <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
                 ) : (
-                  <BreadcrumbLink render={<Link href={crumb.href} />}>{crumb.label}</BreadcrumbLink>
+                  <BreadcrumbLink render={<Link href={crumb.linkHref} />}>{crumb.label}</BreadcrumbLink>
                 )}
               </BreadcrumbItem>
             </Fragment>

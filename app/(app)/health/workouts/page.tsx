@@ -9,10 +9,12 @@ import { WorkoutsList } from "@/components/health/workouts-list";
 import { HevySyncButton } from "@/components/health/hevy-sync-button";
 import { HevyAutoSync } from "@/components/health/hevy-auto-sync";
 import { WorkoutCalendar } from "@/components/health/workout-calendar";
+import { TrainingInsights } from "@/components/health/training-insights";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { HEALTH_TABS } from "@/lib/nav-items";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
+import { personalRecords, volumeByMuscleGroup } from "@/lib/health/training";
 
 export default async function WorkoutsPage() {
   await ensureDefaultExercisesAction();
@@ -35,6 +37,12 @@ export default async function WorkoutsPage() {
 
   const trainedDates = new Set(workouts.map((w) => w.started_at.slice(0, 10)));
 
+  // Derived from the sets already loaded above — no extra queries. These
+  // numbers have been sitting in the rows behind the session list since the
+  // module shipped with nothing reading them.
+  const records = personalRecords(sets, exercises, workouts);
+  const byGroup = volumeByMuscleGroup(sets, exercises);
+
   return (
     <div className="space-y-6">
       {connected ? <HevyAutoSync /> : null}
@@ -52,12 +60,14 @@ export default async function WorkoutsPage() {
 
       <ModuleTabs tabs={HEALTH_TABS} />
 
-      <div className="rounded-lg border border-border bg-card p-4">
+      <div className="surface p-4">
         <div className="mb-1 flex items-center justify-end">
           <HevySyncButton connected={connected} />
         </div>
         <WorkoutCalendar trainedDates={trainedDates} />
       </div>
+
+      <TrainingInsights records={records} byGroup={byGroup} />
 
       {workouts.length === 0 ? (
         <div className="surface">

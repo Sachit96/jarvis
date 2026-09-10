@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { deleteJournalEntryAction } from "@/actions/life-actions";
 import type { Database } from "@/lib/supabase/database.types";
+import { shortDate } from "@/lib/date";
 
 type JournalEntry = Database["public"]["Tables"]["journal_entries"]["Row"];
 
@@ -25,14 +26,14 @@ export function JournalEntryCard({ entry }: { entry: JournalEntry }) {
   return (
     <div
       className={cn(
-        "rounded-lg border border-border bg-card p-4 transition-opacity",
+        "surface p-4 transition-opacity",
         isPending && "opacity-70",
       )}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="tabular text-xs text-muted-foreground">{entry.entry_date}</span>
+            <span className="text-xs text-muted-foreground">{shortDate(entry.entry_date)}</span>
             <Badge variant="outline" className="text-[10px] uppercase">
               {entry.entry_type}
             </Badge>
