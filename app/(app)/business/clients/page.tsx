@@ -52,7 +52,7 @@ export default async function ClientsPage() {
           <EmptyState icon={Users} title="No clients yet" description="Move a deal to a won stage on the Pipeline board and the client will appear here." />
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid items-start gap-4 sm:grid-cols-2">
           {contacts.map((contact) => (
             <ContactCard
               key={contact.id}

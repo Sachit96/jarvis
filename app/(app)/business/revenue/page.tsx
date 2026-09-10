@@ -35,7 +35,7 @@ export default async function RevenuePage() {
           <EmptyState icon={Receipt} title="No contracts yet" description="Recurring revenue is calculated from active contracts. Add one once a client is signed." />
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid items-start gap-4 sm:grid-cols-2">
           {contracts.map((contract) => (
             <ContractCard key={contract.id} contract={contract} contact={contactById.get(contract.contact_id)} />
           ))}

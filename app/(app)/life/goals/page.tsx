@@ -42,7 +42,7 @@ export default async function GoalsPage() {
                 />
               </div>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid items-start gap-4 sm:grid-cols-2">
                 {sectionGoals.map((goal) => (
                   <GoalCard key={goal.id} goal={goal} />
                 ))}

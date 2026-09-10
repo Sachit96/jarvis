@@ -3,14 +3,28 @@
 import { Cell, Pie, PieChart, Tooltip } from "recharts";
 import { ChartFrame } from "@/components/shared/chart-frame";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, KanbanSquare } from "lucide-react";
+import { EmptyState } from "@/components/shared/empty-state";
 import { Card } from "@/components/ui/card";
 import type { Database } from "@/lib/supabase/database.types";
 
 type PipelineStage = Database["public"]["Tables"]["pipeline_stages"]["Row"];
 type Deal = Database["public"]["Tables"]["deals"]["Row"];
 
-const SLICE_COLORS = ["#8b5cf6", "#3b82f6", "#2dd4bf", "#f97316", "#ec4899", "#22c55e"];
+/**
+ * Chart slots in order (see --chart-* in globals.css), not six hard-coded
+ * hexes from before this palette existed. The donut was rendering violet,
+ * blue, teal, orange, pink and green — an entire second colour scheme on the
+ * Business dashboard, none of which appeared anywhere else in the product.
+ */
+const SLICE_COLORS = [
+  "var(--chart-1)",
+  "var(--chart-2)",
+  "var(--chart-3)",
+  "var(--chart-4)",
+  "var(--chart-5)",
+  "var(--chart-6)",
+];
 
 function money(n: number) {
   return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
@@ -49,12 +63,16 @@ export function PipelineDonutCard({ stages, deals }: { stages: PipelineStage[]; 
     <Card>
       <p className="eyebrow">Pipeline by Stage</p>
       {rows.every((r) => r.count === 0) ? (
-        <p className="mt-3 text-body text-muted-foreground">No deals yet.</p>
+        <EmptyState
+          icon={KanbanSquare}
+          title="No deals yet"
+          description="Deals you add will split by stage here, with the value sitting in each."
+        />
       ) : (
         <>
           {slices.length > 0 ? (
-            <div className="relative mt-2 h-40">
-              <ChartFrame height={160}>
+            <div className="relative mx-auto mt-3 h-44 w-full max-w-[16rem]">
+              <ChartFrame height={176}>
                 <PieChart>
                   <Pie data={slices} dataKey="value" nameKey="name" innerRadius="62%" outerRadius="90%" paddingAngle={2} stroke="var(--card)" strokeWidth={2}>
                     {slices.map((s, i) => (
@@ -65,15 +83,15 @@ export function PipelineDonutCard({ stages, deals }: { stages: PipelineStage[]; 
                 </PieChart>
               </ChartFrame>
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                <p className="tabular text-heading text-foreground">{money(total)}</p>
-                <p className="text-caption text-muted-foreground">total</p>
+                <p className="tabular font-display text-metric text-foreground">{money(total)}</p>
+                <p className="eyebrow mt-1">Total</p>
               </div>
             </div>
           ) : null}
           <ul className="mt-4 space-y-1.5">
             {rows.map((r, i) => (
               <li key={r.id} className="flex items-center justify-between text-caption">
-                <span className="flex items-center gap-1.5 text-muted-foreground">
+                <span className="flex items-center gap-2 text-foreground-tertiary">
                   <span className="h-2 w-2 rounded-full" style={{ backgroundColor: SLICE_COLORS[i % SLICE_COLORS.length] }} />
                   {r.name}
                 </span>

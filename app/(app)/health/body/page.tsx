@@ -24,7 +24,7 @@ export default async function BodyPage() {
 
       <ModuleTabs tabs={HEALTH_TABS} />
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid items-start gap-4 sm:grid-cols-2">
         <WeightTrendCard entries={bodyMetrics} />
         <SleepTrendCard entries={sleepLogs} />
       </div>

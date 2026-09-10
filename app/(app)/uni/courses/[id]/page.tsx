@@ -69,7 +69,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 items-start gap-4 md:grid-cols-4">
         <StatTile
           label="Current Grade"
           value={assessments.length === 0 ? "No assessments recorded" : grade != null ? `${grade.toFixed(1)}%` : "—"}
@@ -92,7 +92,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
         <StatTile label="Best / Worst Case" value={assessments.length === 0 ? "—" : `${best.toFixed(0)}% / ${worst.toFixed(0)}%`} />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid items-start gap-4 lg:grid-cols-2">
         <Card>
           <div className="flex items-center justify-between">
             <p className="eyebrow">Schedule</p>

@@ -26,7 +26,7 @@ export default async function AccountsPage() {
           <EmptyState icon={Wallet} value="$0" title="No accounts connected" description="Connect an account above to begin tracking net worth and cash flow." />
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid items-start gap-4 sm:grid-cols-2">
           {accounts.map((account) => (
             <AccountCard key={account.id} account={account} />
           ))}

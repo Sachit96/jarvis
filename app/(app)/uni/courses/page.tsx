@@ -36,7 +36,7 @@ export default async function UniCoursesPage() {
         Array.from(byTerm.entries()).map(([term, termCourses]) => (
           <div key={term} className="space-y-3">
             <h2 className="text-sm font-semibold text-muted-foreground">{term}</h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {termCourses.map((course) => (
                 <CourseCard
                   key={course.id}

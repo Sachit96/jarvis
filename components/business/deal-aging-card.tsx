@@ -1,5 +1,7 @@
+import { Hourglass } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import type { Database } from "@/lib/supabase/database.types";
+import { EmptyState } from "@/components/shared/empty-state";
 
 type Deal = Database["public"]["Tables"]["deals"]["Row"];
 
@@ -43,17 +45,21 @@ export function DealAgingCard({ openDealCount, buckets }: { openDealCount: numbe
   return (
     <Card>
       <p className="eyebrow">Deal Aging</p>
-      <p className="mt-0.5 text-caption text-muted-foreground">How long open deals have sat since creation.</p>
+      <p className="mt-1 text-caption text-foreground-tertiary">How long open deals have sat since creation.</p>
       {openDealCount === 0 ? (
-        <p className="mt-3 text-body text-muted-foreground">No open deals right now.</p>
+        <EmptyState
+          icon={Hourglass}
+          title="Nothing open"
+          description="Every deal is closed. Open deals show here with how long they have been sitting."
+        />
       ) : (
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {buckets.map((b) => (
             <div key={b.label}>
-              <p className={`tabular text-heading font-bold ${b.label === "30+ days" && b.count > 0 ? "text-danger" : "text-foreground"}`}>
+              <p className={`tabular font-display text-metric ${b.label === "30+ days" && b.count > 0 ? "text-danger" : "text-foreground"}`}>
                 {b.count}
               </p>
-              <p className="text-caption text-muted-foreground">{b.label}</p>
+              <p className="mt-1.5 text-caption text-foreground-tertiary">{b.label}</p>
               {b.count > 0 ? <p className="mt-0.5 tabular text-caption text-muted-foreground">{money(b.value)}</p> : null}
             </div>
           ))}

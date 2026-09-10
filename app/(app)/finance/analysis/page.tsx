@@ -30,7 +30,7 @@ export default async function MarketAnalysisPage() {
           <EmptyState icon={LineChart} title="No analyses yet" description="Add a pair above to keep a running read on the setups you are watching." />
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid items-start gap-4 sm:grid-cols-2">
           {analyses.map((analysis) => (
             <MarketAnalysisCard key={analysis.id} analysis={analysis} />
           ))}

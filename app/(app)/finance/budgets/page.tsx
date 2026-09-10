@@ -35,7 +35,7 @@ export default async function BudgetsPage() {
           <EmptyState icon={PiggyBank} title="No budgets set" description="Set a monthly cap for a category and this month\u2019s spend will track against it." />
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid items-start gap-4 sm:grid-cols-2">
           {budgets.map((budget) => (
             <BudgetBar
               key={budget.id}

@@ -69,7 +69,7 @@ export default async function BusinessDashboardPage() {
 
       <ModuleTabs tabs={BUSINESS_TABS} />
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 items-start gap-4 md:grid-cols-4">
         <StatTile
           label="Open Pipeline"
           primary

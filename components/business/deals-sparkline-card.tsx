@@ -17,7 +17,12 @@ export function DealsSparklineCard({ points }: { points: Point[] }) {
   return (
     <Card>
       <p className="eyebrow">New Deals</p>
-      <p className="mt-0.5 text-caption text-muted-foreground">{total} in the last 14 days</p>
+      <p className="mt-1 text-caption text-foreground-tertiary">{total} in the last 14 days</p>
+      {total === 0 ? (
+        <p className="mt-4 text-body text-foreground-tertiary">
+          Nothing new in this window. New deals appear here as they are created.
+        </p>
+      ) : (
       <div className="mt-3 h-20">
         <ChartFrame height={80}>
           <BarChart data={recent} barCategoryGap="20%">
@@ -25,6 +30,7 @@ export function DealsSparklineCard({ points }: { points: Point[] }) {
           </BarChart>
         </ChartFrame>
       </div>
+      )}
     </Card>
   );
 }
