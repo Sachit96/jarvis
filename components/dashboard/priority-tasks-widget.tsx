@@ -1,7 +1,9 @@
+import { ListChecks } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import type { Database } from "@/lib/supabase/database.types";
+import { EmptyState } from "@/components/shared/empty-state";
 
 type Task = Database["public"]["Tables"]["tasks"]["Row"];
 
@@ -22,7 +24,12 @@ export function PriorityTasksWidget({ tasks, compact = false, className }: { tas
       </header>
       <div className="flex min-h-0 flex-1 flex-col">
         {tasks.length === 0 ? (
-          <p className="text-[13px] text-muted-foreground">Nothing outstanding — nice.</p>
+          <EmptyState
+            compact
+            icon={ListChecks}
+            title="All clear"
+            description="Nothing overdue and nothing due today."
+          />
         ) : (
           <ul className="-mx-2">
             {tasks.map((task) => (

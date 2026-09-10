@@ -17,6 +17,13 @@ interface EmptyStateProps {
    * reaches for is inventing activity to fill the space.
    */
   value?: ReactNode;
+  /**
+   * Trims the padding for an empty state living inside a dashboard card
+   * rather than standing in for a whole page. Same anatomy, less air —
+   * a full-page empty state's whitespace inside a 200px card just pushes
+   * the copy off the bottom.
+   */
+  compact?: boolean;
   className?: string;
 }
 
@@ -28,18 +35,36 @@ interface EmptyStateProps {
  * ringed icon that echoes the radar motif. Keep titles short and specific to
  * the thing that is missing ("No trades logged yet" beats "No data").
  */
-export function EmptyState({ title, description, icon: Icon, action, value, className }: EmptyStateProps) {
+export function EmptyState({
+  title,
+  description,
+  icon: Icon,
+  action,
+  value,
+  compact = false,
+  className,
+}: EmptyStateProps) {
   return (
-    <div className={cn("flex flex-col items-center gap-3 px-6 py-12 text-center", className)}>
+    <div
+      className={cn(
+        "flex flex-col items-center text-center",
+        compact ? "gap-2 px-4 py-6" : "gap-3 px-6 py-12",
+        className,
+      )}
+    >
       {Icon ? (
         <span
           aria-hidden
-          className="relative flex size-11 items-center justify-center rounded-full bg-white/[0.03] text-foreground-tertiary shadow-[inset_0_1px_0_0_rgb(255_255_255/0.06),0_0_0_1px_var(--border)]"
+          className={cn(
+            "relative flex items-center justify-center rounded-full bg-white/[0.03] text-foreground-tertiary",
+            "shadow-[inset_0_1px_0_0_rgb(255_255_255/0.06),0_0_0_1px_var(--border)]",
+            compact ? "size-9" : "size-11",
+          )}
         >
           {/* The one accent: a brand-tinted ring, echoing the radar rings
               without drawing a whole radar into every empty panel. */}
           <span className="absolute inset-[-5px] rounded-full border border-[color-mix(in_oklab,var(--brand)_28%,transparent)]" />
-          <Icon className="size-[18px]" strokeWidth={1.5} />
+          <Icon className={compact ? "size-4" : "size-[18px]"} strokeWidth={1.5} />
         </span>
       ) : null}
 

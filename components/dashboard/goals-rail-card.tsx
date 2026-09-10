@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { Database } from "@/lib/supabase/database.types";
+import { EmptyState } from "@/components/shared/empty-state";
 
 type Goal = Database["public"]["Tables"]["goals"]["Row"];
 
@@ -34,7 +35,12 @@ export function GoalsRailCard({ goals, className }: { goals: Goal[]; className?:
       </header>
       <div className="flex min-h-0 flex-1 flex-col">
         {active.length === 0 ? (
-          <p className="text-[13px] text-muted-foreground">No active goals.</p>
+          <EmptyState
+            compact
+            icon={Target}
+            title="No objectives"
+            description="Set a goal and its progress tracks here."
+          />
         ) : noneStarted ? (
           <div className="flex items-center gap-2.5 text-[13px] text-muted-foreground">
             <Target className="h-4 w-4 shrink-0 text-muted-foreground/70" strokeWidth={1.75} />

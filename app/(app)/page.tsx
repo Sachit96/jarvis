@@ -283,8 +283,11 @@ export default async function DashboardPage() {
           rows={[
             { label: "Assets", value: money(financeTotals.assets) },
             { label: "Liabilities", value: money(financeTotals.liabilities), tone: financeTotals.liabilities > 0 ? "danger" : "neutral" },
-            { label: "Income (mo)", value: money(pnl.income), tone: "success" },
-            { label: "Expenses (mo)", value: money(pnl.expense), tone: "danger" },
+            // Tone only when there is something to tone. A green $0 income
+            // and a red $0 expense on a first-run dashboard dress an absence
+            // up as a reading.
+            { label: "Income (mo)", value: money(pnl.income), tone: pnl.income > 0 ? "success" : "neutral" },
+            { label: "Expenses (mo)", value: money(pnl.expense), tone: pnl.expense > 0 ? "danger" : "neutral" },
           ]}
           footerLabel="Finance Overview"
           footerHref="/finance/overview"

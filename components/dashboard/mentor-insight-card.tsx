@@ -3,6 +3,7 @@ import { Sparkles, Circle, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { MentorBriefSections } from "@/components/mentor/mentor-brief-sections";
+import { EmptyState } from "@/components/shared/empty-state";
 
 export function MentorInsightCard({
   markdownBody,
@@ -49,12 +50,15 @@ export function MentorInsightCard({
               </ul>
             ) : null}
           </>
-        ) : fill ? (
-          <div className="flex min-h-0 flex-1 flex-col items-center justify-center text-center">
-            <p className="max-w-[280px] text-[13px] text-muted-foreground">No brief yet today — ask your mentor to have a look.</p>
-          </div>
         ) : (
-          <p className="text-[13px] text-muted-foreground">No brief yet today — ask your mentor to have a look.</p>
+          // One empty state, not two near-identical ones behind a `fill`
+          // branch that only changed how the same sentence was centred.
+          <EmptyState
+            compact
+            icon={Sparkles}
+            title="No brief yet"
+            description="Generate today's brief and its focus areas appear here."
+          />
         )}
         <Link
           href="/mentor"

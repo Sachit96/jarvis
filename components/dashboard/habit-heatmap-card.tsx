@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { ArrowRight, Flame } from "lucide-react";
+import { ArrowRight, Flame, Repeat } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { computeStreak } from "@/lib/db/queries/life";
 import type { Database } from "@/lib/supabase/database.types";
+import { EmptyState } from "@/components/shared/empty-state";
 
 type Habit = Database["public"]["Tables"]["habits"]["Row"];
 
@@ -40,7 +41,12 @@ export function HabitHeatmapCard({
         </Link>
       </header>
       {visibleHabits.length === 0 ? (
-        <p className="text-[13px] text-muted-foreground">No active habits yet.</p>
+        <EmptyState
+          compact
+          icon={Repeat}
+          title="No routine yet"
+          description="Twelve weeks of history will build here once you have habits to track."
+        />
       ) : (
         <div className="min-w-[480px] space-y-2">
           {visibleHabits.map((habit) => {

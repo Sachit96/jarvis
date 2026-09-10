@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { Briefcase, HeartPulse, DollarSign, TrendingUp, CheckCircle2 } from "lucide-react";
+import { Activity, Briefcase, HeartPulse, DollarSign, TrendingUp, CheckCircle2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { categoryForHref, type Category } from "@/lib/category-colors";
 import { IconChip } from "@/components/shared/icon-chip";
 import type { ActivityFeedItem } from "@/lib/db/queries/command-center";
+import { EmptyState } from "@/components/shared/empty-state";
 
 const CATEGORY_ICON: Record<Category, LucideIcon> = {
   business: Briefcase,
@@ -40,10 +41,12 @@ export function RecentActivityCard({ items, compact = false, className }: { item
         ) : null}
       </header>
       {items.length === 0 ? (
-        <div className="flex min-h-0 flex-1 flex-col items-center justify-center text-center">
-          <p className="max-w-[280px] text-[13px] text-foreground">Nothing logged yet.</p>
-          <p className="mt-1 max-w-[280px] text-[13px] text-muted-foreground">Activity from every module shows up here.</p>
-        </div>
+        <EmptyState
+          compact
+          icon={Activity}
+          title="Nothing logged"
+          description="Activity from every module shows up here as it happens."
+        />
       ) : (
         <ul className="-mx-2 min-h-0 flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {items.map((item) => {

@@ -161,7 +161,7 @@ export default async function UniDashboardPage() {
                         <li key={b.id} className="flex items-center gap-2.5 py-2.5 text-body">
                           <span
                             className="size-2 shrink-0 rounded-full"
-                            style={{ backgroundColor: course?.color ?? "var(--cat-business)" }}
+                            style={{ backgroundColor: course?.color ?? "var(--brand)" }}
                           />
                           <span className="tabular shrink-0 text-caption text-muted-foreground">
                             {b.start_time.slice(0, 5)}
@@ -227,7 +227,7 @@ export default async function UniDashboardPage() {
                       <div className="flex min-w-0 items-center gap-2">
                         <span
                           className="size-2 shrink-0 rounded-full"
-                          style={{ backgroundColor: c.color ?? "var(--cat-business)" }}
+                          style={{ backgroundColor: c.color ?? "var(--brand)" }}
                         />
                         <span className="truncate text-body font-medium">{c.code}</span>
                       </div>

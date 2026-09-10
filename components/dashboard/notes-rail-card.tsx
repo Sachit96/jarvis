@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, BrainCircuit } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { timeAgo } from "@/lib/time";
 import { MemoryTypeBadge } from "@/components/memory/memory-type-badge";
 import type { MemoryEntry } from "@/lib/db/queries/memory";
 import type { MemoryType } from "@/lib/validations/memory";
+import { EmptyState } from "@/components/shared/empty-state";
 
 /** Column 1, second card — most recently updated memory entries. */
 export function NotesRailCard({ entries, className }: { entries: MemoryEntry[]; className?: string }) {
@@ -18,7 +19,12 @@ export function NotesRailCard({ entries, className }: { entries: MemoryEntry[]; 
       </header>
       <div className="flex min-h-0 flex-1 flex-col">
         {recent.length === 0 ? (
-          <p className="text-[13px] text-muted-foreground">No memories saved yet.</p>
+          <EmptyState
+            compact
+            icon={BrainCircuit}
+            title="Nothing remembered"
+            description="What you tell JARVIS to remember shows up here."
+          />
         ) : (
           <ul className="space-y-2.5">
             {recent.map((entry) => (

@@ -69,7 +69,7 @@ export function SpendByCategoryChart({ spendByCategory }: { spendByCategory: Map
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
                     <div
-                      className="h-full rounded-full bg-cat-finance"
+                      className="gradient-brand h-full rounded-full"
                       style={{ width: `${max > 0 ? Math.max((row.amount / max) * 100, 2) : 0}%` }}
                     />
                   </div>

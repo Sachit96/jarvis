@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Target, ListChecks, ArrowRight } from "lucide-react";
+import { ArrowRight, CalendarClock, ListChecks, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { IconChip } from "@/components/shared/icon-chip";
 import type { UpcomingItem } from "@/lib/db/queries/command-center";
+import { EmptyState } from "@/components/shared/empty-state";
 
 function formatDate(iso: string) {
   const d = new Date(iso + "T00:00:00");
@@ -28,7 +29,12 @@ export function UpcomingCard({ items, compact = false, className }: { items: Upc
       </header>
       <div className="flex min-h-0 flex-1 flex-col">
         {items.length === 0 ? (
-          <p className="text-[13px] text-muted-foreground">Nothing on the horizon — you&apos;re caught up.</p>
+          <EmptyState
+            compact
+            icon={CalendarClock}
+            title="Caught up"
+            description="Nothing due in the next few days."
+          />
         ) : (
           <ul className="-mx-2">
             {items.map((item) => {
