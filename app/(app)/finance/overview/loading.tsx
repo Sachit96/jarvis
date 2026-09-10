@@ -9,7 +9,7 @@ export default function FinanceOverviewLoading() {
       </div>
       <Skeleton className="h-8 w-72 rounded-lg" />
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         <Skeleton className="col-span-3 h-24 rounded-2xl sm:col-span-1" />
         <Skeleton className="h-24 rounded-2xl" />
         <Skeleton className="h-24 rounded-2xl" />

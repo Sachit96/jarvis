@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getContacts, getAllActivities, getAllOnboardingTasks } from "@/lib/db/queries/business";
 import { ensureOnboardingTasksAction } from "@/actions/business-actions";
 import { ContactCard } from "@/components/business/contact-card";
-import { StatTile } from "@/components/shared/stat-tile";
+import { KpiCell, KpiGrid } from "@/components/shared/kpi-grid";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { BUSINESS_TABS } from "@/lib/nav-items";
 import { PageHeader } from "@/components/shared/page-header";
@@ -40,11 +40,19 @@ export default async function ClientsPage() {
       <ModuleTabs tabs={BUSINESS_TABS} />
 
       {contacts.length > 0 ? (
-        <div className="grid grid-cols-3 gap-4">
-          <StatTile label="Total Clients" value={String(contacts.length)} icon={Users} />
-          <StatTile label="Manual" value={String(contacts.filter((c) => c.source === "manual").length)} icon={UserPlus} />
-          <StatTile label="From Lead Research" value={String(contacts.filter((c) => c.source === "research_agent").length)} icon={Search} />
-        </div>
+        <KpiGrid columns={3}>
+          <KpiCell label="Total clients" value={contacts.length} icon={Users} primary />
+          <KpiCell
+            label="Added by hand"
+            value={contacts.filter((c) => c.source === "manual").length}
+            icon={UserPlus}
+          />
+          <KpiCell
+            label="From lead research"
+            value={contacts.filter((c) => c.source === "research_agent").length}
+            icon={Search}
+          />
+        </KpiGrid>
       ) : null}
 
       {contacts.length === 0 ? (
