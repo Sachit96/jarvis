@@ -3,11 +3,33 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { generateFlashcards } from "@/lib/ai/providers/gemini-uni-parser";
-import { getFlashcards } from "@/lib/db/queries/uni";
+import { getCourses, getFlashcards, getDueFlashcards, getMaterialsForCourses } from "@/lib/db/queries/uni";
 
 export async function getFlashcardsForMaterialAction(materialId: string) {
   const supabase = await createClient();
   return getFlashcards(supabase, materialId);
+}
+
+/**
+ * Every card due for review, across every course.
+ *
+ * The spaced-repetition schedule has always been written — reviewing a card
+ * pushes next_review out — but nothing ever read it back, so a card fell due
+ * and simply sat there. Studying was per-material and by memory, which is
+ * the one thing spaced repetition exists to remove.
+ */
+export async function getDueFlashcardsAction() {
+  const supabase = await createClient();
+  const courses = await getCourses(supabase);
+  const materials = await getMaterialsForCourses(supabase, courses.map((c) => c.id));
+  const cards = await getDueFlashcards(supabase, materials.map((m) => m.id));
+
+  const courseByMaterial = new Map(materials.map((m) => [m.id, m.course_id]));
+  const courseById = new Map(courses.map((c) => [c.id, c]));
+  return cards.map((card) => {
+    const course = courseById.get(courseByMaterial.get(card.material_id) ?? "");
+    return { ...card, courseCode: course?.code ?? null, courseColor: course?.color ?? null };
+  });
 }
 
 export async function generateFlashcardsAction(materialId: string, courseId: string): Promise<{ ok: boolean; error?: string; count?: number }> {

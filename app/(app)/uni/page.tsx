@@ -16,12 +16,13 @@ import { RiskChip } from "@/components/uni/risk-chip";
 import { PlanTonight } from "@/components/uni/plan-tonight";
 import { TermOverview } from "@/components/uni/term-overview";
 import { StudySessionsCard, type StudySessionRow } from "@/components/uni/study-sessions-card";
+import { DueFlashcardsCard } from "@/components/uni/due-flashcards-card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { UNI_TABS } from "@/lib/nav-items";
 import { cn } from "@/lib/utils";
-import { PageHeader } from "@/components/shared/page-header";
+import { PageHeader, SectionHeader } from "@/components/shared/page-header";
 
 export default async function UniDashboardPage() {
   const supabase = await createClient();
@@ -240,10 +241,14 @@ export default async function UniDashboardPage() {
           <div className="space-y-4">
             <PlanTonight assessmentCourseIds={Object.fromEntries(assessments.map((a) => [a.id, a.course_id]))} />
             <StudySessionsCard sessions={studySessionRows} />
+            {/* The other half of the same loop: reviewing a flashcard has
+                always pushed its next_review out, and nothing ever read that
+                schedule back. */}
+            <DueFlashcardsCard />
           </div>
 
           <div className="space-y-3">
-            <h2 className="text-heading text-muted-foreground">Courses</h2>
+            <SectionHeader title="Courses" />
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {coursesWithGrades.map((c) => (
                 <Link
