@@ -53,3 +53,4 @@ operator-live-report.json
 
 # Rendered visual QA output (screenshots + reports) — never committed
 .ui-qa/
+.ui-qa-empty/

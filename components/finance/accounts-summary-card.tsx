@@ -3,6 +3,7 @@ import { ArrowRight, Wallet } from "lucide-react";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { Database } from "@/lib/supabase/database.types";
+import { EmptyState } from "@/components/shared/empty-state";
 
 type Account = Database["public"]["Tables"]["accounts"]["Row"];
 
@@ -40,13 +41,20 @@ export function AccountsSummaryCard({ accounts }: { accounts: Account[] }) {
 
       <CardContent>
         {accounts.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 py-8 text-center">
-            <Wallet className="size-5 text-muted-foreground" strokeWidth={1.75} />
-            <p className="text-body text-muted-foreground">No accounts yet.</p>
-            <Link href="/finance/accounts" className="text-body font-medium text-brand hover:underline">
-              Add one →
-            </Link>
-          </div>
+          <EmptyState
+            icon={Wallet}
+            value="$0"
+            title="No accounts connected"
+            description="Connect a financial account to begin tracking net worth."
+            action={
+              <Link
+                href="/finance/accounts"
+                className="inline-flex items-center gap-1 text-body font-medium text-brand hover:underline"
+              >
+                Add one →
+              </Link>
+            }
+          />
         ) : (
           <ul className="-my-1 divide-y divide-border">
             {accounts.map((account) => {

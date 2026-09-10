@@ -308,6 +308,36 @@
   .press:active {
     transform: scale(0.98);
   }
+
+  /* Entrance: a short rise and fade, on the app's one easing curve.
+     `both` so the element is already at its start state before the first
+     frame — without it there is a flash of the final position.
+
+     The comment above this block has referred to a `.rise` utility since
+     the design system landed; it was never actually defined, so every
+     "entrance animation" in the app was a class that did nothing. Reserved
+     for the one or two elements per page that should announce themselves —
+     §19 is explicit that animating every component is the failure mode. */
+  .rise {
+    animation: rise-in 420ms var(--ease-jarvis) both;
+  }
+  .rise-delay-1 {
+    animation-delay: 60ms;
+  }
+  .rise-delay-2 {
+    animation-delay: 120ms;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* Anyone with reduce-motion set gets it fully respected, not just on the
@@ -568,7 +598,8 @@
 @media (prefers-reduced-motion: reduce) {
   .aurora-orb,
   .radar-sweep::after,
-  .btn-pulse {
+  .btn-pulse,
+  .rise {
     animation: none;
   }
 }

@@ -193,14 +193,18 @@ export default async function DashboardPage() {
         title="Today"
       />
 
-      {/* The page's answer, and the only lit panel on it. */}
-      <JarvisPriorityCard priority={priority} runnersUp={ranked.slice(1, 3)} />
+      {/* The page's answer, and the only lit panel on it. It and the KPI
+          block are the only two things on Home that animate in — §19's
+          "selectively", meant literally. */}
+      <div className="rise">
+        <JarvisPriorityCard priority={priority} runnersUp={ranked.slice(1, 3)} />
+      </div>
 
       {/* One fused block. These four are always read as a set, and four
           separate outlines at the top of a dashboard is most of what makes
           one look busy. Goal completion is the figure that dropped:
           LifeScoreCard and the goals rail both already carry it. */}
-      <KpiGrid columns={4}>
+      <KpiGrid columns={4} className="rise rise-delay-1">
         <KpiCell
           label="Net worth"
           icon={Wallet}
