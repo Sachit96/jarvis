@@ -102,34 +102,40 @@ const clickSelector = argOf("click", "").trim() || null;
  * person reads, so the files are named the way a person would name them.
  */
 const naming = argOf("naming", "default");
+/**
+ * Audit filenames. Each one names its ROUTE, not its module — "business" and
+ * "finance" were ambiguous once each module gained a landing page alongside
+ * its tabs, so a reader could not tell whether business-desktop.png was the
+ * dashboard or the module as a whole.
+ */
 const PAGE_NAMES = {
   "/": "home",
-  "/business/dashboard": "business",
+  "/business/dashboard": "business-dashboard",
   "/business/leads": "business-leads",
   "/business/pipeline": "business-pipeline",
   "/business/clients": "business-clients",
   "/business/revenue": "business-revenue",
-  "/finance/overview": "finance",
+  "/finance/overview": "finance-overview",
   "/finance/transactions": "finance-transactions",
   "/finance/accounts": "finance-accounts",
   "/finance/budgets": "finance-budgets",
   "/finance/trades": "finance-trades",
   "/finance/analysis": "finance-analysis",
-  "/health/workouts": "health",
+  "/health/workouts": "health-workouts",
   "/health/nutrition": "health-nutrition",
   "/health/body": "health-body",
   "/life/goals": "goals",
   "/life/tasks": "tasks",
-  "/life/habits": "tasks-routine",
-  "/life/journal": "tasks-journal",
-  "/uni": "university",
+  "/life/habits": "routine",
+  "/life/journal": "journal",
+  "/uni": "university-dashboard",
   "/uni/courses": "university-courses",
   "/uni/timetable": "university-timetable",
   "/uni/attendance": "university-attendance",
   "/uni/calendar": "university-calendar",
   "/uni/assessments": "university-assessments",
   "/uni/deadlines": "university-deadlines",
-  "/mentor": "mentor",
+  "/mentor": "mentor-today",
   "/mentor/weekly-review": "mentor-weekly-review",
   "/voice": "voice",
   "/youtube": "youtube",
@@ -237,6 +243,91 @@ async function assertPortFree(port) {
     probe.once("listening", () => probe.close(() => resolve()));
     probe.listen(port, "127.0.0.1");
   });
+}
+
+/**
+ * The audit manifest: one row per ROUTE carrying both viewports, rather than
+ * the flat route×viewport list the run produces internally.
+ *
+ * A person opening this wants to answer "did /uni/calendar render, and which
+ * two files show it" — which the flat form makes them do by scanning for two
+ * separate entries. The per-viewport detail is kept nested underneath, so
+ * nothing is lost.
+ *
+ * `pass` is deliberately strict: HTTP 200, no thrown error, no horizontal
+ * overflow, hydrated, no page error, and every chart sized. A screenshot that
+ * exists is not the same as a page that rendered.
+ */
+function buildReport(entries) {
+  const byRoute = new Map();
+  for (const e of entries) {
+    if (!byRoute.has(e.route)) byRoute.set(e.route, []);
+    byRoute.get(e.route).push(e);
+  }
+
+  // Network noise that is the sandbox, not the app: the webfont CDN is behind
+  // a TLS-inspecting proxy here, and Next aborts its own route prefetches on
+  // navigation. Neither is a render failure.
+  const isEnvironmental = (line) =>
+    line.includes("fontshare.com") ||
+    line.includes("ERR_CERT_AUTHORITY_INVALID") ||
+    line.includes("ERR_ABORTED");
+
+  const viewportOf = (e) => ({
+    file: e.file.split("/").pop(),
+    viewport: `${VIEWPORTS[e.viewport].width}x${VIEWPORTS[e.viewport].height}`,
+    status: e.status ?? null,
+    hydrated: e.probe?.hydrated ?? null,
+    horizontalOverflow: e.probe?.horizontalOverflow ?? null,
+    chartsSized: e.chartsNeverSized ? false : true,
+    pageErrors: (e.consoleErrors ?? []).filter((l) => l.startsWith("pageerror:")),
+    failedRequests: (e.failedRequests ?? []).filter((l) => !isEnvironmental(l)),
+    error: e.error ?? null,
+    render: renderStatus(e, isEnvironmental),
+  });
+
+  const routes = [...byRoute.entries()].map(([route, list]) => {
+    const desktop = list.find((e) => e.viewport === "desktop");
+    const mobile = list.find((e) => e.viewport === "mobile");
+    const row = {
+      route,
+      page: PAGE_NAMES[route] ?? route,
+      desktop: desktop ? viewportOf(desktop) : null,
+      mobile: mobile ? viewportOf(mobile) : null,
+    };
+    row.pass = (!row.desktop || row.desktop.render === "pass") && (!row.mobile || row.mobile.render === "pass");
+    return row;
+  });
+
+  return {
+    generatedAt: new Date().toISOString(),
+    scenario,
+    mode,
+    viewports: Object.fromEntries(
+      viewportNames.map((v) => [v, `${VIEWPORTS[v].width}x${VIEWPORTS[v].height}`]),
+    ),
+    summary: {
+      routes: routes.length,
+      screenshots: routes.reduce((n, r) => n + (r.desktop ? 1 : 0) + (r.mobile ? 1 : 0), 0),
+      passed: routes.filter((r) => r.pass).length,
+      failed: routes.filter((r) => !r.pass).length,
+    },
+    routes,
+  };
+}
+
+/** "pass", or the first reason it is not. */
+function renderStatus(entry, isEnvironmental) {
+  if (entry.error) return `error: ${entry.error.slice(0, 80)}`;
+  if (entry.status !== 200) return `http ${entry.status}`;
+  if (entry.probe?.hydrated === false) return "not hydrated";
+  if (entry.probe?.horizontalOverflow > 0) return `overflow ${entry.probe.horizontalOverflow}px`;
+  if (entry.chartsNeverSized) return "charts never sized";
+  const pageErrors = (entry.consoleErrors ?? []).filter((l) => l.startsWith("pageerror:"));
+  if (pageErrors.length) return `page error: ${pageErrors[0].slice(11, 80)}`;
+  const failed = (entry.failedRequests ?? []).filter((l) => !isEnvironmental(l));
+  if (failed.length) return `failed request: ${failed[0].slice(0, 70)}`;
+  return "pass";
 }
 
 async function main() {
@@ -392,8 +483,13 @@ async function main() {
   }
 
   await browser.close();
-  writeFileSync(`${outDir}/report.json`, JSON.stringify(report, null, 2));
-  writeFileSync(`${outDir}/dev.log`, devLog);
+
+  // dev.log only when the run is being debugged. In `--naming audit` the
+  // output directory is a committed deliverable, and a harness log sitting
+  // beside the screenshots is noise in the diff of every audit.
+  if (naming !== "audit") writeFileSync(`${outDir}/dev.log`, devLog);
+
+  writeFileSync(`${outDir}/report.json`, JSON.stringify(buildReport(report), null, 2), "utf8");
   console.log(`[qa] wrote ${outDir}/report.json`);
   cleanup();
   process.exit(0);
