@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getDeal, getContact, getPipelineStages, getDealTasks, getActivitiesForDeal } from "@/lib/db/queries/business";
 import { getBacklinks } from "@/lib/obsidian/wikilinks";
@@ -9,6 +8,9 @@ import { DealNotesEditor } from "@/components/business/deal-notes-editor";
 import { ActivityForm } from "@/components/business/activity-form";
 import { ActivityItem } from "@/components/business/activity-item";
 import { Backlinks } from "@/components/shared/backlinks";
+import { BackLink } from "@/components/shared/back-link";
+import { PageHeader } from "@/components/shared/page-header";
+import { DealTasksCard } from "@/components/business/deal-tasks-card";
 
 export default async function DealDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -26,33 +28,38 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
 
   return (
     <div className="space-y-6">
-      <Link href="/business/pipeline" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-3.5 w-3.5" /> Pipeline
-      </Link>
+      <BackLink href="/business/pipeline" label="Pipeline" />
 
-      <div>
-        <h1 className="text-display">{deal.title || "Untitled deal"}</h1>
-        {contact ? (
-          <Link href={`/business/clients/${contact.id}`} className="text-sm text-muted-foreground hover:underline">
-            {contact.company_name || contact.contact_person}
-          </Link>
-        ) : null}
-      </div>
+      <PageHeader
+        eyebrow="Deal"
+        title={deal.title || "Untitled deal"}
+        description={
+          contact ? (
+            <Link href={`/business/clients/${contact.id}`} className="hover:text-foreground hover:underline">
+              {contact.company_name || contact.contact_person}
+            </Link>
+          ) : undefined
+        }
+      />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.3fr]">
         <div className="space-y-6">
           <DealCard deal={deal} contact={contact ?? undefined} stages={stages} tasks={tasks} />
 
-          <div className="rounded-lg border border-border bg-card p-4">
+          {/* The board card no longer carries its own task list, so this is
+              where the "N open" counter on the board actually leads. */}
+          <DealTasksCard dealId={deal.id} tasks={tasks} />
+
+          <div className="surface p-4">
             <DealNotesEditor dealId={deal.id} notes={deal.notes} />
           </div>
 
-          <div className="rounded-lg border border-border bg-card p-4">
+          <div className="surface p-4">
             <Backlinks backlinks={backlinks} />
           </div>
         </div>
 
-        <div className="rounded-lg border border-border bg-card p-4">
+        <div className="surface p-4">
           <p className="eyebrow">Activity</p>
           <div className="mt-2">
             <ActivityForm contactId={deal.contact_id} dealId={deal.id} />
@@ -64,7 +71,7 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
               ))}
             </ul>
           ) : (
-            <p className="mt-3 text-sm text-muted-foreground">No activity logged against this deal yet.</p>
+            <p className="mt-3 text-body text-foreground-tertiary">No activity logged against this deal yet.</p>
           )}
         </div>
       </div>

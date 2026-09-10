@@ -32,7 +32,7 @@ export function ContractCard({ contract, contact }: { contract: Contract; contac
   const [isPending, startTransition] = useTransition();
 
   return (
-    <div className={cn("rounded-lg border border-border bg-card p-4", isPending && "opacity-60")}>
+    <div className={cn("surface p-4", isPending && "opacity-60")}>
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="truncate text-sm font-medium">{contract.title}</p>

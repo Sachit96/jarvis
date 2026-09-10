@@ -54,3 +54,7 @@ operator-live-report.json
 # Rendered visual QA output (screenshots + reports) — never committed
 .ui-qa/
 .ui-qa-empty/
+
+# Rendered UI audit screenshots ARE a deliverable and are committed;
+# only the scratch QA runs above are ignored.
+!artifacts/ui-audit/

@@ -1,0 +1,2423 @@
+[
+  {
+    "route": "/",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/home-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Today",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=5CB68i4pnAekjehf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/habits?_rsc=5CB68i4pnAekjehf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=5CB68i4pnAekjehf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=5CB68i4pnAekjehf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=5CB68i4pnAekjehf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=5CB68i4pnAekjehf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=5CB68i4pnAekjehf"
+    ]
+  },
+  {
+    "route": "/business/dashboard",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/business-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Dashboard",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=o3_12enZ8Cf_4Nei",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=o3_12enZ8Cf_4Nei",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=o3_12enZ8Cf_4Nei",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline?_rsc=o3_12enZ8Cf_4Nei",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/revenue?_rsc=o3_12enZ8Cf_4Nei",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=o3_12enZ8Cf_4Nei",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=HKNNtuUGRNm4PS5Y"
+    ]
+  },
+  {
+    "route": "/business/leads",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/business-leads-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Lead Research",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "HTTP 404 http://127.0.0.1:3111/business?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/revenue?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/clients?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=D2Z8MufIpwjRWmfK"
+    ]
+  },
+  {
+    "route": "/business/pipeline",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/business-pipeline-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Lead Pipeline",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/business?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "HTTP 404 http://127.0.0.1:3111/business?_rsc=oTsex1wSLfqHGEFq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=oTsex1wSLfqHGEFq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=oTsex1wSLfqHGEFq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=oTsex1wSLfqHGEFq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=oTsex1wSLfqHGEFq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline/deal-0000-0000-0000-000000000004?_rsc=oTsex1wSLfqHGEFq"
+    ]
+  },
+  {
+    "route": "/business/clients",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/business-clients-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Clients",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/business?_rsc=oTsex1wSLfqHGEFq",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "HTTP 404 http://127.0.0.1:3111/business?_rsc=xWO5G7efR6odeVa4",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=xWO5G7efR6odeVa4",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=xWO5G7efR6odeVa4",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=xWO5G7efR6odeVa4",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=xWO5G7efR6odeVa4",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=xWO5G7efR6odeVa4"
+    ]
+  },
+  {
+    "route": "/business/revenue",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/business-revenue-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Revenue & Contracts",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/business?_rsc=xWO5G7efR6odeVa4",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "HTTP 404 http://127.0.0.1:3111/business?_rsc=_RCMyx_lCvdpxNXV",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=_RCMyx_lCvdpxNXV",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=_RCMyx_lCvdpxNXV",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=_RCMyx_lCvdpxNXV",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=_RCMyx_lCvdpxNXV",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=_RCMyx_lCvdpxNXV"
+    ]
+  },
+  {
+    "route": "/finance/overview",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/finance-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Overview",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/business?_rsc=_RCMyx_lCvdpxNXV",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=f2enUUpVF_qM4cSG",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=f2enUUpVF_qM4cSG",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/trades?_rsc=f2enUUpVF_qM4cSG",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=f2enUUpVF_qM4cSG",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=f2enUUpVF_qM4cSG",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=n5YPPXs6d1uo_ozf"
+    ]
+  },
+  {
+    "route": "/finance/transactions",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/finance-transactions-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Transactions",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/analysis?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/trades?_rsc=ptrt5iFeC7HpM30x",
+      "HTTP 404 http://127.0.0.1:3111/finance?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=ptrt5iFeC7HpM30x"
+    ]
+  },
+  {
+    "route": "/finance/accounts",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/finance-accounts-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Accounts",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "HTTP 404 http://127.0.0.1:3111/finance?_rsc=n3IGH-egQkMqxWn1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=n3IGH-egQkMqxWn1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=n3IGH-egQkMqxWn1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=n3IGH-egQkMqxWn1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=n3IGH-egQkMqxWn1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/analysis?_rsc=n3IGH-egQkMqxWn1"
+    ]
+  },
+  {
+    "route": "/finance/budgets",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/finance-budgets-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Budgets",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance?_rsc=n3IGH-egQkMqxWn1",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "HTTP 404 http://127.0.0.1:3111/finance?_rsc=22pv1zVOKerFgnKj",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=22pv1zVOKerFgnKj",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=22pv1zVOKerFgnKj",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=22pv1zVOKerFgnKj",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=22pv1zVOKerFgnKj",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=22pv1zVOKerFgnKj"
+    ]
+  },
+  {
+    "route": "/finance/trades",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/finance-trades-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Trading & Venture Journal",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance?_rsc=22pv1zVOKerFgnKj",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "HTTP 404 http://127.0.0.1:3111/finance?_rsc=bag_GcvIBBJXPB5h",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=bag_GcvIBBJXPB5h",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=bag_GcvIBBJXPB5h",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=bag_GcvIBBJXPB5h",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=bag_GcvIBBJXPB5h",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=bag_GcvIBBJXPB5h"
+    ]
+  },
+  {
+    "route": "/finance/analysis",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/finance-analysis-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Top-Down Analysis",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance?_rsc=bag_GcvIBBJXPB5h",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "HTTP 404 http://127.0.0.1:3111/finance?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/trades?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/transactions?_rsc=BE6pjSK8p-MA_Yfb"
+    ]
+  },
+  {
+    "route": "/health/workouts",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/health-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Workouts",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=NuDYc2o2lOzWC31e",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=NuDYc2o2lOzWC31e",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=NuDYc2o2lOzWC31e",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=NuDYc2o2lOzWC31e",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=NuDYc2o2lOzWC31e",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=NuDYc2o2lOzWC31e"
+    ]
+  },
+  {
+    "route": "/health/nutrition",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/health-nutrition-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Nutrition",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "HTTP 404 http://127.0.0.1:3111/health?_rsc=ccvzu7DEeQuwtMWy",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=ccvzu7DEeQuwtMWy",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=ccvzu7DEeQuwtMWy",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=ccvzu7DEeQuwtMWy",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=ccvzu7DEeQuwtMWy",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/body?_rsc=ccvzu7DEeQuwtMWy",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=ccvzu7DEeQuwtMWy"
+    ]
+  },
+  {
+    "route": "/health/body",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/health-body-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Body",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/health?_rsc=ccvzu7DEeQuwtMWy",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "HTTP 404 http://127.0.0.1:3111/health?_rsc=j7HX79jea-HQ4hRQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=j7HX79jea-HQ4hRQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=j7HX79jea-HQ4hRQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/nutrition?_rsc=j7HX79jea-HQ4hRQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=j7HX79jea-HQ4hRQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/goals?_rsc=j7HX79jea-HQ4hRQ"
+    ]
+  },
+  {
+    "route": "/life/goals",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/goals-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Goals",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/health?_rsc=j7HX79jea-HQ4hRQ",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=2bQpa8NN0dgTns7a",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=2bQpa8NN0dgTns7a",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=2bQpa8NN0dgTns7a",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=2bQpa8NN0dgTns7a",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=2bQpa8NN0dgTns7a",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=2bQpa8NN0dgTns7a"
+    ]
+  },
+  {
+    "route": "/life/tasks",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/tasks-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Tasks",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=Ep5vvZ4dkaeJDSnf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=Ep5vvZ4dkaeJDSnf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=Ep5vvZ4dkaeJDSnf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=Ep5vvZ4dkaeJDSnf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/journal?_rsc=Ep5vvZ4dkaeJDSnf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/habits?_rsc=Ep5vvZ4dkaeJDSnf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=Ep5vvZ4dkaeJDSnf"
+    ]
+  },
+  {
+    "route": "/life/habits",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/tasks-routine-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Routine",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "HTTP 404 http://127.0.0.1:3111/life?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=UG6lc75EF8TajgD1"
+    ]
+  },
+  {
+    "route": "/life/journal",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/tasks-journal-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Journal",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/life?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "HTTP 404 http://127.0.0.1:3111/life?_rsc=jLp05vBH7c2QSDsN",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=jLp05vBH7c2QSDsN",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=jLp05vBH7c2QSDsN",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=jLp05vBH7c2QSDsN",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=jLp05vBH7c2QSDsN",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=jLp05vBH7c2QSDsN"
+    ]
+  },
+  {
+    "route": "/uni",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/university-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Dashboard",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/life?_rsc=jLp05vBH7c2QSDsN",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/calendar?_rsc=dQJGrTnWKDaHnCb6",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=dQJGrTnWKDaHnCb6",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/deadlines?_rsc=dQJGrTnWKDaHnCb6",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/assessments?_rsc=dQJGrTnWKDaHnCb6",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=dQJGrTnWKDaHnCb6",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=dQJGrTnWKDaHnCb6"
+    ]
+  },
+  {
+    "route": "/uni/courses",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/university-courses-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Courses",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=D2cyvoThjh17kpJq"
+    ]
+  },
+  {
+    "route": "/uni/timetable",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/university-timetable-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Timetable",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=_yMWtpyA1TM6x9D-",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=_yMWtpyA1TM6x9D-",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=_yMWtpyA1TM6x9D-",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=_yMWtpyA1TM6x9D-",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=_yMWtpyA1TM6x9D-",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=_yMWtpyA1TM6x9D-",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/deadlines?_rsc=_yMWtpyA1TM6x9D-"
+    ]
+  },
+  {
+    "route": "/uni/attendance",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/university-attendance-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Attendance",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=VNxNCDZQiPFzDKse",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=VNxNCDZQiPFzDKse",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=VNxNCDZQiPFzDKse",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=VNxNCDZQiPFzDKse",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=VNxNCDZQiPFzDKse",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=VNxNCDZQiPFzDKse",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=VNxNCDZQiPFzDKse"
+    ]
+  },
+  {
+    "route": "/uni/calendar",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/university-calendar-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Calendar",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=fAJtcAUkWGjD45ay",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=fAJtcAUkWGjD45ay",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=fAJtcAUkWGjD45ay",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=fAJtcAUkWGjD45ay",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=fAJtcAUkWGjD45ay",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=fAJtcAUkWGjD45ay",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=fAJtcAUkWGjD45ay"
+    ]
+  },
+  {
+    "route": "/uni/assessments",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/university-assessments-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Assessments",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=c8lDI1-FgQ4NaUpn"
+    ]
+  },
+  {
+    "route": "/uni/deadlines",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/university-deadlines-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Deadlines",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=3qOzJPo3BJfB6ezt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=3qOzJPo3BJfB6ezt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=3qOzJPo3BJfB6ezt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/calendar?_rsc=3qOzJPo3BJfB6ezt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=3qOzJPo3BJfB6ezt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=3qOzJPo3BJfB6ezt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=3qOzJPo3BJfB6ezt"
+    ]
+  },
+  {
+    "route": "/mentor",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/mentor-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(0, 0, 0, 0)",
+        "backdrop-filter": "blur(18px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.1) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px, rgba(0, 0, 0, 0.9) 0px 12px 40px -16px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Today",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor/weekly-review?_rsc=_z6xjKsFLokdF5wt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=_z6xjKsFLokdF5wt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=_z6xjKsFLokdF5wt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=_z6xjKsFLokdF5wt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=_z6xjKsFLokdF5wt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=_z6xjKsFLokdF5wt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=_z6xjKsFLokdF5wt"
+    ]
+  },
+  {
+    "route": "/mentor/weekly-review",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/mentor-weekly-review-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Weekly Review",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=hc41BiiGnQumc4IY",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=hc41BiiGnQumc4IY",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=hc41BiiGnQumc4IY",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=hc41BiiGnQumc4IY",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=hc41BiiGnQumc4IY",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=hc41BiiGnQumc4IY",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=hc41BiiGnQumc4IY"
+    ]
+  },
+  {
+    "route": "/voice",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/voice-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": null,
+      "h1Text": null,
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap"
+    ]
+  },
+  {
+    "route": "/youtube",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/youtube-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "YouTube",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=IvzQG1HTTo-_9-eQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=IvzQG1HTTo-_9-eQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=IvzQG1HTTo-_9-eQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=IvzQG1HTTo-_9-eQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=IvzQG1HTTo-_9-eQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=IvzQG1HTTo-_9-eQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=IvzQG1HTTo-_9-eQ"
+    ]
+  },
+  {
+    "route": "/memory",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/memory-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Library",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=ODExhA-fjN9Pzh9j",
+      "net::ERR_ABORTED http://127.0.0.1:3111/settings?_rsc=ODExhA-fjN9Pzh9j",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=ODExhA-fjN9Pzh9j",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=ODExhA-fjN9Pzh9j",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=ODExhA-fjN9Pzh9j",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/goals?_rsc=ODExhA-fjN9Pzh9j",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=ODExhA-fjN9Pzh9j"
+    ]
+  },
+  {
+    "route": "/settings",
+    "viewport": "desktop",
+    "file": "artifacts/ui-audit/settings-desktop.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Settings",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/voice?_rsc=DQxjArDrgutTG17x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=DQxjArDrgutTG17x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/youtube?_rsc=DQxjArDrgutTG17x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/memory?_rsc=DQxjArDrgutTG17x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=DQxjArDrgutTG17x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=DQxjArDrgutTG17x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=DQxjArDrgutTG17x"
+    ]
+  },
+  {
+    "route": "/",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/home-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Today",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=5CB68i4pnAekjehf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=5CB68i4pnAekjehf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/habits?_rsc=5CB68i4pnAekjehf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=5CB68i4pnAekjehf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=5CB68i4pnAekjehf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=5CB68i4pnAekjehf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=5CB68i4pnAekjehf"
+    ]
+  },
+  {
+    "route": "/business/dashboard",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/business-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Dashboard",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/leads?_rsc=o3_12enZ8Cf_4Nei",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/revenue?_rsc=o3_12enZ8Cf_4Nei",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/clients?_rsc=o3_12enZ8Cf_4Nei",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline?_rsc=o3_12enZ8Cf_4Nei",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=o3_12enZ8Cf_4Nei",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=o3_12enZ8Cf_4Nei",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=o3_12enZ8Cf_4Nei"
+    ]
+  },
+  {
+    "route": "/business/leads",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/business-leads-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Lead Research",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/clients?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/revenue?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=D2Z8MufIpwjRWmfK"
+    ]
+  },
+  {
+    "route": "/business/pipeline",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/business-pipeline-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Lead Pipeline",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/business?_rsc=D2Z8MufIpwjRWmfK",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline/deal-0000-0000-0000-000000000003?_rsc=oTsex1wSLfqHGEFq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline/deal-0000-0000-0000-000000000001?_rsc=oTsex1wSLfqHGEFq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/revenue?_rsc=oTsex1wSLfqHGEFq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/clients?_rsc=oTsex1wSLfqHGEFq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/leads?_rsc=oTsex1wSLfqHGEFq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=oTsex1wSLfqHGEFq"
+    ]
+  },
+  {
+    "route": "/business/clients",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/business-clients-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Clients",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/business?_rsc=oTsex1wSLfqHGEFq",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/clients/con-0000-0000-0000-000000000003?_rsc=xWO5G7efR6odeVa4",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/clients/con-0000-0000-0000-000000000002?_rsc=xWO5G7efR6odeVa4",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/revenue?_rsc=xWO5G7efR6odeVa4",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline?_rsc=xWO5G7efR6odeVa4",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/leads?_rsc=xWO5G7efR6odeVa4",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=xWO5G7efR6odeVa4"
+    ]
+  },
+  {
+    "route": "/business/revenue",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/business-revenue-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Revenue & Contracts",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/business?_rsc=xWO5G7efR6odeVa4",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/clients?_rsc=_RCMyx_lCvdpxNXV",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/pipeline?_rsc=_RCMyx_lCvdpxNXV",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/leads?_rsc=_RCMyx_lCvdpxNXV",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=_RCMyx_lCvdpxNXV",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=_RCMyx_lCvdpxNXV",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=_RCMyx_lCvdpxNXV"
+    ]
+  },
+  {
+    "route": "/finance/overview",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/finance-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Overview",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/business?_rsc=_RCMyx_lCvdpxNXV",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/transactions?_rsc=f2enUUpVF_qM4cSG",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=f2enUUpVF_qM4cSG",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=f2enUUpVF_qM4cSG",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=f2enUUpVF_qM4cSG",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=f2enUUpVF_qM4cSG",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=f2enUUpVF_qM4cSG"
+    ]
+  },
+  {
+    "route": "/finance/transactions",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/finance-transactions-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Transactions",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=ptrt5iFeC7HpM30x"
+    ]
+  },
+  {
+    "route": "/finance/accounts",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/finance-accounts-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Accounts",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance?_rsc=ptrt5iFeC7HpM30x",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=n3IGH-egQkMqxWn1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/transactions?_rsc=n3IGH-egQkMqxWn1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=n3IGH-egQkMqxWn1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=n3IGH-egQkMqxWn1",
+      "HTTP 404 http://127.0.0.1:3111/finance?_rsc=n3IGH-egQkMqxWn1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=hmgWUCZbeTX5Yc2C"
+    ]
+  },
+  {
+    "route": "/finance/budgets",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/finance-budgets-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Budgets",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance?_rsc=n3IGH-egQkMqxWn1",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=22pv1zVOKerFgnKj",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/transactions?_rsc=22pv1zVOKerFgnKj",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=22pv1zVOKerFgnKj",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=22pv1zVOKerFgnKj",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=22pv1zVOKerFgnKj",
+      "HTTP 404 http://127.0.0.1:3111/finance?_rsc=22pv1zVOKerFgnKj"
+    ]
+  },
+  {
+    "route": "/finance/trades",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/finance-trades-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Trading & Venture Journal",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance?_rsc=22pv1zVOKerFgnKj",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=bag_GcvIBBJXPB5h",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=bag_GcvIBBJXPB5h",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=bag_GcvIBBJXPB5h",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/transactions?_rsc=bag_GcvIBBJXPB5h",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=bag_GcvIBBJXPB5h",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=bag_GcvIBBJXPB5h"
+    ]
+  },
+  {
+    "route": "/finance/analysis",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/finance-analysis-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Top-Down Analysis",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance?_rsc=bag_GcvIBBJXPB5h",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/budgets?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/accounts?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/transactions?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=BE6pjSK8p-MA_Yfb"
+    ]
+  },
+  {
+    "route": "/health/workouts",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/health-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Workouts",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance?_rsc=BE6pjSK8p-MA_Yfb",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/nutrition?_rsc=NuDYc2o2lOzWC31e",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=NuDYc2o2lOzWC31e",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=NuDYc2o2lOzWC31e",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/body?_rsc=NuDYc2o2lOzWC31e",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=NuDYc2o2lOzWC31e",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/nutrition?_rsc=7_m01JHZVHMWsviE"
+    ]
+  },
+  {
+    "route": "/health/nutrition",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/health-nutrition-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Nutrition",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/body?_rsc=ccvzu7DEeQuwtMWy",
+      "HTTP 404 http://127.0.0.1:3111/health?_rsc=ccvzu7DEeQuwtMWy",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=ccvzu7DEeQuwtMWy",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=ccvzu7DEeQuwtMWy",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=ccvzu7DEeQuwtMWy",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/body?_rsc=nEqeYUdxlKf5qttn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/nutrition?_rsc=nEqeYUdxlKf5qttn"
+    ]
+  },
+  {
+    "route": "/health/body",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/health-body-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Body",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/health?_rsc=ccvzu7DEeQuwtMWy",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/nutrition?_rsc=j7HX79jea-HQ4hRQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=j7HX79jea-HQ4hRQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=j7HX79jea-HQ4hRQ",
+      "HTTP 404 http://127.0.0.1:3111/health?_rsc=j7HX79jea-HQ4hRQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=j7HX79jea-HQ4hRQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/nutrition?_rsc=bwbd6Oe9H9L946q9"
+    ]
+  },
+  {
+    "route": "/life/goals",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/goals-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Goals",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/health?_rsc=j7HX79jea-HQ4hRQ",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=2bQpa8NN0dgTns7a",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=2bQpa8NN0dgTns7a",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=2bQpa8NN0dgTns7a",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=2bQpa8NN0dgTns7a",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=khL-B0rLxYSeRi14",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=2bQpa8NN0dgTns7a"
+    ]
+  },
+  {
+    "route": "/life/tasks",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/tasks-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Tasks",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/journal?_rsc=Ep5vvZ4dkaeJDSnf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/habits?_rsc=Ep5vvZ4dkaeJDSnf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=Ep5vvZ4dkaeJDSnf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=Ep5vvZ4dkaeJDSnf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=Ep5vvZ4dkaeJDSnf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=Ep5vvZ4dkaeJDSnf",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=Ep5vvZ4dkaeJDSnf"
+    ]
+  },
+  {
+    "route": "/life/habits",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/tasks-routine-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Routine",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/journal?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/tasks?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=UG6lc75EF8TajgD1"
+    ]
+  },
+  {
+    "route": "/life/journal",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/tasks-journal-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Journal",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/life?_rsc=UG6lc75EF8TajgD1",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=jLp05vBH7c2QSDsN",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=jLp05vBH7c2QSDsN",
+      "HTTP 404 http://127.0.0.1:3111/life?_rsc=jLp05vBH7c2QSDsN",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=jLp05vBH7c2QSDsN",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=jLp05vBH7c2QSDsN",
+      "net::ERR_ABORTED http://127.0.0.1:3111/life/journal?_rsc=lRgkUYeANosasO4m"
+    ]
+  },
+  {
+    "route": "/uni",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/university-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Dashboard",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_ABORTED http://127.0.0.1:3111/life?_rsc=jLp05vBH7c2QSDsN",
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=dQJGrTnWKDaHnCb6",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=dQJGrTnWKDaHnCb6",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=dQJGrTnWKDaHnCb6",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=dQJGrTnWKDaHnCb6",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=dQJGrTnWKDaHnCb6",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=dQJGrTnWKDaHnCb6"
+    ]
+  },
+  {
+    "route": "/uni/courses",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/university-courses-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Courses",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses/crs-0000-0000-0000-000000000001?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses/crs-0000-0000-0000-000000000002?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=D2cyvoThjh17kpJq",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=D2cyvoThjh17kpJq"
+    ]
+  },
+  {
+    "route": "/uni/timetable",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/university-timetable-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Timetable",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=_yMWtpyA1TM6x9D-",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=_yMWtpyA1TM6x9D-",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=_yMWtpyA1TM6x9D-",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=_yMWtpyA1TM6x9D-",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=_yMWtpyA1TM6x9D-",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=_yMWtpyA1TM6x9D-",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=_yMWtpyA1TM6x9D-"
+    ]
+  },
+  {
+    "route": "/uni/attendance",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/university-attendance-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Attendance",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=VNxNCDZQiPFzDKse",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=VNxNCDZQiPFzDKse",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=VNxNCDZQiPFzDKse",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=VNxNCDZQiPFzDKse",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=VNxNCDZQiPFzDKse",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=VNxNCDZQiPFzDKse",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=QHqAyk9uHt41JjAX"
+    ]
+  },
+  {
+    "route": "/uni/calendar",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/university-calendar-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Calendar",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=fAJtcAUkWGjD45ay",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=fAJtcAUkWGjD45ay",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=fAJtcAUkWGjD45ay",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=fAJtcAUkWGjD45ay",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=fAJtcAUkWGjD45ay",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=fAJtcAUkWGjD45ay",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=fAJtcAUkWGjD45ay"
+    ]
+  },
+  {
+    "route": "/uni/assessments",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/university-assessments-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Assessments",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=c8lDI1-FgQ4NaUpn",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=c8lDI1-FgQ4NaUpn"
+    ]
+  },
+  {
+    "route": "/uni/deadlines",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/university-deadlines-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Deadlines",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/attendance?_rsc=3qOzJPo3BJfB6ezt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/timetable?_rsc=3qOzJPo3BJfB6ezt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni/courses?_rsc=3qOzJPo3BJfB6ezt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=3qOzJPo3BJfB6ezt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=3qOzJPo3BJfB6ezt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=3qOzJPo3BJfB6ezt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=3qOzJPo3BJfB6ezt"
+    ]
+  },
+  {
+    "route": "/mentor",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/mentor-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(0, 0, 0, 0)",
+        "backdrop-filter": "blur(18px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.1) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px, rgba(0, 0, 0, 0.9) 0px 12px 40px -16px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Today",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor/weekly-review?_rsc=_z6xjKsFLokdF5wt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=_z6xjKsFLokdF5wt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=_z6xjKsFLokdF5wt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=_z6xjKsFLokdF5wt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=_z6xjKsFLokdF5wt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=_z6xjKsFLokdF5wt",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor/weekly-review?_rsc=s2CZf6syBfyfbP-r"
+    ]
+  },
+  {
+    "route": "/mentor/weekly-review",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/mentor-weekly-review-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Weekly Review",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=hc41BiiGnQumc4IY",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=hmRZCZitoNCeKBHx",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=hmRZCZitoNCeKBHx",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=hmRZCZitoNCeKBHx",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=hmRZCZitoNCeKBHx",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=5XI03wdTgZhEW4ao"
+    ]
+  },
+  {
+    "route": "/voice",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/voice-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": null,
+      "h1": null,
+      "h1Text": null,
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap"
+    ]
+  },
+  {
+    "route": "/youtube",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/youtube-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "YouTube",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=IvzQG1HTTo-_9-eQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=IvzQG1HTTo-_9-eQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=IvzQG1HTTo-_9-eQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=IvzQG1HTTo-_9-eQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=IvzQG1HTTo-_9-eQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=IvzQG1HTTo-_9-eQ",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=-yv4Acx9SoPtQLQV"
+    ]
+  },
+  {
+    "route": "/memory",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/memory-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Library",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=ODExhA-fjN9Pzh9j",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=ODExhA-fjN9Pzh9j",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=ODExhA-fjN9Pzh9j",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=ODExhA-fjN9Pzh9j",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=zjCJ0-Y0cH1teZ9D",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=ODExhA-fjN9Pzh9j",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=phuxUfNDAWue8DAB"
+    ]
+  },
+  {
+    "route": "/settings",
+    "viewport": "mobile",
+    "file": "artifacts/ui-audit/settings-mobile.png",
+    "status": 200,
+    "probe": {
+      "bodyBg": "rgb(0, 0, 0)",
+      "brand": "#9c35f0",
+      "gradient": "linear-gradient(135deg, #9c35f0, #ec4899)",
+      "card": {
+        "background-color": "rgba(255, 255, 255, 0.03)",
+        "backdrop-filter": "blur(12px)",
+        "border-radius": "16px",
+        "box-shadow": "rgba(255, 255, 255, 0.055) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.08) 0px 0px 0px 1px, rgba(0, 0, 0, 0.5) 0px 1px 3px 0px"
+      },
+      "h1": {
+        "font-family": "\"Clash Display\", \"Space Grotesk\", Inter, \"Inter Fallback\", system-ui, sans-serif",
+        "font-size": "36px",
+        "letter-spacing": "-1.08px",
+        "color": "rgb(255, 255, 255)"
+      },
+      "h1Text": "Settings",
+      "horizontalOverflow": 0,
+      "errorOverlay": false,
+      "hydrated": true
+    },
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID"
+    ],
+    "failedRequests": [
+      "net::ERR_CERT_AUTHORITY_INVALID https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=DQxjArDrgutTG17x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/business/dashboard?_rsc=DQxjArDrgutTG17x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/health/workouts?_rsc=DQxjArDrgutTG17x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/finance/overview?_rsc=DQxjArDrgutTG17x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/uni?_rsc=DQxjArDrgutTG17x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/?_rsc=DQxjArDrgutTG17x",
+      "net::ERR_ABORTED http://127.0.0.1:3111/mentor?_rsc=63kLqKpnmbbA0dpI"
+    ]
+  }
+]

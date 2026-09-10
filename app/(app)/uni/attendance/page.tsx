@@ -1,7 +1,7 @@
-import { UserCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCourses, getAttendance, getScheduleBlocks } from "@/lib/db/queries/uni";
 import { ModuleTabs } from "@/components/shared/module-tabs";
+import { PageHeader } from "@/components/shared/page-header";
 import { AttendanceOverview } from "@/components/uni/attendance-overview";
 import { AttendanceMarker, type TodayClass } from "@/components/uni/attendance-marker";
 import { todayStr } from "@/lib/date";
@@ -54,13 +54,7 @@ export default async function UniAttendancePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="eyebrow">University</p>
-        <h1 className="flex items-center gap-2 text-display">
-          <UserCheck className="size-5 text-brand" strokeWidth={2} />
-          Attendance
-        </h1>
-      </div>
+      <PageHeader eyebrow="University" title="Attendance" />
 
       <ModuleTabs tabs={UNI_TABS} />
 

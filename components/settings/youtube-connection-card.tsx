@@ -28,7 +28,7 @@ export function YoutubeConnectionCard({ configured, connected, channelTitle, con
   const likelyExpired = age !== null && age > TESTING_MODE_TOKEN_LIFETIME_DAYS;
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
+    <div className="surface p-4">
       <p className="eyebrow">YouTube Upload</p>
       <div className="mt-2 flex items-center gap-2 text-sm">
         {!configured ? (

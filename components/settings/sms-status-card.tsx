@@ -2,7 +2,7 @@ import { CheckCircle2, XCircle } from "lucide-react";
 
 export function SmsStatusCard({ configured, ownerNumber, recentCount }: { configured: boolean; ownerNumber: string | null; recentCount: number }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
+    <div className="surface p-4">
       <p className="eyebrow">SMS Logging (Twilio)</p>
       <div className="mt-2 flex items-center gap-2 text-sm">
         {configured ? <CheckCircle2 className="h-4 w-4 text-success" /> : <XCircle className="h-4 w-4 text-danger" />}

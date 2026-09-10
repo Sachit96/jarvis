@@ -47,7 +47,7 @@ export function MentorChat({ initialMessages, hasKey }: { initialMessages: Mento
   }
 
   return (
-    <div className="flex flex-col rounded-lg border border-border bg-card">
+    <div className="flex flex-col surface">
       <div className="flex items-center gap-2 border-b border-border px-4 py-3">
         <Sparkles className="h-4 w-4 text-brand" />
         <p className="text-sm font-medium">AI Nutrition &amp; Health Mentor</p>

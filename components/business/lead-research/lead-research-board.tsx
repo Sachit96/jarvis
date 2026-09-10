@@ -145,7 +145,7 @@ export function LeadResearchBoard({ rows, stages }: { rows: LeadRowData[]; stage
         <EmptyState icon={Radar} title="No leads yet" description="Start a research run and scored leads will appear on this board." />
       </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-border bg-card">
+        <div className="overflow-x-auto surface">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-border eyebrow">

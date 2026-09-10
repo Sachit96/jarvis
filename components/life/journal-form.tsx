@@ -35,7 +35,7 @@ export function JournalForm() {
     <form
       ref={formRef}
       action={formAction}
-      className="space-y-3 rounded-lg border border-border bg-card p-4"
+      className="space-y-3 surface p-4"
     >
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Trash2 } from "lucide-react";
+import { CheckSquare, Clock, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Select,
@@ -12,8 +12,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { deleteDealAction, updateDealStageAction } from "@/actions/business-actions";
-import { DealTaskItem } from "@/components/business/deal-task-item";
-import { AddDealTaskForm } from "@/components/business/add-deal-task-form";
 import type { Database } from "@/lib/supabase/database.types";
 
 type Deal = Database["public"]["Tables"]["deals"]["Row"];
@@ -25,6 +23,24 @@ function money(n: number) {
   return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 }
 
+/** Whole days since a timestamp. */
+function ageInDays(iso: string) {
+  return Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000));
+}
+
+/**
+ * One deal on the pipeline board.
+ *
+ * Compact on purpose. This card used to carry a full-width stage select, a
+ * rendered task list AND an always-mounted "add follow-up task" form — three
+ * controls per card, on every card, in every column. A board with a dozen
+ * deals was a wall of inputs, and the thing a board is actually for (seeing
+ * where everything stands) was the hardest thing to do on it.
+ *
+ * What stays is what you do FROM the board: read the deal, see how long it
+ * has sat, and move it. Tasks, notes and activity live on the deal's own
+ * page, one click away, where there is room for them.
+ */
 export function DealCard({
   deal,
   contact,
@@ -39,6 +55,9 @@ export function DealCard({
   const [stageId, setStageId] = useState(deal.stage_id);
   const [isPending, startTransition] = useTransition();
 
+  const age = ageInDays(deal.stage_changed_at ?? deal.created_at);
+  const openTasks = tasks.filter((t) => !t.completed).length;
+
   function handleMove(next: string) {
     const prev = stageId;
     setStageId(next);
@@ -52,54 +71,69 @@ export function DealCard({
   }
 
   return (
-    <div className={cn("rounded-lg border border-border bg-card p-3", isPending && "opacity-70")}>
+    <div
+      className={cn(
+        "surface surface-interactive group/deal p-3",
+        isPending && "opacity-70",
+        // A deal that has sat in one stage for over a month gets a warm edge.
+        // Ageing is the signal this board exists to surface, so it belongs on
+        // the card rather than only in a summary underneath it.
+        age >= 30 && "shadow-[inset_0_1px_0_0_rgb(255_255_255/0.055),0_0_0_1px_var(--warn)]",
+      )}
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <Link href={`/business/pipeline/${deal.id}`} className="truncate text-sm font-medium hover:underline">
-            {contact?.contact_person ?? "Unknown contact"}
+          <Link
+            href={`/business/pipeline/${deal.id}`}
+            className="truncate text-body font-medium text-foreground hover:underline"
+          >
+            {deal.title || contact?.contact_person || "Untitled deal"}
           </Link>
           {contact?.company_name ? (
-            <p className="truncate text-xs text-muted-foreground">{contact.company_name}</p>
+            <p className="truncate text-caption text-foreground-tertiary">{contact.company_name}</p>
           ) : null}
         </div>
         <button
           onClick={() => startTransition(() => deleteDealAction(deal.id))}
           aria-label="Delete deal"
-          className="relative after:absolute after:-inset-3.5 shrink-0 text-muted-foreground hover:text-danger"
+          className="relative shrink-0 text-foreground-tertiary opacity-0 transition-opacity after:absolute after:-inset-3 group-hover/deal:opacity-100 hover:text-danger focus-visible:opacity-100"
         >
-          <Trash2 className="h-3.5 w-3.5" />
+          <Trash2 className="size-3.5" />
         </button>
       </div>
 
-      <div className="mt-2 flex items-center gap-2">
-        <p className="tabular text-sm text-brand">{money(Number(deal.value))}</p>
+      <p className="tabular mt-2 font-display text-body font-semibold text-foreground">
+        {money(Number(deal.value))}
+      </p>
+
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-caption text-foreground-tertiary">
+        <span className={cn("inline-flex items-center gap-1", age >= 30 && "text-warn")}>
+          <Clock className="size-3" strokeWidth={2} />
+          {age}d in stage
+        </span>
+        {openTasks > 0 ? (
+          <span className="inline-flex items-center gap-1">
+            <CheckSquare className="size-3" strokeWidth={2} />
+            {openTasks} open
+          </span>
+        ) : null}
       </div>
 
-      {deal.notes ? <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{deal.notes}</p> : null}
-
-      <div className="mt-2">
-        <Select value={stageId} onValueChange={(v) => v && handleMove(v)}>
-          <SelectTrigger className="h-7 w-full text-xs">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {stages.map((s) => (
-              <SelectItem key={s.id} value={s.id} label={s.name}>
-                {s.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {tasks.length > 0 ? (
-        <ul className="mt-2 space-y-1 border-t border-border pt-2">
-          {tasks.map((t) => (
-            <DealTaskItem key={t.id} task={t} />
+      <Select value={stageId} onValueChange={(v) => v && handleMove(v)}>
+        <SelectTrigger
+          className="mt-2.5 h-7 w-full border-white/[0.08] bg-white/[0.03] text-caption"
+          aria-label="Move deal to stage"
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {stages.map((s) => (
+            <SelectItem key={s.id} value={s.id} label={s.name}>
+              {s.name}
+            </SelectItem>
           ))}
-        </ul>
-      ) : null}
-      <AddDealTaskForm dealId={deal.id} />
+        </SelectContent>
+      </Select>
     </div>
   );
 }

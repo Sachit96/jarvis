@@ -14,6 +14,7 @@ import { KpiCell, KpiGrid } from "@/components/shared/kpi-grid";
 import { ModuleTabs } from "@/components/shared/module-tabs";
 import { RiskChip } from "@/components/uni/risk-chip";
 import { PlanTonight } from "@/components/uni/plan-tonight";
+import { TermOverview } from "@/components/uni/term-overview";
 import { StudySessionsCard, type StudySessionRow } from "@/components/uni/study-sessions-card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -230,6 +231,8 @@ export default async function UniDashboardPage() {
               </CardContent>
             </Card>
           </div>
+
+          <TermOverview courses={courses} />
 
           {/* Plan, then the plan. These sat unpaired: PlanTonight wrote rows
               into uni_study_sessions and nothing in the app ever read them

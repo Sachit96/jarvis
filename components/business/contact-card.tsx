@@ -26,7 +26,7 @@ export function ContactCard({
   const [isPending, startTransition] = useTransition();
 
   return (
-    <div className={cn("space-y-3 rounded-lg border border-border bg-card p-4", isPending && "opacity-50")}>
+    <div className={cn("space-y-3 surface p-4", isPending && "opacity-50")}>
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="flex items-center gap-2">

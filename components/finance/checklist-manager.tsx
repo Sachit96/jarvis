@@ -45,7 +45,7 @@ export function ChecklistManager({ items }: { items: ChecklistItem[] }) {
   }, [isPending, state.error]);
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
+    <div className="surface p-4">
       <p className="eyebrow">Pre-trade confluence checklist</p>
       <p className="mt-1 text-xs text-muted-foreground">
         Every item here must be checked before you can log a new trade.

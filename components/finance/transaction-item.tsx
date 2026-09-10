@@ -31,7 +31,7 @@ export function TransactionItem({
   return (
     <li
       className={cn(
-        "flex items-center gap-3 rounded-lg border border-border bg-card p-3 transition-opacity",
+        "flex items-center gap-3 surface p-3 transition-opacity",
         isPending && "opacity-70",
       )}
     >

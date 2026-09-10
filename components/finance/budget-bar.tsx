@@ -23,7 +23,7 @@ export function BudgetBar({ budget, spent }: { budget: Budget; spent: number }) 
   }
 
   return (
-    <div className={cn("rounded-lg border border-border bg-card p-4 transition-opacity", isPending && "opacity-70")}>
+    <div className={cn("surface p-4 transition-opacity", isPending && "opacity-70")}>
       <div className="flex items-start justify-between gap-2">
         <p className="text-sm font-medium">{budget.category}</p>
         <button

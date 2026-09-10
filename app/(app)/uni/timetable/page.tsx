@@ -1,7 +1,7 @@
-import { CalendarRange } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCourses, getScheduleBlocks } from "@/lib/db/queries/uni";
 import { ModuleTabs } from "@/components/shared/module-tabs";
+import { PageHeader } from "@/components/shared/page-header";
 import { WeeklyTimetable } from "@/components/uni/weekly-timetable";
 import { UNI_TABS } from "@/lib/nav-items";
 
@@ -20,13 +20,7 @@ export default async function UniTimetablePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="eyebrow">University</p>
-        <h1 className="flex items-center gap-2 text-display">
-          <CalendarRange className="size-5 text-brand" strokeWidth={2} />
-          Timetable
-        </h1>
-      </div>
+      <PageHeader eyebrow="University" title="Timetable" />
 
       <ModuleTabs tabs={UNI_TABS} />
 

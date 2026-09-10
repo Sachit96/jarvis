@@ -20,7 +20,7 @@ export function PositionSizeCalculator() {
   const lotSize = valid ? riskAmount / (stopLossPipsNum * pipValueNum) : 0;
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
+    <div className="surface p-4">
       <p className="eyebrow">Position size &amp; risk calculator</p>
       <div className="mt-3 grid grid-cols-2 gap-3">
         <div className="space-y-1.5">

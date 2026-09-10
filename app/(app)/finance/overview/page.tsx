@@ -13,7 +13,9 @@ import { CashflowTrendChart } from "@/components/finance/cashflow-trend-chart";
 import { SpendByCategoryChart } from "@/components/finance/spend-by-category-chart";
 import { RecentTransactionsCard } from "@/components/finance/recent-transactions-card";
 import { AccountsSummaryCard } from "@/components/finance/accounts-summary-card";
+import { AllocationCard } from "@/components/finance/allocation-card";
 import { ModuleTabs } from "@/components/shared/module-tabs";
+import { PageHeader } from "@/components/shared/page-header";
 import { FINANCE_TABS } from "@/lib/nav-items";
 
 /** Liquid accounts — what could actually be spent today, so investments are out. */
@@ -49,11 +51,7 @@ export default async function FinanceOverviewPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <p className="eyebrow">Finance</p>
-        <h1 className="text-display">Overview</h1>
-        <p className="text-body text-muted-foreground">{monthLabel}</p>
-      </div>
+      <PageHeader eyebrow="Finance" title="Overview" description={monthLabel} />
 
       <ModuleTabs tabs={FINANCE_TABS} />
 
@@ -81,8 +79,12 @@ export default async function FinanceOverviewPage() {
         <div className="xl:col-span-7">
           <RecentTransactionsCard transactions={recentTransactions} />
         </div>
-        <div className="xl:col-span-5">
+        {/* Accounts answers "where is the money", allocation answers "in what
+            shape". They read as one column beside the transaction list
+            rather than as a fourth full-width row. */}
+        <div className="space-y-4 xl:col-span-5">
           <AccountsSummaryCard accounts={accounts} />
+          <AllocationCard accounts={accounts} />
         </div>
       </div>
     </div>

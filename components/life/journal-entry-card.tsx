@@ -25,7 +25,7 @@ export function JournalEntryCard({ entry }: { entry: JournalEntry }) {
   return (
     <div
       className={cn(
-        "rounded-lg border border-border bg-card p-4 transition-opacity",
+        "surface p-4 transition-opacity",
         isPending && "opacity-70",
       )}
     >

@@ -18,7 +18,7 @@ export function AiMentorStatusCard({ hasKey, model }: { hasKey: boolean; model: 
   }
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
+    <div className="surface p-4">
       <p className="eyebrow">AI Mentor (Gemini)</p>
       <div className="mt-2 flex items-center gap-2 text-sm">
         {hasKey ? (

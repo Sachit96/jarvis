@@ -90,6 +90,46 @@ const evalExpr = argOf("eval", "").trim() || null;
  * input to be believed.
  */
 const clickSelector = argOf("click", "").trim() || null;
+/**
+ * --naming audit writes `<page>-<viewport>.png` (home-desktop.png) instead of
+ * the default `<viewport>__<slug>.png`. The audit output is a deliverable a
+ * person reads, so the files are named the way a person would name them.
+ */
+const naming = argOf("naming", "default");
+const PAGE_NAMES = {
+  "/": "home",
+  "/business/dashboard": "business",
+  "/business/leads": "business-leads",
+  "/business/pipeline": "business-pipeline",
+  "/business/clients": "business-clients",
+  "/business/revenue": "business-revenue",
+  "/finance/overview": "finance",
+  "/finance/transactions": "finance-transactions",
+  "/finance/accounts": "finance-accounts",
+  "/finance/budgets": "finance-budgets",
+  "/finance/trades": "finance-trades",
+  "/finance/analysis": "finance-analysis",
+  "/health/workouts": "health",
+  "/health/nutrition": "health-nutrition",
+  "/health/body": "health-body",
+  "/life/goals": "goals",
+  "/life/tasks": "tasks",
+  "/life/habits": "tasks-routine",
+  "/life/journal": "tasks-journal",
+  "/uni": "university",
+  "/uni/courses": "university-courses",
+  "/uni/timetable": "university-timetable",
+  "/uni/attendance": "university-attendance",
+  "/uni/calendar": "university-calendar",
+  "/uni/assessments": "university-assessments",
+  "/uni/deadlines": "university-deadlines",
+  "/mentor": "mentor",
+  "/mentor/weekly-review": "mentor-weekly-review",
+  "/voice": "voice",
+  "/youtube": "youtube",
+  "/memory": "memory",
+  "/settings": "settings",
+};
 const clickWaitMs = Number(argOf("click-wait", "4000"));
 const routes = argOf("routes", "").trim() ? argOf("routes", "").split(",") : ALL_ROUTES;
 
@@ -269,7 +309,10 @@ async function main() {
       consoleErrors.length = 0;
       failedRequests.length = 0;
       const slug = route === "/" ? "home" : route.slice(1).replaceAll("/", "_");
-      const file = `${outDir}/${viewportName}__${slug}.png`;
+      const file =
+        naming === "audit"
+          ? `${outDir}/${PAGE_NAMES[route] ?? slug}-${viewportName}.png`
+          : `${outDir}/${viewportName}__${slug}.png`;
       let entry = { route, viewport: viewportName, file };
       try {
         // Not networkidle: some routes hold a connection open (the Hevy

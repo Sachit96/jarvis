@@ -24,7 +24,7 @@ export function WaterTracker({ totalMl, targetMl }: { totalMl: number; targetMl:
   }
 
   return (
-    <div className={cn("rounded-lg border border-border bg-card p-4", isPending && "opacity-80")}>
+    <div className={cn("surface p-4", isPending && "opacity-80")}>
       <div className="flex items-center justify-between text-xs">
         <span className="flex items-center gap-1 text-muted-foreground">
           <Droplet className="h-3.5 w-3.5" /> Water

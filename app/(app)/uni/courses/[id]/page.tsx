@@ -19,6 +19,8 @@ import { DeleteScheduleBlockButton, DeleteMaterialButton } from "@/components/un
 import { Backlinks } from "@/components/shared/backlinks";
 import { getBacklinks } from "@/lib/obsidian/wikilinks";
 import { EmptyState } from "@/components/shared/empty-state";
+import { BackLink } from "@/components/shared/back-link";
+import { PageHeader } from "@/components/shared/page-header";
 
 const DAY_LABEL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -47,27 +49,33 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full" style={{ backgroundColor: course.color ?? "#8b5cf6" }} />
-            <p className="eyebrow">{course.term}</p>
-          </div>
-          <h1 className="text-display">{course.code} — {course.name}</h1>
-          {course.professor ? (
-            <p className="mt-1 text-sm text-muted-foreground">
-              {course.professor}
-              {course.professor_email ? ` · ${course.professor_email}` : ""}
-              {course.room ? ` · ${course.room}` : ""}
-            </p>
-          ) : null}
-        </div>
-        <div className="flex items-center gap-2">
-          <RiskChip score={risk} />
-          <SyllabusUpload courseId={course.id} />
-          <CourseForm course={course} />
-        </div>
-      </div>
+      <BackLink href="/uni/courses" label="Courses" />
+
+      <PageHeader
+        eyebrow={
+          <span className="flex items-center gap-2">
+            <span
+              aria-hidden
+              className="size-2.5 rounded-full"
+              style={{ backgroundColor: course.color ?? "var(--brand)" }}
+            />
+            {course.term}
+          </span>
+        }
+        title={`${course.code} — ${course.name}`}
+        description={
+          course.professor
+            ? [course.professor, course.professor_email, course.room].filter(Boolean).join(" · ")
+            : undefined
+        }
+        actions={
+          <>
+            <RiskChip score={risk} />
+            <SyllabusUpload courseId={course.id} />
+            <CourseForm course={course} />
+          </>
+        }
+      />
 
       <div className="grid grid-cols-2 items-start gap-4 md:grid-cols-4">
         <StatTile
@@ -99,7 +107,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
             <ScheduleBlockForm courseId={course.id} />
           </div>
           {sortedBlocks.length === 0 ? (
-            <p className="mt-3 text-sm text-muted-foreground/50">No class times added</p>
+            <p className="mt-3 text-body text-foreground-tertiary">No class times added</p>
           ) : (
             <ul className="mt-3 space-y-2">
               {sortedBlocks.map((b) => (
@@ -125,7 +133,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
             </div>
           </div>
           {materials.length === 0 ? (
-            <p className="mt-3 text-sm text-muted-foreground/50">No materials uploaded</p>
+            <p className="mt-3 text-body text-foreground-tertiary">No materials uploaded</p>
           ) : (
             <ul className="mt-3 space-y-2">
               {materials.map((m) => (
@@ -153,8 +161,12 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
         </div>
         {assessments.length === 0 ? (
           <div className="surface">
-          <EmptyState icon={BookOpen} title="No assessments yet" description="Assignments and exams added to this course will be listed here with their weightings." />
-        </div>
+            <EmptyState
+              icon={BookOpen}
+              title="No assessments yet"
+              description="Assignments and exams added to this course will be listed here with their weightings."
+            />
+          </div>
         ) : (
           <div className="space-y-2">
             {assessments.map((a) => (

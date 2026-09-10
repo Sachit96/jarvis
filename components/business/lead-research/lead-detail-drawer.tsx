@@ -84,7 +84,7 @@ export function LeadDetailDrawer({ row, onClose }: { row: LeadRowData | null; on
               <p className="eyebrow">Opportunities</p>
               <ul className="mt-1.5 space-y-2">
                 {opportunities.map((o) => (
-                  <li key={o.tag} className="rounded-lg border border-border bg-card p-2.5">
+                  <li key={o.tag} className="surface p-2.5">
                     <Badge variant="outline" className="text-[10px] uppercase">
                       {OPPORTUNITY_LABEL[o.tag] ?? o.tag}
                     </Badge>
@@ -118,7 +118,7 @@ export function LeadDetailDrawer({ row, onClose }: { row: LeadRowData | null; on
             ) : audit?.auditBlocked ? (
               <p className="mt-1 text-xs text-muted-foreground">Audit blocked: {audit.blockedReason ?? "unknown reason"}.</p>
             ) : audit ? (
-              <div className="mt-1.5 space-y-1 rounded-lg border border-border bg-card p-2.5">
+              <div className="mt-1.5 space-y-1 surface p-2.5">
                 {signalRow("HTTPS", audit.https)}
                 {signalRow("Mobile viewport tag", audit.hasViewportMeta)}
                 {signalRow("Title", audit.title ?? "missing")}

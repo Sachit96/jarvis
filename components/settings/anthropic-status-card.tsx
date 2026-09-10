@@ -23,7 +23,7 @@ export function AnthropicStatusCard({ hasKey, spentUsd, capUsd }: { hasKey: bool
   }
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
+    <div className="surface p-4">
       <p className="eyebrow">Lead Qualifier (Anthropic) — paid, no free tier</p>
       <div className="mt-2 flex items-center gap-2 text-sm">
         {hasKey ? <CheckCircle2 className="h-4 w-4 text-success" /> : <XCircle className="h-4 w-4 text-danger" />}

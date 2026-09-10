@@ -18,8 +18,12 @@ export function PageHeader({
   actions,
   className,
 }: {
-  /** The module this page belongs to — "Health", "Finance". Uppercase micro-label. */
-  eyebrow?: string;
+  /**
+   * The module this page belongs to — "Health", "Finance". Uppercase
+   * micro-label. Takes a node rather than a string so a detail page can put
+   * its subject's colour dot inline with the label.
+   */
+  eyebrow?: ReactNode;
   title: ReactNode;
   description?: ReactNode;
   actions?: ReactNode;
