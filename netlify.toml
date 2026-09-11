@@ -12,5 +12,19 @@
 [build.environment]
   NODE_VERSION = "22"
 
+  # Force devDependencies to install.
+  #
+  # With NODE_ENV=production set on the site, `npm ci` omits
+  # devDependencies — and tailwindcss, @tailwindcss/postcss, typescript and
+  # the @types packages all live there, because that is where a Next app
+  # conventionally puts them. The build then dies on the first CSS import
+  # with "Cannot find module '@tailwindcss/postcss'", which reads like a
+  # missing package rather than a package that was deliberately skipped.
+  #
+  # Reproduced locally: `NODE_ENV=production npm ci && npm run build` fails
+  # exactly that way, and `--include=dev` fixes it. Harmless when NODE_ENV
+  # is unset, which is the default.
+  NPM_FLAGS = "--include=dev"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
