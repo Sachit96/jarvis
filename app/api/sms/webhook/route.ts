@@ -219,10 +219,10 @@ export async function POST(request: NextRequest) {
 
   const from = params.From ?? "";
   console.log(`[sms] in from=${from} body=${JSON.stringify((params.Body ?? "").slice(0, 160))}`);
-  // By digits, not ===. Twilio sends E.164 ("+12895361536"); an env var
-  // typed as "12895361536" or "(289) 536-1536" is the same number and used
-  // to be rejected in silence, since an unrecognised sender gets no reply
-  // at all.
+  // By digits, not ===. Twilio sends E.164 ("+1XXXXXXXXXX"); the same
+  // number typed into the environment without the plus, or with the
+  // punctuation a person would use, used to be rejected in silence, since
+  // an unrecognised sender gets no reply at all.
   if (!samePhoneNumber(from, ownerNumber)) {
     console.warn(`[sms] sender rejected from=${from} (owner is ${ownerNumber})`);
     // Logged (from_number is exactly what was rejected, useful for
