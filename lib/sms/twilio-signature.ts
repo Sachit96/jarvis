@@ -54,9 +54,9 @@ export function twilioRequestUrl(request: { url: string; headers: Headers }): st
 /**
  * Compare two phone numbers by their digits.
  *
- * Twilio always sends E.164 ("+12895361536"). A number written into the
- * environment without the plus, or with the spacing a person would type
- * ("(289) 536-1536"), fails a strict === against it — and the route's
+ * Twilio always sends E.164, "+1" then ten digits. The same number written
+ * into the environment without the plus, or with the punctuation a person
+ * would type, fails a strict === against it — and the route's
  * response to an unrecognised sender is deliberate silence, so the
  * mismatch produces no error anywhere. Only a `rejected_sender` row in
  * sms_messages, which nothing surfaces.

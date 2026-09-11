@@ -2,29 +2,36 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { samePhoneNumber, twilioRequestUrl } from "../lib/sms/twilio-signature.ts";
 
+/**
+ * The numbers here are 555-01xx, the block reserved for fiction in the North
+ * American plan. Deliberately not the real one: Netlify's secret scanner
+ * compares the VALUES of the site's environment variables against every file
+ * in the repo, so a real TWILIO_PHONE_NUMBER written into a test fails the
+ * deploy — which is exactly what it did.
+ */
 test("owner number matching", async (t) => {
   await t.test("matches E.164 against the same digits without a plus", () => {
     // Twilio always sends "+1...". The env var is typed by a person.
-    assert.equal(samePhoneNumber("+12895361536", "12895361536"), true);
+    assert.equal(samePhoneNumber("+12025550123", "12025550123"), true);
   });
 
   await t.test("matches a number written the way a person types it", () => {
-    assert.equal(samePhoneNumber("+12895361536", "(289) 536-1536"), true);
-    assert.equal(samePhoneNumber("+12895361536", "289-536-1536"), true);
+    assert.equal(samePhoneNumber("+12025550123", "(202) 555-0123"), true);
+    assert.equal(samePhoneNumber("+12025550123", "202-555-0123"), true);
   });
 
   await t.test("treats the North American country code as optional", () => {
-    assert.equal(samePhoneNumber("2895361536", "+12895361536"), true);
+    assert.equal(samePhoneNumber("2025550123", "+12025550123"), true);
   });
 
   await t.test("still rejects a genuinely different number", () => {
-    assert.equal(samePhoneNumber("+12895361536", "+12895361537"), false);
-    assert.equal(samePhoneNumber("+12895361536", "+442895361536"), false);
+    assert.equal(samePhoneNumber("+12025550123", "+12025550124"), false);
+    assert.equal(samePhoneNumber("+12025550123", "+442025550123"), false);
   });
 
   await t.test("rejects empty input rather than matching everything", () => {
-    assert.equal(samePhoneNumber("", "+12895361536"), false);
-    assert.equal(samePhoneNumber("+12895361536", "   "), false);
+    assert.equal(samePhoneNumber("", "+12025550123"), false);
+    assert.equal(samePhoneNumber("+12025550123", "   "), false);
   });
 });
 
