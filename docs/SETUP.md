@@ -42,7 +42,7 @@ The first end-to-end run against the real model and the real database:
 | --- | --- |
 | Read matrix | **22/23** prompts selected an acceptable tool |
 | Tools exercised by the model | 13 of 39 (read-only run — no write was attempted) |
-| Fabrication | **none** — Brightspace unconnected reported as untracked, empty finance reported as not connected, no stale deals reported as none |
+| Fabrication | **none** — empty finance reported as not connected, no stale deals reported as none, Hevy unconnected reported as unsynced |
 | Write journey + confirmation gate | **NOT RUN** — needs `-- --with-writes` |
 
 Two bugs had to be cleared to get there, and both are worth knowing about
@@ -88,8 +88,6 @@ issue.
 | Variable | Why |
 | --- | --- |
 | `HEVY_API_KEY` | Workout sync. Requires Hevy Pro. |
-| `BRIGHTSPACE_HOST`, `BRIGHTSPACE_CLIENT_ID`, `BRIGHTSPACE_CLIENT_SECRET` | University sync — see §5. |
-| `YOUTUBE_CLIENT_ID`, `YOUTUBE_CLIENT_SECRET` | YouTube uploads. These register the app; a user still has to authorise it. |
 | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`, `OWNER_PHONE_NUMBER` | Inbound SMS logging. **All four or nothing** — the webhook silently no-ops until every one is set. |
 | `GOOGLE_PLACES_API_KEY`, `PAGESPEED_API_KEY` | Lead Research discovery and audit. |
 | `CRON_SECRET` | Bearer token the scheduler sends to `POST /api/mentor/run`. |
@@ -169,44 +167,7 @@ instead of concluding you stopped training.
 
 ---
 
-## 5. Brightspace
-
-Brightspace uses OAuth2 authorization-code. **No password is ever requested or
-stored**, and there is no code path that accepts one.
-
-1. Register an OAuth application with your institution's D2L administrator.
-   Redirect URI, exactly:
-   `https://<your-domain>/api/brightspace/oauth/callback`
-   (and `http://localhost:3000/...` for local testing).
-2. Set `BRIGHTSPACE_HOST`, `BRIGHTSPACE_CLIENT_ID`, `BRIGHTSPACE_CLIENT_SECRET`.
-3. Apply migration `0037`, which creates the token table.
-4. Settings → **Connect Brightspace** → authorise.
-
-Requested scopes are read-only (`core`, `grades:read`, `enrollment:read`,
-`content:read`). JARVIS reads coursework; it never submits on your behalf.
-
-**Many institutions do not offer student OAuth registration.** If yours does
-not, this stays at `configuration_required` and the Settings card says so.
-University then runs on manually-entered data, which is fully supported — and
-JARVIS will tell you Brightspace is unavailable rather than inventing
-assignments.
-
----
-
-## 6. YouTube
-
-1. Google Cloud Console → Credentials → OAuth client ID → Web application.
-2. Authorized redirect URI, exactly:
-   `https://<your-domain>/api/youtube/oauth/callback`
-3. Set `YOUTUBE_CLIENT_ID` and `YOUTUBE_CLIENT_SECRET`.
-4. Settings → **Connect YouTube**.
-
-While the consent screen is in "Testing", Google expires refresh tokens after
-7 days regardless of use. The Settings card warns before that happens.
-
----
-
-## 7. Local development
+## 5. Local development
 
 ```bash
 npm install
@@ -230,7 +191,7 @@ and never touches anything it did not create.
 
 ---
 
-## 8. Production deployment
+## 6. Production deployment
 
 Deployed on Netlify. `scripts/check-env.mjs` diffs `.env.local` against
 Netlify's environment (fingerprints only — secret-scoped variables are
@@ -251,7 +212,7 @@ authentication at all.
 
 ---
 
-## 9. Integration status meanings
+## 7. Integration status meanings
 
 One vocabulary, defined in `lib/integrations/status.ts` and used identically by
 Settings, Home, Voice and the AI tools — so what the page claims and what
@@ -282,6 +243,5 @@ JARVIS has **no authentication and no RLS** — migration 0012 removed it. One
 fixed dataset, one owner. Everything is gated by `SITE_PASSWORD` at the edge
 and by the service-role key staying server-side. `tests/security-guards.test.ts`
 enforces the latter on every commit: no client component may read a non-public
-environment variable, no secret value may reach a log line, no `eval`, no
-dynamically-built table name in the tool layer, and no password path in the
-Brightspace integration.
+environment variable, no secret value may reach a log line, no `eval`, and no
+dynamically-built table name in the tool layer.

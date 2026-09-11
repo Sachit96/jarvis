@@ -9,7 +9,6 @@ function input(overrides: Partial<PriorityInput> = {}): PriorityInput {
     today: TODAY,
     overdueTasks: [],
     tasksDueToday: [],
-    universityDue: [],
     staleDeals: [],
     routine: { completed: 0, total: 0 },
     ...overrides,
@@ -21,19 +20,6 @@ describe("JARVIS priority", () => {
     // A dashboard that always has something urgent to say trains the user
     // to ignore it. "Nothing is on fire" is real information.
     assert.equal(topPriority(input()), null);
-  });
-
-  test("an overdue assessment outranks an overdue task", () => {
-    // A hard external deadline that has already passed is the one category
-    // where the cost of missing it is not the user's to negotiate.
-    const result = topPriority(
-      input({
-        universityDue: [{ id: "a", title: "Essay", due_at: "2026-09-05T23:59:00Z", course: "ECN 104" }],
-        overdueTasks: [{ id: "t", title: "Email landlord", due_date: "2026-09-01" }],
-      }),
-    );
-    assert.equal(result?.domain, "university");
-    assert.match(result!.headline, /ECN 104 — Essay is overdue/);
   });
 
   test("an overdue task outranks something merely due today", () => {
@@ -55,13 +41,6 @@ describe("JARVIS priority", () => {
     );
     assert.equal(ranked[0].domain, "tasks");
     assert.equal(ranked[ranked.length - 1].domain, "routine");
-  });
-
-  test("assessments further than three days out are not urgent yet", () => {
-    const ranked = rankPriorities(
-      input({ universityDue: [{ id: "a", title: "Final", due_at: "2026-10-20T12:00:00Z" }] }),
-    );
-    assert.equal(ranked.length, 0);
   });
 
   test("counts the extra overdue tasks rather than listing them all", () => {
@@ -97,8 +76,8 @@ describe("JARVIS priority", () => {
   test("every candidate carries somewhere to act on it", () => {
     const ranked = rankPriorities(
       input({
-        universityDue: [{ id: "a", title: "Quiz", due_at: "2026-09-08T09:00:00Z" }],
         overdueTasks: [{ id: "t", title: "Thing", due_date: "2026-09-01" }],
+        tasksDueToday: [{ id: "u", title: "Other" }],
         staleDeals: [{ label: "Acme", daysSinceStageChange: 9 }],
         routine: { completed: 0, total: 3 },
       }),

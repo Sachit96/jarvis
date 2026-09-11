@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowUp,
   Briefcase,
@@ -132,6 +133,9 @@ export function MentorConsole({
   const [isPending, startTransition] = useTransition();
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const handedOff = useRef(false);
 
   const isEmpty = messages.length === 0;
 
@@ -207,6 +211,27 @@ export function MentorConsole({
       scrollToEnd();
     });
   }
+
+  /**
+   * A question handed over from the command palette.
+   *
+   * The palette's "Ask JARVIS" row navigates here with ?q= rather than
+   * running the turn itself, because the operator can return a
+   * confirmation gate and the palette has nowhere to render one.
+   *
+   * The ref guards against a second send: this effect re-runs whenever the
+   * transition settles, and the URL is only cleaned afterwards.
+   */
+  useEffect(() => {
+    const handoff = searchParams.get("q");
+    if (!handoff || handedOff.current || !hasKey) return;
+    handedOff.current = true;
+    send(handoff);
+    router.replace("/mentor");
+    // send/router are stable enough for this one-shot; re-running on every
+    // render would re-ask the question.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, hasKey]);
 
   function approve() {
     if (!pending || isPending) return;

@@ -2,6 +2,7 @@ import { test, describe } from "node:test";
 import assert from "node:assert/strict";
 import { runToolRound } from "../lib/ai/providers/tool-round.ts";
 import { executeTool, toolResultForModel } from "../lib/ai/tools/executor.ts";
+import { unavailable } from "../lib/ai/tools/types.ts";
 import { getTool, getToolDeclarations, listTools } from "../lib/ai/tools/registry.ts";
 import { applyApproval } from "../lib/ai/approval.ts";
 import type { AgentToolCall, AgentToolOutcome } from "../lib/ai/providers/types.ts";
@@ -41,7 +42,7 @@ function makeExecutor(log: string[]) {
 const parallelSafe = (name: string) => getTool(name)?.risk === "safe";
 
 describe("scenario 1 — 'What should I do tomorrow?'", () => {
-  const CALLS = ["get_upcoming_tasks", "get_routines", "get_university_deadlines", "get_upcoming"];
+  const CALLS = ["get_upcoming_tasks", "get_routines", "get_goals", "get_upcoming"];
 
   test("every tool the scenario needs exists and is a safe read", () => {
     for (const name of CALLS) {
@@ -66,7 +67,7 @@ describe("scenario 1 — 'What should I do tomorrow?'", () => {
   });
 });
 
-describe("scenario 2 — university + tasks + calendar, then a write", () => {
+describe("scenario 2 — reads across modules, then a write", () => {
   test("a read/write mixture runs strictly in order", async () => {
     // "Make me a plan, then create the task" must not create the task while
     // the reads it depends on are still in flight.
@@ -80,14 +81,14 @@ describe("scenario 2 — university + tasks + calendar, then a write", () => {
     };
     await runToolRound(
       [
-        { name: "get_university_deadlines", args: {} },
+        { name: "get_goals", args: {} },
         { name: "get_upcoming_tasks", args: {} },
         { name: "create_task", args: { title: "Start the assignment" } },
       ],
       execute,
       parallelSafe,
     );
-    assert.deepEqual(order, ["get_university_deadlines", "get_upcoming_tasks", "create_task"]);
+    assert.deepEqual(order, ["get_goals", "get_upcoming_tasks", "create_task"]);
   });
 });
 
@@ -125,42 +126,49 @@ describe("scenario 5 — 'find my hottest leads and create follow-up tasks'", ()
 });
 
 describe("an unavailable integration does not sink the turn", () => {
-  test("Brightspace reports its state instead of inventing courses", async () => {
-    // No BRIGHTSPACE_* variables are set in the test environment, so this is
-    // the genuine unconfigured path.
-    const result = await executeTool("get_brightspace_courses", {}, { supabase: noDb });
-    assert.equal(result.status, "integration_unavailable");
-    if (result.status !== "integration_unavailable") return;
-    assert.equal(result.integration, "brightspace");
-    assert.equal(result.state, "configuration_required");
-    // And it points at what IS available, so the turn can still be useful.
-    assert.match(result.message, /get_grades|get_university_deadlines/);
-  });
-
-  test("the model is told it could not look, not that there was nothing", async () => {
+  /**
+   * Tested against the executor's translation layer rather than through a
+   * tool, because no tool in the registry currently returns this status —
+   * Brightspace was the only gated integration and it is gone. The path it
+   * used still exists and still matters: the next gated integration
+   * inherits it, and the failure it prevents (an assistant narrating "you
+   * have no assignments" for a service it never reached) is the worst kind
+   * this codebase has.
+   */
+  test("the model is told it could not look, not that there was nothing", () => {
     const flat = toolResultForModel(
-      await executeTool("get_brightspace_courses", {}, { supabase: noDb }),
+      unavailable("hevy", "configuration_required", "Hevy is not connected."),
     );
     assert.equal(flat.ok, false);
     assert.equal(flat.error, "integration_unavailable");
+    assert.equal(flat.integration, "hevy");
+    assert.equal(flat.state, "configuration_required");
     // Conflating this with an empty result is how an assistant ends up
-    // narrating "you have no assignments" for an LMS it never reached.
+    // narrating "you logged no workouts" for a service it never reached.
     assert.notDeepEqual(flat.data, []);
+    assert.equal(flat.data, undefined);
   });
 
-  test("the rest of the round still runs after an unavailable integration", async () => {
+  test("the rest of the round still runs after a tool reports unavailable", async () => {
     const log: string[] = [];
+    const execute = async (call: AgentToolCall): Promise<AgentToolOutcome> => {
+      log.push(call.name);
+      if (call.name === "get_workout_history") {
+        return { response: toolResultForModel(unavailable("hevy", "configuration_required", "no")), label: "", ok: false };
+      }
+      return { response: {}, label: "", ok: true };
+    };
     const outcomes = await runToolRound(
       [
-        { name: "get_brightspace_courses", args: {} },
+        { name: "get_workout_history", args: {} },
         { name: "get_upcoming_tasks", args: {} },
         { name: "get_goals", args: {} },
       ],
-      makeExecutor(log),
+      execute,
       parallelSafe,
     );
     assert.equal(outcomes.length, 3, "an unavailable integration must not halt the round");
-    assert.deepEqual(log, ["get_brightspace_courses", "get_upcoming_tasks", "get_goals"]);
+    assert.deepEqual(log.sort(), ["get_goals", "get_upcoming_tasks", "get_workout_history"]);
   });
 });
 

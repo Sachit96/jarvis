@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { validateTwilioSignature, twiMlReply, emptyTwiMl } from "@/lib/sms/twilio-signature";
+import {
+  validateTwilioSignature,
+  twiMlReply,
+  emptyTwiMl,
+  twilioRequestUrl,
+  samePhoneNumber,
+} from "@/lib/sms/twilio-signature";
+import { runGeneralMentorChat } from "@/lib/ai/mentor-brief";
+import { createClient } from "@/lib/supabase/server";
 import { callGemini, type GeminiFunctionDeclaration } from "@/lib/ai/providers/gemini-client";
 import { LOG_NUTRITION_TOOL } from "@/lib/ai/providers/gemini-mentor-provider";
 import { todayStr } from "@/lib/date";
 import { lbsToKg } from "@/lib/units";
-import { DEADLINE_CATEGORIES } from "@/lib/validations/uni";
 
 // Inbound SMS logging engine (Work Order 5) — Twilio POSTs here on every
 // message to TWILIO_PHONE_NUMBER. Inert (returns empty TwiML immediately)
@@ -114,19 +121,6 @@ const TOOLS: GeminiFunctionDeclaration[] = [
     },
   },
   {
-    name: "add_deadline",
-    description: "Add a university deadline (e.g. 'OSAP deadline is Sept 30', 'add-drop ends Oct 5').",
-    parameters: {
-      type: "OBJECT",
-      properties: {
-        title: { type: "STRING" },
-        due_date: { type: "STRING", description: "YYYY-MM-DD" },
-        category: { type: "STRING", enum: [...DEADLINE_CATEGORIES] },
-      },
-      required: ["title", "due_date"],
-    },
-  },
-  {
     name: "add_memory_entry",
     description: "Save a durable fact worth remembering long-term — not a diary note (e.g. 'remember my landlord's number is 555-1234').",
     parameters: {
@@ -148,19 +142,6 @@ const TOOLS: GeminiFunctionDeclaration[] = [
     },
   },
   {
-    name: "log_study_session",
-    description: "Log a completed study session for a university course.",
-    parameters: {
-      type: "OBJECT",
-      properties: {
-        course_code: { type: "STRING" },
-        minutes: { type: "NUMBER" },
-        notes: { type: "STRING" },
-      },
-      required: ["course_code", "minutes"],
-    },
-  },
-  {
     name: "add_journal_entry",
     description: "Save a freeform diary/reflection note — use this ONLY when the message is clearly a reflective thought or observation the person wants remembered as a journal entry. Do not use this as a default for messages that don't clearly match another tool — leave those uncalled instead.",
     parameters: {
@@ -174,10 +155,10 @@ const TOOLS: GeminiFunctionDeclaration[] = [
   },
 ];
 
-const BASE_SYSTEM_INSTRUCTION = `You parse a text message from the user into exactly one logging action. Call the single most specific tool that clearly and unambiguously matches the message. Prefer a specific domain tool (weight, sleep, habit, transaction, trade, goal, deadline, memory, workout, nutrition, task, study session) over add_journal_entry whenever the message fits one. Only call add_journal_entry when the message is clearly a reflective note/thought with no other clear category. If the message is ambiguous, vague, or doesn't confidently match ANY tool — including add_journal_entry — do not call any tool at all. Never guess at a match you're not confident about.`;
+const BASE_SYSTEM_INSTRUCTION = `You parse a text message from the user into exactly one logging action. Call the single most specific tool that clearly and unambiguously matches the message. Prefer a specific domain tool (weight, sleep, habit, transaction, trade, goal, memory, workout, nutrition, task) over add_journal_entry whenever the message fits one. Only call add_journal_entry when the message is clearly a reflective note/thought with no other clear category. If the message is ambiguous, vague, or doesn't confidently match ANY tool — including add_journal_entry — do not call any tool at all. Never guess at a match you're not confident about.`;
 
 const CAPABILITIES_SUMMARY =
-  "a workout, a meal, your weight, sleep, a habit, a trade, a transaction, a goal update, a task done, a study session, a uni deadline, a memory to save, or a journal note";
+  "a workout, a meal, your weight, sleep, a habit, a trade, a transaction, a goal update, a task done, a memory to save, or a journal note";
 
 /**
  * Found live (2026-09-06): "OSAP deadline is Sept 30" inserted with
@@ -223,17 +204,27 @@ export async function POST(request: NextRequest) {
   for (const [key, value] of formData.entries()) params[key] = String(value);
 
   const signature = request.headers.get("X-Twilio-Signature") ?? "";
-  const isValidSignature = validateTwilioSignature(authToken, signature, request.url, params);
+  // Not request.url — see twilioRequestUrl. Behind the platform proxy that
+  // is the internal address, and hashing it can never match.
+  const signedUrl = twilioRequestUrl(request);
+  const isValidSignature = validateTwilioSignature(authToken, signature, signedUrl, params);
 
   const supabase = createAdminClient();
 
   if (!isValidSignature) {
+    console.warn(`[sms] signature rejected from=${params.From ?? "unknown"} url=${signedUrl}`);
     await supabase.from("sms_messages").insert({ from_number: params.From ?? "unknown", body: params.Body ?? "", reply: "", status: "rejected_signature" });
     return new NextResponse(emptyTwiMl(), { status: 200, headers: { "Content-Type": "text/xml" } });
   }
 
   const from = params.From ?? "";
-  if (from !== ownerNumber) {
+  console.log(`[sms] in from=${from} body=${JSON.stringify((params.Body ?? "").slice(0, 160))}`);
+  // By digits, not ===. Twilio sends E.164 ("+12895361536"); an env var
+  // typed as "12895361536" or "(289) 536-1536" is the same number and used
+  // to be rejected in silence, since an unrecognised sender gets no reply
+  // at all.
+  if (!samePhoneNumber(from, ownerNumber)) {
+    console.warn(`[sms] sender rejected from=${from} (owner is ${ownerNumber})`);
     // Logged (from_number is exactly what was rejected, useful for
     // noticing spoofing attempts) but never processed — a non-owner
     // sender gets no reply at all, not even an error.
@@ -261,6 +252,16 @@ export async function POST(request: NextRequest) {
   }
 
   const body = params.Body ?? "";
+
+  // Answered without a model call. "help" over SMS should be instant and
+  // free, and it is the one reply whose content must not vary.
+  if (/^\s*(help|what can you do\??)\s*$/i.test(body)) {
+    const reply = `Text me to log ${CAPABILITIES_SUMMARY} — or just ask me a question.`;
+    console.log(`[sms] out to=${from} action=help`);
+    await supabase.from("sms_messages").insert({ from_number: from, body, action_taken: "help", reply, status: "processed" });
+    return new NextResponse(twiMlReply(reply), { status: 200, headers: { "Content-Type": "text/xml" } });
+  }
+
   let actionTaken: string | null = null;
   let reply: string;
 
@@ -280,8 +281,13 @@ export async function POST(request: NextRequest) {
       // where the person meant it to go. No tool call at all (not even
       // add_journal_entry) now means: say so, name what's loggable, log
       // nothing.
-      actionTaken = null;
-      reply = `Couldn't tell what to log from that. I can log ${CAPABILITIES_SUMMARY}.`;
+      // Nothing to log — so answer it. This route used to stop here and
+      // reply "couldn't tell what to log", which meant a perfectly good
+      // question ("what's on today?") got a refusal by text while the same
+      // question in the Mentor got a real answer. A message that is not a
+      // log entry is usually a question.
+      actionTaken = "conversation";
+      reply = await answerConversationally(body);
     } else if (call.name === "add_journal_entry") {
       const args = call.args as { body?: string; mood?: number };
       const text = args.body ?? body;
@@ -404,15 +410,7 @@ export async function POST(request: NextRequest) {
         actionTaken = "update_goal_progress";
         reply = `Updated "${match.title}" to ${clamped}%.`;
       }
-    } else if (call.name === "add_deadline") {
-      const args = call.args as { title: string; due_date: string; category?: string };
-      const category = DEADLINE_CATEGORIES.includes(args.category as (typeof DEADLINE_CATEGORIES)[number])
-        ? (args.category as (typeof DEADLINE_CATEGORIES)[number])
-        : "other";
-      await supabase.from("uni_deadlines").insert({ title: args.title, due_at: args.due_date, category });
-      actionTaken = "add_deadline";
-      reply = `Added deadline: ${args.title} (${args.due_date})`;
-    } else if (call.name === "add_memory_entry") {
+        } else if (call.name === "add_memory_entry") {
       const args = call.args as { title: string; body: string };
       await supabase.from("memory_entries").insert({ type: "fact", title: args.title, body: args.body, source: "manual" });
       actionTaken = "add_memory_entry";
@@ -430,39 +428,46 @@ export async function POST(request: NextRequest) {
         actionTaken = "complete_task";
         reply = `Marked "${match.title}" done.`;
       }
-    } else if (call.name === "log_study_session") {
-      const args = call.args as { course_code: string; minutes: number; notes?: string };
-      const { data: courses } = await supabase.from("uni_courses").select("id, code").eq("archived", false);
-      const needle = args.course_code.trim().toLowerCase();
-      const match = (courses ?? []).find((c) => c.code.toLowerCase() === needle);
-      if (!match) {
-        actionTaken = null;
-        reply = `Couldn't find a course matching "${args.course_code}" — nothing logged.`;
-      } else {
-        await supabase.from("uni_study_sessions").insert({
-          course_id: match.id,
-          planned_start: new Date().toISOString(),
-          planned_minutes: Math.round(args.minutes),
-          actual_minutes: Math.round(args.minutes),
-          completed: true,
-          notes: args.notes ?? null,
-        });
-        actionTaken = "log_study_session";
-        reply = `Logged ${args.minutes}min of study for ${match.code}.`;
-      }
     } else {
       // Declared a tool but the name matched none of the above — shouldn't
-      // happen given TOOLS above, but fail honestly rather than journal it.
-      actionTaken = null;
-      reply = `Couldn't tell what to log from that. I can log ${CAPABILITIES_SUMMARY}.`;
+      // happen given TOOLS above. Answer it rather than journal it.
+      actionTaken = "conversation";
+      reply = await answerConversationally(body);
     }
   } catch (err) {
-    reply = "Something went wrong logging that — try again in a moment.";
+    reply = "Something went wrong on my side — try that again in a moment.";
     await supabase.from("sms_messages").insert({ from_number: from, body, action_taken: null, reply, status: "error" });
-    console.error("[sms-webhook]", err instanceof Error ? err.message : err);
+    console.error("[sms] error", err instanceof Error ? err.message : err);
     return new NextResponse(twiMlReply(reply), { status: 200, headers: { "Content-Type": "text/xml" } });
   }
 
+  console.log(`[sms] out to=${from} action=${actionTaken ?? "none"} reply=${JSON.stringify(reply.slice(0, 160))}`);
   await supabase.from("sms_messages").insert({ from_number: from, body, action_taken: actionTaken, reply, status: "processed" });
   return new NextResponse(twiMlReply(reply), { status: 200, headers: { "Content-Type": "text/xml" } });
+}
+
+/**
+ * Answer a text that is not a log entry.
+ *
+ * Runs the same mentor chat the app's own Mentor uses, so the reply comes
+ * from the same context and persona rather than a second, thinner brain
+ * that would drift from it.
+ *
+ * SMS segments at 160 characters and every segment is billed, so the reply
+ * is capped. Truncating mid-sentence reads as a bug, so it trims at the
+ * last sentence end inside the budget and only hard-cuts when there is no
+ * sentence boundary to find.
+ */
+const SMS_REPLY_BUDGET = 300;
+
+async function answerConversationally(message: string): Promise<string> {
+  const supabase = await createClient();
+  // runGeneralMentorChat returns the stored assistant row, not a string.
+  const answer = (await runGeneralMentorChat(supabase, message)).content.trim();
+  if (!answer) return "I didn't get an answer together for that one — try asking again.";
+  if (answer.length <= SMS_REPLY_BUDGET) return answer;
+
+  const clipped = answer.slice(0, SMS_REPLY_BUDGET);
+  const lastStop = Math.max(clipped.lastIndexOf(". "), clipped.lastIndexOf("! "), clipped.lastIndexOf("? "));
+  return lastStop > SMS_REPLY_BUDGET * 0.5 ? clipped.slice(0, lastStop + 1) : `${clipped.trimEnd()}…`;
 }

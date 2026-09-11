@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-10T17:40:01.246Z",
+  "generatedAt": "2026-09-11T01:30:39.500Z",
   "scenario": "populated",
   "mode": "prod",
   "viewports": {
@@ -7,9 +7,9 @@
     "mobile": "390x844"
   },
   "summary": {
-    "routes": 35,
-    "screenshots": 70,
-    "passed": 35,
+    "routes": 26,
+    "screenshots": 52,
+    "passed": 26,
     "failed": 0
   },
   "routes": [
@@ -565,209 +565,6 @@
       "pass": true
     },
     {
-      "route": "/uni",
-      "page": "university-dashboard",
-      "desktop": {
-        "file": "university-dashboard-desktop.png",
-        "viewport": "1512x950",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "mobile": {
-        "file": "university-dashboard-mobile.png",
-        "viewport": "390x844",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "pass": true
-    },
-    {
-      "route": "/uni/courses",
-      "page": "university-courses",
-      "desktop": {
-        "file": "university-courses-desktop.png",
-        "viewport": "1512x950",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "mobile": {
-        "file": "university-courses-mobile.png",
-        "viewport": "390x844",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "pass": true
-    },
-    {
-      "route": "/uni/timetable",
-      "page": "university-timetable",
-      "desktop": {
-        "file": "university-timetable-desktop.png",
-        "viewport": "1512x950",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "mobile": {
-        "file": "university-timetable-mobile.png",
-        "viewport": "390x844",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "pass": true
-    },
-    {
-      "route": "/uni/attendance",
-      "page": "university-attendance",
-      "desktop": {
-        "file": "university-attendance-desktop.png",
-        "viewport": "1512x950",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "mobile": {
-        "file": "university-attendance-mobile.png",
-        "viewport": "390x844",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "pass": true
-    },
-    {
-      "route": "/uni/calendar",
-      "page": "university-calendar",
-      "desktop": {
-        "file": "university-calendar-desktop.png",
-        "viewport": "1512x950",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "mobile": {
-        "file": "university-calendar-mobile.png",
-        "viewport": "390x844",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "pass": true
-    },
-    {
-      "route": "/uni/assessments",
-      "page": "university-assessments",
-      "desktop": {
-        "file": "university-assessments-desktop.png",
-        "viewport": "1512x950",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "mobile": {
-        "file": "university-assessments-mobile.png",
-        "viewport": "390x844",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "pass": true
-    },
-    {
-      "route": "/uni/deadlines",
-      "page": "university-deadlines",
-      "desktop": {
-        "file": "university-deadlines-desktop.png",
-        "viewport": "1512x950",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "mobile": {
-        "file": "university-deadlines-mobile.png",
-        "viewport": "390x844",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "pass": true
-    },
-    {
       "route": "/mentor",
       "page": "mentor-today",
       "desktop": {
@@ -842,35 +639,6 @@
       },
       "mobile": {
         "file": "voice-mobile.png",
-        "viewport": "390x844",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "pass": true
-    },
-    {
-      "route": "/youtube",
-      "page": "youtube",
-      "desktop": {
-        "file": "youtube-desktop.png",
-        "viewport": "1512x950",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "mobile": {
-        "file": "youtube-mobile.png",
         "viewport": "390x844",
         "status": 200,
         "hydrated": true,
@@ -987,35 +755,6 @@
       },
       "mobile": {
         "file": "business-client-detail-mobile.png",
-        "viewport": "390x844",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "pass": true
-    },
-    {
-      "route": "/uni/courses/crs-0000-0000-0000-000000000001",
-      "page": "university-course-detail",
-      "desktop": {
-        "file": "university-course-detail-desktop.png",
-        "viewport": "1512x950",
-        "status": 200,
-        "hydrated": true,
-        "horizontalOverflow": 0,
-        "chartsSized": true,
-        "pageErrors": [],
-        "failedRequests": [],
-        "error": null,
-        "render": "pass"
-      },
-      "mobile": {
-        "file": "university-course-detail-mobile.png",
         "viewport": "390x844",
         "status": 200,
         "hydrated": true,

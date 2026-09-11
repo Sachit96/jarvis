@@ -25,7 +25,7 @@ export type IntegrationState =
   /** Cannot work here at all — no adapter, or the provider is unreachable by design. */
   | "unavailable";
 
-export type IntegrationId = "brightspace" | "hevy" | "youtube" | "gemini" | "anthropic" | "sms";
+export type IntegrationId = "hevy" | "gemini" | "anthropic" | "sms";
 
 export interface IntegrationStatus {
   id: IntegrationId;
@@ -90,42 +90,6 @@ export function getIntegrationStatuses(): IntegrationStatus[] {
         ? undefined
         : "Add HEVY_API_KEY (requires a Hevy Pro subscription) to sync automatically.",
       requires: ["HEVY_API_KEY"],
-    },
-    {
-      id: "brightspace",
-      label: "Brightspace",
-      state: configured("BRIGHTSPACE_HOST", "BRIGHTSPACE_CLIENT_ID", "BRIGHTSPACE_CLIENT_SECRET")
-        ? "disconnected"
-        : "configuration_required",
-      // Two distinct states, and the difference matters: with no app
-      // registered there is nothing to connect TO, whereas a registered app
-      // with no token just needs the user to authorise once.
-      message: configured("BRIGHTSPACE_HOST", "BRIGHTSPACE_CLIENT_ID", "BRIGHTSPACE_CLIENT_SECRET")
-        ? "Brightspace is configured but not authorised yet."
-        : "Brightspace is not connected. University data is whatever you entered by hand.",
-      actionHint: configured("BRIGHTSPACE_HOST", "BRIGHTSPACE_CLIENT_ID", "BRIGHTSPACE_CLIENT_SECRET")
-        ? "Authorise JARVIS from Settings to start syncing."
-        : "Register an OAuth app with your institution, then set BRIGHTSPACE_HOST, BRIGHTSPACE_CLIENT_ID and BRIGHTSPACE_CLIENT_SECRET.",
-      requires: ["BRIGHTSPACE_HOST", "BRIGHTSPACE_CLIENT_ID", "BRIGHTSPACE_CLIENT_SECRET"],
-    },
-    {
-      id: "youtube",
-      label: "YouTube",
-      // Client ID/secret are an app REGISTRATION, not a grant — exactly the
-      // same distinction as Brightspace. Reporting "connected" from these
-      // alone claimed uploads would work when no account had ever authorised
-      // JARVIS. Only a stored token in yt_connections earns "connected", and
-      // only getIntegrationStatusesWithGrants can see that.
-      state: configured("YOUTUBE_CLIENT_ID", "YOUTUBE_CLIENT_SECRET")
-        ? "disconnected"
-        : "configuration_required",
-      message: configured("YOUTUBE_CLIENT_ID", "YOUTUBE_CLIENT_SECRET")
-        ? "YouTube is configured but no account has been authorised yet."
-        : "YouTube upload is not configured.",
-      actionHint: configured("YOUTUBE_CLIENT_ID", "YOUTUBE_CLIENT_SECRET")
-        ? "Connect YouTube from Settings to authorise uploads."
-        : "Set YOUTUBE_CLIENT_ID and YOUTUBE_CLIENT_SECRET to enable uploads.",
-      requires: ["YOUTUBE_CLIENT_ID", "YOUTUBE_CLIENT_SECRET"],
     },
     {
       id: "gemini",

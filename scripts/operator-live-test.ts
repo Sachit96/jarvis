@@ -54,7 +54,7 @@ interface Case {
 const READ_CASES: Case[] = [
   // --- tasks -------------------------------------------------------------
   { id: "T1", group: "tasks", prompt: "What are my tasks today?", anyOf: ["get_today_tasks", "get_tasks"],
-    forbid: ["get_finance_summary", "get_health_summary", "get_business_pipeline", "get_grades"] },
+    forbid: ["get_finance_summary", "get_health_summary", "get_business_pipeline"] },
   { id: "T2", group: "tasks", prompt: "What tasks are overdue?", anyOf: ["get_overdue_tasks"],
     forbid: ["get_finance_summary", "get_health_summary", "get_business_pipeline"] },
   { id: "T3", group: "tasks", prompt: "What should I work on next?", anyOf: ["get_today_tasks", "get_overdue_tasks", "get_upcoming_tasks"] },
@@ -67,30 +67,20 @@ const READ_CASES: Case[] = [
 
   // --- business ----------------------------------------------------------
   { id: "B1", group: "business", prompt: "What's my current pipeline?", anyOf: ["get_business_pipeline"],
-    forbid: ["get_health_summary", "get_grades", "get_body_metrics"] },
+    forbid: ["get_health_summary", "get_body_metrics"] },
   { id: "B2", group: "business", prompt: "Show me my open deals.", anyOf: ["get_business_pipeline"] },
   { id: "B3", group: "business", prompt: "Which deals are getting stale?", anyOf: ["get_business_pipeline", "get_follow_ups"] },
   { id: "B4", group: "business", prompt: "What should I focus on in my pipeline?", anyOf: ["get_business_pipeline", "get_follow_ups", "get_leads"] },
 
-  // --- university --------------------------------------------------------
-  // With Brightspace unconnected the ONLY acceptable outcome is a plain
-  // statement that it is unavailable. Fabricated assignments are the single
-  // worst failure this whole harness exists to catch — checked by hand
-  // against the FINAL RESPONSE column, which is why it is printed in full.
-  { id: "U1", group: "university", prompt: "What assignments are coming up?",
-    anyOf: ["get_university_deadlines", "get_brightspace_courses"] },
-  { id: "U2", group: "university", prompt: "How am I doing academically?", anyOf: ["get_grades"] },
-  { id: "U3", group: "university", prompt: "What should I study today?",
-    anyOf: ["get_university_deadlines", "get_grades", "get_upcoming"] },
 
   // --- health ------------------------------------------------------------
   { id: "H1", group: "health", prompt: "What was my latest workout?", anyOf: ["get_recent_workouts", "get_health_summary"],
-    forbid: ["get_finance_summary", "get_business_pipeline", "get_grades"] },
+    forbid: ["get_finance_summary", "get_business_pipeline"] },
   { id: "H2", group: "health", prompt: "How is my training progressing?", anyOf: ["get_training_progress", "get_recent_workouts"] },
 
   // --- finance -----------------------------------------------------------
   { id: "F1", group: "finance", prompt: "What's my financial overview?", anyOf: ["get_finance_summary", "get_accounts"],
-    forbid: ["get_health_summary", "get_grades", "get_recent_workouts"] },
+    forbid: ["get_health_summary", "get_recent_workouts"] },
   { id: "F2", group: "finance", prompt: "What happened with my recent transactions?", anyOf: ["get_finance_summary", "get_budget_status", "get_accounts"] },
 
   // --- calendar ----------------------------------------------------------
@@ -111,13 +101,13 @@ const READ_CASES: Case[] = [
 
   // --- cross-module ------------------------------------------------------
   // The actual JARVIS advantage. `maxTools` is the discipline check: a model
-  // that answers "what should I focus on" by querying all eight modules has
+  // that answers "what should I focus on" by querying every module has
   // failed even when the prose reads well.
   { id: "X1", group: "cross", prompt: "What should I focus on today?",
-    anyOf: ["get_today_tasks", "get_overdue_tasks", "get_university_deadlines"], maxTools: 5 },
-  { id: "X2", group: "cross", prompt: "Plan my evening around my university deadlines, business priorities, and tasks.",
-    anyOf: ["get_university_deadlines"], maxTools: 6,
-    note: "should reach university + business + tasks, and little else" },
+    anyOf: ["get_today_tasks", "get_overdue_tasks", "get_goals"], maxTools: 5 },
+  { id: "X2", group: "cross", prompt: "Plan my evening around my goals, business priorities, and tasks.",
+    anyOf: ["get_goals"], maxTools: 6,
+    note: "should reach goals + business + tasks, and little else" },
   // The only cross-module prompt that names NO domain, which is why its
   // acceptable set is wider than the others'. The 2026-09-09 run answered it
   // from get_business_pipeline alone and was marked FAIL — wrongly. With the
@@ -134,12 +124,12 @@ const READ_CASES: Case[] = [
   // still catch both.
   { id: "X3", group: "cross", prompt: "I have three hours tonight. What is the highest-value way I should use them?",
     anyOf: [
-      "get_today_tasks", "get_overdue_tasks", "get_university_deadlines", "get_upcoming_tasks",
+      "get_today_tasks", "get_overdue_tasks", "get_upcoming_tasks",
       "get_business_pipeline", "get_follow_ups",
     ],
     maxTools: 5 },
-  { id: "X4", group: "cross", prompt: "Look at my upcoming university work and business pipeline and help me prioritize tomorrow.",
-    anyOf: ["get_university_deadlines"], maxTools: 6 },
+  { id: "X4", group: "cross", prompt: "Look at my upcoming tasks and business pipeline and help me prioritize tomorrow.",
+    anyOf: ["get_upcoming_tasks", "get_today_tasks"], maxTools: 6 },
 ];
 
 const RESET = "\x1b[0m", RED = "\x1b[31m", GREEN = "\x1b[32m", DIM = "\x1b[2m", YELLOW = "\x1b[33m";

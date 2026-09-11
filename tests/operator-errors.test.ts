@@ -12,7 +12,7 @@ import type { Client, ToolResult } from "../lib/ai/tools/types.ts";
  * The requirement is not "these do not crash": it is that each distinct
  * failure stays DISTINGUISHABLE by the time it reaches the model. An
  * assistant that cannot tell "you have no assignments" from "I could not
- * reach Brightspace" is exactly the one that invents assignments, so the
+ * reach Hevy" is exactly the one that invents workouts, so the
  * tests below check the shape of each failure, not merely that one occurred.
  */
 
@@ -114,9 +114,9 @@ describe("what the model is told", () => {
       { status: "invalid_arguments", issues: ["task_id: Required"] },
       {
         status: "integration_unavailable",
-        integration: "brightspace",
+        integration: "hevy",
         state: "configuration_required",
-        message: "Brightspace is not connected.",
+        message: "Hevy is not connected.",
       },
       { status: "confirmation_required", toolName: "delete_task", summary: "Delete X", args: {} },
     ];

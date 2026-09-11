@@ -42,7 +42,10 @@ import type { NextRequest } from "next/server";
 // Every other route, including the OAuth callback a browser redirects
 // back to (which still carries the site's cached Basic Auth), stays
 // gated.
-const UNGATED_WEBHOOK_PATHS = ["/api/sms/webhook", "/api/mentor/run"];
+// /api/twilio/sms is the same handler re-exported under the path Twilio
+// consoles are usually pointed at; it needs the same carve-out, or the
+// gate 401s Twilio before the route's own signature check can run.
+const UNGATED_WEBHOOK_PATHS = ["/api/sms/webhook", "/api/twilio/sms", "/api/mentor/run"];
 const UNGATED_PREFIXES = ["/api/research/runs"];
 
 /**

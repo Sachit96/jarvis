@@ -15,7 +15,7 @@ import { activeNavHref, crumbHref, SIDEBAR_ITEMS } from "@/lib/nav-items";
 
 /**
  * Titles a segment the way the nav does wherever possible, so the trail and
- * the sidebar agree ("uni" reads as "University", not "Uni"). Falls back to
+ * the sidebar agree ("life" reads as "Goals", not "Life"). Falls back to
  * de-slugged title case for leaf segments the nav has no entry for.
  *
  * `fullPath` matters, not just the crumb's own href: naming a module segment
