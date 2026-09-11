@@ -28,7 +28,6 @@ export type ToolDomain =
   | "goals"
   | "business"
   | "finance"
-  | "university"
   | "health"
   | "calendar"
   | "memory";

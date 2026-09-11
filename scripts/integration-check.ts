@@ -19,9 +19,7 @@ import { describeEnvSource } from "./load-env";
 import { safeError } from "./safe-error";
 import { createAdminClient } from "../lib/supabase/admin";
 import { getIntegrationStatuses } from "../lib/integrations/status";
-import { getIntegrationStatusesWithGrants } from "../lib/integrations/grants";
 import { fetchRecentWorkouts } from "../lib/integrations/hevy";
-import { getBrightspaceConnectionStatus, fetchCourses } from "../lib/integrations/brightspace";
 
 const RESET = "\x1b[0m", GREEN = "\x1b[32m", RED = "\x1b[31m", YELLOW = "\x1b[33m", DIM = "\x1b[2m";
 const has = (n: string) => Boolean(process.env[n]);
@@ -60,18 +58,13 @@ async function checkSupabase() {
   record("schema", "migration 0036 (routine cadence)", cadence.error ? "MISSING" : "PRESENT",
     cadence.error ? `habits.cadence/days_of_week absent — apply 0036` : "habits.cadence + days_of_week exist");
 
-  // Migration 0037: the table it creates.
-  const bs = await supabase.from("brightspace_connections").select("host").limit(1);
-  record("schema", "migration 0037 (brightspace_connections)", bs.error ? "MISSING" : "PRESENT",
-    bs.error ? "table absent — apply 0037" : "table exists");
-
   // A representative read from each domain, proving the generated types match
   // the real columns and the app's own queries execute.
   const domains: [string, () => PromiseLike<{ error: { message: string } | null }>][] = [
     ["tasks", () => supabase.from("tasks").select("id, title, status, priority, due_date").limit(1)],
     ["goals", () => supabase.from("goals").select("id, title, timeframe").limit(1)],
     ["deals", () => supabase.from("deals").select("id, stage_id, closed_at").limit(1)],
-    ["uni_assessments", () => supabase.from("uni_assessments").select("id, title, due_at, status").limit(1)],
+    ["habits", () => supabase.from("habits").select("id, name, is_active").limit(1)],
     ["workouts", () => supabase.from("workouts").select("id, started_at, completed").limit(1)],
     ["transactions", () => supabase.from("transactions").select("id, amount, occurred_at").limit(1)],
     ["memory_entries", () => supabase.from("memory_entries").select("id, title, body, type, pinned").limit(1)],
@@ -102,35 +95,7 @@ async function checkHevy() {
   }
 }
 
-async function checkBrightspace() {
-  console.log(`\n${YELLOW}Brightspace${RESET}`);
-  const vars = ["BRIGHTSPACE_HOST", "BRIGHTSPACE_CLIENT_ID", "BRIGHTSPACE_CLIENT_SECRET"];
-  const absent = vars.filter((v) => !has(v));
-  if (absent.length) {
-    record("brightspace", "OAuth app registration", "MISSING", `configuration_required — unset: ${absent.join(", ")}`);
-    return;
-  }
-  record("brightspace", "OAuth app registration", "PRESENT");
-
-  const status = await getBrightspaceConnectionStatus();
-  if (status.state !== "connected") {
-    record("brightspace", "OAuth grant", "MISSING", `${status.state} — ${status.message}`);
-    return;
-  }
-  record("brightspace", "OAuth grant", "PRESENT", status.message);
-
-  const courses = await fetchCourses();
-  record("brightspace", "read-only course fetch", courses.data ? "PRESENT" : "INVALID",
-    courses.data ? `${courses.data.length} course(s)` : (courses.failure ?? courses.status.message));
-}
-
-function checkYouTubeAndSms() {
-  console.log(`\n${YELLOW}YouTube${RESET}`);
-  const ytVars = ["YOUTUBE_CLIENT_ID", "YOUTUBE_CLIENT_SECRET"];
-  const ytAbsent = ytVars.filter((v) => !has(v));
-  record("youtube", "client credentials", ytAbsent.length ? "MISSING" : "PRESENT",
-    ytAbsent.length ? `unset: ${ytAbsent.join(", ")}` : "app registered; grant checked below");
-
+function checkSms() {
   console.log(`\n${YELLOW}Twilio / SMS${RESET} ${DIM}(configuration only — no message is sent)${RESET}`);
   const smsVars = ["TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_PHONE_NUMBER", "OWNER_PHONE_NUMBER"];
   const smsAbsent = smsVars.filter((v) => !has(v));
@@ -148,15 +113,13 @@ async function main() {
 
   await checkSupabase();
   await checkHevy();
-  await checkBrightspace();
-  checkYouTubeAndSms();
+  checkSms();
 
   console.log(`\n${YELLOW}Integration states, as the app and the AI tools see them${RESET}`);
-  // Grant-aware where a database is reachable; credential-only otherwise.
-  let statuses = getIntegrationStatuses();
-  if (has("NEXT_PUBLIC_SUPABASE_URL") && has("SUPABASE_SERVICE_ROLE_KEY")) {
-    try { statuses = await getIntegrationStatusesWithGrants(); } catch { /* fall back to the sync view */ }
-  }
+  // Credential-only. The grant-aware variant existed for the two OAuth
+  // integrations, both of which are gone; what is left is answered by
+  // environment variables alone.
+  const statuses = getIntegrationStatuses();
   for (const s of statuses) console.log(`  ${s.state.padEnd(23)} ${s.label.padEnd(12)} ${DIM}${s.message}${RESET}`);
 
   const bad = results.filter((r) => r.verdict === "INVALID");

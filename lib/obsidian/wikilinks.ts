@@ -4,7 +4,7 @@ import type { Database } from "@/lib/supabase/database.types";
 
 type Client = SupabaseClient<Database>;
 
-export type NoteLinkType = "memory_entry" | "contact" | "uni_course" | "deal" | "journal_entry";
+export type NoteLinkType = "memory_entry" | "contact" | "deal" | "journal_entry";
 
 /** [[Title]] or [[Title|Display text]] — the Obsidian wikilink syntax used throughout the existing vault (see Jarvis memory/00-INDEX.md). */
 const WIKILINK_PATTERN = /\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g;
@@ -19,7 +19,7 @@ export function parseWikilinks(text: string): string[] {
 }
 
 interface DomainConfig {
-  table: "memory_entries" | "contacts" | "uni_courses" | "deals" | "journal_entries";
+  table: "memory_entries" | "contacts" | "deals" | "journal_entries";
   /** Every field a wikilink's title text might match against — checked case-insensitively. */
   titleFields: string[];
   /** Body-ish fields scanned for outgoing [[...]] references when this domain acts as a link SOURCE. */
@@ -29,7 +29,6 @@ interface DomainConfig {
 const DOMAINS: Record<NoteLinkType, DomainConfig> = {
   memory_entry: { table: "memory_entries", titleFields: ["title"], textFields: ["body"] },
   contact: { table: "contacts", titleFields: ["company_name", "contact_person"], textFields: ["notes"] },
-  uni_course: { table: "uni_courses", titleFields: ["code", "name"], textFields: ["description"] },
   deal: { table: "deals", titleFields: ["title"], textFields: ["notes"] },
   journal_entry: { table: "journal_entries", titleFields: ["title"], textFields: ["body"] },
 };

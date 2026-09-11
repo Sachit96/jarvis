@@ -159,20 +159,6 @@ describe("the model cannot reach arbitrary execution", () => {
   });
 });
 
-describe("no password path exists for Brightspace", () => {
-  test("nothing in the Brightspace integration accepts a credential", () => {
-    const files = FILES.filter((f) => f.includes("brightspace"));
-    assert.ok(files.length > 0, "expected the Brightspace integration to exist");
-    for (const f of files) {
-      const src = read(f);
-      // Comments documenting the absence of a password path are the point;
-      // an actual field or parameter is not.
-      const code = src.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "");
-      assert.doesNotMatch(code, /password/i, `${f} must have no password path`);
-    }
-  });
-});
-
 describe("the trace does not leak arguments to the browser", () => {
   /**
    * AgentTraceEntry carries the arguments each tool was called with, so a live

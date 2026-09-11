@@ -7,8 +7,6 @@ function hrefFor(type: NoteLinkType, id: string): string | null {
   switch (type) {
     case "memory_entry":
       return `/memory?entry=${id}`;
-    case "uni_course":
-      return `/uni/courses/${id}`;
     case "journal_entry":
       return `/life/journal`;
     case "contact":
@@ -21,7 +19,6 @@ function hrefFor(type: NoteLinkType, id: string): string | null {
 const TYPE_LABEL: Record<NoteLinkType, string> = {
   memory_entry: "Memory",
   contact: "Contact",
-  uni_course: "Course",
   deal: "Deal",
   journal_entry: "Journal",
 };

@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { type IntegrationState } from "@/lib/integrations/status";
-import { getIntegrationStatusesWithGrants } from "@/lib/integrations/grants";
+import { getIntegrationStatuses } from "@/lib/integrations/status";
 
 /**
  * One board showing every external service and whether it can actually do
@@ -40,7 +40,11 @@ const STATE_DOT: Record<IntegrationState, string> = {
 // Async so the two OAuth integrations report an actual grant rather than a
 // mere app registration — see lib/integrations/grants.ts.
 export async function IntegrationStatusCard() {
-  const statuses = await getIntegrationStatusesWithGrants();
+  // Synchronous again. grants.ts existed only to tell a registered OAuth
+  // app apart from an authorised one, and both OAuth integrations
+  // (YouTube, Brightspace) are gone — every remaining integration is
+  // answered by environment variables alone.
+  const statuses = getIntegrationStatuses();
 
   // No card header: the section this card sits in already carries the title
   // and the "anything not connected is simply unavailable" line, so both were

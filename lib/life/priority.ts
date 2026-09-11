@@ -15,7 +15,7 @@
  * testable and cannot disagree with the modules it draws from.
  */
 
-export type PriorityDomain = "university" | "tasks" | "business" | "health" | "routine";
+export type PriorityDomain = "tasks" | "business" | "health" | "routine";
 
 export interface PriorityCandidate {
   domain: PriorityDomain;
@@ -29,16 +29,17 @@ export interface PriorityCandidate {
 /**
  * Urgency bands, not arbitrary numbers.
  *
- * The ordering encodes one judgement: a hard external deadline that has
- * already passed outranks anything self-imposed, because it is the only
- * category where the cost of missing it is not the user's to negotiate.
- * Below that, things with a date beat things without one.
+ * The ordering encodes one judgement: things with a date beat things
+ * without one, and something already past its date beats something
+ * approaching it.
+ *
+ * The top two bands used to belong to university assessments, on the
+ * reasoning that an external deadline is the one category whose cost is
+ * not the user's to negotiate. With that module gone the numbers simply
+ * close up; the relative order of what remains is unchanged.
  */
 const RANK = {
-  overdueAssessment: 100,
-  assessmentDueToday: 90,
   overdueTask: 80,
-  assessmentDueSoon: 70,
   taskDueToday: 60,
   staleDeal: 50,
   routineIncomplete: 20,
@@ -48,16 +49,8 @@ export interface PriorityInput {
   today: string;
   overdueTasks: { id: string; title: string; due_date: string | null }[];
   tasksDueToday: { id: string; title: string }[];
-  /** Assessments and deadlines from the University module, ISO timestamps. */
-  universityDue: { id: string; title: string; due_at: string; course?: string | null }[];
   staleDeals: { label: string; daysSinceStageChange: number }[];
   routine: { completed: number; total: number };
-}
-
-function dayDiff(fromIso: string, toDate: string): number {
-  const a = new Date(`${toDate}T00:00:00`).getTime();
-  const b = new Date(fromIso).getTime();
-  return Math.round((b - a) / 86_400_000);
 }
 
 /**
@@ -67,33 +60,6 @@ function dayDiff(fromIso: string, toDate: string): number {
  */
 export function rankPriorities(input: PriorityInput): PriorityCandidate[] {
   const candidates: PriorityCandidate[] = [];
-
-  for (const item of input.universityDue) {
-    const days = dayDiff(item.due_at, input.today);
-    const label = item.course ? `${item.course} — ${item.title}` : item.title;
-    if (days < 0) {
-      candidates.push({
-        domain: "university",
-        weight: RANK.overdueAssessment,
-        headline: `${label} is overdue`,
-        href: "/uni/assessments",
-      });
-    } else if (days === 0) {
-      candidates.push({
-        domain: "university",
-        weight: RANK.assessmentDueToday,
-        headline: `${label} is due today`,
-        href: "/uni/assessments",
-      });
-    } else if (days <= 3) {
-      candidates.push({
-        domain: "university",
-        weight: RANK.assessmentDueSoon,
-        headline: `${label} is due in ${days} day${days === 1 ? "" : "s"}`,
-        href: "/uni/assessments",
-      });
-    }
-  }
 
   if (input.overdueTasks.length > 0) {
     const [first] = input.overdueTasks;

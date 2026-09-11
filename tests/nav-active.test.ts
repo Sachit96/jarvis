@@ -13,20 +13,18 @@ const SIDEBAR_ITEMS: NavTarget[] = [
   { href: "/finance/overview" },
   { href: "/life/goals" },
   { href: "/life/tasks", matches: ["/life/habits", "/life/journal"] },
-  { href: "/uni" },
   { href: "/mentor" },
   { href: "/voice" },
-  { href: "/youtube" },
   { href: "/memory" },
   { href: "/settings" },
 ];
 
 const NAV_ITEMS: NavTarget[] = [
   { href: "/" },
-  { href: "/uni" },
+  { href: "/business/dashboard" },
   { href: "/finance/overview" },
   { href: "/health/workouts" },
-  { href: "/business/dashboard" },
+  { href: "/life/goals" },
 ];
 
 test("the mirrored tables match lib/nav-items.ts", async () => {
@@ -41,6 +39,20 @@ test("the mirrored tables match lib/nav-items.ts", async () => {
   }
   const hrefCount = [...declared.matchAll(/href: "/g)].length;
   assert.equal(hrefCount, SIDEBAR_ITEMS.length, "SIDEBAR_ITEMS gained or lost an entry");
+
+  // NAV_ITEMS was NOT checked here, and drifted: the mobile bar lost
+  // University and gained Goals while this file's copy kept asserting that
+  // /life/goals lights nothing. A stale mirror that still passes is worse
+  // than no mirror.
+  const mobile = source.slice(source.indexOf("export const NAV_ITEMS"), source.indexOf("export interface ModuleTab"));
+  for (const item of NAV_ITEMS) {
+    assert.ok(mobile.includes(`href: "${item.href}"`), `nav-items.ts no longer has ${item.href} in NAV_ITEMS`);
+  }
+  assert.equal(
+    [...mobile.matchAll(/href: "/g)].length,
+    NAV_ITEMS.length,
+    "NAV_ITEMS gained or lost an entry",
+  );
 });
 
 test("exactly one sidebar item is ever active", () => {
@@ -57,12 +69,9 @@ test("exactly one sidebar item is ever active", () => {
     "/life/tasks",
     "/life/habits",
     "/life/journal",
-    "/uni",
-    "/uni/attendance",
     "/mentor",
     "/mentor/weekly-review",
     "/voice",
-    "/youtube",
     "/memory",
     "/settings",
   ];
@@ -88,7 +97,7 @@ test("Tasks & Routine owns its own tab routes", () => {
 test("a module's deeper routes light its top-level entry", () => {
   assert.equal(activeNavHref("/finance/budgets", SIDEBAR_ITEMS), "/finance/overview");
   assert.equal(activeNavHref("/health/nutrition", SIDEBAR_ITEMS), "/health/workouts");
-  assert.equal(activeNavHref("/uni/attendance", SIDEBAR_ITEMS), "/uni");
+  assert.equal(activeNavHref("/business/pipeline", SIDEBAR_ITEMS), "/business/dashboard");
 });
 
 test("Home is active only at the root", () => {
@@ -101,10 +110,12 @@ test("an unknown route lights nothing rather than guessing", () => {
 });
 
 test("the mobile bar resolves against its own shorter list", () => {
-  // NAV_ITEMS has no /life entry at all, so those routes must light nothing
-  // rather than falling through to an unrelated tab.
-  assert.equal(activeNavHref("/life/goals", NAV_ITEMS), null);
+  // The bar carries five of the sidebar's entries. A route under one of
+  // them lights it; a route under an entry the bar does not carry lights
+  // nothing, rather than falling through to an unrelated tab.
+  assert.equal(activeNavHref("/life/goals", NAV_ITEMS), "/life/goals");
   assert.equal(activeNavHref("/health/body", NAV_ITEMS), "/health/workouts");
+  assert.equal(activeNavHref("/memory", NAV_ITEMS), null);
 });
 
 test("breadcrumb crumb destinations", async (t) => {
@@ -112,12 +123,12 @@ test("breadcrumb crumb destinations", async (t) => {
     { href: "/" },
     { href: "/business/dashboard" },
     { href: "/finance/overview" },
-    { href: "/uni" },
+    { href: "/memory" },
     { href: "/settings" },
   ];
 
   await t.test("a real route links to itself", () => {
-    assert.equal(crumbHref("/uni", items), "/uni");
+    assert.equal(crumbHref("/memory", items), "/memory");
     assert.equal(crumbHref("/settings", items), "/settings");
   });
 

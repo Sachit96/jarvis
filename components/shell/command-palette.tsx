@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { FileText, Search, Sparkles } from "lucide-react";
-import { toast } from "sonner";
 import {
   CommandDialog,
   CommandEmpty,
@@ -21,7 +20,6 @@ import {
   type SearchGroup,
   type SearchResult,
 } from "@/actions/search-actions";
-import { runUniCommandAction } from "@/actions/uni-command-actions";
 
 const PAGES: SearchResult[] = SIDEBAR_ITEMS.filter((i) => i.href !== "/").map((i) => ({
   id: i.href,
@@ -51,7 +49,6 @@ export function CommandPalette() {
   const [groups, setGroups] = useState<SearchGroup[]>([]);
   const [recent, setRecent] = useState<SearchResult[]>([]);
   const [isPending, startTransition] = useTransition();
-  const [isCommandPending, startCommandTransition] = useTransition();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -131,25 +128,23 @@ export function CommandPalette() {
   );
 
   /**
-   * UniOS command bar extension — opt-in, not automatic on every keystroke:
-   * this only runs when the user explicitly picks the "Ask JARVIS" row, both
-   * to avoid a model call per debounced keystroke and because the palette's
-   * default job is search; natural-language actions are a deliberate
-   * escalation from that, never a silent guess.
+   * Hand the question to the Mentor rather than answering it here.
+   *
+   * This row used to call a University-only action that could create an
+   * assessment or plan a study night — four hard-coded academic verbs, and
+   * nothing else. With that module gone the capability moves to the
+   * operator, which reaches tasks, goals, finance, business and health.
+   *
+   * It navigates instead of executing in place: the operator can return a
+   * confirmation gate for anything destructive, and the palette has no way
+   * to render one. Running it here would mean either dropping the gate or
+   * approving on the user's behalf from a toast.
    */
-  function runCommand() {
+  function askJarvis() {
     const text = query.trim();
     if (!text) return;
-    startCommandTransition(async () => {
-      const result = await runUniCommandAction(text);
-      if (result.matched) {
-        toast.success(result.message);
-        setOpen(false);
-        router.refresh();
-      } else {
-        toast(result.message);
-      }
-    });
+    setOpen(false);
+    router.push(`/mentor?q=${encodeURIComponent(text)}`);
   }
 
   const hasResults = pageMatches.length > 0 || resultGroups.length > 0 || (showingRecent && recent.length > 0);
@@ -255,9 +250,9 @@ export function CommandPalette() {
             <>
               <CommandSeparator />
               <CommandGroup heading="Actions">
-                <CommandItem value="ask-jarvis" onSelect={runCommand} disabled={isCommandPending}>
+                <CommandItem value="ask-jarvis" onSelect={askJarvis}>
                   <Sparkles />
-                  {isCommandPending ? "Asking JARVIS…" : `Ask JARVIS to “${query.trim()}”`}
+                  {`Ask JARVIS to “${query.trim()}”`}
                   <CommandShortcut>↵</CommandShortcut>
                 </CommandItem>
               </CommandGroup>

@@ -14,7 +14,6 @@ import { callGemini, type GeminiFunctionDeclaration } from "@/lib/ai/providers/g
 import { LOG_NUTRITION_TOOL } from "@/lib/ai/providers/gemini-mentor-provider";
 import { todayStr } from "@/lib/date";
 import { lbsToKg } from "@/lib/units";
-import { DEADLINE_CATEGORIES } from "@/lib/validations/uni";
 
 // Inbound SMS logging engine (Work Order 5) — Twilio POSTs here on every
 // message to TWILIO_PHONE_NUMBER. Inert (returns empty TwiML immediately)
@@ -122,19 +121,6 @@ const TOOLS: GeminiFunctionDeclaration[] = [
     },
   },
   {
-    name: "add_deadline",
-    description: "Add a university deadline (e.g. 'OSAP deadline is Sept 30', 'add-drop ends Oct 5').",
-    parameters: {
-      type: "OBJECT",
-      properties: {
-        title: { type: "STRING" },
-        due_date: { type: "STRING", description: "YYYY-MM-DD" },
-        category: { type: "STRING", enum: [...DEADLINE_CATEGORIES] },
-      },
-      required: ["title", "due_date"],
-    },
-  },
-  {
     name: "add_memory_entry",
     description: "Save a durable fact worth remembering long-term — not a diary note (e.g. 'remember my landlord's number is 555-1234').",
     parameters: {
@@ -156,19 +142,6 @@ const TOOLS: GeminiFunctionDeclaration[] = [
     },
   },
   {
-    name: "log_study_session",
-    description: "Log a completed study session for a university course.",
-    parameters: {
-      type: "OBJECT",
-      properties: {
-        course_code: { type: "STRING" },
-        minutes: { type: "NUMBER" },
-        notes: { type: "STRING" },
-      },
-      required: ["course_code", "minutes"],
-    },
-  },
-  {
     name: "add_journal_entry",
     description: "Save a freeform diary/reflection note — use this ONLY when the message is clearly a reflective thought or observation the person wants remembered as a journal entry. Do not use this as a default for messages that don't clearly match another tool — leave those uncalled instead.",
     parameters: {
@@ -182,10 +155,10 @@ const TOOLS: GeminiFunctionDeclaration[] = [
   },
 ];
 
-const BASE_SYSTEM_INSTRUCTION = `You parse a text message from the user into exactly one logging action. Call the single most specific tool that clearly and unambiguously matches the message. Prefer a specific domain tool (weight, sleep, habit, transaction, trade, goal, deadline, memory, workout, nutrition, task, study session) over add_journal_entry whenever the message fits one. Only call add_journal_entry when the message is clearly a reflective note/thought with no other clear category. If the message is ambiguous, vague, or doesn't confidently match ANY tool — including add_journal_entry — do not call any tool at all. Never guess at a match you're not confident about.`;
+const BASE_SYSTEM_INSTRUCTION = `You parse a text message from the user into exactly one logging action. Call the single most specific tool that clearly and unambiguously matches the message. Prefer a specific domain tool (weight, sleep, habit, transaction, trade, goal, memory, workout, nutrition, task) over add_journal_entry whenever the message fits one. Only call add_journal_entry when the message is clearly a reflective note/thought with no other clear category. If the message is ambiguous, vague, or doesn't confidently match ANY tool — including add_journal_entry — do not call any tool at all. Never guess at a match you're not confident about.`;
 
 const CAPABILITIES_SUMMARY =
-  "a workout, a meal, your weight, sleep, a habit, a trade, a transaction, a goal update, a task done, a study session, a uni deadline, a memory to save, or a journal note";
+  "a workout, a meal, your weight, sleep, a habit, a trade, a transaction, a goal update, a task done, a memory to save, or a journal note";
 
 /**
  * Found live (2026-09-06): "OSAP deadline is Sept 30" inserted with
@@ -437,15 +410,7 @@ export async function POST(request: NextRequest) {
         actionTaken = "update_goal_progress";
         reply = `Updated "${match.title}" to ${clamped}%.`;
       }
-    } else if (call.name === "add_deadline") {
-      const args = call.args as { title: string; due_date: string; category?: string };
-      const category = DEADLINE_CATEGORIES.includes(args.category as (typeof DEADLINE_CATEGORIES)[number])
-        ? (args.category as (typeof DEADLINE_CATEGORIES)[number])
-        : "other";
-      await supabase.from("uni_deadlines").insert({ title: args.title, due_at: args.due_date, category });
-      actionTaken = "add_deadline";
-      reply = `Added deadline: ${args.title} (${args.due_date})`;
-    } else if (call.name === "add_memory_entry") {
+        } else if (call.name === "add_memory_entry") {
       const args = call.args as { title: string; body: string };
       await supabase.from("memory_entries").insert({ type: "fact", title: args.title, body: args.body, source: "manual" });
       actionTaken = "add_memory_entry";
@@ -462,26 +427,6 @@ export async function POST(request: NextRequest) {
         await supabase.from("tasks").update({ status: "done", completed_at: new Date().toISOString() }).eq("id", match.id);
         actionTaken = "complete_task";
         reply = `Marked "${match.title}" done.`;
-      }
-    } else if (call.name === "log_study_session") {
-      const args = call.args as { course_code: string; minutes: number; notes?: string };
-      const { data: courses } = await supabase.from("uni_courses").select("id, code").eq("archived", false);
-      const needle = args.course_code.trim().toLowerCase();
-      const match = (courses ?? []).find((c) => c.code.toLowerCase() === needle);
-      if (!match) {
-        actionTaken = null;
-        reply = `Couldn't find a course matching "${args.course_code}" — nothing logged.`;
-      } else {
-        await supabase.from("uni_study_sessions").insert({
-          course_id: match.id,
-          planned_start: new Date().toISOString(),
-          planned_minutes: Math.round(args.minutes),
-          actual_minutes: Math.round(args.minutes),
-          completed: true,
-          notes: args.notes ?? null,
-        });
-        actionTaken = "log_study_session";
-        reply = `Logged ${args.minutes}min of study for ${match.code}.`;
       }
     } else {
       // Declared a tool but the name matched none of the above — shouldn't

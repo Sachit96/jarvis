@@ -166,52 +166,15 @@ export const fixtures = {
     },
   ],
 
-  uni_courses: [
-    { id: id("crs", 1), code: "SAMPLE-101", name: "SAMPLE Systems Design", term: "2026-S1", credit_weight: 1, professor: "SAMPLE Lecturer", professor_email: null, room: "A1.01", color: null, description: null, target_grade: 80, archived: false, term_start: day(-40), term_end: day(60), ...stamps },
-    { id: id("crs", 2), code: "SAMPLE-202", name: "SAMPLE Data Structures", term: "2026-S1", credit_weight: 1, professor: null, professor_email: null, room: "B2.14", color: null, description: null, target_grade: 75, archived: false, term_start: day(-40), term_end: day(60), ...stamps },
-  ],
 
-  uni_schedule_blocks: [
-    { id: id("blk", 1), course_id: id("crs", 1), day_of_week: 1, start_time: "09:00", end_time: "11:00", room: "A1.01", type: "lecture", ...stamps },
-    { id: id("blk", 2), course_id: id("crs", 2), day_of_week: 1, start_time: "13:00", end_time: "14:00", room: "B2.14", type: "tutorial", ...stamps },
-    { id: id("blk", 3), course_id: id("crs", 1), day_of_week: 3, start_time: "10:00", end_time: "12:00", room: "A1.01", type: "lab", ...stamps },
-    { id: id("blk", 4), course_id: id("crs", 2), day_of_week: 4, start_time: "15:00", end_time: "17:00", room: "B2.14", type: "lecture", ...stamps },
-  ],
 
-  uni_attendance: [
-    { id: id("att", 1), course_id: id("crs", 1), schedule_block_id: id("blk", 1), class_date: day(-7), status: "attended", note: null, ...stamps },
-    { id: id("att", 2), course_id: id("crs", 1), schedule_block_id: id("blk", 3), class_date: day(-5), status: "missed", note: null, ...stamps },
-    { id: id("att", 3), course_id: id("crs", 2), schedule_block_id: id("blk", 2), class_date: day(-7), status: "attended", note: null, ...stamps },
-  ],
 
-  uni_assessments: [
-    { id: id("asm", 1), course_id: id("crs", 1), title: "SAMPLE Assignment 1", type: "assignment", status: "not_started", due_at: iso(5, 23), max_score: 100, earned_score: null, weight_pct: 20, difficulty: 3, estimated_hours: 8, group_id: null, needs_verification: false, verification_note: null, notes: null, source: "manual", ...stamps },
-    { id: id("asm", 2), course_id: id("crs", 2), title: "SAMPLE Midterm", type: "exam", status: "graded", due_at: iso(-10, 9), max_score: 100, earned_score: 78, weight_pct: 30, difficulty: 4, estimated_hours: 12, group_id: null, needs_verification: false, verification_note: null, notes: null, source: "manual", ...stamps },
-  ],
 
   // Rows the study-plan loop reads: previously written by "Plan tonight" and
   // the AI assignment breakdown, and displayed by nothing.
-  uni_study_sessions: [
-    { id: id("sts", 1), course_id: id("crs", 1), assessment_id: id("asm", 1), planned_start: iso(0, 19), planned_minutes: 90, actual_minutes: null, completed: false, notes: "Draft the intro", ...stamps },
-    { id: id("sts", 2), course_id: id("crs", 2), assessment_id: null, planned_start: iso(0, 21), planned_minutes: 45, actual_minutes: null, completed: false, notes: null, ...stamps },
-    { id: id("sts", 3), course_id: id("crs", 1), assessment_id: id("asm", 1), planned_start: iso(-2, 19), planned_minutes: 60, actual_minutes: null, completed: false, notes: null, ...stamps },
-    { id: id("sts", 4), course_id: id("crs", 2), assessment_id: id("asm", 2), planned_start: iso(-4, 18), planned_minutes: 60, actual_minutes: 75, completed: true, notes: null, ...stamps },
-    { id: id("sts", 5), course_id: id("crs", 1), assessment_id: null, planned_start: iso(2, 18), planned_minutes: 120, actual_minutes: null, completed: false, notes: null, ...stamps },
-  ],
 
-  uni_assessment_requirements: [
-    { id: id("req", 1), assessment_id: id("asm", 1), requirement: "SAMPLE — 2000 word report", completed: true, sort_order: 0, ...stamps },
-    { id: id("req", 2), assessment_id: id("asm", 1), requirement: "SAMPLE — cite at least six sources", completed: false, sort_order: 1, ...stamps },
-    { id: id("req", 3), assessment_id: id("asm", 1), requirement: "SAMPLE — submit via the portal", completed: false, sort_order: 2, ...stamps },
-  ],
 
-  uni_deadlines: [
-    { id: id("dln", 1), title: "SAMPLE enrolment deadline", category: "admin", due_at: iso(11, 17), end_at: null, notes: null, ...stamps },
-  ],
 
-  yt_scripts: [
-    { id: id("yts", 1), topic: "SAMPLE video topic", status: "draft", hook: "SAMPLE hook line", niche: "SAMPLE niche", script_body: null, sections: [], suggested_titles: ["SAMPLE title"], research_grounded: false, research_summary: null, estimated_runtime_sec: 480, youtube_video_id: null, youtube_privacy_status: null, ...stamps },
-  ],
 };
 
 /** RPC responses. Only the ones the UI actually calls need an entry. */

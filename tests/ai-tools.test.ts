@@ -190,14 +190,6 @@ describe("executor", () => {
     assert.equal(result.status, "invalid_arguments");
   });
 
-  test("an unconfigured integration reports its state instead of inventing data", async () => {
-    const result = await executeTool("get_brightspace_courses", {}, ctx);
-    assert.equal(result.status, "integration_unavailable");
-    const unavailable = result as { integration: string; state: string };
-    assert.equal(unavailable.integration, "brightspace");
-    assert.equal(unavailable.state, "configuration_required");
-  });
-
   test("a handler that throws becomes a structured error, not a stack trace", async () => {
     // get_goals is safe and reaches the handler, where the stub client throws.
     const result = await executeTool("get_goals", {}, ctx);
@@ -345,7 +337,6 @@ describe("operator coverage across modules", () => {
       "goals",
       "business",
       "finance",
-      "university",
       "health",
       "calendar",
       "memory",

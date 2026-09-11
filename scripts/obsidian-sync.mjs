@@ -118,7 +118,6 @@ async function resyncOutgoingLinks(memoryEntryId, bodyText) {
   const domains = [
     { type: "memory_entry", table: "memory_entries", fields: ["title"] },
     { type: "contact", table: "contacts", fields: ["company_name", "contact_person"] },
-    { type: "uni_course", table: "uni_courses", fields: ["code", "name"] },
     { type: "deal", table: "deals", fields: ["title"] },
     { type: "journal_entry", table: "journal_entries", fields: ["title"] },
   ];

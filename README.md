@@ -1,7 +1,7 @@
 # JARVIS
 
-A personal command centre — tasks, goals, finance, business, university,
-health and memory in one place, with an AI operator that can actually read and
+A personal command centre — tasks, goals, finance, business, health and
+memory in one place, with an AI operator that can actually read and
 change the data rather than just talk about it.
 
 Built on Next.js 16, React 19, Tailwind 4 and Supabase.

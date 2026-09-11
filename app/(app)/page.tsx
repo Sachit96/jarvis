@@ -1,8 +1,8 @@
-import { Briefcase, Dumbbell, GraduationCap, Wallet } from "lucide-react";
+import { Briefcase, Dumbbell, Target, Wallet } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { AuroraBackdrop } from "@/components/shell/aurora-backdrop";
 import { dueLabel, todayStr } from "@/lib/date";
-import { getTasks } from "@/lib/db/queries/life";
+import { getGoals, getTasks } from "@/lib/db/queries/life";
 import { getAccounts, computeAssetLiabilityTotals } from "@/lib/db/queries/finance";
 import { getWorkouts, getWorkoutSets, computeWorkoutVolume } from "@/lib/db/queries/health";
 import {
@@ -14,10 +14,8 @@ import {
   computeStaleDeals,
 } from "@/lib/db/queries/business";
 import { getTodayRoutineItems } from "@/lib/db/queries/routine";
-import { getCourses, getAssessments, getDeadlines, getScheduleBlocks } from "@/lib/db/queries/uni";
 import { groupTasks, selectPriorityTasks, type TaskLike } from "@/lib/life/task-views";
 import { topPriority, rankPriorities } from "@/lib/life/priority";
-import { describeUntil, nextClass, nowContext, formatTime } from "@/lib/uni/timetable";
 import { hasHevyKey } from "@/lib/integrations/hevy/client";
 import { formatLbs } from "@/lib/units";
 import { JarvisPriorityCard } from "@/components/dashboard/jarvis-priority-card";
@@ -102,7 +100,7 @@ export default async function DashboardPage() {
   const supabase = await createClient();
   const today = todayStr();
 
-  const [accounts, contracts, stages, deals, contacts, routineItems, allTasks, courses, deadlines, workouts] =
+  const [accounts, contracts, stages, deals, contacts, routineItems, allTasks, goals, workouts] =
     await Promise.all([
       getAccounts(supabase),
       getContracts(supabase),
@@ -111,25 +109,18 @@ export default async function DashboardPage() {
       getContacts(supabase),
       getTodayRoutineItems(supabase),
       getTasks(supabase),
-      getCourses(supabase),
-      getDeadlines(supabase),
+      getGoals(supabase),
       getWorkouts(supabase),
     ]);
 
-  const courseIds = courses.map((c) => c.id);
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
   const recentWorkoutIds = workouts
     .filter((w) => new Date(w.started_at) >= sevenDaysAgo)
     .map((w) => w.id);
 
-  // The only reads that need an id from the batch above, so they overlap
-  // rather than queueing.
-  const [scheduleBlocks, assessments, recentSets] = await Promise.all([
-    getScheduleBlocks(supabase, courseIds),
-    getAssessments(supabase, courseIds),
-    getWorkoutSets(supabase, recentWorkoutIds),
-  ]);
+  // The only read that needs ids from the batch above.
+  const recentSets = await getWorkoutSets(supabase, recentWorkoutIds);
 
   const financeTotals = computeAssetLiabilityTotals(accounts);
   const mrr = computeMrr(contracts);
@@ -141,20 +132,20 @@ export default async function DashboardPage() {
   const trainedThisWeek = recentWorkoutIds.length;
   const routineDone = routineItems.filter((i) => i.completed).length;
 
-  const courseCode = new Map(courses.map((c) => [c.id, c.code]));
-  const upNext = nextClass(scheduleBlocks, nowContext(new Date()));
+  // Goals take the tile University's next class used to hold. Average
+  // progress across what is still open — a finished goal would otherwise
+  // drag the number that is meant to show momentum.
+  const openGoals = goals.filter((g) => g.status !== "achieved");
+  const goalProgress =
+    openGoals.length === 0
+      ? null
+      : Math.round(openGoals.reduce((sum, g) => sum + (g.progress_percent ?? 0), 0) / openGoals.length);
 
   const groupedTasks = groupTasks(allTasks as TaskLike[], today);
   const priorityInput = {
     today,
     overdueTasks: groupedTasks.overdue.map((t) => ({ id: t.id, title: t.title, due_date: t.due_date })),
     tasksDueToday: groupedTasks.today.map((t) => ({ id: t.id, title: t.title })),
-    universityDue: [
-      ...assessments
-        .filter((a) => a.due_at && a.status !== "graded" && a.status !== "submitted")
-        .map((a) => ({ id: a.id, title: a.title, due_at: a.due_at!, course: courseCode.get(a.course_id) })),
-      ...deadlines.map((d) => ({ id: d.id, title: d.title, due_at: d.due_at, course: null })),
-    ],
     staleDeals: computeStaleDeals(deals, stages, contacts),
     routine: { completed: routineDone, total: routineItems.length },
   };
@@ -210,17 +201,11 @@ export default async function DashboardPage() {
           hint={openCount === 0 ? "No open deals" : `${openCount} open deal(s)`}
         />
         <BentoTile
-          label="Next class"
-          icon={GraduationCap}
-          href="/uni/timetable"
-          value={upNext ? (courseCode.get(upNext.block.course_id) ?? "Class") : "—"}
-          hint={
-            upNext
-              ? `${formatTime(upNext.block.start_time)} · ${describeUntil(upNext.minutesUntil)}`
-              : courses.length === 0
-                ? "No courses yet"
-                : "No timetable set"
-          }
+          label="Goal progress"
+          icon={Target}
+          href="/life/goals"
+          value={goalProgress === null ? "—" : `${goalProgress}%`}
+          hint={openGoals.length === 0 ? "No open goals" : `Across ${openGoals.length} open goal(s)`}
         />
         <BentoTile
           label="Workout volume"
