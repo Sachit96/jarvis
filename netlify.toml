@@ -1,5 +1,16 @@
 [build]
   command = "npm run build"
 
+# Pinned, not left to Netlify's default.
+#
+# Netlify picks a default Node version per site, fixed at the time the site
+# was created — so two sites built from the same commit can disagree, and a
+# site created a while ago can still be on 18. Next 16 requires >= 20.9.0,
+# so on such a site this repo fails to build at all while building cleanly
+# on any developer machine. .nvmrc says the same thing for anyone running
+# it locally.
+[build.environment]
+  NODE_VERSION = "22"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
