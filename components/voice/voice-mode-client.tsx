@@ -2,23 +2,20 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { X, Mic, MicOff } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
 import { useSpeechRecognition } from "@/lib/voice/use-speech-recognition";
 import { useMicAudioLevel } from "@/lib/voice/use-mic-audio-level";
 import { useSyntheticEnvelope } from "@/lib/voice/use-synthetic-envelope";
 import { browserTts } from "@/lib/voice/tts";
 import { interpretConfirmation, REPROMPT } from "@/lib/voice/confirmation";
 import { sendVoiceMessageAction } from "@/actions/voice-actions";
-import { RadarMark } from "@/components/shell/radar-mark";
-import { NeuralMap, type RegionActivity } from "@/components/voice/neural-map";
+import { BrainGraph3D, type BrainGraphHandle } from "@/components/voice/brain-graph-3d";
+import { BrainSearch } from "@/components/voice/brain-search";
+import { JarvisTelemetry } from "@/components/voice/jarvis-telemetry";
+import { VoiceControlBar } from "@/components/voice/voice-control-bar";
+import { buildBrainGraph, colorForCategory, searchBrain } from "@/lib/voice/brain-graph";
 import {
-  TopLeftPanel,
-  TopRightPanel,
-  StatusRail,
   StatusPill,
-  Subtitle,
-  StatusStrip,
   ActivityStrip,
   type VoiceStatusMode,
   type VoiceTraceEntry,
@@ -26,7 +23,6 @@ import {
 import type { VoiceDashboardData } from "@/lib/db/queries/voice";
 
 const WAKE_PATTERN = /\bjarvis\b/i;
-const MOTOR_PULSE_MS = 700;
 
 function extractAfterWake(text: string): string {
   const match = text.match(WAKE_PATTERN);
@@ -42,7 +38,23 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
   const [interimTranscript, setInterimTranscript] = useState("");
   const [finalDisplay, setFinalDisplay] = useState("");
   const [replyText, setReplyText] = useState("");
-  const [motorPulse, setMotorPulse] = useState(false);
+
+  // The knowledge graph, built once from the memory entries the server sent.
+  // Rebuilding it per render would restart the force simulation and make the
+  // whole network lurch on every keystroke and every status change.
+  const graph = useMemo(() => buildBrainGraph(data.brain), [data.brain]);
+  const [search, setSearch] = useState("");
+  const litNodes = useMemo(() => searchBrain(graph, search), [graph, search]);
+  // State rather than a ref: the React Compiler rejects mutating a ref from
+  // inside a memoized callback, and the handle genuinely is a value this
+  // component renders against once the 3D chunk has loaded.
+  const [brain, setBrain] = useState<BrainGraphHandle | null>(null);
+
+  const legend = useMemo(
+    () => graph.categories.map((c) => ({ ...c, color: colorForCategory(c.id) })),
+    [graph],
+  );
+
   const [trace, setTrace] = useState<VoiceTraceEntry[]>([]);
   // Held while JARVIS waits for a spoken yes. The next utterance is read as
   // an answer to this rather than as a new request.
@@ -60,7 +72,6 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
   // submitUtterance is a stable callback, so it cannot close over the
   // pendingConfirmation state directly without going stale between turns.
   const pendingConfirmationRef = useRef<typeof pendingConfirmation>(null);
-  const motorPulseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // recognitionControlsRef breaks what would otherwise be a circular
   // dependency: the callbacks below need to pause/resume recognition, but
   // useSpeechRecognition itself needs those same callbacks as input. The
@@ -116,6 +127,10 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
   const speakReply = useCallback((text: string, after: VoiceStatusMode = "idle") => {
     setReplyText(text);
     setMode("speaking");
+    // If the reply names a cluster, fly there. Conservative by design —
+    // focusTargetFor returns null rather than guessing, because a wrong
+    // fly-to is more disorienting than none.
+    brain?.focusOn(text);
     // Gotcha 2, the single most important detail here: pause recognition
     // before speaking or the mic hears JARVIS's own voice and re-triggers.
     recognitionControlsRef.current.pause();
@@ -129,7 +144,7 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
         setMode(after);
       },
     });
-  }, []);
+  }, [brain]);
 
   const submitUtterance = useCallback(
     async (text: string) => {
@@ -194,12 +209,6 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
       isRequestInFlightRef.current = false;
 
       if (!result.rateLimited && !result.error) {
-        // A real mentor_messages write just happened as part of that call —
-        // MOTOR CORTEX's pulse reflects that real event, timed to when we
-        // can confirm it occurred.
-        setMotorPulse(true);
-        if (motorPulseTimeoutRef.current) clearTimeout(motorPulseTimeoutRef.current);
-        motorPulseTimeoutRef.current = setTimeout(() => setMotorPulse(false), MOTOR_PULSE_MS);
       }
 
       if (result.trace) setTrace(result.trace);
@@ -271,29 +280,12 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
   const micLevel = useMicAudioLevel(micOn && mode === "listening");
   const speakingEnvelope = useSyntheticEnvelope(mode === "speaking");
 
-  // Every value below reads state the app already computes — no new Gemini
-  // call anywhere in here. PREFRONTAL is bounded to exactly the
-  // sendVoiceMessageAction promise above; HIPPOCAMPUS reflects the real,
-  // server-computed data.moduleStatus.memory flag (same one the System
-  // Status rail already shows); ASSOCIATION reflects that context assembly
-  // (buildMentorContext) is unconditional in the mentor-chat path, a stable
-  // fact about this codebase, not a per-request guess.
-  const hasMemory = data.moduleStatus.memory;
-  const regionActivity: RegionActivity = useMemo(() => {
-    const listening = mode === "listening";
-    const thinking = mode === "thinking";
-    const speaking = mode === "speaking";
-    return {
-      sensory_cortex: listening ? Math.round(micLevel * 1000) / 10 : 0,
-      language: speaking ? Math.round(Math.max(18, speakingEnvelope * 100) * 10) / 10 : 0,
-      prefrontal: thinking ? 100 : 0,
-      hippocampus: thinking && hasMemory ? 68 : 0,
-      association: thinking ? 55 : 0,
-      motor_cortex: motorPulse ? 100 : 0,
-      concept_layer: 3.2,
-      feature_layer: 2.4,
-    };
-  }, [mode, micLevel, speakingEnvelope, hasMemory, motorPulse]);
+  // One level for the telemetry ring: the mic while listening, the speech
+  // envelope while speaking. Both are real signals the page already has, so
+  // a moving gauge always means sound is genuinely moving through it.
+  const telemetryLevel =
+    mode === "speaking" ? speakingEnvelope : mode === "listening" ? micLevel : 0;
+
 
   // Push-to-talk: hold to talk, no wake word needed. Built first, per the
   // work order, as the simplest path and the one used to debug everything
@@ -304,6 +296,27 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
   // voice-based barge-in isn't compatible with gotcha 2's hard
   // pause-recognition-during-speech rule (paused = literally can't hear the
   // user), so this is the reliable mechanism instead of a fragile one.
+  /**
+   * A quick prompt.
+   *
+   * Goes through submitUtterance, the same path a spoken sentence takes, so
+   * the in-flight guard, the cooldown and the confirmation interception all
+   * apply. A separate send path would be a second place for those rules to
+   * be forgotten.
+   *
+   * The text is shown as the final transcript first, so the prompt you
+   * pressed is visible while the answer is being worked out.
+   */
+  const handleQuickPrompt = useCallback(
+    (text: string) => {
+      finalBufferRef.current = text;
+      setFinalDisplay(text);
+      setInterimTranscript("");
+      void submitUtterance(text);
+    },
+    [submitUtterance],
+  );
+
   const startPtt = useCallback(() => {
     if (!micOn) return;
     if (modeRef.current === "speaking") {
@@ -357,53 +370,48 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
 
   return (
     <div className="relative flex h-dvh w-full flex-col overflow-hidden bg-black">
-      <div className="absolute inset-0">
-        <NeuralMap activity={regionActivity} />
-      </div>
+      {/* The space the network hangs in: deep purple bleeding out of black,
+          with a fine dust so the depth reads before a single node loads. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_45%,color-mix(in_oklab,var(--brand)_18%,transparent),transparent_65%)]"
+      />
+      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.35] [background-image:radial-gradient(circle,rgb(255_255_255/0.55)_0.5px,transparent_0.5px)] [background-size:64px_64px]" />
 
-      {/* The radar sits at the centre of the map, behind the interaction
-          (§14/§21): the identity mark on the one screen that is entirely
-          about the assistant. It sweeps only while JARVIS is actually doing
-          something — a permanently rotating sweep is decoration, whereas one
-          that starts when you speak is the system showing it is working. */}
-      {/* Inset to match the neural map's own reserved top/bottom chrome
-          (TOP_INSET/BOTTOM_INSET in neural-map.tsx) so the radar shares the
-          map's centre. Centred on the viewport instead, the two centres sat
-          ~65px apart and read as a misalignment rather than one object. */}
-      <div className="pointer-events-none absolute inset-x-0 top-[90px] bottom-[220px] z-[5] flex items-center justify-center">
-        <RadarMark
-          size={520}
-          sweep={displayMode !== "idle" && displayMode !== "error"}
-          className="max-w-[70vw] opacity-[0.35]"
+      <div className="absolute inset-0">
+        <BrainGraph3D
+          entries={data.brain}
+          active={mode === "thinking" || mode === "executing" || mode === "speaking"}
+          search={search}
+          onReady={setBrain}
         />
       </div>
 
-      {/* Corner HUD panels — supplementary context, not core to the voice
-          interaction, and there's no room for three dense panels on a
-          phone-width screen without them overlapping each other and the
-          neural map's own labels. Desktop/tablet only. */}
-      <div className="pointer-events-none absolute left-6 top-6 z-10 hidden 2xl:block">
-        <TopLeftPanel data={data.last7Days} />
+      <div className="pointer-events-auto absolute left-4 top-4 z-10 hidden sm:block">
+        <BrainSearch
+          value={search}
+          onChange={setSearch}
+          categories={legend}
+          matchCount={search ? litNodes.size : 0}
+        />
       </div>
-      {/* Sits under the stats panel on the same rail. Only rendered once a
-          turn has actually run something, so the HUD stays clean until
-          there is something real to report. */}
-      <div className="pointer-events-none absolute left-6 top-56 z-10 hidden 2xl:block">
+
+      {/* Only once a turn has actually run something, so the HUD stays clean
+          until there is something real to report. */}
+      <div className="pointer-events-none absolute left-4 top-[19rem] z-10 hidden 2xl:block">
         <ActivityStrip entries={trace} />
       </div>
-      <div className="pointer-events-none absolute right-6 top-20 z-10 hidden 2xl:block">
-        <TopRightPanel data={data.today} />
-      </div>
-      <div className="pointer-events-none absolute right-6 top-1/2 z-10 hidden -translate-y-1/2 2xl:block">
-        <StatusRail
-          moduleStatus={data.moduleStatus}
-          geminiBudget={data.geminiBudget}
-          voiceSupported={browserSupport.voice}
-          ttsSupported={browserSupport.tts}
+
+      <div className="pointer-events-none absolute right-4 top-1/2 z-10 hidden -translate-y-1/2 lg:block">
+        <JarvisTelemetry
+          mode={displayMode}
+          level={telemetryLevel}
+          model={data.geminiBudget.model}
+          budget={{ used: data.geminiBudget.used, limit: data.geminiBudget.limit }}
         />
       </div>
 
-      <div className="pointer-events-none absolute left-1/2 top-6 z-10 -translate-x-1/2">
+      <div className="pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2">
         <StatusPill mode={displayMode} />
       </div>
 
@@ -421,95 +429,23 @@ export function VoiceModeClient({ data }: { data: VoiceDashboardData }) {
         </div>
       ) : null}
 
-      {/* Bottom control zone — one flex column so the mobile hold-to-talk row
-          stacks cleanly above the status strip instead of guessing fixed
-          pixel offsets per element. */}
-      <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center gap-3 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-6">
-        {/* The most functionally important text on screen — sized to read across a room. */}
-        <div className="pointer-events-none w-full">
-          <Subtitle finalText={finalDisplay} interimText={interimTranscript} replyText={replyText} />
-        </div>
-
-        {/* Touch controls — spacebar covers push-to-talk on desktop, so this
-            row only matters on mobile, which has no physical keyboard. */}
-        <div className="flex items-center gap-5 2xl:hidden">
-          <button
-            onClick={() => setMicOn((v) => !v)}
-            aria-pressed={micOn}
-            aria-label={micOn ? "Stop listening" : "Start listening"}
-            className={cn(
-              "flex h-11 w-11 items-center justify-center rounded-full border transition-colors",
-              micOn ? "border-danger/50 bg-danger/10 text-danger" : "border-white/20 bg-white/5 text-white/70",
-            )}
-          >
-            {micOn ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
-          </button>
-          <button
-            disabled={!micOn}
-            aria-label="Hold to talk"
-            onPointerDown={(e) => {
-              e.preventDefault();
-              startPtt();
-            }}
-            onPointerUp={endPtt}
-            onPointerCancel={endPtt}
-            onPointerLeave={() => {
-              if (isPttHeldRef.current) endPtt();
-            }}
-            className={cn(
-              "flex h-16 w-16 touch-none select-none items-center justify-center rounded-full border-2 text-[10px] font-semibold uppercase tracking-wide transition-colors",
-              !micOn
-                ? "border-white/10 bg-white/5 text-white/30"
-                : mode === "listening"
-                  ? "border-brand bg-brand/20 text-brand"
-                  : "border-white/30 bg-white/10 text-white/80 active:bg-white/20",
-            )}
-          >
-            Hold
-          </button>
-        </div>
-
-        <div className="pointer-events-none">
-          <StatusStrip micActive={micOn} />
-        </div>
+      <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center px-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-6">
+        <VoiceControlBar
+          micOn={micOn}
+          onToggleMic={() => setMicOn((v) => !v)}
+          onQuickPrompt={handleQuickPrompt}
+          listening={mode === "listening"}
+          disabled={!browserSupport.voice}
+          finalText={finalDisplay}
+          interimText={interimTranscript}
+          replyText={replyText}
+        />
       </div>
 
-      {/* Desktop/tablet: floating toggle + spacebar hint. Mobile uses the
-          touch controls in the bottom zone above instead. */}
-      <div className="absolute right-6 top-[calc(50%+8rem)] z-20 hidden flex-col items-end gap-2 2xl:flex">
-        <button
-          onClick={() => setMicOn((v) => !v)}
-          className={cn(
-            "flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition-colors",
-            micOn ? "border-danger/50 bg-danger/10 text-danger" : "border-white/20 bg-white/5 text-white/70 hover:bg-white/10",
-          )}
-          aria-pressed={micOn}
-          // Explicit, distinct from the mobile toggle's "Start/Stop listening"
-          // aria-label — found live (2026-09-06 audit): both buttons control
-          // the same micOn state and are only ever CSS-hidden (2xl:hidden /
-          // hidden 2xl:flex), not unmounted, so an accessibility tree walk
-          // sees both regardless of viewport and hears "Start listening"
-          // twice with no way to tell them apart.
-          aria-label={micOn ? "Stop listening (desktop toggle)" : "Start listening (desktop toggle)"}
-        >
-          {micOn ? <Mic className="h-3.5 w-3.5" /> : <MicOff className="h-3.5 w-3.5" />}
-          {micOn ? "Listening — click to stop" : "Start listening"}
-        </button>
-        <p className="max-w-52 text-right text-[10px] leading-tight text-white/40">
-          Hold space to talk any time. The mic stays on and is sent to Chrome for recognition while listening is on —
-          click to stop it whenever you want.
-        </p>
-      </div>
-
-      {/* Made more prominent — found live (2026-09-06 audit): this full-bleed
-          screen replaces all app navigation with no other way back, but the
-          only way out was a bare 36px icon at low contrast (white/60 on
-          near-black) in a corner, easy to miss on a screen this dense with
-          motion. Bigger tap target, a visible label, higher-contrast border. */}
       <Link
         href="/"
         aria-label="Exit voice mode"
-        className="absolute right-4 top-4 z-20 flex h-10 items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3.5 text-xs font-medium text-white/90 backdrop-blur-sm transition-colors hover:border-white/30 hover:bg-white/15 hover:text-white sm:right-6 sm:top-6"
+        className="absolute right-4 top-4 z-20 flex h-10 items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3.5 text-xs font-medium text-white/90 backdrop-blur-sm transition-colors hover:border-white/30 hover:bg-white/15 hover:text-white lg:right-6"
       >
         <X className="h-4 w-4" />
         <span className="hidden sm:inline">Exit</span>

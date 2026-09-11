@@ -266,6 +266,13 @@ function buildReport(entries) {
     failedRequests: (e.failedRequests ?? []).filter((l) => !isEnvironmental(l)),
     error: e.error ?? null,
     render: renderStatus(e, isEnvironmental),
+    // Carried through when --eval is used. Reshaping the report dropped it,
+    // which quietly disabled the one probe that answers "why does this look
+    // wrong" — the screenshot poses that question and only the live DOM
+    // answers it.
+    ...(e.eval !== undefined ? { eval: e.eval } : {}),
+    ...(e.clicked ? { clicked: e.clicked } : {}),
+    ...(e.clickError ? { clickError: e.clickError } : {}),
   });
 
   const routes = [...byRoute.entries()].map(([route, list]) => {

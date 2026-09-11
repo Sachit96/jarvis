@@ -47,6 +47,14 @@ export interface VoiceDashboardData {
     used: number;
     limit: number;
   };
+  /**
+   * The memory entries the knowledge graph is built from.
+   *
+   * Trimmed to what the graph reads — a full row carries timestamps and a
+   * confidence score the visualisation never looks at, and this crosses to
+   * a client component.
+   */
+  brain: { id: string; title: string; body: string; type: string; tags: string[]; pinned: boolean }[];
 }
 
 /**
@@ -104,6 +112,16 @@ export async function getVoiceDashboardData(supabase: Client): Promise<VoiceDash
   const closestToCeiling = tierBudgets.reduce((a, b) => (b.fractionUsed > a.fractionUsed ? b : a));
 
   return {
+    brain: memoryEntries.map((e) => ({
+      id: e.id,
+      title: e.title,
+      // Capped: the graph only ever shows a preview on hover, and the whole
+      // set is serialised into the client payload.
+      body: (e.body ?? "").slice(0, 400),
+      type: e.type,
+      tags: e.tags ?? [],
+      pinned: e.pinned,
+    })),
     last7Days: { newClientsOnboarded, mrr, cashCollected },
     today: {
       tasksCompleted,
