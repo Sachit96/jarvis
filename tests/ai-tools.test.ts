@@ -337,6 +337,7 @@ describe("operator coverage across modules", () => {
       "goals",
       "business",
       "finance",
+      "university",
       "health",
       "calendar",
       "memory",

@@ -13,6 +13,7 @@ const SIDEBAR_ITEMS: NavTarget[] = [
   { href: "/finance/overview" },
   { href: "/life/goals" },
   { href: "/life/tasks", matches: ["/life/habits", "/life/journal"] },
+  { href: "/uni" },
   { href: "/mentor" },
   { href: "/voice" },
   { href: "/memory" },
@@ -21,10 +22,10 @@ const SIDEBAR_ITEMS: NavTarget[] = [
 
 const NAV_ITEMS: NavTarget[] = [
   { href: "/" },
-  { href: "/business/dashboard" },
+  { href: "/uni" },
   { href: "/finance/overview" },
   { href: "/health/workouts" },
-  { href: "/life/goals" },
+  { href: "/business/dashboard" },
 ];
 
 test("the mirrored tables match lib/nav-items.ts", async () => {
@@ -69,6 +70,8 @@ test("exactly one sidebar item is ever active", () => {
     "/life/tasks",
     "/life/habits",
     "/life/journal",
+    "/uni",
+    "/uni/attendance",
     "/mentor",
     "/mentor/weekly-review",
     "/voice",
@@ -97,7 +100,7 @@ test("Tasks & Routine owns its own tab routes", () => {
 test("a module's deeper routes light its top-level entry", () => {
   assert.equal(activeNavHref("/finance/budgets", SIDEBAR_ITEMS), "/finance/overview");
   assert.equal(activeNavHref("/health/nutrition", SIDEBAR_ITEMS), "/health/workouts");
-  assert.equal(activeNavHref("/business/pipeline", SIDEBAR_ITEMS), "/business/dashboard");
+  assert.equal(activeNavHref("/uni/attendance", SIDEBAR_ITEMS), "/uni");
 });
 
 test("Home is active only at the root", () => {
@@ -110,12 +113,10 @@ test("an unknown route lights nothing rather than guessing", () => {
 });
 
 test("the mobile bar resolves against its own shorter list", () => {
-  // The bar carries five of the sidebar's entries. A route under one of
-  // them lights it; a route under an entry the bar does not carry lights
-  // nothing, rather than falling through to an unrelated tab.
-  assert.equal(activeNavHref("/life/goals", NAV_ITEMS), "/life/goals");
+  // NAV_ITEMS has no /life entry at all, so those routes must light nothing
+  // rather than falling through to an unrelated tab.
+  assert.equal(activeNavHref("/life/goals", NAV_ITEMS), null);
   assert.equal(activeNavHref("/health/body", NAV_ITEMS), "/health/workouts");
-  assert.equal(activeNavHref("/memory", NAV_ITEMS), null);
 });
 
 test("breadcrumb crumb destinations", async (t) => {
@@ -123,12 +124,12 @@ test("breadcrumb crumb destinations", async (t) => {
     { href: "/" },
     { href: "/business/dashboard" },
     { href: "/finance/overview" },
-    { href: "/memory" },
+    { href: "/uni" },
     { href: "/settings" },
   ];
 
   await t.test("a real route links to itself", () => {
-    assert.equal(crumbHref("/memory", items), "/memory");
+    assert.equal(crumbHref("/uni", items), "/uni");
     assert.equal(crumbHref("/settings", items), "/settings");
   });
 

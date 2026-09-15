@@ -65,6 +65,13 @@ const ALL_ROUTES = [
   "/life/tasks",
   "/life/habits",
   "/life/journal",
+  "/uni",
+  "/uni/courses",
+  "/uni/timetable",
+  "/uni/attendance",
+  "/uni/calendar",
+  "/uni/assessments",
+  "/uni/deadlines",
   "/mentor",
   "/mentor/weekly-review",
   "/voice",
@@ -75,6 +82,7 @@ const ALL_ROUTES = [
   // are where the densest layouts live.
   "/business/pipeline/deal-0000-0000-0000-000000000002",
   "/business/clients/con-0000-0000-0000-000000000001",
+  "/uni/courses/crs-0000-0000-0000-000000000001",
 ];
 const evalExpr = argOf("eval", "").trim() || null;
 /**
@@ -119,6 +127,13 @@ const PAGE_NAMES = {
   "/life/tasks": "tasks",
   "/life/habits": "routine",
   "/life/journal": "journal",
+  "/uni": "university-dashboard",
+  "/uni/courses": "university-courses",
+  "/uni/timetable": "university-timetable",
+  "/uni/attendance": "university-attendance",
+  "/uni/calendar": "university-calendar",
+  "/uni/assessments": "university-assessments",
+  "/uni/deadlines": "university-deadlines",
   "/mentor": "mentor-today",
   "/mentor/weekly-review": "mentor-weekly-review",
   "/voice": "voice",
@@ -126,6 +141,7 @@ const PAGE_NAMES = {
   "/settings": "settings",
   "/business/pipeline/deal-0000-0000-0000-000000000002": "business-deal-detail",
   "/business/clients/con-0000-0000-0000-000000000001": "business-client-detail",
+  "/uni/courses/crs-0000-0000-0000-000000000001": "university-course-detail",
 };
 const clickWaitMs = Number(argOf("click-wait", "4000"));
 const routes = argOf("routes", "").trim() ? argOf("routes", "").split(",") : ALL_ROUTES;
@@ -231,7 +247,7 @@ async function assertPortFree(port) {
  * The audit manifest: one row per ROUTE carrying both viewports, rather than
  * the flat route×viewport list the run produces internally.
  *
- * A person opening this wants to answer "did /finance/budgets render, and which
+ * A person opening this wants to answer "did /uni/calendar render, and which
  * two files show it" — which the flat form makes them do by scanning for two
  * separate entries. The per-viewport detail is kept nested underneath, so
  * nothing is lost.

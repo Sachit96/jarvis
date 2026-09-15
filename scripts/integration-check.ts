@@ -64,6 +64,7 @@ async function checkSupabase() {
     ["tasks", () => supabase.from("tasks").select("id, title, status, priority, due_date").limit(1)],
     ["goals", () => supabase.from("goals").select("id, title, timeframe").limit(1)],
     ["deals", () => supabase.from("deals").select("id, stage_id, closed_at").limit(1)],
+    ["uni_assessments", () => supabase.from("uni_assessments").select("id, title, due_at, status").limit(1)],
     ["habits", () => supabase.from("habits").select("id, name, is_active").limit(1)],
     ["workouts", () => supabase.from("workouts").select("id, started_at, completed").limit(1)],
     ["transactions", () => supabase.from("transactions").select("id, amount, occurred_at").limit(1)],

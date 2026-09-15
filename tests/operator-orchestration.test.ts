@@ -42,7 +42,7 @@ function makeExecutor(log: string[]) {
 const parallelSafe = (name: string) => getTool(name)?.risk === "safe";
 
 describe("scenario 1 — 'What should I do tomorrow?'", () => {
-  const CALLS = ["get_upcoming_tasks", "get_routines", "get_goals", "get_upcoming"];
+  const CALLS = ["get_upcoming_tasks", "get_routines", "get_university_deadlines", "get_upcoming"];
 
   test("every tool the scenario needs exists and is a safe read", () => {
     for (const name of CALLS) {
@@ -67,7 +67,7 @@ describe("scenario 1 — 'What should I do tomorrow?'", () => {
   });
 });
 
-describe("scenario 2 — reads across modules, then a write", () => {
+describe("scenario 2 — university + tasks + calendar, then a write", () => {
   test("a read/write mixture runs strictly in order", async () => {
     // "Make me a plan, then create the task" must not create the task while
     // the reads it depends on are still in flight.
@@ -81,14 +81,14 @@ describe("scenario 2 — reads across modules, then a write", () => {
     };
     await runToolRound(
       [
-        { name: "get_goals", args: {} },
+        { name: "get_university_deadlines", args: {} },
         { name: "get_upcoming_tasks", args: {} },
         { name: "create_task", args: { title: "Start the assignment" } },
       ],
       execute,
       parallelSafe,
     );
-    assert.deepEqual(order, ["get_goals", "get_upcoming_tasks", "create_task"]);
+    assert.deepEqual(order, ["get_university_deadlines", "get_upcoming_tasks", "create_task"]);
   });
 });
 

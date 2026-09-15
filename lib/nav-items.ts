@@ -10,6 +10,7 @@ import {
   Sparkles,
   BrainCircuit,
   Mic,
+  GraduationCap,
   Settings as SettingsIcon,
 } from "lucide-react";
 
@@ -37,6 +38,7 @@ export const SIDEBAR_ITEMS: NavItem[] = [
   { href: "/finance/overview", label: "Finance", icon: Wallet },
   { href: "/life/goals", label: "Goals", icon: Target },
   { href: "/life/tasks", label: "Tasks & Routine", icon: ListChecks, matches: ["/life/habits", "/life/journal"] },
+  { href: "/uni", label: "University", icon: GraduationCap },
   { href: "/mentor", label: "AI Mentor", icon: Sparkles },
   { href: "/voice", label: "Voice Mode", icon: Mic },
   { href: "/memory", label: "Memory", icon: BrainCircuit },
@@ -77,7 +79,8 @@ export const SIDEBAR_GROUPS: NavGroup[] = [
       { href: "/health/workouts", label: "Health", icon: HeartPulse },
       { href: "/life/goals", label: "Goals", icon: Target },
       { href: "/life/tasks", label: "Tasks & Routine", icon: ListChecks, matches: ["/life/habits", "/life/journal"] },
-        ],
+      { href: "/uni", label: "University", icon: GraduationCap },
+    ],
   },
   {
     label: "Assistant",
@@ -91,19 +94,19 @@ export const SIDEBAR_GROUPS: NavGroup[] = [
 
 /**
  * Curated subset for the mobile bottom bar — five is the most a thumb can
- * reach comfortably.
- *
- * University used to hold the second slot and its removal freed one, which
- * goes to Goals: with Tasks reachable from Home's priority widget, Goals
- * was the remaining domain with no prominent surface of its own on a
- * phone.
+ * reach comfortably, so a 6th domain (University) means swapping one out
+ * rather than crowding a 6th tab in. Tasks is the swap: it's the one
+ * domain here that's already one tap away from Home (PriorityTasksWidget)
+ * and from the sidebar on desktop, whereas Finance/Health/Business/
+ * University are each a freestanding dashboard with nothing else
+ * surfacing them as prominently.
  */
 export const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Home", icon: LayoutDashboard },
-  { href: "/business/dashboard", label: "Business", icon: Briefcase },
+  { href: "/uni", label: "Uni", icon: GraduationCap },
   { href: "/finance/overview", label: "Finance", icon: Wallet },
   { href: "/health/workouts", label: "Health", icon: HeartPulse },
-  { href: "/life/goals", label: "Goals", icon: Target },
+  { href: "/business/dashboard", label: "Business", icon: Briefcase },
 ];
 
 export interface ModuleTab {
@@ -149,5 +152,18 @@ export const BUSINESS_TABS: ModuleTab[] = [
 export const MENTOR_TABS: ModuleTab[] = [
   { href: "/mentor", label: "Today" },
   { href: "/mentor/weekly-review", label: "Weekly Review" },
+];
+
+export const UNI_TABS: ModuleTab[] = [
+  { href: "/uni", label: "Dashboard" },
+  { href: "/uni/courses", label: "Courses" },
+  // Timetable and Calendar answer different questions and both earn a tab:
+  // the timetable is "where do I need to be" (recurring blocks), the
+  // calendar is "what is due" (dated assessments and deadlines).
+  { href: "/uni/timetable", label: "Timetable" },
+  { href: "/uni/attendance", label: "Attendance" },
+  { href: "/uni/calendar", label: "Calendar" },
+  { href: "/uni/assessments", label: "Assessments" },
+  { href: "/uni/deadlines", label: "Deadlines" },
 ];
 
