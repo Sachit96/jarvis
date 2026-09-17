@@ -46,7 +46,15 @@ export function buildAuthUrl(redirectUri: string, state: string): string {
     response_type: "code",
     scope: GOOGLE_CALENDAR_OAUTH_SCOPE,
     access_type: "offline", // required to get a refresh_token back, not just an access_token
-    prompt: "consent", // forces the consent screen (and a fresh refresh_token) even on a returning user — needed since Testing-mode tokens expire in 7 days and reconnecting should always yield a new one
+    // Forces the consent screen even on a returning user, which is what
+    // makes Google reissue a refresh_token on every reconnect — normally
+    // it's only granted on the FIRST authorization. Without this, a
+    // reconnect (e.g. after disconnecting, or after a scope change) could
+    // silently hand back an access_token with no refresh_token, breaking
+    // the callback's ability to refresh later. See its own guard for that
+    // case. This is independent of Internal vs Testing consent-screen
+    // status — it's just how Google's refresh_token issuance works.
+    prompt: "consent",
     state,
   });
   return `${AUTH_ENDPOINT}?${params.toString()}`;
