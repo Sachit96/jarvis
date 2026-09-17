@@ -2,10 +2,9 @@
 
 import { useTransition } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, XCircle, AlertTriangle, RefreshCw } from "lucide-react";
+import { CheckCircle2, XCircle, RefreshCw } from "lucide-react";
 import { disconnectGoogleCalendarAction, syncGoogleCalendarNowAction } from "@/actions/google-calendar-actions";
 import { Button } from "@/components/ui/button";
-import { TESTING_MODE_TOKEN_LIFETIME_DAYS } from "@/lib/google-calendar/constants";
 
 interface Props {
   configured: boolean;
@@ -41,11 +40,6 @@ export function GoogleCalendarConnectionCard({ configured, connected, calendarSu
   const [isSyncing, startSync] = useTransition();
 
   const age = connectedAt ? daysAgo(connectedAt) : null;
-  // While the OAuth consent screen is unpublished ("Testing" status),
-  // Google expires the refresh token after this many days regardless of
-  // use — warn before it silently breaks rather than after.
-  const nearingExpiry = age !== null && age >= TESTING_MODE_TOKEN_LIFETIME_DAYS - 2;
-  const likelyExpired = age !== null && age > TESTING_MODE_TOKEN_LIFETIME_DAYS;
 
   function handleSync() {
     startSync(async () => {
@@ -94,17 +88,6 @@ export function GoogleCalendarConnectionCard({ configured, connected, calendarSu
           <p className="mt-1 tabular text-xs text-muted-foreground">
             connected {age}d ago · last synced {lastSyncedAt ? timeAgo(lastSyncedAt) : "never"}
           </p>
-          {likelyExpired ? (
-            <p className="mt-2 flex items-center gap-1.5 text-xs text-danger">
-              <AlertTriangle className="h-3.5 w-3.5" />
-              Likely expired — Testing-mode refresh tokens last {TESTING_MODE_TOKEN_LIFETIME_DAYS} days. Reconnect below.
-            </p>
-          ) : nearingExpiry ? (
-            <p className="mt-2 flex items-center gap-1.5 text-xs text-warn">
-              <AlertTriangle className="h-3.5 w-3.5" />
-              Expires around day {TESTING_MODE_TOKEN_LIFETIME_DAYS} while the consent screen is in Testing mode — reconnect soon.
-            </p>
-          ) : null}
           <div className="mt-3 flex flex-wrap gap-2">
             <Button size="sm" className="gap-1.5" onClick={handleSync} disabled={isSyncing}>
               <RefreshCw className={`h-3.5 w-3.5 ${isSyncing ? "animate-spin" : ""}`} />
