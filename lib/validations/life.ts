@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { optionalNumeric, optionalTextInput, optionalDateInput, dateInput } from "@/lib/validation";
+import { optionalNumeric, optionalTextInput, optionalDateInput, dateInput, numeric } from "@/lib/validation";
 
 export const taskSchema = z.object({
   title: z.string().trim().min(1, "Title is required").max(200),
@@ -19,6 +19,25 @@ export const goalSchema = z.object({
   progress_percent: optionalNumeric(z.number().int().min(0).max(100)).default(0),
 });
 export type GoalInput = z.infer<typeof goalSchema>;
+
+export const LIFE_SCHEDULE_CATEGORIES = [
+  "self_care",
+  "commute",
+  "deep_work",
+  "gym",
+  "meal",
+  "personal",
+] as const;
+
+export const lifeScheduleBlockSchema = z.object({
+  day_of_week: numeric(z.number().int().min(0).max(6)),
+  start_time: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/, "Pick a time"),
+  end_time: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/, "Pick a time"),
+  label: z.string().trim().min(1, "Label is required").max(100),
+  category: z.enum(LIFE_SCHEDULE_CATEGORIES),
+  notes: optionalTextInput,
+});
+export type LifeScheduleBlockInput = z.infer<typeof lifeScheduleBlockSchema>;
 
 export const habitSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),

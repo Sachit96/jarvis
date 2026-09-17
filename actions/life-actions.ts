@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { taskSchema, goalSchema, habitSchema, journalEntrySchema } from "@/lib/validations/life";
+import { taskSchema, goalSchema, habitSchema, journalEntrySchema, lifeScheduleBlockSchema } from "@/lib/validations/life";
 import { actionStateFromZodError, type ActionState } from "@/lib/validation";
 import { syncOutgoingLinksForRow } from "@/lib/obsidian/wikilinks";
 import { todayStr } from "@/lib/date";
@@ -282,3 +282,32 @@ export async function deleteJournalEntryAction(id: string) {
 // togglePrayerTodayAction) — removed once "Pray to God" became a Daily
 // Routine item instead. The prayers/prayer_logs tables and their historical
 // data are untouched; only the now-redundant standalone UI/actions are gone.
+
+
+// ===================================================== Life schedule blocks
+
+export async function createLifeScheduleBlockAction(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const parsed = lifeScheduleBlockSchema.safeParse({
+    day_of_week: formData.get("day_of_week"),
+    start_time: formData.get("start_time"),
+    end_time: formData.get("end_time"),
+    label: formData.get("label"),
+    category: formData.get("category"),
+    notes: formData.get("notes"),
+  });
+  if (!parsed.success) return actionStateFromZodError(parsed.error);
+  const supabase = await createClient();
+  const { error } = await supabase.from("life_schedule_blocks").insert(parsed.data);
+  if (error) return { error: error.message };
+  revalidatePath("/life/timetable");
+  return {};
+}
+
+export async function deleteLifeScheduleBlockAction(id: string): Promise<void> {
+  const supabase = await createClient();
+  await supabase.from("life_schedule_blocks").delete().eq("id", id);
+  revalidatePath("/life/timetable");
+}

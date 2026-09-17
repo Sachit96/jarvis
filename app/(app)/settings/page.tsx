@@ -2,11 +2,14 @@ import { ExportBackupButton } from "@/components/settings/export-backup-button";
 import { createClient } from "@/lib/supabase/server";
 import { getIntegrationStatus, type IntegrationId } from "@/lib/integrations/status";
 import { getSavedLeadSearches } from "@/lib/db/queries/lead-research";
+import { getGoogleCalendarConnection } from "@/lib/db/queries/google-calendar";
 import { AiMentorStatusCard } from "@/components/settings/ai-mentor-status-card";
 import { IntegrationStatusCard } from "@/components/settings/integration-status-card";
 import { SavedLeadSearchesCard } from "@/components/settings/saved-lead-searches-card";
 import { SmsStatusCard } from "@/components/settings/sms-status-card";
 import { AnthropicStatusCard } from "@/components/settings/anthropic-status-card";
+import { GoogleCalendarConnectionCard } from "@/components/settings/google-calendar-connection-card";
+import { GoogleCalendarOAuthResultToast } from "@/components/settings/google-calendar-oauth-result-toast";
 import { TIER_MODEL } from "@/lib/ai/providers/gemini-client";
 import { getAnthropicSpendCap, getAnthropicSpendToDate } from "@/lib/ai/providers/anthropic-client";
 import { isMissingRelation } from "@/lib/db/missing-relation";
@@ -19,7 +22,12 @@ function oneDayAgoIso() {
   return new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 }
 
-export default async function SettingsPage() {
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ gcal_connected?: string; gcal_error?: string }>;
+}) {
+  const params = await searchParams;
   const supabase = await createClient();
   // Derived from the shared status module rather than re-read here: the SMS
   // four-variable rule in particular now lives in exactly one place, so this
@@ -42,8 +50,10 @@ export default async function SettingsPage() {
 
   const hasAnthropicKey = statusOf("anthropic") === "connected";
   const [anthropicCap, anthropicSpent] = await Promise.all([getAnthropicSpendCap(), getAnthropicSpendToDate()]);
+  const googleCalendarConnection = await getGoogleCalendarConnection(supabase);
   return (
     <div className="space-y-8">
+      <GoogleCalendarOAuthResultToast connected={params.gcal_connected} error={params.gcal_error} />
       <PageHeader
         eyebrow="System"
         title="Settings"
@@ -66,8 +76,17 @@ export default async function SettingsPage() {
         {/* The OAuth connect cards that used to sit under this board are
             gone with the integrations they authorised. Every remaining
             integration is a key in the environment, which this board already
-            reports in full. */}
+            reports in full. Google Calendar is the exception — it's a
+            per-account OAuth grant, not just an env var, so it gets its
+            own card back. */}
         <IntegrationStatusCard />
+        <GoogleCalendarConnectionCard
+          configured={Boolean(process.env.GOOGLE_CALENDAR_CLIENT_ID)}
+          connected={Boolean(googleCalendarConnection)}
+          calendarSummary={googleCalendarConnection?.calendar_summary ?? null}
+          connectedAt={googleCalendarConnection?.connected_at ?? null}
+          lastSyncedAt={googleCalendarConnection?.last_synced_at ?? null}
+        />
       </section>
 
       <section className="space-y-3">

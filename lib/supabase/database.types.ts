@@ -564,6 +564,75 @@ export type Database = {
         }
         Relationships: []
       }
+      google_calendar_connections: {
+        Row: {
+          access_token: string
+          calendar_id: string
+          calendar_summary: string
+          connected_at: string
+          id: boolean
+          last_synced_at: string | null
+          refresh_token: string
+          scope: string
+          sync_token: string | null
+          token_expires_at: string
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          calendar_id: string
+          calendar_summary: string
+          connected_at?: string
+          id?: boolean
+          last_synced_at?: string | null
+          refresh_token: string
+          scope: string
+          sync_token?: string | null
+          token_expires_at: string
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          calendar_id?: string
+          calendar_summary?: string
+          connected_at?: string
+          id?: boolean
+          last_synced_at?: string | null
+          refresh_token?: string
+          scope?: string
+          sync_token?: string | null
+          token_expires_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      google_calendar_event_links: {
+        Row: {
+          created_at: string
+          google_event_id: string
+          id: string
+          last_pushed_at: string
+          source_id: string
+          source_type: string
+        }
+        Insert: {
+          created_at?: string
+          google_event_id: string
+          id?: string
+          last_pushed_at?: string
+          source_id: string
+          source_type: string
+        }
+        Update: {
+          created_at?: string
+          google_event_id?: string
+          id?: string
+          last_pushed_at?: string
+          source_id?: string
+          source_type?: string
+        }
+        Relationships: []
+      }
       habit_logs: {
         Row: {
           completed: boolean
@@ -1848,6 +1917,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      life_schedule_blocks: {
+        Row: {
+          category: string
+          created_at: string
+          day_of_week: number
+          end_time: string
+          id: string
+          label: string
+          notes: string | null
+          start_time: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          day_of_week: number
+          end_time: string
+          id?: string
+          label: string
+          notes?: string | null
+          start_time: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          label?: string
+          notes?: string | null
+          start_time?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       uni_no_class_periods: {
         Row: {

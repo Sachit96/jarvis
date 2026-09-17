@@ -37,7 +37,7 @@ export const SIDEBAR_ITEMS: NavItem[] = [
   { href: "/health/workouts", label: "Health", icon: HeartPulse },
   { href: "/finance/overview", label: "Finance", icon: Wallet },
   { href: "/life/goals", label: "Goals", icon: Target },
-  { href: "/life/tasks", label: "Tasks & Routine", icon: ListChecks, matches: ["/life/habits", "/life/journal"] },
+  { href: "/life/tasks", label: "Tasks & Routine", icon: ListChecks, matches: ["/life/habits", "/life/journal", "/life/timetable"] },
   { href: "/uni", label: "University", icon: GraduationCap },
   { href: "/mentor", label: "AI Mentor", icon: Sparkles },
   { href: "/voice", label: "Voice Mode", icon: Mic },
@@ -78,7 +78,7 @@ export const SIDEBAR_GROUPS: NavGroup[] = [
     items: [
       { href: "/health/workouts", label: "Health", icon: HeartPulse },
       { href: "/life/goals", label: "Goals", icon: Target },
-      { href: "/life/tasks", label: "Tasks & Routine", icon: ListChecks, matches: ["/life/habits", "/life/journal"] },
+      { href: "/life/tasks", label: "Tasks & Routine", icon: ListChecks, matches: ["/life/habits", "/life/journal", "/life/timetable"] },
       { href: "/uni", label: "University", icon: GraduationCap },
     ],
   },
@@ -119,6 +119,7 @@ export const TASKS_TABS: ModuleTab[] = [
   { href: "/life/tasks", label: "Tasks" },
   { href: "/life/habits", label: "Routine" },
   { href: "/life/journal", label: "Journal" },
+  { href: "/life/timetable", label: "Timetable" },
 ];
 
 // GOALS_TABS was retired (Habits/Routine moved fully under Tasks & Routine,
